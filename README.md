@@ -144,4 +144,4 @@ npm run build
 
 ## Licenc
 
-MIT © 2024 – Szakdolgozat projekt
+RUK © 2026 – Szakdolgozat projekt
