@@ -76,6 +76,7 @@ model User {
   applications  AdoptionApplication[]
   shelterAdmins ShelterAdmin[]
   favorites     Favorite[]
+  reports       AnimalReport[]
 }
 
 // -------------------------------------------------------
@@ -244,4 +245,50 @@ model Favorite {
   animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
   @@unique([userId, animalId])
+}
+
+// -------------------------------------------------------
+// Animal Report (Elveszett / Megtalált / Kóbor bejelentés)
+// -------------------------------------------------------
+
+enum ReportType {
+  LOST   // Elveszett
+  FOUND  // Megtalált
+  STRAY  // Kóbor
+}
+
+enum ReportStatus {
+  ACTIVE   // Aktív
+  RESOLVED // Megoldva
+  CLOSED   // Lezárt
+}
+
+model AnimalReport {
+  id           String       @id @default(cuid())
+  userId       String?
+  type         ReportType
+  animalType   AnimalType
+  name         String?
+  breed        String?
+  color        String?
+  gender       String?
+  description  String       @db.Text
+  city         String
+  address      String?
+  lat          Float?
+  lng          Float?
+  imageUrl     String?
+  contactName  String
+  contactPhone String?
+  contactEmail String
+  status       ReportStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([status])
+  @@index([city])
+  @@index([animalType])
 }

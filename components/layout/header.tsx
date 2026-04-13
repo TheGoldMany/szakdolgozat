@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { href: "/animals",  label: "Állatok" },
   { href: "/shelters", label: "Menhelyek" },
+  { href: "/reports",  label: "Bejelentések" },
 ];
 
 export function Header() {
