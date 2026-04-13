@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
@@ -40,6 +40,55 @@ export default function LoginPage() {
   }
 
   return (
+    <Card>
+      <CardHeader>
+        <h1 className="text-xl font-semibold text-gray-900">Bejelentkezés</h1>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <Input
+            id="email"
+            type="email"
+            label="Email cím"
+            placeholder="pelda@email.hu"
+            autoComplete="email"
+            error={errors.email?.message}
+            {...register("email")}
+          />
+          <Input
+            id="password"
+            type="password"
+            label="Jelszó"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register("password")}
+          />
+
+          {serverError && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+              {serverError}
+            </p>
+          )}
+
+          <Button type="submit" loading={isSubmitting} className="w-full">
+            Bejelentkezés
+          </Button>
+        </form>
+
+        <p className="mt-4 text-center text-sm text-gray-500">
+          Még nincs fiókod?{" "}
+          <Link href="/auth/register" className="font-medium text-brand-500 hover:underline">
+            Regisztrálj
+          </Link>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
@@ -49,50 +98,9 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-gray-600">Jelentkezz be a fiókodba</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <h1 className="text-xl font-semibold text-gray-900">Bejelentkezés</h1>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <Input
-                id="email"
-                type="email"
-                label="Email cím"
-                placeholder="pelda@email.hu"
-                autoComplete="email"
-                error={errors.email?.message}
-                {...register("email")}
-              />
-              <Input
-                id="password"
-                type="password"
-                label="Jelszó"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                error={errors.password?.message}
-                {...register("password")}
-              />
-
-              {serverError && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
-                  {serverError}
-                </p>
-              )}
-
-              <Button type="submit" loading={isSubmitting} className="w-full">
-                Bejelentkezés
-              </Button>
-            </form>
-
-            <p className="mt-4 text-center text-sm text-gray-500">
-              Még nincs fiókod?{" "}
-              <Link href="/auth/register" className="font-medium text-brand-500 hover:underline">
-                Regisztrálj
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
+        <Suspense fallback={<div className="h-64 rounded-2xl bg-white animate-pulse" />}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
