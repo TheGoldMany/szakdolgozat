@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Ruler, Venus, Mars } from "lucide-react";
+import { MapPin, Ruler } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimalType, AnimalStatus } from "@prisma/client";
 
@@ -83,9 +83,9 @@ export function AnimalCard({ animal }: AnimalCardProps) {
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-500">
             {animal.gender && (
               <span className="flex items-center gap-1">
-                {animal.gender === "MALE"
-                  ? <Mars className="h-3.5 w-3.5 text-blue-400" />
-                  : <Venus className="h-3.5 w-3.5 text-pink-400" />}
+                <span className={animal.gender === "MALE" ? "text-blue-400" : "text-pink-400"}>
+                  {animal.gender === "MALE" ? "♂" : "♀"}
+                </span>
                 {animal.gender === "MALE" ? "Hím" : "Nőstény"}
               </span>
             )}
