@@ -3,24 +3,34 @@ import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { AnimalType, AnimalSize, AnimalStatus, Role } from "@prisma/client";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, x-seed-token",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
 // Csak SEED_SECRET tokennel hívható – soha ne hagyd publikusan nyitva!
 export async function POST(req: NextRequest) {
   const token = req.headers.get("x-seed-token");
 
   if (!process.env.SEED_SECRET || token !== process.env.SEED_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS_HEADERS });
   }
 
   if (process.env.NODE_ENV === "production" && !process.env.ALLOW_SEED_IN_PROD) {
     return NextResponse.json(
       { error: "Seeding disabled in production. Set ALLOW_SEED_IN_PROD=true to override." },
-      { status: 403 }
+      { status: 403, headers: CORS_HEADERS }
     );
   }
 
   try {
     const result = await runSeed();
-    return NextResponse.json({ success: true, ...result });
+    return NextResponse.json({ success: true, ...result }, { headers: CORS_HEADERS });
   } catch (error) {
     console.error("Seed error:", error);
     return NextResponse.json(
