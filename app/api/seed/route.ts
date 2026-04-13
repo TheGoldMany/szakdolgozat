@@ -53,6 +53,12 @@ function randomInt(min: number, max: number) {
 function randomBool(p = 0.5) {
   return Math.random() < p;
 }
+const ANIMAL_IMAGE_KEYWORDS: Record<AnimalType, string> = {
+  DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "parrot", OTHER: "hamster",
+};
+function getAnimalImageUrl(type: AnimalType, seed: number): string {
+  return `https://loremflickr.com/640/480/${ANIMAL_IMAGE_KEYWORDS[type]}?lock=${seed}`;
+}
 function slugify(text: string, suffix: string) {
   return (
     text
@@ -204,7 +210,7 @@ async function runSeed() {
             ? new Date(arrivedAt.getTime() + randomInt(14, 180) * 86400000) : null,
           images: {
             create: [{
-              url: `https://placedog.net/640/480?id=${randomInt(1, 100)}`,
+              url: getAnimalImageUrl(type, animalCount),
               alt: `${aname} fotó`, isPrimary: true, order: 0,
             }],
           },

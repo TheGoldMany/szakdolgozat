@@ -28,6 +28,19 @@ function slugify(text: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+const ANIMAL_IMAGE_KEYWORDS: Record<AnimalType, string> = {
+  DOG:    "dog",
+  CAT:    "cat",
+  RABBIT: "rabbit",
+  BIRD:   "parrot",
+  OTHER:  "hamster",
+};
+
+function getAnimalImageUrl(type: AnimalType, seed: number): string {
+  const keyword = ANIMAL_IMAGE_KEYWORDS[type];
+  return `https://loremflickr.com/640/480/${keyword}?lock=${seed}`;
+}
+
 // -------------------------------------------------------
 // Adatok
 // -------------------------------------------------------
@@ -252,7 +265,7 @@ async function main() {
           images: {
             create: [
               {
-                url: `https://placedog.net/640/480?id=${randomInt(1, 100)}`,
+                url: getAnimalImageUrl(type, animalCount),
                 alt: `${name} fotó`,
                 isPrimary: true,
                 order: 0,
