@@ -1,0 +1,112 @@
+// -------------------------------------------------------
+// Data Warehouse Schema – Csillag séma
+// Külön Neon adatbázis (DWH_DATABASE_URL)
+// -------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/dwh-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DWH_DATABASE_URL")
+}
+
+// -------------------------------------------------------
+// Dimenzió táblák
+// -------------------------------------------------------
+
+model DimDate {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @unique @db.Date
+  year      Int
+  month     Int
+  day       Int
+  quarter   Int
+  dayOfWeek Int
+  isWeekend Boolean
+
+  factAdoptions FactAdoption[]
+  factInventory FactAnimalInventory[]
+}
+
+model DimShelter {
+  id         Int     @id @default(autoincrement())
+  shelterId  String  @unique
+  name       String
+  city       String
+  country    String  @default("HU")
+  isVerified Boolean @default(false)
+
+  dimAnimals    DimAnimal[]
+  factAdoptions FactAdoption[]
+  factInventory FactAnimalInventory[]
+}
+
+model DimAnimal {
+  id        Int        @id @default(autoincrement())
+  animalId  String     @unique
+  name      String
+  type      String
+  breed     String?
+  size      String?
+  gender    String?
+  shelterId Int
+  shelter   DimShelter @relation(fields: [shelterId], references: [id])
+
+  factAdoptions FactAdoption[]
+}
+
+model DimUser {
+  id      Int     @id @default(autoincrement())
+  userId  String  @unique
+  city    String?
+  country String  @default("HU")
+
+  factAdoptions FactAdoption[]
+}
+
+// -------------------------------------------------------
+// Tény táblák
+// -------------------------------------------------------
+
+model FactAdoption {
+  id            Int        @id @default(autoincrement())
+  applicationId String     @unique
+  dateId        Int
+  date          DimDate    @relation(fields: [dateId], references: [id])
+  animalId      Int
+  animal        DimAnimal  @relation(fields: [animalId], references: [id])
+  shelterId     Int
+  shelter       DimShelter @relation(fields: [shelterId], references: [id])
+  userId        Int
+  user          DimUser    @relation(fields: [userId], references: [id])
+  status        String
+  homeType      String?
+  hasGarden     Boolean?
+  hasChildren   Boolean?
+  hasPets       Boolean?
+  createdAt     DateTime
+  reviewedAt    DateTime?
+
+  @@index([dateId])
+  @@index([shelterId])
+  @@index([animalId])
+  @@index([status])
+}
+
+// Napi állomány-pillanatkép menhelyenként és státuszonként
+model FactAnimalInventory {
+  id        Int        @id @default(autoincrement())
+  dateId    Int
+  date      DimDate    @relation(fields: [dateId], references: [id])
+  shelterId Int
+  shelter   DimShelter @relation(fields: [shelterId], references: [id])
+  status    String
+  count     Int
+
+  @@unique([dateId, shelterId, status])
+  @@index([dateId])
+  @@index([shelterId])
+}

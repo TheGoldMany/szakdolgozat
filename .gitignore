@@ -41,3 +41,6 @@ next-env.d.ts
 # prisma
 prisma/*.db
 prisma/*.db-journal
+
+# generated Prisma clients
+lib/generated/

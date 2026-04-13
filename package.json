@@ -4,14 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --accept-data-loss && next build",
+    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && prisma db push --accept-data-loss && prisma db push --schema=prisma/dwh.prisma --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
-    "db:reset": "prisma migrate reset --force && npm run prisma:seed"
+    "db:reset": "prisma migrate reset --force && npm run prisma:seed",
+    "dwh:generate": "prisma generate --schema=prisma/dwh.prisma",
+    "dwh:push": "prisma db push --schema=prisma/dwh.prisma --accept-data-loss"
   },
   "prisma": {
     "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
