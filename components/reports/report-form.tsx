@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 const schema = z.object({
   type:         z.enum(["LOST", "FOUND", "STRAY"]),
@@ -19,6 +20,7 @@ const schema = z.object({
   contactName:  z.string().min(2, "Kötelező mező"),
   contactPhone: z.string().optional(),
   contactEmail: z.string().email("Érvénytelen email"),
+  imageUrl:     z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -45,10 +47,11 @@ export function ReportForm() {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { type: "LOST", animalType: "DOG" },
+    defaultValues: { type: "LOST", animalType: "DOG", imageUrl: "" },
   });
 
   const selectedType = watch("type");
@@ -139,6 +142,19 @@ export function ReportForm() {
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" />
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
       </div>
+
+      {/* Fotó */}
+      <Controller
+        name="imageUrl"
+        control={control}
+        render={({ field }) => (
+          <ImageUpload
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            label="Fotó (opcionális)"
+          />
+        )}
+      />
 
       {/* Helyszín */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
