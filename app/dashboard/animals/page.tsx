@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatusSelect } from "@/components/dashboard/animal-status-select";
+import { AddAnimalPanel } from "@/components/dashboard/add-animal-panel";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
@@ -67,7 +68,10 @@ export default async function DashboardAnimalsPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Állatok</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Állatok</h1>
+        <AddAnimalPanel />
+      </div>
 
       {/* Státusz szűrő */}
       <div className="mb-5 flex flex-wrap gap-2">
