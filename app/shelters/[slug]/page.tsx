@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { MapPin, Phone, Mail, Globe, PawPrint } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalStatus } from "@prisma/client";
@@ -50,57 +50,81 @@ export default async function ShelterDetailPage({
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Borítókép / fejléc sáv */}
-      <div className="relative h-48 w-full bg-gradient-to-r from-brand-400 to-brand-600 sm:h-64">
+      {/* Borítókép sáv – csak a grafika, semmi szöveg */}
+      <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-52">
         {shelter.coverUrl && (
           <Image
             src={shelter.coverUrl}
-            alt={shelter.name}
+            alt=""
             fill
-            className="object-cover opacity-40"
+            className="object-cover opacity-50"
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      {/* Profil fejléc – fehér sáv a banner alatt */}
+      <div className="border-b border-gray-100 bg-white shadow-sm">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:gap-5">
 
-        {/* Profil sor */}
-        <div className="relative -mt-16 mb-6 flex items-end gap-5">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md sm:h-28 sm:w-28">
-            {shelter.logoUrl ? (
-              <Image src={shelter.logoUrl} alt={shelter.name} fill className="object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center bg-brand-50">
-                <PawPrint className="h-10 w-10 text-brand-400" />
-              </div>
-            )}
-          </div>
-
-          <div className="pb-2">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-white drop-shadow sm:text-2xl">{shelter.name}</h1>
-              {shelter.isVerified && (
-                <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
-                  ✓ Ellenőrzött
-                </span>
+            {/* Avatar – átlóg a banner aljára */}
+            <div className="relative -mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md sm:-mt-14 sm:h-28 sm:w-28">
+              {shelter.logoUrl ? (
+                <Image
+                  src={shelter.logoUrl}
+                  alt={shelter.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-brand-50">
+                  <PawPrint className="h-10 w-10 text-brand-400" />
+                </div>
               )}
             </div>
-            <div className="flex items-center gap-1 text-sm text-white/90 drop-shadow">
-              <MapPin className="h-3.5 w-3.5" />
-              {shelter.city}
+
+            {/* Név + breadcrumb */}
+            <div className="min-w-0 pb-1 pt-2 sm:pt-0">
+              <nav className="mb-1.5 flex items-center gap-1 text-xs text-gray-400">
+                <Link href="/shelters" className="hover:text-brand-500 transition-colors">
+                  Menhelyek
+                </Link>
+                <span>›</span>
+                <span className="text-gray-600">{shelter.name}</span>
+              </nav>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
+                  {shelter.name}
+                </h1>
+                {shelter.isVerified && (
+                  <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-600">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Ellenőrzött
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+                <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                <span>{shelter.city}</span>
+                {shelter.address && (
+                  <>
+                    <span className="text-gray-300">·</span>
+                    <span className="truncate">{shelter.address}</span>
+                  </>
+                )}
+              </div>
             </div>
+
           </div>
         </div>
+      </div>
 
-        {/* Breadcrumb */}
-        <nav className="mb-6 text-sm text-gray-500">
-          <Link href="/shelters" className="hover:text-brand-500">Menhelyek</Link>
-          <span className="mx-2">›</span>
-          <span className="text-gray-800">{shelter.name}</span>
-        </nav>
-
+      {/* Tartalom */}
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-3">
 
           {/* Bal: állatok */}
@@ -125,7 +149,9 @@ export default async function ShelterDetailPage({
             {shelter.animals.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
                 <span className="text-4xl">🐾</span>
-                <p className="mt-3 text-sm text-gray-500">Jelenleg nincs örökbefogadható állat</p>
+                <p className="mt-3 text-sm text-gray-500">
+                  Jelenleg nincs örökbefogadható állat
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -152,31 +178,44 @@ export default async function ShelterDetailPage({
             {/* Elérhetőségek */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">Elérhetőségek</h2>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
+              <ul className="space-y-2.5 text-sm text-gray-600">
+                <li className="flex items-start gap-2.5">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                  <span>{shelter.address}, {shelter.city}{shelter.zipCode ? ` ${shelter.zipCode}` : ""}</span>
+                  <span>
+                    {shelter.address}, {shelter.city}
+                    {shelter.zipCode ? ` ${shelter.zipCode}` : ""}
+                  </span>
                 </li>
                 {shelter.phone && (
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={`tel:${shelter.phone}`} className="hover:text-brand-500">{shelter.phone}</a>
+                    <a
+                      href={`tel:${shelter.phone}`}
+                      className="hover:text-brand-500 transition-colors"
+                    >
+                      {shelter.phone}
+                    </a>
                   </li>
                 )}
                 {shelter.email && (
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Mail className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={`mailto:${shelter.email}`} className="hover:text-brand-500 truncate">{shelter.email}</a>
+                    <a
+                      href={`mailto:${shelter.email}`}
+                      className="min-w-0 truncate hover:text-brand-500 transition-colors"
+                    >
+                      {shelter.email}
+                    </a>
                   </li>
                 )}
                 {shelter.website && (
-                  <li className="flex items-center gap-2">
+                  <li className="flex items-center gap-2.5">
                     <Globe className="h-4 w-4 shrink-0 text-gray-400" />
                     <a
                       href={shelter.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="truncate hover:text-brand-500"
+                      className="min-w-0 truncate hover:text-brand-500 transition-colors"
                     >
                       {shelter.website.replace(/^https?:\/\//, "")}
                     </a>
@@ -185,10 +224,18 @@ export default async function ShelterDetailPage({
               </ul>
             </div>
 
+            {/* Statisztika */}
+            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+              <p className="text-center text-3xl font-bold text-brand-600">
+                {shelter._count.animals}
+              </p>
+              <p className="mt-1 text-center text-sm text-brand-500">
+                állat vár gazdira
+              </p>
+            </div>
+
           </div>
         </div>
-
-        <div className="pb-10" />
       </div>
     </div>
   );
