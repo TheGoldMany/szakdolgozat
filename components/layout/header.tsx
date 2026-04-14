@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
-import { Menu, X, PawPrint, ChevronDown } from "lucide-react";
+import { Menu, X, PawPrint, ChevronDown, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -12,14 +12,24 @@ const NAV_LINKS = [
   { href: "/reports",  label: "Bejelentések" },
 ];
 
+const ROLE_LABELS: Record<string, { label: string; color: string }> = {
+  SUPER_ADMIN:   { label: "Főadmin",       color: "bg-red-100 text-red-700" },
+  SHELTER_ADMIN: { label: "Menhely admin", color: "bg-amber-100 text-amber-700" },
+  USER:          { label: "Felhasználó",   color: "bg-gray-100 text-gray-600" },
+};
+
 export function Header() {
   const { data: session } = useSession();
-  const [mobileOpen, setMobileOpen]   = useState(false);
+  const [mobileOpen, setMobileOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const isAdmin =
     session?.user?.role === "SHELTER_ADMIN" ||
     session?.user?.role === "SUPER_ADMIN";
+
+  const roleInfo = session?.user?.role
+    ? (ROLE_LABELS[session.user.role] ?? ROLE_LABELS.USER)
+    : null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
@@ -45,52 +55,63 @@ export function Header() {
         </nav>
 
         {/* Auth – desktop */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           {session ? (
-            <div className="relative">
-              <button
-                onClick={() => setUserMenuOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            <>
+              {/* Messages link */}
+              <Link
+                href="/messages"
+                className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-500"
               >
-                <span className="max-w-[120px] truncate">{session.user?.name}</span>
-                <ChevronDown className="h-4 w-4" />
-              </button>
+                <MessageCircle className="h-4 w-4" />
+                <span className="hidden lg:inline">Üzenetek</span>
+              </Link>
 
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
-                  <Link
-                    href="/profile"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Profilom
-                  </Link>
-                  <Link
-                    href="/applications"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Kérelmeim
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Admin felület
+              {/* User dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <span className="max-w-[120px] truncate">{session.user?.name}</span>
+                  <ChevronDown className="h-4 w-4 shrink-0" />
+                </button>
+
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+                    {roleInfo && (
+                      <div className="px-4 pb-2 pt-1">
+                        <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
+                          {roleInfo.label}
+                        </span>
+                      </div>
+                    )}
+                    <hr className="mb-1 border-gray-100" />
+                    <Link href="/profile" onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Profilom
                     </Link>
-                  )}
-                  <hr className="my-1 border-gray-100" />
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50"
-                  >
-                    Kijelentkezés
-                  </button>
-                </div>
-              )}
-            </div>
+                    <Link href="/messages" onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Üzeneteim
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/dashboard" onClick={() => setUserMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        Admin felület
+                      </Link>
+                    )}
+                    <hr className="my-1 border-gray-100" />
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50"
+                    >
+                      Kijelentkezés
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <>
               <Link
@@ -101,7 +122,7 @@ export function Header() {
               </Link>
               <Link
                 href="/auth/register"
-                className="rounded-xl bg-brand-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+                className="rounded-xl bg-brand-500 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-600"
               >
                 Regisztráció
               </Link>
@@ -121,7 +142,7 @@ export function Header() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.href}
@@ -135,9 +156,21 @@ export function Header() {
             <hr className="my-2 border-gray-100" />
             {session ? (
               <>
+                {roleInfo && (
+                  <div className="px-3 pb-1">
+                    <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
+                      {roleInfo.label}
+                    </span>
+                  </div>
+                )}
                 <Link href="/profile" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   Profilom
+                </Link>
+                <Link href="/messages" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  <MessageCircle className="h-4 w-4" />
+                  Üzeneteim
                 </Link>
                 {isAdmin && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}

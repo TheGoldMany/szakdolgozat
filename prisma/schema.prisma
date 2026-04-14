@@ -77,6 +77,8 @@ model User {
   shelterAdmins ShelterAdmin[]
   favorites     Favorite[]
   reports       AnimalReport[]
+  conversations Conversation[]        @relation("ConversationUser")
+  sentMessages  Message[]             @relation("MessageSender")
 }
 
 // -------------------------------------------------------
@@ -142,8 +144,9 @@ model Shelter {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  animals  Animal[]
-  admins   ShelterAdmin[]
+  animals       Animal[]
+  admins        ShelterAdmin[]
+  conversations Conversation[]
 }
 
 model ShelterAdmin {
@@ -187,10 +190,11 @@ model Animal {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
-  shelter      Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
-  images       AnimalImage[]
-  applications AdoptionApplication[]
-  favorites    Favorite[]
+  shelter       Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  images        AnimalImage[]
+  applications  AdoptionApplication[]
+  favorites     Favorite[]
+  conversations Conversation[]
 }
 
 model AnimalImage {
@@ -291,4 +295,38 @@ model AnimalReport {
   @@index([status])
   @@index([city])
   @@index([animalType])
+}
+
+// -------------------------------------------------------
+// Conversation / Chat
+// -------------------------------------------------------
+
+model Conversation {
+  id        String   @id @default(cuid())
+  animalId  String
+  userId    String
+  shelterId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  animal   Animal    @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  user     User      @relation("ConversationUser", fields: [userId], references: [id], onDelete: Cascade)
+  shelter  Shelter   @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([animalId, userId])
+  @@index([userId])
+  @@index([shelterId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String       @db.Text
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
 }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { LayoutDashboard, ClipboardList, PawPrint } from "lucide-react";
+import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = { title: { default: "Dashboard", template: "%s | Dashboard" } };
 
@@ -11,6 +11,7 @@ const NAV = [
   { href: "/dashboard",              icon: LayoutDashboard, label: "Áttekintés" },
   { href: "/dashboard/applications", icon: ClipboardList,   label: "Kérelmek" },
   { href: "/dashboard/animals",      icon: PawPrint,        label: "Állatok" },
+  { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek" },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

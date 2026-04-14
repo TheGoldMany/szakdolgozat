@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { MapPin, Phone, Mail, Ruler, Calendar, Weight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { AdoptionForm } from "@/components/animals/adoption-form";
+import { AdoptionContact } from "@/components/animals/adoption-contact";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
@@ -90,13 +90,14 @@ export default async function AnimalDetailPage({
 
   const status = STATUS_LABELS[animal.status];
 
-  // Check if user already applied
-  let alreadyApplied = false;
+  // Check if user already has a conversation with this animal
+  let existingConvId: string | null = null;
   if (session?.user?.id) {
-    const existing = await prisma.adoptionApplication.findUnique({
-      where: { userId_animalId: { userId: session.user.id, animalId: animal.id } },
+    const conv = await prisma.conversation.findUnique({
+      where: { animalId_userId: { animalId: animal.id, userId: session.user.id } },
+      select: { id: true },
     });
-    alreadyApplied = !!existing;
+    existingConvId = conv?.id ?? null;
   }
 
   const primaryImage = animal.images[0];
@@ -251,7 +252,7 @@ export default async function AnimalDetailPage({
 
         {/* Örökbefogadási kérelem */}
         <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-semibold text-gray-800">Örökbefogadási kérelem</h2>
+          <h2 className="mb-4 text-lg font-semibold text-gray-800">Örökbefogadás</h2>
 
           {animal.status !== AnimalStatus.AVAILABLE ? (
             <p className="text-sm text-gray-500">
@@ -259,7 +260,7 @@ export default async function AnimalDetailPage({
             </p>
           ) : !session ? (
             <div className="rounded-xl bg-gray-50 border border-gray-200 p-5 text-center">
-              <p className="text-sm text-gray-600">A kérelem beküldéséhez be kell jelentkezned.</p>
+              <p className="text-sm text-gray-600">Az örökbefogadáshoz be kell jelentkezned.</p>
               <Link
                 href={`/auth/login?callbackUrl=/animals/${animal.slug}`}
                 className="mt-3 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
@@ -267,16 +268,22 @@ export default async function AnimalDetailPage({
                 Bejelentkezés
               </Link>
             </div>
-          ) : alreadyApplied ? (
-            <div className="rounded-xl bg-blue-50 border border-blue-200 p-5 text-center">
-              <p className="font-medium text-blue-800">Már nyújtottál be kérelmet ehhez az állathoz.</p>
-              <p className="mt-1 text-sm text-blue-600">Kövesd nyomon a kérelmeid állapotát a profilodon.</p>
-              <Link href="/applications" className="mt-3 inline-block text-sm font-medium text-blue-700 underline">
-                Kérelmeim →
+          ) : existingConvId ? (
+            <div className="rounded-xl bg-brand-50 border border-brand-200 p-5">
+              <p className="font-medium text-brand-800">Már van folyamatban lévő beszélgetésed a menhellyel.</p>
+              <Link
+                href={`/messages/${existingConvId}`}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+              >
+                Folytatás →
               </Link>
             </div>
           ) : (
-            <AdoptionForm animalId={animal.id} animalName={animal.name} />
+            <AdoptionContact
+              animalId={animal.id}
+              animalName={animal.name}
+              shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
+            />
           )}
         </div>
 
