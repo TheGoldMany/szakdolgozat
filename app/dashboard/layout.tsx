@@ -3,15 +3,16 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle } from "lucide-react";
+import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2 } from "lucide-react";
 
 export const metadata: Metadata = { title: { default: "Dashboard", template: "%s | Dashboard" } };
 
 const NAV = [
-  { href: "/dashboard",              icon: LayoutDashboard, label: "Áttekintés" },
-  { href: "/dashboard/applications", icon: ClipboardList,   label: "Kérelmek" },
-  { href: "/dashboard/animals",      icon: PawPrint,        label: "Állatok" },
-  { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek" },
+  { href: "/dashboard",              icon: LayoutDashboard, label: "Áttekintés",  roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/applications", icon: ClipboardList,   label: "Kérelmek",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/animals",      icon: PawPrint,        label: "Állatok",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/shelters",     icon: Building2,       label: "Menhelyek",   roles: ["SUPER_ADMIN"] },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const role = session.user.role;
   if (role !== "SHELTER_ADMIN" && role !== "SUPER_ADMIN") redirect("/");
+
+  const visibleNav = NAV.filter((item) => item.roles.includes(role));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -31,7 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
               {role === "SUPER_ADMIN" ? "Főadmin" : "Admin"}
             </p>
-            {NAV.map(({ href, icon: Icon, label }) => (
+            {visibleNav.map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}
                 href={href}
