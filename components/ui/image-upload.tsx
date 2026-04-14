@@ -28,7 +28,9 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
     setError(null);
     setUploading(true);
     try {
-      const blob = await upload(file.name, file, {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const blob = await upload(uniqueName, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
