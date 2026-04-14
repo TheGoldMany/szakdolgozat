@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 const applicationSchema = z.object({
   animalId:    z.string().min(1),
@@ -38,17 +39,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ez az állat jelenleg nem fogadható örökbe" }, { status: 409 });
   }
 
-  // Check duplicate
-  const existing = await prisma.adoptionApplication.findUnique({
-    where: { userId_animalId: { userId: session.user.id, animalId } },
-  });
-  if (existing) {
-    return NextResponse.json({ error: "Már nyújtottál be kérelmet ehhez az állathoz" }, { status: 409 });
+  try {
+    const application = await prisma.adoptionApplication.create({
+      data: { userId: session.user.id, animalId, ...rest },
+    });
+    return NextResponse.json({ application }, { status: 201 });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return NextResponse.json({ error: "Már nyújtottál be kérelmet ehhez az állathoz" }, { status: 409 });
+    }
+    console.error("Application create error:", error);
+    return NextResponse.json({ error: "Nem sikerült elküldeni a kérelmet" }, { status: 500 });
   }
-
-  const application = await prisma.adoptionApplication.create({
-    data: { userId: session.user.id, animalId, ...rest },
-  });
-
-  return NextResponse.json({ application }, { status: 201 });
 }

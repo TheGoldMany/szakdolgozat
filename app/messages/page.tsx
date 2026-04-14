@@ -13,60 +13,45 @@ export default async function MessagesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/messages");
 
-  const isShelterAdmin =
-    session.user.role === "SHELTER_ADMIN" || session.user.role === "SUPER_ADMIN";
+  const userId = session.user.id;
+  const role   = session.user.role;
 
-  let conversations;
+  const isShelterAdmin = role === "SHELTER_ADMIN";
+  const isSuperAdmin   = role === "SUPER_ADMIN";
 
-  if (isShelterAdmin && session.user.role !== "SUPER_ADMIN") {
+  // Build where clause
+  let whereClause: Record<string, unknown> = {};
+
+  if (isShelterAdmin) {
     const shelterAdmins = await prisma.shelterAdmin.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { shelterId: true },
     });
     const shelterIds = shelterAdmins.map((s) => s.shelterId);
-
-    conversations = await prisma.conversation.findMany({
-      where: { shelterId: { in: shelterIds } },
-      include: {
-        animal: { select: { name: true, slug: true, images: { where: { isPrimary: true }, take: 1 } } },
-        shelter: { select: { name: true } },
-        user: { select: { name: true, email: true } },
-        messages: { orderBy: { createdAt: "desc" }, take: 1 },
-      },
-      orderBy: { updatedAt: "desc" },
-    });
-  } else if (session.user.role === "SUPER_ADMIN") {
-    conversations = await prisma.conversation.findMany({
-      include: {
-        animal: { select: { name: true, slug: true, images: { where: { isPrimary: true }, take: 1 } } },
-        shelter: { select: { name: true } },
-        user: { select: { name: true, email: true } },
-        messages: { orderBy: { createdAt: "desc" }, take: 1 },
-      },
-      orderBy: { updatedAt: "desc" },
-    });
-  } else {
-    conversations = await prisma.conversation.findMany({
-      where: { userId: session.user.id },
-      include: {
-        animal: { select: { name: true, slug: true, images: { where: { isPrimary: true }, take: 1 } } },
-        shelter: { select: { name: true } },
-        user: { select: { name: true, email: true } },
-        messages: { orderBy: { createdAt: "desc" }, take: 1 },
-      },
-      orderBy: { updatedAt: "desc" },
-    });
+    whereClause = { shelterId: { in: shelterIds } };
+  } else if (!isSuperAdmin) {
+    whereClause = { userId };
   }
+  // SUPER_ADMIN: no filter → sees all
 
-  // Unread counts per conversation
-  const unreadMap: Record<string, number> = {};
-  await Promise.all(
-    conversations.map(async (conv) => {
-      unreadMap[conv.id] = await prisma.message.count({
-        where: { conversationId: conv.id, senderId: { not: session.user!.id }, readAt: null },
-      });
-    })
-  );
+  // Single query – no N+1
+  const conversations = await prisma.conversation.findMany({
+    where: whereClause,
+    include: {
+      animal: {
+        select: { name: true, slug: true, images: { where: { isPrimary: true }, take: 1 } },
+      },
+      shelter: { select: { name: true } },
+      user:    { select: { name: true, email: true } },
+      messages: { orderBy: { createdAt: "desc" }, take: 1 },
+      _count: {
+        select: {
+          messages: { where: { senderId: { not: userId }, readAt: null } },
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,8 +76,8 @@ export default async function MessagesPage() {
           <div className="space-y-2">
             {conversations.map((conv) => {
               const lastMsg = conv.messages[0];
-              const unread = unreadMap[conv.id] ?? 0;
-              const img = conv.animal.images[0];
+              const unread  = conv._count.messages;
+              const img     = conv.animal.images[0];
 
               return (
                 <Link
@@ -118,12 +103,15 @@ export default async function MessagesPage() {
                       <p className="truncate font-semibold text-gray-900">{conv.animal.name}</p>
                       {lastMsg && (
                         <span className="shrink-0 text-xs text-gray-400">
-                          {new Date(lastMsg.createdAt).toLocaleDateString("hu-HU", { month: "short", day: "numeric" })}
+                          {new Date(lastMsg.createdAt).toLocaleDateString("hu-HU", {
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">{conv.shelter.name}</p>
-                    {isShelterAdmin && (
+                    <p className="mt-0.5 text-xs text-gray-500">{conv.shelter.name}</p>
+                    {(isShelterAdmin || isSuperAdmin) && (
                       <p className="text-xs text-gray-400">{conv.user.name ?? conv.user.email}</p>
                     )}
                     {lastMsg && (

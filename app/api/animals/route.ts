@@ -9,8 +9,10 @@ import { z } from "zod";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
-  const page  = Math.max(1, Number(searchParams.get("page") ?? 1));
-  const limit = Math.min(48, Math.max(1, Number(searchParams.get("limit") ?? 12)));
+  const rawPage  = Number(searchParams.get("page")  ?? 1);
+  const rawLimit = Number(searchParams.get("limit") ?? 12);
+  const page  = Math.max(1, isNaN(rawPage)  ? 1  : rawPage);
+  const limit = Math.min(48, Math.max(1, isNaN(rawLimit) ? 12 : rawLimit));
   const skip  = (page - 1) * limit;
 
   const type    = searchParams.get("type") as AnimalType | null;
@@ -134,38 +136,42 @@ export async function POST(req: NextRequest) {
 
 async function createAnimal(data: z.infer<typeof createSchema>, shelterId: string) {
   // Egyedi slug
-  const base = slugify(data.name);
-  const suffix = Math.random().toString(36).slice(2, 7);
-  const slug = `${base}-${suffix}`;
+  const base   = slugify(data.name);
+  const suffix = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const slug   = `${base}-${suffix}`;
 
-  const animal = await prisma.animal.create({
-    data: {
-      shelterId,
-      name:           data.name,
-      slug,
-      type:           data.type,
-      breed:          data.breed || null,
-      age:            data.ageMonths ?? null,
-      size:           data.size ?? null,
-      gender:         data.gender ?? null,
-      color:          data.color || null,
-      weight:         data.weight ?? null,
-      description:    data.description || null,
-      isVaccinated:   data.isVaccinated,
-      isNeutered:     data.isNeutered,
-      isMicrochipped: data.isMicrochipped,
-      isGoodWithKids: data.isGoodWithKids ?? null,
-      isGoodWithDogs: data.isGoodWithDogs ?? null,
-      isGoodWithCats: data.isGoodWithCats ?? null,
-      status:         AnimalStatus.AVAILABLE,
-      arrivedAt:      new Date(),
-      ...(data.imageUrl && {
-        images: {
-          create: [{ url: data.imageUrl, alt: data.name, isPrimary: true, order: 0 }],
-        },
-      }),
-    },
-  });
-
-  return NextResponse.json(animal, { status: 201 });
+  try {
+    const animal = await prisma.animal.create({
+      data: {
+        shelterId,
+        name:           data.name,
+        slug,
+        type:           data.type,
+        breed:          data.breed || null,
+        age:            data.ageMonths ?? null,
+        size:           data.size ?? null,
+        gender:         data.gender ?? null,
+        color:          data.color || null,
+        weight:         data.weight ?? null,
+        description:    data.description || null,
+        isVaccinated:   data.isVaccinated,
+        isNeutered:     data.isNeutered,
+        isMicrochipped: data.isMicrochipped,
+        isGoodWithKids: data.isGoodWithKids ?? null,
+        isGoodWithDogs: data.isGoodWithDogs ?? null,
+        isGoodWithCats: data.isGoodWithCats ?? null,
+        status:         AnimalStatus.AVAILABLE,
+        arrivedAt:      new Date(),
+        ...(data.imageUrl && {
+          images: {
+            create: [{ url: data.imageUrl, alt: data.name, isPrimary: true, order: 0 }],
+          },
+        }),
+      },
+    });
+    return NextResponse.json(animal, { status: 201 });
+  } catch (error) {
+    console.error("Animal create error:", error);
+    return NextResponse.json({ error: "Nem sikerült menteni az állatot" }, { status: 500 });
+  }
 }

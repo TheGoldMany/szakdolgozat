@@ -34,13 +34,17 @@ export async function POST(req: NextRequest) {
   }
 
   const data = parsed.data;
-  const report = await prisma.animalReport.create({
-    data: {
-      ...data,
-      imageUrl: data.imageUrl || null,
-      userId: session?.user?.id ?? null,
-    },
-  });
-
-  return NextResponse.json({ report }, { status: 201 });
+  try {
+    const report = await prisma.animalReport.create({
+      data: {
+        ...data,
+        imageUrl: data.imageUrl || null,
+        userId: session?.user?.id ?? null,
+      },
+    });
+    return NextResponse.json({ report }, { status: 201 });
+  } catch (error) {
+    console.error("Report create error:", error);
+    return NextResponse.json({ error: "Nem sikerült elküldeni a bejelentést" }, { status: 500 });
+  }
 }
