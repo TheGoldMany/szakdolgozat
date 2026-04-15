@@ -51,15 +51,23 @@ export async function POST(
   const senderName  = sender?.name ?? session.user.name ?? "Ismeretlen felhasználó";
   const senderEmail = sender?.email ?? session.user.email ?? "";
 
-  await sendReportMessageEmail({
-    to:          report.contactEmail,
-    contactName: report.contactName,
-    senderName,
-    senderEmail,
-    reportTitle,
-    reportUrl,
-    message:     parsed.data.message,
-  });
+  try {
+    await sendReportMessageEmail({
+      to:          report.contactEmail,
+      contactName: report.contactName,
+      senderName,
+      senderEmail,
+      reportTitle,
+      reportUrl,
+      message:     parsed.data.message,
+    });
+  } catch (err) {
+    console.error("Email sending failed:", err);
+    return NextResponse.json(
+      { error: "Az email küldése sikertelen. Kérjük, vedd fel a kapcsolatot közvetlenül a megadott elérhetőségeken." },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }
