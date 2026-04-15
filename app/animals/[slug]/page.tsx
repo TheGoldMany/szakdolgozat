@@ -230,10 +230,18 @@ export default async function AnimalDetailPage({
             {/* Menhely */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">Menhely</h2>
-              <Link href={`/shelters/${animal.shelter.slug}`} className="font-medium text-brand-500 hover:underline">
-                {animal.shelter.name}
+              <Link href={`/shelters/${animal.shelter.slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-brand-50 flex items-center justify-center">
+                  {animal.shelter.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={animal.shelter.logoUrl} alt={animal.shelter.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-brand-400" />
+                  )}
+                </div>
+                <span className="font-medium text-brand-500 hover:underline">{animal.shelter.name}</span>
               </Link>
-              <div className="mt-2 space-y-1 text-xs text-gray-500">
+              <div className="mt-3 space-y-1 text-xs text-gray-500">
                 <div className="flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5" />
                   {animal.shelter.city}{animal.shelter.address ? `, ${animal.shelter.address}` : ""}
