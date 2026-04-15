@@ -13,6 +13,46 @@ const transporter = nodemailer.createTransport({
 const FROM = process.env.SMTP_FROM ?? "ÁllatiMenhelyek.hu <noreply@allatimenhelyek.hu>";
 const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
 
+export async function sendReportMessageEmail(opts: {
+  to:           string;
+  contactName:  string;
+  senderName:   string;
+  senderEmail:  string;
+  reportTitle:  string;
+  reportUrl:    string;
+  message:      string;
+}) {
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Üzenet a bejelentésedről – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+          Új üzenet érkezett
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.contactName}!<br/>
+          <strong>${opts.senderName}</strong> (${opts.senderEmail}) üzenetet küldött
+          a(z) <a href="${opts.reportUrl}" style="color:#16a34a">${opts.reportTitle}</a>
+          bejelentéseddel kapcsolatban:
+        </p>
+        <blockquote style="border-left:3px solid #22c55e;margin:16px 0;padding:12px 16px;
+                           background:#f0fdf4;color:#374151;font-size:14px;line-height:1.6;border-radius:0 8px 8px 0">
+          ${opts.message.replace(/\n/g, "<br/>")}
+        </blockquote>
+        <p style="color:#374151;font-size:14px">
+          Válaszolhatsz közvetlenül erre az emailre, vagy felveheted a kapcsolatot a feladóval:
+          <a href="mailto:${opts.senderEmail}" style="color:#16a34a">${opts.senderEmail}</a>
+        </p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
+        <p style="color:#9ca3af;font-size:11px">ÁllatiMenhelyek.hu</p>
+      </div>
+    `,
+    replyTo: opts.senderEmail,
+  });
+}
+
 export async function sendPasswordResetEmail(email: string, token: string) {
   const url = `${BASE}/auth/reset-password?token=${token}`;
 

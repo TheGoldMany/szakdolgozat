@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, Mail, Search, Home, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus, AnimalType } from "@prisma/client";
@@ -34,6 +35,7 @@ interface ReportCardProps {
     contactName: string;
     contactPhone: string | null;
     contactEmail: string;
+    imageUrl:     string | null;
     createdAt: Date;
   };
 }
@@ -45,7 +47,19 @@ export function ReportCard({ report }: ReportCardProps) {
 
   return (
     <Link href={`/reports/${report.id}`} className="group block">
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+        {report.imageUrl && (
+          <div className="relative h-40 w-full bg-gray-100">
+            <Image
+              src={report.imageUrl}
+              alt={report.name ?? report.breed ?? "Bejelentett állat"}
+              fill
+              className="object-cover"
+              sizes="(max-width: 896px) 100vw, 896px"
+            />
+          </div>
+        )}
+        <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <div className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl", typeConfig.color)}>
@@ -102,6 +116,7 @@ export function ReportCard({ report }: ReportCardProps) {
             <Mail className="h-3 w-3" />
             {report.contactEmail}
           </span>
+        </div>
         </div>
       </div>
     </Link>

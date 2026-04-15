@@ -5,7 +5,9 @@ import { getServerSession } from "next-auth/next";
 import { MapPin, Phone, Mail, Calendar, Search, Home, Navigation } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 import { ResolveButton } from "@/components/reports/resolve-button";
+import { SendMessageForm } from "@/components/reports/send-message-form";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus } from "@prisma/client";
 
@@ -75,6 +77,19 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             </span>
           </div>
 
+          {/* Kép */}
+          {report.imageUrl && (
+            <div className="relative h-56 w-full sm:h-72 bg-gray-100">
+              <Image
+                src={report.imageUrl}
+                alt={report.name ?? report.breed ?? "Bejelentett állat"}
+                fill
+                className="object-cover"
+                sizes="(max-width: 672px) 100vw, 672px"
+              />
+            </div>
+          )}
+
           <div className="p-6 space-y-5">
             {/* Adatok */}
             <div className="grid grid-cols-2 gap-3 text-sm">
@@ -134,6 +149,14 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             </div>
 
             {canResolve && <ResolveButton reportId={report.id} />}
+
+            {/* Üzenet küldése – bejelentkezett, nem tulajdonos felhasználóknak */}
+            {session?.user?.id && !isOwner && report.status === "ACTIVE" && (
+              <div className="border-t border-gray-100 pt-5">
+                <h2 className="mb-3 text-sm font-semibold text-gray-700">Üzenet a bejelentőnek</h2>
+                <SendMessageForm reportId={report.id} />
+              </div>
+            )}
           </div>
         </div>
       </div>
