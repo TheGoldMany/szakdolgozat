@@ -4,16 +4,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
 const TYPES = [
-  { value: "", label: "Minden állat" },
-  { value: "DOG",    label: "🐕 Kutya" },
-  { value: "CAT",    label: "🐈 Macska" },
-  { value: "RABBIT", label: "🐇 Nyúl" },
-  { value: "BIRD",   label: "🦜 Madár" },
-  { value: "OTHER",  label: "🐾 Egyéb" },
+  { value: "",       label: "Minden állat" },
+  { value: "DOG",    label: "Kutya" },
+  { value: "CAT",    label: "Macska" },
+  { value: "RABBIT", label: "Nyúl" },
+  { value: "BIRD",   label: "Madár" },
+  { value: "OTHER",  label: "Egyéb" },
 ];
 
 const SIZES = [
-  { value: "", label: "Bármilyen méret" },
+  { value: "",            label: "Bármilyen méret" },
   { value: "SMALL",       label: "Kis" },
   { value: "MEDIUM",      label: "Közepes" },
   { value: "LARGE",       label: "Nagy" },
@@ -22,8 +22,8 @@ const SIZES = [
 
 const GENDERS = [
   { value: "",       label: "Mindkét nem" },
-  { value: "MALE",   label: "♂ Hím" },
-  { value: "FEMALE", label: "♀ Nőstény" },
+  { value: "MALE",   label: "Hím" },
+  { value: "FEMALE", label: "Nőstény" },
 ];
 
 export function AnimalsFilters() {
@@ -70,7 +70,7 @@ export function AnimalsFilters() {
               className={`rounded-lg px-3 py-1.5 text-left text-sm transition-colors ${
                 type === t.value
                   ? "bg-brand-500 text-white font-medium"
-                  : "hover:bg-gray-50 text-gray-700"
+                  : "text-gray-700 hover:bg-gray-50"
               }`}
             >
               {t.label}
@@ -107,11 +107,10 @@ export function AnimalsFilters() {
         </select>
       </div>
 
-      {/* Reset */}
       {(type || size || gender || q) && (
         <button
           onClick={() => router.push("/animals")}
-          className="w-full rounded-lg border border-gray-200 py-1.5 text-sm text-gray-500 hover:bg-gray-50"
+          className="w-full rounded-lg border border-gray-200 py-1.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
         >
           Szűrők törlése
         </button>

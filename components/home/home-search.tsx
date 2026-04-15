@@ -5,18 +5,18 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 
 const TYPES = [
-  { value: "",       emoji: "🐾", label: "Összes" },
-  { value: "DOG",    emoji: "🐕", label: "Kutya" },
-  { value: "CAT",    emoji: "🐈", label: "Macska" },
-  { value: "RABBIT", emoji: "🐇", label: "Nyúl" },
-  { value: "BIRD",   emoji: "🦜", label: "Madár" },
-  { value: "OTHER",  emoji: "🐹", label: "Egyéb" },
+  { value: "",       label: "Összes" },
+  { value: "DOG",    label: "Kutya" },
+  { value: "CAT",    label: "Macska" },
+  { value: "RABBIT", label: "Nyúl" },
+  { value: "BIRD",   label: "Madár" },
+  { value: "OTHER",  label: "Egyéb" },
 ];
 
 export function HomeSearch() {
   const router = useRouter();
-  const [query, setQuery]   = useState("");
-  const [type, setType]     = useState("");
+  const [query, setQuery] = useState("");
+  const [type, setType]   = useState("");
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -55,13 +55,12 @@ export function HomeSearch() {
             key={t.value}
             type="button"
             onClick={() => setType(t.value)}
-            className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
               type === t.value
                 ? "bg-brand-500 text-white shadow-sm"
-                : "bg-white/80 text-gray-600 hover:bg-white hover:shadow-sm border border-gray-200"
+                : "border border-gray-200 bg-white/80 text-gray-600 hover:bg-white hover:shadow-sm"
             }`}
           >
-            <span>{t.emoji}</span>
             {t.label}
           </button>
         ))}
