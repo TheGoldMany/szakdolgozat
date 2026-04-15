@@ -9,7 +9,7 @@ interface ShelterDoc {
   name:      string;
   url:       string;
   fileType:  string;
-  createdAt: string;
+  createdAt: Date | string;
 }
 
 interface Props {
