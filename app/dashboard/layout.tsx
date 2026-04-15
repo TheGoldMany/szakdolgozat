@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2, Settings } from "lucide-react";
+import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2, Settings, Heart, ClipboardCheck } from "lucide-react";
 
 export const metadata: Metadata = { title: { default: "Dashboard", template: "%s | Dashboard" } };
 
@@ -14,6 +14,8 @@ const NAV = [
   { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek",          roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
   { href: "/dashboard/settings",     icon: Settings,        label: "Menhely beállítás", roles: ["SHELTER_ADMIN"] },
   { href: "/dashboard/shelters",     icon: Building2,       label: "Menhelyek",         roles: ["SUPER_ADMIN"] },
+  { href: "/dashboard/tiers",        icon: Heart,           label: "Előfizetések",       roles: ["SHELTER_ADMIN"] },
+  { href: "/dashboard/campaigns",    icon: ClipboardCheck,  label: "Gyűjtések jóváhagyása", roles: ["SUPER_ADMIN"] },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

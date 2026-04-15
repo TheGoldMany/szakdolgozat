@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
+import { TierCard } from "@/components/donate/tier-card";
 import { AnimalStatus } from "@prisma/client";
 
 export async function generateMetadata({
@@ -36,6 +37,10 @@ export default async function ShelterDetailPage({
           images:  { where: { isPrimary: true }, take: 1 },
           shelter: { select: { id: true, name: true, city: true } },
         },
+      },
+      tiers: {
+        where: { isActive: true },
+        include: { _count: { select: { subscriptions: true } } },
       },
       _count: {
         select: {
@@ -223,6 +228,18 @@ export default async function ShelterDetailPage({
                 )}
               </ul>
             </div>
+
+            {/* Havi előfizetések */}
+            {shelter.tiers.length > 0 && (
+              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                <h2 className="mb-3 text-sm font-semibold text-gray-700">Havi előfizetések</h2>
+                <div className="flex flex-col gap-3">
+                  {shelter.tiers.map((tier) => (
+                    <TierCard key={tier.id} tier={tier} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Statisztika */}
             <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
