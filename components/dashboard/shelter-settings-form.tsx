@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
-import { FileText, Trash2, Upload, Save } from "lucide-react";
+import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint } from "lucide-react";
 
 interface ShelterDoc {
   id:        string;
@@ -16,21 +16,57 @@ interface Props {
   shelter: {
     id:                   string;
     name:                 string;
+    logoUrl:              string | null;
     adoptionRequirements: string | null;
     documents:            ShelterDoc[];
   };
 }
 
 export function ShelterSettingsForm({ shelter }: Props) {
-  const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
-  const [reqSaving, setReqSaving]       = useState(false);
-  const [reqSaved,  setReqSaved]        = useState(false);
+  // --- Logo ---
+  const [logoPreview,   setLogoPreview]   = useState<string | null>(shelter.logoUrl);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError,     setLogoError]     = useState("");
+  const logoRef = useRef<HTMLInputElement>(null);
 
+  // --- Requirements ---
+  const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
+  const [reqSaving,    setReqSaving]    = useState(false);
+  const [reqSaved,     setReqSaved]     = useState(false);
+
+  // --- Documents ---
   const [docs,        setDocs]        = useState<ShelterDoc[]>(shelter.documents);
   const [docName,     setDocName]     = useState("");
   const [uploading,   setUploading]   = useState(false);
   const [uploadError, setUploadError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoPreview(URL.createObjectURL(file));
+    setLogoError("");
+    setLogoUploading(true);
+    try {
+      const ext  = file.name.split(".").pop() ?? "jpg";
+      const blob = await upload(`logo-${Date.now()}.${ext}`, file, {
+        access:          "public",
+        handleUploadUrl: "/api/upload/avatar", // reuse: same allowed types
+      });
+      const res = await fetch(`/api/shelters/${shelter.id}/logo`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ logoUrl: blob.url }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setLogoError("Feltöltés sikertelen.");
+      setLogoPreview(shelter.logoUrl);
+    } finally {
+      setLogoUploading(false);
+      if (logoRef.current) logoRef.current.value = "";
+    }
+  }
 
   async function saveRequirements() {
     setReqSaving(true);
@@ -89,6 +125,51 @@ export function ShelterSettingsForm({ shelter }: Props) {
   return (
     <div className="space-y-6">
 
+      {/* Menhely logó */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">Menhely profilkép</h2>
+        <p className="mb-5 text-xs text-gray-400">
+          Ez az ikon jelenik meg a menhelyek listáján és az állatok oldalán.
+        </p>
+        <div className="flex items-center gap-5">
+          {/* Avatar circle */}
+          <label className="group relative cursor-pointer shrink-0">
+            <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-brand-100 shadow-md">
+              {logoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoPreview} alt="Logó" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <PawPrint className="h-10 w-10 text-brand-400" />
+                </div>
+              )}
+            </div>
+            {/* Hover overlay */}
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              {logoUploading
+                ? <Loader2 className="h-6 w-6 animate-spin text-white" />
+                : <Camera className="h-6 w-6 text-white" />
+              }
+            </div>
+            <input
+              ref={logoRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="sr-only"
+              disabled={logoUploading}
+              onChange={handleLogoChange}
+            />
+          </label>
+          <div>
+            <p className="text-sm font-medium text-gray-700">{shelter.name}</p>
+            <p className="mt-0.5 text-xs text-gray-400">
+              {logoUploading ? "Feltöltés..." : "Kattints a képre a módosításhoz"}
+            </p>
+            {logoError && <p className="mt-1 text-xs text-red-500">{logoError}</p>}
+          </div>
+        </div>
+      </div>
+
       {/* Örökbefogadási feltételek */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Örökbefogadási feltételek</h2>
@@ -123,7 +204,6 @@ export function ShelterSettingsForm({ shelter }: Props) {
           Örökbefogadási nyilatkozat, igénylőlap – minden állatod oldalán megjelennek.
         </p>
 
-        {/* Meglévő dokumentumok */}
         {docs.length > 0 && (
           <ul className="mb-4 space-y-2">
             {docs.map((doc) => (
@@ -151,7 +231,6 @@ export function ShelterSettingsForm({ shelter }: Props) {
           </ul>
         )}
 
-        {/* Új dokumentum feltöltése */}
         <div className="space-y-3 rounded-xl border border-dashed border-gray-300 p-4">
           <p className="text-xs font-medium text-gray-500">Új dokumentum feltöltése</p>
           <input

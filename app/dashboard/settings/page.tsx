@@ -16,10 +16,11 @@ export default async function ShelterSettingsPage() {
     include: {
       shelter: {
         select: {
-          id:                  true,
-          name:                true,
+          id:                   true,
+          name:                 true,
+          logoUrl:              true,
           adoptionRequirements: true,
-          documents:           { orderBy: { createdAt: "asc" } },
+          documents:            { orderBy: { createdAt: "asc" } },
         },
       },
     },
