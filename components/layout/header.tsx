@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/animals",  label: "Állatok" },
   { href: "/shelters", label: "Menhelyek" },
   { href: "/reports",  label: "Bejelentések" },
+  { href: "/donate",   label: "Támogatás" },
 ];
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {

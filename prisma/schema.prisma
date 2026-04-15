@@ -80,6 +80,9 @@ model User {
   conversations       Conversation[]        @relation("ConversationUser")
   sentMessages        Message[]             @relation("MessageSender")
   passwordResetTokens PasswordResetToken[]
+  subscriptions       Subscription[]
+  donations           Donation[]            @relation("DonationUser")
+  campaigns           Campaign[]            @relation("CampaignCreator")
 }
 
 // -------------------------------------------------------
@@ -164,6 +167,8 @@ model Shelter {
   conversations        Conversation[]
   documents            ShelterDocument[]
   adoptionRequirements String?            @db.Text
+  tiers                DonationTier[]
+  campaigns            Campaign[]
 }
 
 model ShelterDocument {
@@ -359,4 +364,97 @@ model Message {
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------
+// Donation System
+// -------------------------------------------------------
+
+enum CampaignStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+}
+
+model DonationTier {
+  id          String   @id @default(cuid())
+  shelterId   String
+  name        String
+  description String?  @db.Text
+  amount      Int      // HUF / month
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shelter       Shelter        @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+
+  @@index([shelterId])
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  userId      String
+  tierId      String
+  status      SubscriptionStatus @default(ACTIVE)
+  stripeSubId String?            @unique
+  createdAt   DateTime           @default(now())
+  cancelledAt DateTime?
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier DonationTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tierId])
+}
+
+model Campaign {
+  id           String         @id @default(cuid())
+  userId       String
+  shelterId    String?
+  title        String
+  slug         String         @unique
+  description  String         @db.Text
+  targetAmount Int
+  raisedAmount Int            @default(0)
+  imageUrl     String?
+  status       CampaignStatus @default(PENDING)
+  approvedById String?
+  approvedAt   DateTime?
+  endsAt       DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user      User       @relation("CampaignCreator", fields: [userId], references: [id])
+  shelter   Shelter?   @relation(fields: [shelterId], references: [id], onDelete: SetNull)
+  donations Donation[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model Donation {
+  id              String    @id @default(cuid())
+  userId          String?
+  campaignId      String?
+  tierId          String?
+  amount          Int
+  message         String?   @db.Text
+  isAnonymous     Boolean   @default(false)
+  stripeSessionId String?   @unique
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  user     User?     @relation("DonationUser", fields: [userId], references: [id], onDelete: SetNull)
+  campaign Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([userId])
 }

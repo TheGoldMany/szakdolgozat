@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { z } from "zod";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+const donateSchema = z.object({
+  campaignId:  z.string().min(1),
+  amount:      z.number().int().positive(), // HUF
+  message:     z.string().max(500).optional().nullable(),
+  isAnonymous: z.boolean().optional().default(false),
+});
+
+// POST /api/checkout/donate – create a Stripe Checkout session for a one-time donation
+export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  const parsed = donateSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Érvénytelen adatok", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  const { campaignId, amount, message, isAnonymous } = parsed.data;
+
+  // Validate campaign is ACTIVE
+  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
+  if (!campaign) {
+    return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
+  }
+  if (campaign.status !== "ACTIVE") {
+    return NextResponse.json({ error: "A kampány nem fogad adományokat" }, { status: 409 });
+  }
+
+  // Create pending Donation record (paidAt will be set by webhook)
+  const donation = await prisma.donation.create({
+    data: {
+      userId:      session?.user?.id ?? null,
+      campaignId,
+      amount,
+      message:     message ?? null,
+      isAnonymous: isAnonymous ?? false,
+      paidAt:      null,
+    },
+  });
+
+  // Create Stripe Checkout Session
+  // HUF is a zero-decimal currency in Stripe → pass amount as-is
+  const checkoutSession = await stripe.checkout.sessions.create({
+    mode:     "payment",
+    currency: "huf",
+    line_items: [
+      {
+        price_data: {
+          currency:     "huf",
+          product_data: { name: campaign.title },
+          unit_amount:  amount, // HUF, zero-decimal
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${BASE}/donate/${campaign.id}`,
+    metadata: {
+      donationId: donation.id,
+    },
+  });
+
+  // Store the Stripe session ID on the donation record
+  await prisma.donation.update({
+    where: { id: donation.id },
+    data:  { stripeSessionId: checkoutSession.id },
+  });
+
+  return NextResponse.json({ url: checkoutSession.url });
+}
