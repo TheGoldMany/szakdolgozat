@@ -6,7 +6,11 @@ import { z } from "zod";
 import { sendNewMessageEmail } from "@/lib/email";
 
 const schema = z.object({
-  content: z.string().min(1).max(2000),
+  content:        z.string().max(2000).optional(),
+  attachmentUrl:  z.string().url().optional(),
+  attachmentName: z.string().max(255).optional(),
+}).refine((d) => (d.content && d.content.trim().length > 0) || d.attachmentUrl, {
+  message: "Üzenet szövege vagy csatolmány szükséges",
 });
 
 // POST /api/conversations/[id]/messages – send a message
@@ -64,8 +68,10 @@ export async function POST(
     prisma.message.create({
       data: {
         conversationId: params.id,
-        senderId: session.user.id,
-        content: parsed.data.content,
+        senderId:       session.user.id,
+        content:        parsed.data.content ?? null,
+        attachmentUrl:  parsed.data.attachmentUrl  ?? null,
+        attachmentName: parsed.data.attachmentName ?? null,
       },
       include: { sender: { select: { id: true, name: true, role: true } } },
     }),
@@ -80,7 +86,9 @@ export async function POST(
   const convUrl     = `${BASE}/messages/${params.id}`;
   const animalName  = conversation.animal?.name ?? "Ismeretlen állat";
   const senderName  = session.user.name ?? "Ismeretlen";
-  const preview     = parsed.data.content.slice(0, 200);
+  const preview     = parsed.data.content
+    ? parsed.data.content.slice(0, 200)
+    : `[Csatolmány: ${parsed.data.attachmentName ?? "fájl"}]`;
   const senderIsUser = conversation.userId === session.user.id;
 
   void (async () => {

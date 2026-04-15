@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send } from "lucide-react";
+import { upload } from "@vercel/blob/client";
+import { Send, Paperclip, X, FileText, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Sender {
@@ -12,7 +13,9 @@ interface Sender {
 
 interface Message {
   id: string;
-  content: string;
+  content: string | null;
+  attachmentUrl:  string | null;
+  attachmentName: string | null;
   senderId: string;
   createdAt: string;
   sender: Sender;
@@ -38,12 +41,56 @@ function isSameDay(a: string, b: string) {
   return new Date(a).toDateString() === new Date(b).toDateString();
 }
 
+function isImage(name: string | null) {
+  if (!name) return false;
+  return /\.(jpe?g|png|webp|gif)$/i.test(name);
+}
+
+function AttachmentBubble({ url, name, own }: { url: string; name: string | null; own: boolean }) {
+  const displayName = name ?? "Csatolmány";
+  const img = isImage(name);
+
+  if (img) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="block mt-1.5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={displayName}
+          className="max-w-[220px] rounded-xl object-cover border border-white/20"
+        />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "mt-1.5 flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-colors",
+        own
+          ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
+          : "border-gray-200 bg-white text-brand-600 hover:bg-brand-50"
+      )}
+    >
+      <FileText className="h-4 w-4 shrink-0" />
+      <span className="truncate max-w-[160px]">{displayName}</span>
+    </a>
+  );
+}
+
 export function ChatWindow({ conversationId, currentUserId, initialMessages }: ChatWindowProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [messages, setMessages]         = useState<Message[]>(initialMessages);
+  const [input, setInput]               = useState("");
+  const [sending, setSending]           = useState(false);
+  const [attachment, setAttachment]     = useState<{ url: string; name: string } | null>(null);
+  const [uploading, setUploading]       = useState(false);
+  const [uploadError, setUploadError]   = useState("");
+  const bottomRef  = useRef<HTMLDivElement>(null);
+  const inputRef   = useRef<HTMLTextAreaElement>(null);
+  const fileRef    = useRef<HTMLInputElement>(null);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -68,22 +115,54 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
     return () => clearInterval(interval);
   }, [poll]);
 
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError("");
+    setUploading(true);
+    try {
+      const ext        = file.name.split(".").pop() ?? "bin";
+      const uniqueName = `chat-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const blob       = await upload(uniqueName, file, {
+        access:          "public",
+        handleUploadUrl: "/api/upload/attachment",
+      });
+      setAttachment({ url: blob.url, name: file.name });
+    } catch {
+      setUploadError("Feltöltés sikertelen, próbáld újra.");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
   async function sendMessage() {
     const content = input.trim();
-    if (!content || sending) return;
+    if ((!content && !attachment) || sending) return;
 
     setSending(true);
+    const prev = input;
+    const prevAttachment = attachment;
     setInput("");
+    setAttachment(null);
 
     try {
       const res = await fetch(`/api/conversations/${conversationId}/messages`, {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
+        body:    JSON.stringify({
+          content:        content || undefined,
+          attachmentUrl:  prevAttachment?.url,
+          attachmentName: prevAttachment?.name,
+        }),
       });
       if (res.ok) {
         const msg = await res.json();
         setMessages((prev) => [...prev, msg]);
+      } else {
+        // Restore on failure
+        setInput(prev);
+        setAttachment(prevAttachment);
       }
     } finally {
       setSending(false);
@@ -112,7 +191,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
         )}
 
         {messages.map((msg, i) => {
-          const isOwn = msg.senderId === currentUserId;
+          const isOwn    = msg.senderId === currentUserId;
           const showDate = i === 0 || !isSameDay(messages[i - 1].createdAt, msg.createdAt);
           const showName = !isOwn && (i === 0 || messages[i - 1].senderId !== msg.senderId);
 
@@ -140,16 +219,25 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                       )}
                     </span>
                   )}
-                  <div
-                    className={cn(
-                      "rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
-                      isOwn
-                        ? "bg-brand-500 text-white rounded-br-sm"
-                        : "bg-gray-100 text-gray-800 rounded-bl-sm"
-                    )}
-                  >
-                    {msg.content}
-                  </div>
+                  {(msg.content || msg.attachmentUrl) && (
+                    <div
+                      className={cn(
+                        "rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
+                        isOwn
+                          ? "bg-brand-500 text-white rounded-br-sm"
+                          : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                      )}
+                    >
+                      {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
+                      {msg.attachmentUrl && (
+                        <AttachmentBubble
+                          url={msg.attachmentUrl}
+                          name={msg.attachmentName}
+                          own={isOwn}
+                        />
+                      )}
+                    </div>
+                  )}
                   <span className="text-[10px] text-gray-400 mx-1">{formatTime(msg.createdAt)}</span>
                 </div>
               </div>
@@ -160,8 +248,52 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
       </div>
 
       {/* Input area */}
-      <div className="border-t border-gray-100 p-3">
+      <div className="border-t border-gray-100 p-3 space-y-2">
+        {/* Pending attachment preview */}
+        {(attachment || uploading) && (
+          <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+            {uploading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+                <span className="text-xs text-gray-500">Feltöltés...</span>
+              </>
+            ) : attachment ? (
+              <>
+                {isImage(attachment.name)
+                  ? <ImageIcon className="h-4 w-4 shrink-0 text-brand-500" />
+                  : <FileText className="h-4 w-4 shrink-0 text-brand-500" />
+                }
+                <span className="flex-1 truncate text-xs text-gray-700">{attachment.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setAttachment(null)}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </>
+            ) : null}
+          </div>
+        )}
+        {uploadError && <p className="text-xs text-red-500 px-1">{uploadError}</p>}
+
         <div className="flex items-end gap-2">
+          {/* Attach button */}
+          <label className={cn(
+            "flex h-[42px] w-[42px] shrink-0 cursor-pointer items-center justify-center rounded-xl border border-gray-200 text-gray-400 transition-colors hover:bg-gray-50 hover:text-brand-500",
+            uploading && "pointer-events-none opacity-50"
+          )}>
+            <Paperclip className="h-4 w-4" />
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.gif"
+              className="sr-only"
+              disabled={uploading || sending}
+              onChange={handleFileChange}
+            />
+          </label>
+
           <textarea
             ref={inputRef}
             value={input}
@@ -174,7 +306,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
           />
           <button
             onClick={sendMessage}
-            disabled={!input.trim() || sending}
+            disabled={(!input.trim() && !attachment) || sending || uploading}
             className="rounded-xl bg-brand-500 p-2.5 text-white hover:bg-brand-600 disabled:opacity-40 transition-colors shrink-0"
           >
             <Send className="h-4 w-4" />
