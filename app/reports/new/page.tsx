@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { Info } from "lucide-react";
+import { authOptions } from "@/lib/auth";
 import { ReportForm } from "@/components/reports/report-form";
 
 export const metadata: Metadata = { title: "Új bejelentés" };
 
-export default function NewReportPage() {
+export default async function NewReportPage() {
+  const session = await getServerSession(authOptions);
+  const isGuest = !session?.user?.id;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
@@ -21,6 +27,26 @@ export default function NewReportPage() {
             Elveszett, megtalált vagy kóbor állat esetén töltsd ki az alábbi űrlapot.
           </p>
         </div>
+
+        {isGuest && (
+          <div className="mb-6 flex gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+            <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
+            <div className="text-sm text-blue-800">
+              <p className="font-semibold">Bejelentkezés nélkül is bejelenthetsz!</p>
+              <p className="mt-0.5 text-blue-700">
+                Az űrlap alján add meg a nevedet, email címedet és telefonszámodat,
+                hogy az érdeklődők fel tudják venni veled a kapcsolatot.{" "}
+                <Link
+                  href="/auth/login?callbackUrl=/reports/new"
+                  className="font-semibold underline hover:text-blue-900"
+                >
+                  Bejelentkezve
+                </Link>{" "}
+                ezeket az adatokat automatikusan kitöltjük.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <ReportForm />

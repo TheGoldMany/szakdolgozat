@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { ChangePasswordForm } from "@/components/profile/change-password-form";
 import { Role } from "@prisma/client";
 
 export const metadata: Metadata = { title: "Profilom" };
@@ -31,6 +32,7 @@ export default async function ProfilePage() {
       address:   true,
       city:      true,
       role:      true,
+      password:  true,
       createdAt: true,
       _count: { select: { applications: true } },
     },
@@ -84,6 +86,14 @@ export default async function ProfilePage() {
             <h2 className="mb-4 text-sm font-semibold text-gray-700">Személyes adatok</h2>
             <ProfileForm user={user} />
           </div>
+
+          {/* Jelszó csere – csak jelszavas fiókoknál */}
+          {user.password && (
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-sm font-semibold text-gray-700">Jelszó módosítása</h2>
+              <ChangePasswordForm />
+            </div>
+          )}
 
         </div>
       </div>

@@ -77,8 +77,23 @@ model User {
   shelterAdmins ShelterAdmin[]
   favorites     Favorite[]
   reports       AnimalReport[]
-  conversations Conversation[]        @relation("ConversationUser")
-  sentMessages  Message[]             @relation("MessageSender")
+  conversations       Conversation[]        @relation("ConversationUser")
+  sentMessages        Message[]             @relation("MessageSender")
+  passwordResetTokens PasswordResetToken[]
+}
+
+// -------------------------------------------------------
+// Password Reset
+// -------------------------------------------------------
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // -------------------------------------------------------
