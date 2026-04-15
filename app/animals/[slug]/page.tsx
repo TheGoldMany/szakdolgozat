@@ -150,7 +150,7 @@ export default async function AnimalDetailPage({
             )}
           </div>
 
-          {/* ── Jobb oszlop: adatok + kérelem ── */}
+          {/* ── Jobb oszlop: adatok + kérelem + feltételek ── */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Alap adatok */}
@@ -264,86 +264,121 @@ export default async function AnimalDetailPage({
           </div>
         )}
 
-        {/* Örökbefogadási kérelem */}
-        <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-gray-800">Örökbefogadás</h2>
+        {/* Örökbefogadási kérelem + feltételek + dokumentumok */}
+        {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
+          <div className="mt-8 grid gap-6 lg:grid-cols-5">
+            {/* Adoption contact */}
+            <div className="lg:col-span-3 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-lg font-semibold text-gray-800">Örökbefogadás</h2>
+              {animal.status !== AnimalStatus.AVAILABLE ? (
+                <p className="text-sm text-gray-500">
+                  Ez az állat jelenleg nem fogadható örökbe (<span className="font-medium">{status.label}</span>).
+                </p>
+              ) : !session ? (
+                <div className="rounded-xl bg-gray-50 border border-gray-200 p-5 text-center">
+                  <p className="text-sm text-gray-600">Az örökbefogadáshoz be kell jelentkezned.</p>
+                  <Link
+                    href={`/auth/login?callbackUrl=/animals/${animal.slug}`}
+                    className="mt-3 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+                  >
+                    Bejelentkezés
+                  </Link>
+                </div>
+              ) : existingConvId ? (
+                <div className="rounded-xl bg-brand-50 border border-brand-200 p-5">
+                  <p className="font-medium text-brand-800">Már van folyamatban lévő beszélgetésed a menhellyel.</p>
+                  <Link
+                    href={`/messages/${existingConvId}`}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+                  >
+                    Folytatás →
+                  </Link>
+                </div>
+              ) : (
+                <AdoptionContact
+                  animalId={animal.id}
+                  animalName={animal.name}
+                  shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
+                />
+              )}
+            </div>
 
-          {animal.status !== AnimalStatus.AVAILABLE ? (
-            <p className="text-sm text-gray-500">
-              Ez az állat jelenleg nem fogadható örökbe (<span className="font-medium">{status.label}</span>).
-            </p>
-          ) : !session ? (
-            <div className="rounded-xl bg-gray-50 border border-gray-200 p-5 text-center">
-              <p className="text-sm text-gray-600">Az örökbefogadáshoz be kell jelentkezned.</p>
-              <Link
-                href={`/auth/login?callbackUrl=/animals/${animal.slug}`}
-                className="mt-3 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
-              >
-                Bejelentkezés
-              </Link>
+            {/* Feltételek + dokumentumok sidebar */}
+            <div className="lg:col-span-2 space-y-4">
+              {animal.shelter.adoptionRequirements && (
+                <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+                  <div className="mb-2.5 flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4 text-brand-600" />
+                    <h2 className="text-sm font-semibold text-brand-800">Örökbefogadási feltételek</h2>
+                  </div>
+                  <p className="whitespace-pre-line text-xs leading-relaxed text-brand-700">
+                    {animal.shelter.adoptionRequirements}
+                  </p>
+                </div>
+              )}
+              {animal.shelter.documents.length > 0 && (
+                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <h2 className="text-sm font-semibold text-gray-700">Dokumentumok</h2>
+                  </div>
+                  <ul className="space-y-2">
+                    {animal.shelter.documents.map((doc) => (
+                      <li key={doc.id}>
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs font-medium text-brand-600 transition-colors hover:bg-brand-50 hover:border-brand-100 hover:text-brand-700"
+                        >
+                          <FileText className="h-3.5 w-3.5 shrink-0" />
+                          {doc.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-          ) : existingConvId ? (
-            <div className="rounded-xl bg-brand-50 border border-brand-200 p-5">
-              <p className="font-medium text-brand-800">Már van folyamatban lévő beszélgetésed a menhellyel.</p>
-              <Link
-                href={`/messages/${existingConvId}`}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
-              >
-                Folytatás →
-              </Link>
-            </div>
-          ) : (
-            <AdoptionContact
-              animalId={animal.id}
-              animalName={animal.name}
-              shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
-            />
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-gray-800">Örökbefogadás</h2>
+            {animal.status !== AnimalStatus.AVAILABLE ? (
+              <p className="text-sm text-gray-500">
+                Ez az állat jelenleg nem fogadható örökbe (<span className="font-medium">{status.label}</span>).
+              </p>
+            ) : !session ? (
+              <div className="rounded-xl bg-gray-50 border border-gray-200 p-5 text-center">
+                <p className="text-sm text-gray-600">Az örökbefogadáshoz be kell jelentkezned.</p>
+                <Link
+                  href={`/auth/login?callbackUrl=/animals/${animal.slug}`}
+                  className="mt-3 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+                >
+                  Bejelentkezés
+                </Link>
+              </div>
+            ) : existingConvId ? (
+              <div className="rounded-xl bg-brand-50 border border-brand-200 p-5">
+                <p className="font-medium text-brand-800">Már van folyamatban lévő beszélgetésed a menhellyel.</p>
+                <Link
+                  href={`/messages/${existingConvId}`}
+                  className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+                >
+                  Folytatás →
+                </Link>
+              </div>
+            ) : (
+              <AdoptionContact
+                animalId={animal.id}
+                animalName={animal.name}
+                shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
+              />
+            )}
+          </div>
+        )}
 
       </div>
-
-      {/* Örökbefogadási feltételek + dokumentumok */}
-      {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) && (
-        <div className="mt-8 space-y-4">
-          {animal.shelter.adoptionRequirements && (
-            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-6">
-              <div className="mb-3 flex items-center gap-2">
-                <ClipboardList className="h-5 w-5 text-brand-600" />
-                <h2 className="font-semibold text-brand-800">Örökbefogadási feltételek</h2>
-              </div>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-brand-700">
-                {animal.shelter.adoptionRequirements}
-              </p>
-            </div>
-          )}
-
-          {animal.shelter.documents.length > 0 && (
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gray-500" />
-                <h2 className="font-semibold text-gray-700">Letölthető dokumentumok</h2>
-              </div>
-              <ul className="space-y-2">
-                {animal.shelter.documents.map((doc) => (
-                  <li key={doc.id}>
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-brand-600 hover:underline"
-                    >
-                      <FileText className="h-4 w-4 shrink-0" />
-                      {doc.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
     </div>
   );
 }
