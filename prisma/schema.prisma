@@ -159,9 +159,22 @@ model Shelter {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  animals       Animal[]
-  admins        ShelterAdmin[]
-  conversations Conversation[]
+  animals              Animal[]
+  admins               ShelterAdmin[]
+  conversations        Conversation[]
+  documents            ShelterDocument[]
+  adoptionRequirements String?            @db.Text
+}
+
+model ShelterDocument {
+  id        String   @id @default(cuid())
+  shelterId String
+  name      String
+  url       String
+  fileType  String   @default("application/pdf")
+  createdAt DateTime @default(now())
+
+  shelter Shelter @relation(fields: [shelterId], references: [id], onDelete: Cascade)
 }
 
 model ShelterAdmin {

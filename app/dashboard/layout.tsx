@@ -3,16 +3,17 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2 } from "lucide-react";
+import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2, Settings } from "lucide-react";
 
 export const metadata: Metadata = { title: { default: "Dashboard", template: "%s | Dashboard" } };
 
 const NAV = [
-  { href: "/dashboard",              icon: LayoutDashboard, label: "Áttekintés",  roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-  { href: "/dashboard/applications", icon: ClipboardList,   label: "Kérelmek",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-  { href: "/dashboard/animals",      icon: PawPrint,        label: "Állatok",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-  { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-  { href: "/dashboard/shelters",     icon: Building2,       label: "Menhelyek",   roles: ["SUPER_ADMIN"] },
+  { href: "/dashboard",              icon: LayoutDashboard, label: "Áttekintés",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/applications", icon: ClipboardList,   label: "Kérelmek",          roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/animals",      icon: PawPrint,        label: "Állatok",           roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/messages",     icon: MessageCircle,   label: "Üzenetek",          roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/settings",     icon: Settings,        label: "Menhely beállítás", roles: ["SHELTER_ADMIN"] },
+  { href: "/dashboard/shelters",     icon: Building2,       label: "Menhelyek",         roles: ["SUPER_ADMIN"] },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

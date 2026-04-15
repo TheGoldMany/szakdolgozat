@@ -79,7 +79,7 @@ const createSchema = z.object({
   isGoodWithKids:  z.boolean().nullable().optional(),
   isGoodWithDogs:  z.boolean().nullable().optional(),
   isGoodWithCats:  z.boolean().nullable().optional(),
-  imageUrl:        z.string().url().optional().or(z.literal("")),
+  imageUrls:       z.array(z.string().url()).optional(),
 });
 
 function slugify(text: string) {
@@ -162,9 +162,11 @@ async function createAnimal(data: z.infer<typeof createSchema>, shelterId: strin
         isGoodWithCats: data.isGoodWithCats ?? null,
         status:         AnimalStatus.AVAILABLE,
         arrivedAt:      new Date(),
-        ...(data.imageUrl && {
+        ...((data.imageUrls?.length) && {
           images: {
-            create: [{ url: data.imageUrl, alt: data.name, isPrimary: true, order: 0 }],
+            create: data.imageUrls.map((url, i) => ({
+              url, alt: data.name, isPrimary: i === 0, order: i,
+            })),
           },
         }),
       },

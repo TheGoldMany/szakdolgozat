@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi } from "lucide-react";
+import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
@@ -80,7 +80,9 @@ export default async function AnimalDetailPage({
       where: { slug: params.slug },
       include: {
         images:  { orderBy: [{ isPrimary: "desc" }, { order: "asc" }] },
-        shelter: true,
+        shelter: {
+          include: { documents: { orderBy: { createdAt: "asc" } } },
+        },
       },
     }),
     getServerSession(authOptions),
@@ -300,6 +302,48 @@ export default async function AnimalDetailPage({
         </div>
 
       </div>
+
+      {/* Örökbefogadási feltételek + dokumentumok */}
+      {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) && (
+        <div className="mt-8 space-y-4">
+          {animal.shelter.adoptionRequirements && (
+            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <ClipboardList className="h-5 w-5 text-brand-600" />
+                <h2 className="font-semibold text-brand-800">Örökbefogadási feltételek</h2>
+              </div>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-brand-700">
+                {animal.shelter.adoptionRequirements}
+              </p>
+            </div>
+          )}
+
+          {animal.shelter.documents.length > 0 && (
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className="mb-3 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-gray-500" />
+                <h2 className="font-semibold text-gray-700">Letölthető dokumentumok</h2>
+              </div>
+              <ul className="space-y-2">
+                {animal.shelter.documents.map((doc) => (
+                  <li key={doc.id}>
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-brand-600 hover:underline"
+                    >
+                      <FileText className="h-4 w-4 shrink-0" />
+                      {doc.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }

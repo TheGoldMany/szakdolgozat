@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { X } from "lucide-react";
-import { ImageUpload } from "@/components/ui/image-upload";
+import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 
 const schema = z.object({
   name:           z.string().min(1, "Kötelező"),
@@ -24,7 +24,7 @@ const schema = z.object({
   isGoodWithKids: z.boolean().nullable().optional(),
   isGoodWithDogs: z.boolean().nullable().optional(),
   isGoodWithCats: z.boolean().nullable().optional(),
-  imageUrl:       z.string().optional(),
+  imageUrls:      z.array(z.string()).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -49,7 +49,7 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
     useForm<FormData>({
       resolver: zodResolver(schema),
       defaultValues: {
-        type: "DOG", isVaccinated: false, isNeutered: false, isMicrochipped: false,
+        type: "DOG", isVaccinated: false, isNeutered: false, isMicrochipped: false, imageUrls: [],
       },
     });
 
@@ -133,15 +133,14 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      {/* Fotó */}
+      {/* Fotók */}
       <Controller
-        name="imageUrl"
+        name="imageUrls"
         control={control}
-        defaultValue=""
         render={({ field }) => (
-          <ImageUpload
-            label="Fotó"
-            value={field.value ?? ""}
+          <MultiImageUpload
+            label="Fotók"
+            value={field.value ?? []}
             onChange={field.onChange}
           />
         )}
