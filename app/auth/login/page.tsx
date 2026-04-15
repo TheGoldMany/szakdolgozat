@@ -45,11 +45,23 @@ function Divider({ label }: { label: string }) {
 }
 
 // ── Login form ───────────────────────────────────────────
+const OAUTH_ERRORS: Record<string, string> = {
+  Configuration:        "A Google/Facebook bejelentkezés nincs beállítva. Kérjük, használj email-es belépést.",
+  OAuthAccountNotLinked:"Ez az email cím már más bejelentkezési módhoz van kötve. Kérjük, használd azt.",
+  OAuthCallback:        "Hiba a Google/Facebook kapcsolódásnál. Próbáld újra.",
+  OAuthSignin:          "Nem sikerült csatlakozni a Google/Facebook-hoz. Próbáld újra.",
+  Callback:             "Hiba a bejelentkezés során. Próbáld újra.",
+  Default:              "Bejelentkezési hiba. Kérjük, próbáld újra.",
+};
+
 function LoginForm() {
   const router      = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
-  const [serverError, setServerError] = useState("");
+  const urlError    = searchParams.get("error");
+  const [serverError, setServerError] = useState(
+    urlError ? (OAUTH_ERRORS[urlError] ?? OAUTH_ERRORS.Default) : ""
+  );
 
   const {
     register,
@@ -74,6 +86,12 @@ function LoginForm() {
 
   return (
     <div className="space-y-4">
+      {serverError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {serverError}
+        </div>
+      )}
+
       {/* OAuth gombok */}
       <div className="grid grid-cols-2 gap-3">
         <button
@@ -127,12 +145,6 @@ function LoginForm() {
           />
           {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
         </div>
-
-        {serverError && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {serverError}
-          </div>
-        )}
 
         <button
           type="submit"
