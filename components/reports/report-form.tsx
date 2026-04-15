@@ -29,9 +29,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const TYPE_OPTIONS = [
-  { value: "LOST",  label: "Elveszett – keresem a gazdát" },
-  { value: "FOUND", label: "Megtalált – gazdát keresek neki" },
-  { value: "STRAY", label: "Kóbor – segítséget kérek" },
+  { value: "LOST",  label: "Elveszett",  sub: "Az én állatom tűnt el" },
+  { value: "FOUND", label: "Megtalált",  sub: "Befogott egy gazdátlan állatot" },
+  { value: "STRAY", label: "Kóbor",      sub: "Kóborló állatot láttam" },
 ];
 
 const ANIMAL_OPTIONS = [
@@ -92,9 +92,10 @@ export function ReportForm() {
         </label>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {TYPE_OPTIONS.map((o) => (
-            <label key={o.value} className="flex cursor-pointer items-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-3 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+            <label key={o.value} className="flex cursor-pointer flex-col gap-0.5 rounded-xl border-2 border-gray-200 px-4 py-3 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
               <input type="radio" value={o.value} {...register("type")} className="sr-only" />
-              <span className="text-sm font-medium text-gray-700">{o.label}</span>
+              <span className="text-sm font-semibold text-gray-800">{o.label}</span>
+              <span className="text-xs text-gray-400">{o.sub}</span>
             </label>
           ))}
         </div>
