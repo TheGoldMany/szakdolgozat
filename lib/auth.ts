@@ -60,29 +60,36 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session: sessionData }) {
       // Credentials sign-in
       if (user) {
-        token.id   = user.id;
-        token.role = (user as { role: Role }).role;
+        token.id    = user.id;
+        token.role  = (user as { role: Role }).role;
+        token.image = user.image ?? null;
       }
       // OAuth sign-in: fetch role + id from DB (provider doesn't know role)
       if (account && account.provider !== "credentials" && token.email) {
         const dbUser = await prisma.user.findUnique({
           where:  { email: token.email },
-          select: { id: true, role: true },
+          select: { id: true, role: true, image: true },
         });
         if (dbUser) {
-          token.id   = dbUser.id;
-          token.role = dbUser.role;
+          token.id    = dbUser.id;
+          token.role  = dbUser.role;
+          token.image = dbUser.image ?? token.picture ?? null;
         }
+      }
+      // Client called update({ image }) after avatar change
+      if (trigger === "update" && sessionData?.image !== undefined) {
+        token.image = sessionData.image;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id   = token.id as string;
-        session.user.role = token.role as Role;
+        session.user.id    = token.id   as string;
+        session.user.role  = token.role as Role;
+        session.user.image = (token.image ?? token.picture ?? null) as string | null;
       }
       return session;
     },

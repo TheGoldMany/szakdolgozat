@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ChangePasswordForm } from "@/components/profile/change-password-form";
+import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { Role } from "@prisma/client";
 
 export const metadata: Metadata = { title: "Profilom" };
@@ -28,6 +29,7 @@ export default async function ProfilePage() {
       id:        true,
       name:      true,
       email:     true,
+      image:     true,
       phone:     true,
       address:   true,
       city:      true,
@@ -44,8 +46,12 @@ export default async function ProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Profilom</h1>
+        <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
+          <AvatarUpload currentImage={user.image} name={user.name} />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{user.name ?? "Profilom"}</h1>
+            <p className="mt-0.5 text-sm text-gray-400">{user.email}</p>
+          </div>
         </div>
 
         <div className="space-y-6">
