@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sendNewMessageEmail } from "@/lib/email";
 
 const schema = z.object({
   content: z.string().min(1).max(2000),
@@ -20,7 +21,19 @@ export async function POST(
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: params.id },
-    select: { id: true, userId: true, shelterId: true },
+    select: {
+      id:       true,
+      userId:   true,
+      shelterId: true,
+      animal:   { select: { name: true } },
+      user:     { select: { email: true, name: true } },
+      shelter:  {
+        select: {
+          name:   true,
+          admins: { include: { user: { select: { email: true, name: true } } } },
+        },
+      },
+    },
   });
   if (!conversation) {
     return NextResponse.json({ error: "Nem található" }, { status: 404 });
@@ -61,6 +74,48 @@ export async function POST(
       data: { updatedAt: new Date() },
     }),
   ]);
+
+  // Send email notification to the other party (fire-and-forget)
+  const BASE        = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
+  const convUrl     = `${BASE}/messages/${params.id}`;
+  const animalName  = conversation.animal?.name ?? "Ismeretlen állat";
+  const senderName  = session.user.name ?? "Ismeretlen";
+  const preview     = parsed.data.content.slice(0, 200);
+  const senderIsUser = conversation.userId === session.user.id;
+
+  void (async () => {
+    try {
+      if (senderIsUser) {
+        // Notify shelter admins
+        for (const admin of conversation.shelter?.admins ?? []) {
+          if (admin.user.email) {
+            await sendNewMessageEmail({
+              to:              admin.user.email,
+              recipientName:   admin.user.name ?? "Admin",
+              senderName,
+              animalName,
+              preview,
+              conversationUrl: convUrl,
+            });
+          }
+        }
+      } else {
+        // Notify the conversation user
+        if (conversation.user?.email) {
+          await sendNewMessageEmail({
+            to:              conversation.user.email,
+            recipientName:   conversation.user.name ?? "Felhasználó",
+            senderName,
+            animalName,
+            preview,
+            conversationUrl: convUrl,
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Message notification email failed:", err);
+    }
+  })();
 
   return NextResponse.json(message, { status: 201 });
 }

@@ -13,6 +13,44 @@ const transporter = nodemailer.createTransport({
 const FROM = process.env.SMTP_FROM ?? "ÁllatiMenhelyek.hu <noreply@allatimenhelyek.hu>";
 const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
 
+export async function sendNewMessageEmail(opts: {
+  to:              string;
+  recipientName:   string;
+  senderName:      string;
+  animalName:      string;
+  preview:         string;
+  conversationUrl: string;
+}) {
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Új üzenet érkezett – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+          Új üzenet érkezett
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.recipientName}!<br/>
+          <strong>${opts.senderName}</strong> üzenetet küldött neked
+          a(z) <strong>${opts.animalName}</strong> témában.
+        </p>
+        <blockquote style="border-left:3px solid #22c55e;margin:16px 0;padding:12px 16px;
+                           background:#f0fdf4;color:#374151;font-size:14px;line-height:1.6;border-radius:0 8px 8px 0">
+          ${opts.preview}
+        </blockquote>
+        <a href="${opts.conversationUrl}"
+           style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                  font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+          Üzenet megtekintése
+        </a>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
+        <p style="color:#9ca3af;font-size:11px">ÁllatiMenhelyek.hu</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendReportMessageEmail(opts: {
   to:           string;
   contactName:  string;

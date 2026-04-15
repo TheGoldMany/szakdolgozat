@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, PawPrint, ChevronDown, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,19 @@ export function Header() {
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unread, setUnread]             = useState(0);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const fetch_ = () =>
+      fetch("/api/messages/unread")
+        .then((r) => r.json())
+        .then((d) => setUnread(d.count ?? 0))
+        .catch(() => {});
+    fetch_();
+    const id = setInterval(fetch_, 30_000);
+    return () => clearInterval(id);
+  }, [session?.user?.id]);
 
   const isAdmin =
     session?.user?.role === "SHELTER_ADMIN" ||
@@ -61,9 +74,16 @@ export function Header() {
               {/* Messages link */}
               <Link
                 href="/messages"
-                className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-500"
+                className="relative flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-500"
               >
-                <MessageCircle className="h-4 w-4" />
+                <span className="relative">
+                  <MessageCircle className="h-4 w-4" />
+                  {unread > 0 && (
+                    <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
+                </span>
                 <span className="hidden lg:inline">Üzenetek</span>
               </Link>
 
@@ -169,8 +189,20 @@ export function Header() {
                 </Link>
                 <Link href="/messages" onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <MessageCircle className="h-4 w-4" />
+                  <span className="relative">
+                    <MessageCircle className="h-4 w-4" />
+                    {unread > 0 && (
+                      <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                        {unread > 9 ? "9+" : unread}
+                      </span>
+                    )}
+                  </span>
                   Üzeneteim
+                  {unread > 0 && (
+                    <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {unread}
+                    </span>
+                  )}
                 </Link>
                 {isAdmin && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}
