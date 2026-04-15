@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { ResolveButton } from "@/components/reports/resolve-button";
-import { SendMessageForm } from "@/components/reports/send-message-form";
+import { StaticMap } from "@/components/ui/static-map";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus } from "@prisma/client";
 
@@ -116,9 +116,14 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             </div>
 
             {/* Helyszín */}
-            <div className="flex items-start gap-2 text-sm text-gray-600">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-              <span>{report.city}{report.address ? `, ${report.address}` : ""}</span>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm text-gray-600">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                <span>{report.city}{report.address ? `, ${report.address}` : ""}</span>
+              </div>
+              {report.lat && report.lng && (
+                <StaticMap lat={report.lat} lng={report.lng} />
+              )}
             </div>
 
             {/* Dátum */}
@@ -149,14 +154,6 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             </div>
 
             {canResolve && <ResolveButton reportId={report.id} />}
-
-            {/* Üzenet küldése – bejelentkezett, nem tulajdonos felhasználóknak */}
-            {session?.user?.id && !isOwner && report.status === "ACTIVE" && (
-              <div className="border-t border-gray-100 pt-5">
-                <h2 className="mb-3 text-sm font-semibold text-gray-700">Üzenet a bejelentőnek</h2>
-                <SendMessageForm reportId={report.id} />
-              </div>
-            )}
           </div>
         </div>
       </div>

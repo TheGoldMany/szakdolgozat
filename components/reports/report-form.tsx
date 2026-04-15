@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { LocationPicker } from "@/components/ui/location-picker";
 
 const schema = z.object({
   type:         z.enum(["LOST", "FOUND", "STRAY"]),
@@ -17,8 +18,10 @@ const schema = z.object({
   description:  z.string().min(10, "Legalább 10 karakter szükséges"),
   city:         z.string().min(1, "Kötelező mező"),
   address:      z.string().optional(),
+  lat:          z.number().optional(),
+  lng:          z.number().optional(),
   contactName:  z.string().min(2, "Kötelező mező"),
-  contactPhone: z.string().optional(),
+  contactPhone: z.string().min(1, "Kötelező mező"),
   contactEmail: z.string().email("Érvénytelen email"),
   imageUrl:     z.string().optional(),
 });
@@ -39,6 +42,9 @@ const ANIMAL_OPTIONS = [
   { value: "OTHER",  label: "Egyéb" },
 ];
 
+const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+const inputWhiteCls = `${inputCls} bg-white`;
+
 export function ReportForm() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -48,6 +54,7 @@ export function ReportForm() {
     handleSubmit,
     watch,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -55,6 +62,8 @@ export function ReportForm() {
   });
 
   const selectedType = watch("type");
+  const lat = watch("lat");
+  const lng = watch("lng");
 
   async function onSubmit(data: FormData) {
     setServerError(null);
@@ -78,7 +87,9 @@ export function ReportForm() {
 
       {/* Bejelentés típusa */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">Bejelentés típusa <span className="text-red-500">*</span></label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          Bejelentés típusa <span className="text-red-500">*</span>
+        </label>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {TYPE_OPTIONS.map((o) => (
             <label key={o.value} className="flex cursor-pointer items-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-3 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
@@ -91,7 +102,9 @@ export function ReportForm() {
 
       {/* Állatfaj */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">Állatfaj <span className="text-red-500">*</span></label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          Állatfaj <span className="text-red-500">*</span>
+        </label>
         <div className="flex flex-wrap gap-2">
           {ANIMAL_OPTIONS.map((o) => (
             <label key={o.value} className="flex cursor-pointer items-center gap-1.5 rounded-lg border-2 border-gray-200 px-3 py-2 transition-colors has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
@@ -107,19 +120,16 @@ export function ReportForm() {
         {selectedType === "LOST" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">Állat neve</label>
-            <input {...register("name")} placeholder="pl. Bodri"
-              className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            <input {...register("name")} placeholder="pl. Bodri" className={inputCls} />
           </div>
         )}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Fajta</label>
-          <input {...register("breed")} placeholder="pl. Labrador"
-            className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          <input {...register("breed")} placeholder="pl. Labrador" className={inputCls} />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Szín / jellemzők</label>
-          <input {...register("color")} placeholder="pl. Fekete-fehér foltos"
-            className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          <input {...register("color")} placeholder="pl. Fekete-fehér foltos" className={inputCls} />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Nem</label>
@@ -157,20 +167,31 @@ export function ReportForm() {
       />
 
       {/* Helyszín */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">
-            Város <span className="text-red-500">*</span>
-          </label>
-          <input {...register("city")} placeholder="pl. Budapest"
-            className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
-          {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Város <span className="text-red-500">*</span>
+            </label>
+            <input {...register("city")} placeholder="pl. Budapest" className={inputCls} />
+            {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">Utca, házszám</label>
+            <input {...register("address")} placeholder="pl. Váci utca 10." className={inputCls} />
+          </div>
         </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Pontos helyszín</label>
-          <input {...register("address")} placeholder="pl. Városliget közelében"
-            className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
-        </div>
+
+        <LocationPicker
+          lat={lat}
+          lng={lng}
+          onChange={({ lat: newLat, lng: newLng, city, address }) => {
+            setValue("lat", newLat);
+            setValue("lng", newLng);
+            if (city)    setValue("city",    city);
+            if (address) setValue("address", address);
+          }}
+        />
       </div>
 
       {/* Kapcsolattartó */}
@@ -178,20 +199,24 @@ export function ReportForm() {
         <p className="text-sm font-semibold text-gray-700">Kapcsolattartói adatok</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Név <span className="text-red-500">*</span></label>
-            <input {...register("contactName")} placeholder="Teljes név"
-              className="h-9 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Név <span className="text-red-500">*</span>
+            </label>
+            <input {...register("contactName")} placeholder="Teljes név" className={inputWhiteCls} />
             {errors.contactName && <p className="mt-1 text-xs text-red-500">{errors.contactName.message}</p>}
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Telefonszám</label>
-            <input {...register("contactPhone")} placeholder="+36 30 123 4567"
-              className="h-9 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Telefonszám <span className="text-red-500">*</span>
+            </label>
+            <input {...register("contactPhone")} placeholder="+36 30 123 4567" className={inputWhiteCls} />
+            {errors.contactPhone && <p className="mt-1 text-xs text-red-500">{errors.contactPhone.message}</p>}
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></label>
-            <input {...register("contactEmail")} type="email" placeholder="email@example.com"
-              className="h-9 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input {...register("contactEmail")} type="email" placeholder="email@example.com" className={inputWhiteCls} />
             {errors.contactEmail && <p className="mt-1 text-xs text-red-500">{errors.contactEmail.message}</p>}
           </div>
         </div>

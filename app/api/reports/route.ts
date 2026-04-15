@@ -17,8 +17,10 @@ const schema = z.object({
   address:      z.string().max(200).optional(),
   imageUrl:     z.string().url().optional().or(z.literal("")),
   contactName:  z.string().min(2).max(100),
-  contactPhone: z.string().max(20).optional(),
+  contactPhone: z.string().min(1, "Kötelező mező").max(20),
   contactEmail: z.string().email("Érvénytelen email"),
+  lat:          z.number().optional(),
+  lng:          z.number().optional(),
 });
 
 export async function POST(req: NextRequest) {
