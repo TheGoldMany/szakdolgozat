@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Menu, X, PawPrint, ChevronDown, MessageCircle } from "lucide-react";
+import { Menu, X, PawPrint, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -91,21 +91,32 @@ export function Header() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen((v) => !v)}
-                  className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-brand-100 text-sm font-semibold text-brand-600 transition-colors hover:border-brand-400 focus:outline-none"
+                  title={session.user?.name ?? "Fiók"}
                 >
-                  <span className="max-w-[120px] truncate">{session.user?.name}</span>
-                  <ChevronDown className="h-4 w-4 shrink-0" />
+                  {session.user?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={session.user.image}
+                      alt={session.user.name ?? "Avatar"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    (session.user?.name ?? "?")[0].toUpperCase()
+                  )}
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
-                    {roleInfo && (
-                      <div className="px-4 pb-2 pt-1">
-                        <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+                    <div className="px-4 pb-2 pt-2">
+                      <p className="truncate text-sm font-semibold text-gray-800">{session.user?.name}</p>
+                      <p className="truncate text-xs text-gray-400">{session.user?.email}</p>
+                      {roleInfo && (
+                        <span className={cn("mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
                           {roleInfo.label}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <hr className="mb-1 border-gray-100" />
                     <Link href="/profile" onClick={() => setUserMenuOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
