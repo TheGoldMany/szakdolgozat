@@ -8,6 +8,7 @@ import { AnimalStatusSelect } from "@/components/dashboard/animal-status-select"
 import { AddAnimalPanel } from "@/components/dashboard/add-animal-panel";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { PawPrint } from "lucide-react";
 
 export const metadata: Metadata = { title: "Állatok" };
 
@@ -93,7 +94,7 @@ export default async function DashboardAnimalsPage({
 
       {animals.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-          <span className="text-4xl">🐾</span>
+          <PawPrint className="h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm text-gray-500">Nincsenek állatok ebben a kategóriában</p>
         </div>
       ) : (

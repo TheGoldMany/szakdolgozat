@@ -82,11 +82,11 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
             </Field>
             <Field label="Faj *" error={errors.type?.message}>
               <select {...register("type")} className={cls}>
-                <option value="DOG">🐕 Kutya</option>
-                <option value="CAT">🐈 Macska</option>
-                <option value="RABBIT">🐇 Nyúl</option>
-                <option value="BIRD">🦜 Madár</option>
-                <option value="OTHER">🐾 Egyéb</option>
+                <option value="DOG">Kutya</option>
+                <option value="CAT">Macska</option>
+                <option value="RABBIT">Nyúl</option>
+                <option value="BIRD">Madár</option>
+                <option value="OTHER">Egyéb</option>
               </select>
             </Field>
           </div>
@@ -152,9 +152,9 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Egészségi állapot</h3>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {[
-            { name: "isVaccinated"   as const, label: "💉 Oltott" },
-            { name: "isNeutered"     as const, label: "✂️ Ivartalanított" },
-            { name: "isMicrochipped" as const, label: "📡 Chippelt" },
+            { name: "isVaccinated"   as const, label: "Oltott" },
+            { name: "isNeutered"     as const, label: "Ivartalanított" },
+            { name: "isMicrochipped" as const, label: "Chippelt" },
           ].map(({ name, label }) => (
             <label key={name} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50 transition-colors">
               <input type="checkbox" {...register(name)} className="h-4 w-4 rounded border-gray-300 text-brand-500" />
@@ -169,9 +169,9 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Jellemzők</h3>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {[
-            { name: "isGoodWithKids" as const, label: "👶 Gyerekbarát" },
-            { name: "isGoodWithDogs" as const, label: "🐕 Kutyabarát" },
-            { name: "isGoodWithCats" as const, label: "🐈 Macskajáró" },
+            { name: "isGoodWithKids" as const, label: "Gyerekbarát" },
+            { name: "isGoodWithDogs" as const, label: "Kutyabarát" },
+            { name: "isGoodWithCats" as const, label: "Macskajáró" },
           ].map(({ name, label }) => (
             <label key={name} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50 transition-colors">
               <input type="checkbox" {...register(name)} className="h-4 w-4 rounded border-gray-300 text-brand-500" />

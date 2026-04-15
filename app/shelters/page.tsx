@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ShelterCard } from "@/components/shelters/shelter-card";
 import { AnimalStatus } from "@prisma/client";
+import { Building2 } from "lucide-react";
 
 export const metadata: Metadata = { title: "Menhelyek" };
 
@@ -32,7 +33,7 @@ export default async function SheltersPage() {
 
         {shelters.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-            <span className="text-5xl">🏠</span>
+            <Building2 className="h-12 w-12 text-gray-300" />
             <p className="mt-4 text-lg font-medium text-gray-700">Nincs menhely</p>
           </div>
         ) : (

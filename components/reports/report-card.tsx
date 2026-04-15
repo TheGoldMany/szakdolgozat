@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail } from "lucide-react";
+import { MapPin, Phone, Mail, Search, Home, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus, AnimalType } from "@prisma/client";
 
-const TYPE_LABELS: Record<ReportType, { label: string; color: string; emoji: string }> = {
-  LOST:  { label: "Elveszett", color: "bg-red-100 text-red-700",    emoji: "🔍" },
-  FOUND: { label: "Megtalált", color: "bg-green-100 text-green-700", emoji: "🏠" },
-  STRAY: { label: "Kóbor",     color: "bg-yellow-100 text-yellow-700", emoji: "🐾" },
+const TYPE_CONFIG: Record<ReportType, { label: string; color: string; Icon: React.ElementType }> = {
+  LOST:  { label: "Elveszett", color: "bg-red-100 text-red-700",      Icon: Search },
+  FOUND: { label: "Megtalált", color: "bg-brand-100 text-brand-700",  Icon: Home },
+  STRAY: { label: "Kóbor",     color: "bg-yellow-100 text-yellow-700", Icon: Navigation },
 };
 
 const STATUS_LABELS: Record<ReportStatus, { label: string; color: string }> = {
@@ -15,8 +15,8 @@ const STATUS_LABELS: Record<ReportStatus, { label: string; color: string }> = {
   CLOSED:   { label: "Lezárt",   color: "bg-gray-100 text-gray-400" },
 };
 
-const ANIMAL_EMOJI: Record<AnimalType, string> = {
-  DOG: "🐕", CAT: "🐈", RABBIT: "🐇", BIRD: "🦜", OTHER: "🐾",
+const ANIMAL_LABELS: Record<AnimalType, string> = {
+  DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb",
 };
 
 interface ReportCardProps {
@@ -39,27 +39,34 @@ interface ReportCardProps {
 }
 
 export function ReportCard({ report }: ReportCardProps) {
-  const type   = TYPE_LABELS[report.type];
-  const status = STATUS_LABELS[report.status];
+  const typeConfig = TYPE_CONFIG[report.type];
+  const status     = STATUS_LABELS[report.status];
+  const Icon       = typeConfig.Icon;
 
   return (
     <Link href={`/reports/${report.id}`} className="group block">
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md p-5">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{ANIMAL_EMOJI[report.animalType]}</span>
+          <div className="flex items-start gap-3">
+            <div className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl", typeConfig.color)}>
+              <Icon className="h-4 w-4" />
+            </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", type.color)}>
-                  {type.emoji} {type.label}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", typeConfig.color)}>
+                  {typeConfig.label}
                 </span>
                 <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", status.color)}>
                   {status.label}
                 </span>
+                <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500">
+                  {ANIMAL_LABELS[report.animalType]}
+                </span>
               </div>
-              <h3 className="mt-1 font-semibold text-gray-900 group-hover:text-brand-500 transition-colors">
-                {report.name ? `${report.name}` : report.breed ?? "Ismeretlen"}
-                {report.breed && report.name ? ` (${report.breed})` : ""}
+              <h3 className="mt-1.5 font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">
+                {report.name
+                  ? report.breed ? `${report.name} (${report.breed})` : report.name
+                  : report.breed ?? "Ismeretlen"}
               </h3>
             </div>
           </div>
@@ -75,15 +82,26 @@ export function ReportCard({ report }: ReportCardProps) {
             <MapPin className="h-3.5 w-3.5" />
             {report.city}{report.address ? `, ${report.address}` : ""}
           </span>
-          {report.color && <span>🎨 {report.color}</span>}
+          {report.color && (
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border border-gray-200 bg-gray-300" />
+              {report.color}
+            </span>
+          )}
         </div>
 
         <div className="mt-3 border-t border-gray-100 pt-3 flex flex-wrap gap-3 text-xs text-gray-500">
           <span className="font-medium">{report.contactName}</span>
           {report.contactPhone && (
-            <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{report.contactPhone}</span>
+            <span className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              {report.contactPhone}
+            </span>
           )}
-          <span className="flex items-center gap-1"><Mail className="h-3 w-3" />{report.contactEmail}</span>
+          <span className="flex items-center gap-1">
+            <Mail className="h-3 w-3" />
+            {report.contactEmail}
+          </span>
         </div>
       </div>
     </Link>

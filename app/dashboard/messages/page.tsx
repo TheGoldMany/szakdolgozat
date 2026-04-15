@@ -110,7 +110,9 @@ export default async function DashboardMessagesPage() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={img.url} alt={conv.animal.name} className="h-full w-full object-cover" />
                           ) : (
-                            <div className="flex h-full items-center justify-center text-base">🐾</div>
+                            <div className="flex h-full items-center justify-center">
+                              <PawPrint className="h-4 w-4 text-gray-300" />
+                            </div>
                           )}
                         </div>
                         <div>

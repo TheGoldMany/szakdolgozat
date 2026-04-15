@@ -1,22 +1,19 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PawPrint, Building2, Heart } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { ReportCard } from "@/components/reports/report-card";
 import { HomeSearch } from "@/components/home/home-search";
 
-export const revalidate = 60; // SSG refresh every 60s
+export const revalidate = 60;
 
 export default async function HomePage() {
-  // Fetch everything in parallel
   const [availableCount, shelterCount, adoptedCount, latestAnimals, latestReports] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
       prisma.animal.count({ where: { status: AnimalStatus.ADOPTED } }),
-
-      // 6 legújabb örökbefogadható állat
       prisma.animal.findMany({
         where: { status: AnimalStatus.AVAILABLE },
         orderBy: { createdAt: "desc" },
@@ -26,8 +23,6 @@ export default async function HomePage() {
           shelter: { select: { id: true, name: true, city: true } },
         },
       }),
-
-      // 4 legújabb aktív bejelentés
       prisma.animalReport.findMany({
         where: { status: ReportStatus.ACTIVE },
         orderBy: { createdAt: "desc" },
@@ -38,10 +33,11 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-brand-50 via-white to-gray-50">
 
-      {/* ── Hero ── */}
-      <section className="flex flex-col items-center px-4 pb-16 pt-20 text-center sm:pt-24">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold text-brand-600 shadow-sm">
-          🐾 {availableCount} állat vár új gazdára
+      {/* Hero */}
+      <section className="flex flex-col items-center px-4 pb-16 pt-20 text-center sm:pt-28">
+        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold text-brand-700 shadow-sm">
+          <PawPrint className="h-3.5 w-3.5" />
+          {availableCount} állat vár új gazdára
         </div>
 
         <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
@@ -53,7 +49,6 @@ export default async function HomePage() {
           vagy jelents be elveszett és megtalált állatot.
         </p>
 
-        {/* Quick search */}
         <div className="mt-10 w-full max-w-2xl">
           <HomeSearch />
         </div>
@@ -74,24 +69,26 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Stats ── */}
+      {/* Stats */}
       <section className="mx-auto max-w-4xl px-4 pb-16 sm:px-6">
         <div className="grid grid-cols-3 gap-4">
           {[
-            { value: availableCount.toLocaleString("hu-HU"), label: "Elérhető állat",     emoji: "🐾" },
-            { value: shelterCount.toLocaleString("hu-HU"),   label: "Aktív menhely",      emoji: "🏠" },
-            { value: adoptedCount.toLocaleString("hu-HU"),   label: "Örökbefogadott",     emoji: "🎉" },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-gray-100 bg-white p-5 text-center shadow-sm sm:p-7">
-              <div className="text-2xl sm:text-3xl">{stat.emoji}</div>
-              <p className="mt-2 text-2xl font-bold text-brand-500 sm:text-3xl">{stat.value}</p>
-              <p className="mt-1 text-xs text-gray-500 sm:text-sm">{stat.label}</p>
+            { value: availableCount.toLocaleString("hu-HU"), label: "Elérhető állat",  Icon: PawPrint },
+            { value: shelterCount.toLocaleString("hu-HU"),   label: "Aktív menhely",   Icon: Building2 },
+            { value: adoptedCount.toLocaleString("hu-HU"),   label: "Örökbefogadott",  Icon: Heart },
+          ].map(({ value, label, Icon }) => (
+            <div key={label} className="rounded-2xl border border-gray-100 bg-white p-5 text-center shadow-sm sm:p-7">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500">
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-brand-600 sm:text-3xl">{value}</p>
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">{label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Latest animals ── */}
+      {/* Latest animals */}
       {latestAnimals.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center justify-between">
@@ -101,7 +98,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/animals"
-              className="flex items-center gap-1 text-sm font-semibold text-brand-500 hover:underline"
+              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline"
             >
               Összes <ArrowRight className="h-4 w-4" />
             </Link>
@@ -114,7 +111,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Latest reports ── */}
+      {/* Latest reports */}
       {latestReports.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center justify-between">
@@ -124,7 +121,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/reports"
-              className="flex items-center gap-1 text-sm font-semibold text-brand-500 hover:underline"
+              className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline"
             >
               Összes <ArrowRight className="h-4 w-4" />
             </Link>

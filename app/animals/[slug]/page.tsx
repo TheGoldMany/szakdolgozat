@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Ruler, Calendar, Weight } from "lucide-react";
+import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
@@ -32,7 +32,7 @@ export async function generateMetadata({
 // Labels / helpers
 // -------------------------------------------------------
 const STATUS_LABELS: Record<AnimalStatus, { label: string; color: string }> = {
-  AVAILABLE:    { label: "Örökbefogadható", color: "bg-green-100 text-green-700" },
+  AVAILABLE:    { label: "Örökbefogadható", color: "bg-brand-100 text-brand-700" },
   PENDING:      { label: "Folyamatban",     color: "bg-yellow-100 text-yellow-700" },
   ADOPTED:      { label: "Örökbefogadott",  color: "bg-blue-100 text-blue-700" },
   FOSTER:       { label: "Ideiglenes",      color: "bg-purple-100 text-purple-700" },
@@ -200,9 +200,21 @@ export default async function AnimalDetailPage({
 
               {/* Egészségügyi státusz */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {animal.isVaccinated   && <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">💉 Oltott</span>}
-                {animal.isNeutered     && <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">✂️ Ivartalanított</span>}
-                {animal.isMicrochipped && <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">📡 Chippelt</span>}
+                {animal.isVaccinated && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                    <Syringe className="h-3 w-3" /> Oltott
+                  </span>
+                )}
+                {animal.isNeutered && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
+                    <Scissors className="h-3 w-3" /> Ivartalanított
+                  </span>
+                )}
+                {animal.isMicrochipped && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                    <Wifi className="h-3 w-3" /> Chippelt
+                  </span>
+                )}
               </div>
 
               {/* Jellemzők */}

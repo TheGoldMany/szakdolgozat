@@ -148,7 +148,7 @@ export default async function ShelterDetailPage({
 
             {shelter.animals.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
-                <span className="text-4xl">🐾</span>
+                <PawPrint className="h-10 w-10 text-gray-300" />
                 <p className="mt-3 text-sm text-gray-500">
                   Jelenleg nincs örökbefogadható állat
                 </p>

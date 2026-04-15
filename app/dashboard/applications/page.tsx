@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { Users, PawPrint } from "lucide-react";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
@@ -136,8 +137,8 @@ export default async function DashboardApplicationsPage({
                         </p>
                       )}
                       <p className="flex gap-3">
-                        {app.hasChildren && <span>👦 Gyerek a háztartásban</span>}
-                        {app.hasPets    && <span>🐾 Van más állat</span>}
+                        {app.hasChildren && <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />Gyerek a háztartásban</span>}
+                        {app.hasPets    && <span className="flex items-center gap-1"><PawPrint className="h-3.5 w-3.5" />Van más állat</span>}
                       </p>
                     </div>
 

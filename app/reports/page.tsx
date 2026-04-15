@@ -1,9 +1,9 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ReportCard } from "@/components/reports/report-card";
-import { ReportType, ReportStatus, AnimalType } from "@prisma/client";
+import { ReportType, ReportStatus } from "@prisma/client";
 
 export const metadata: Metadata = { title: "Elveszett és megtalált állatok" };
 
@@ -26,9 +26,9 @@ export default async function ReportsPage({ searchParams }: PageProps) {
 
   const typeButtons = [
     { value: "",      label: "Összes" },
-    { value: "LOST",  label: "🔍 Elveszett" },
-    { value: "FOUND", label: "🏠 Megtalált" },
-    { value: "STRAY", label: "🐾 Kóbor" },
+    { value: "LOST",  label: "Elveszett" },
+    { value: "FOUND", label: "Megtalált" },
+    { value: "STRAY", label: "Kóbor" },
   ];
 
   const statusButtons = [
@@ -48,7 +48,6 @@ export default async function ReportsPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
 
-        {/* Fejléc */}
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Elveszett és megtalált állatok</h1>
@@ -96,14 +95,15 @@ export default async function ReportsPage({ searchParams }: PageProps) {
           </div>
         </div>
 
-        {/* Lista */}
         {reports.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-            <span className="text-5xl">🔍</span>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+              <Search className="h-7 w-7 text-gray-400" />
+            </div>
             <p className="mt-4 text-lg font-medium text-gray-700">Nincs bejelentés</p>
             <p className="mt-1 text-sm text-gray-400">Légy az első, aki bejelent!</p>
             <Link href="/reports/new"
-              className="mt-5 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600">
+              className="mt-5 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
               Bejelentés indítása
             </Link>
           </div>

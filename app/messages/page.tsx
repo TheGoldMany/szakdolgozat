@@ -94,7 +94,9 @@ export default async function MessagesPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={img.url} alt={conv.animal.name} className="h-full w-full object-cover" />
                     ) : (
-                      <div className="flex h-full items-center justify-center text-2xl">🐾</div>
+                      <div className="flex h-full items-center justify-center">
+                        <PawPrint className="h-6 w-6 text-gray-300" />
+                      </div>
                     )}
                   </div>
 

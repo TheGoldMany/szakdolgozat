@@ -26,17 +26,17 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const TYPE_OPTIONS = [
-  { value: "LOST",  label: "🔍 Elveszett – keresem a gazdát" },
-  { value: "FOUND", label: "🏠 Megtalált – gazdát keresek neki" },
-  { value: "STRAY", label: "🐾 Kóbor – segítséget kérek" },
+  { value: "LOST",  label: "Elveszett – keresem a gazdát" },
+  { value: "FOUND", label: "Megtalált – gazdát keresek neki" },
+  { value: "STRAY", label: "Kóbor – segítséget kérek" },
 ];
 
 const ANIMAL_OPTIONS = [
-  { value: "DOG",    label: "🐕 Kutya" },
-  { value: "CAT",    label: "🐈 Macska" },
-  { value: "RABBIT", label: "🐇 Nyúl" },
-  { value: "BIRD",   label: "🦜 Madár" },
-  { value: "OTHER",  label: "🐾 Egyéb" },
+  { value: "DOG",    label: "Kutya" },
+  { value: "CAT",    label: "Macska" },
+  { value: "RABBIT", label: "Nyúl" },
+  { value: "BIRD",   label: "Madár" },
+  { value: "OTHER",  label: "Egyéb" },
 ];
 
 export function ReportForm() {

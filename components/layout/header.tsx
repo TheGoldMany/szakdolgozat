@@ -14,7 +14,7 @@ const NAV_LINKS = [
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
   SUPER_ADMIN:   { label: "Főadmin",       color: "bg-red-100 text-red-700" },
-  SHELTER_ADMIN: { label: "Menhely admin", color: "bg-amber-100 text-amber-700" },
+  SHELTER_ADMIN: { label: "Menhely admin", color: "bg-brand-100 text-brand-700" },
   USER:          { label: "Felhasználó",   color: "bg-gray-100 text-gray-600" },
 };
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalsFilters } from "@/components/animals/animals-filters";
 import { AnimalStatus, AnimalType, AnimalSize } from "@prisma/client";
+import { PawPrint } from "lucide-react";
 
 export const metadata: Metadata = { title: "Állatok" };
 
@@ -78,7 +79,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
           <main className="flex-1">
             {animals.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-                <span className="text-5xl">🐾</span>
+                <PawPrint className="h-12 w-12 text-gray-300" />
                 <p className="mt-4 text-lg font-medium text-gray-700">Nem találtunk állatot</p>
                 <p className="mt-1 text-sm text-gray-400">Próbálj más szűrőkkel keresni</p>
               </div>
