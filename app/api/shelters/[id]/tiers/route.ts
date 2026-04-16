@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 const createSchema = z.object({
   name:        z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  amount:      z.number().int().positive(),
+  amount:      z.number().int().min(175, "Az összeg minimum 175 Ft (Stripe limit)"),
 });
 
 async function checkShelterAdmin(shelterId: string, userId: string, role: string) {

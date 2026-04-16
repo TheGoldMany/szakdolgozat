@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 const patchSchema = z.object({
   name:        z.string().min(1).max(200).optional(),
   description: z.string().max(2000).optional().nullable(),
-  amount:      z.number().int().positive().optional(),
+  amount:      z.number().int().min(175, "Az összeg minimum 175 Ft (Stripe limit)").optional(),
   isActive:    z.boolean().optional(),
 });
 

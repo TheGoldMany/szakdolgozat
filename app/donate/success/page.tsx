@@ -1,10 +1,55 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CheckCircle2 } from "lucide-react";
+import { getStripe } from "@/lib/stripe";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = { title: "Sikeres adományozás" };
+export const dynamic = "force-dynamic";
 
-export default function DonateSuccessPage() {
+async function fulfillSession(sessionId: string) {
+  try {
+    const session = await getStripe().checkout.sessions.retrieve(sessionId);
+    if (session.payment_status !== "paid" && session.status !== "complete") return;
+
+    const metadata = session.metadata ?? {};
+
+    // Subscription: create record if not yet created by webhook
+    if (metadata.tierId && metadata.userId && session.subscription) {
+      const stripeSubId = String(session.subscription);
+      await prisma.subscription.upsert({
+        where:  { stripeSubId },
+        update: {},
+        create: {
+          userId:      metadata.userId,
+          tierId:      metadata.tierId,
+          status:      "ACTIVE",
+          stripeSubId,
+        },
+      });
+    }
+
+    // One-time donation: mark as paid if not yet done
+    if (metadata.donationId) {
+      await prisma.donation.updateMany({
+        where: { id: metadata.donationId, paidAt: null },
+        data:  { paidAt: new Date() },
+      });
+    }
+  } catch {
+    // Don't crash the page if Stripe call fails
+  }
+}
+
+export default async function DonateSuccessPage({
+  searchParams,
+}: {
+  searchParams: { session_id?: string };
+}) {
+  if (searchParams.session_id) {
+    await fulfillSession(searchParams.session_id);
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-white p-10 text-center shadow-sm">
@@ -24,10 +69,10 @@ export default function DonateSuccessPage() {
             Vissza az adományozáshoz
           </Link>
           <Link
-            href="/"
+            href="/profile"
             className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            Főoldal
+            Előfizetéseim
           </Link>
         </div>
       </div>
