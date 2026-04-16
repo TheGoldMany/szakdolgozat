@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getStripe } from "@/lib/stripe";
+
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 const donateSchema = z.object({
   campaignId:  z.string().min(1),
@@ -11,7 +14,7 @@ const donateSchema = z.object({
   isAnonymous: z.boolean().optional().default(false),
 });
 
-// POST /api/checkout/donate – record a donation and return bank transfer details
+// POST /api/checkout/donate – create a Stripe Checkout session for a one-time donation
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -25,21 +28,7 @@ export async function POST(req: NextRequest) {
 
   const { campaignId, amount, message, isAnonymous } = parsed.data;
 
-  // Validate campaign is ACTIVE
-  const campaign = await prisma.campaign.findUnique({
-    where:   { id: campaignId },
-    include: {
-      shelter: {
-        select: {
-          name:              true,
-          companyName:       true,
-          bankAccountName:   true,
-          bankAccountNumber: true,
-        },
-      },
-    },
-  });
-
+  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
   if (!campaign) {
     return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
   }
@@ -47,33 +36,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A kampány nem fogad adományokat" }, { status: 409 });
   }
 
-  // Create donation record and increment raisedAmount atomically
-  const [donation] = await prisma.$transaction([
-    prisma.donation.create({
-      data: {
-        userId:      session?.user?.id ?? null,
-        campaignId,
-        amount,
-        message:     message ?? null,
-        isAnonymous: isAnonymous ?? false,
-        paidAt:      new Date(),
+  // Create pending Donation record (paidAt set by webhook after payment)
+  const donation = await prisma.donation.create({
+    data: {
+      userId:      session?.user?.id ?? null,
+      campaignId,
+      amount,
+      message:     message ?? null,
+      isAnonymous: isAnonymous ?? false,
+      paidAt:      null,
+    },
+  });
+
+  // Stripe Checkout – HUF is zero-decimal, pass amount as-is
+  const checkoutSession = await getStripe().checkout.sessions.create({
+    mode:     "payment",
+    currency: "huf",
+    line_items: [
+      {
+        price_data: {
+          currency:     "huf",
+          product_data: { name: campaign.title },
+          unit_amount:  amount,
+        },
+        quantity: 1,
       },
-    }),
-    prisma.campaign.update({
-      where: { id: campaignId },
-      data:  { raisedAmount: { increment: amount } },
-    }),
-  ]);
+    ],
+    success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${BASE}/donate/${campaign.id}`,
+    metadata:    { donationId: donation.id },
+  });
 
-  // Return bank transfer details if available
-  const shelter = campaign.shelter;
-  const bankInfo = shelter
-    ? {
-        beneficiary:   shelter.companyName ?? shelter.bankAccountName ?? shelter.name,
-        accountNumber: shelter.bankAccountNumber,
-        reference:     `Adomány: ${campaign.title}`,
-      }
-    : null;
+  await prisma.donation.update({
+    where: { id: donation.id },
+    data:  { stripeSessionId: checkoutSession.id },
+  });
 
-  return NextResponse.json({ donationId: donation.id, amount, bankInfo });
+  return NextResponse.json({ url: checkoutSession.url });
 }

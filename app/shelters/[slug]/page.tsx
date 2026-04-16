@@ -235,16 +235,7 @@ export default async function ShelterDetailPage({
                 <h2 className="mb-3 text-sm font-semibold text-gray-700">Havi előfizetések</h2>
                 <div className="flex flex-col gap-3">
                   {shelter.tiers.map((tier) => (
-                    <TierCard
-                      key={tier.id}
-                      tier={tier}
-                      shelter={{
-                        name:              shelter.name,
-                        companyName:       shelter.companyName,
-                        bankAccountName:   shelter.bankAccountName,
-                        bankAccountNumber: shelter.bankAccountNumber,
-                      }}
-                    />
+                    <TierCard key={tier.id} tier={tier}
                   ))}
                 </div>
               </div>

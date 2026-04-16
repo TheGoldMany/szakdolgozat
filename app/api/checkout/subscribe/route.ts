@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   // Validate tier exists and is active, include shelter name
   const tier = await prisma.donationTier.findUnique({
     where:   { id: tierId },
-    include: { shelter: { select: { id: true, name: true } } },
+    include: { shelter: { select: { id: true, name: true, slug: true } } },
   });
   if (!tier) {
     return NextResponse.json({ error: "A csomag nem található" }, { status: 404 });
@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       },
     ],
-    success_url: `${BASE}/shelters/${tier.shelter.id}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${BASE}/shelters/${tier.shelter.id}`,
+    success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${BASE}/shelters/${tier.shelter.slug}`,
     metadata: {
       tierId,
       userId: session.user.id,
