@@ -8,7 +8,7 @@ import { AnimalStatusSelect } from "@/components/dashboard/animal-status-select"
 import { AddAnimalPanel } from "@/components/dashboard/add-animal-panel";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { PawPrint } from "lucide-react";
+import { PawPrint, FileText } from "lucide-react";
 
 export const metadata: Metadata = { title: "Állatok" };
 
@@ -107,6 +107,7 @@ export default async function DashboardAnimalsPage({
                 <th className="hidden px-4 py-3 text-left md:table-cell">Menhely</th>
                 <th className="px-4 py-3 text-left">Kérelmek</th>
                 <th className="px-4 py-3 text-left">Státusz</th>
+                <th className="px-4 py-3 text-left">Iratok</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -146,6 +147,16 @@ export default async function DashboardAnimalsPage({
                         animalId={animal.id}
                         currentStatus={animal.status}
                       />
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/dashboard/animals/${animal.id}`}
+                        className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-brand-600"
+                        title="Iratok kezelése"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Iratok
+                      </Link>
                     </td>
                   </tr>
                 );

@@ -234,9 +234,24 @@ model Animal {
 
   shelter       Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
   images        AnimalImage[]
+  documents     AnimalDocument[]
   applications  AdoptionApplication[]
   favorites     Favorite[]
   conversations Conversation[]
+}
+
+model AnimalDocument {
+  id        String   @id @default(cuid())
+  animalId  String
+  name      String
+  url       String
+  fileType  String   @default("application/pdf")
+  sizeBytes Int?
+  createdAt DateTime @default(now())
+
+  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@index([animalId])
 }
 
 model AnimalImage {
