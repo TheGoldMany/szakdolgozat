@@ -14,99 +14,105 @@ const bodySchema = z.discriminatedUnion("type", [
 
 // POST /api/stripe/connect/onboard
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
+    }
 
-  const parsed = bodySchema.safeParse(await req.json());
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Érvénytelen adatok", details: parsed.error.flatten() },
-      { status: 400 }
-    );
-  }
+    const parsed = bodySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Érvénytelen adatok", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
 
-  const body = parsed.data;
+    const body = parsed.data;
 
-  if (body.type === "shelter") {
-    const { shelterId } = body;
+    if (body.type === "shelter") {
+      const { shelterId } = body;
 
-    // Verify user is shelter admin or SUPER_ADMIN
-    const isSuperAdmin = (session.user as { role?: string }).role === "SUPER_ADMIN";
-    if (!isSuperAdmin) {
-      const adminRecord = await prisma.shelterAdmin.findUnique({
-        where: { userId_shelterId: { userId: session.user.id, shelterId } },
-      });
-      if (!adminRecord) {
-        return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+      // Verify user is shelter admin or SUPER_ADMIN
+      const isSuperAdmin = (session.user as { role?: string }).role === "SUPER_ADMIN";
+      if (!isSuperAdmin) {
+        const adminRecord = await prisma.shelterAdmin.findUnique({
+          where: { userId_shelterId: { userId: session.user.id, shelterId } },
+        });
+        if (!adminRecord) {
+          return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+        }
       }
+
+      const shelter = await prisma.shelter.findUnique({ where: { id: shelterId } });
+      if (!shelter) {
+        return NextResponse.json({ error: "Menhely nem található" }, { status: 404 });
+      }
+
+      let accountId = shelter.stripeAccountId;
+
+      // Create Stripe Express account if not exists
+      if (!accountId) {
+        const account = await getStripe().accounts.create({
+          type:    "express",
+          country: "HU",
+        });
+        accountId = account.id;
+        await prisma.shelter.update({
+          where: { id: shelterId },
+          data:  { stripeAccountId: accountId, stripeOnboardingComplete: false },
+        });
+      }
+
+      const returnUrl  = `${BASE}/api/stripe/connect/callback?type=shelter&shelterId=${shelterId}`;
+      const refreshUrl = `${BASE}/dashboard/settings`;
+
+      const accountLink = await getStripe().accountLinks.create({
+        account:     accountId,
+        refresh_url: refreshUrl,
+        return_url:  returnUrl,
+        type:        "account_onboarding",
+      });
+
+      return NextResponse.json({ url: accountLink.url });
     }
 
-    const shelter = await prisma.shelter.findUnique({ where: { id: shelterId } });
-    if (!shelter) {
-      return NextResponse.json({ error: "Menhely nem található" }, { status: 404 });
+    // type === "user"
+    const userId = session.user.id;
+    const user   = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return NextResponse.json({ error: "Felhasználó nem található" }, { status: 404 });
     }
 
-    let accountId = shelter.stripeAccountId;
+    let accountId = user.stripeAccountId;
 
-    // Create Stripe Express account if not exists
     if (!accountId) {
       const account = await getStripe().accounts.create({
-        type: "express",
+        type:    "express",
         country: "HU",
       });
       accountId = account.id;
-      await prisma.shelter.update({
-        where: { id: shelterId },
-        data: { stripeAccountId: accountId },
+      await prisma.user.update({
+        where: { id: userId },
+        data:  { stripeAccountId: accountId, stripeOnboardingComplete: false },
       });
     }
 
-    const returnUrl = `${BASE}/api/stripe/connect/callback?type=shelter&shelterId=${shelterId}`;
-    const refreshUrl = `${BASE}/api/stripe/connect/onboard`;
+    const returnUrl  = `${BASE}/api/stripe/connect/callback?type=user`;
+    const refreshUrl = `${BASE}/profile`;
 
     const accountLink = await getStripe().accountLinks.create({
-      account: accountId,
+      account:     accountId,
       refresh_url: refreshUrl,
-      return_url: returnUrl,
-      type: "account_onboarding",
+      return_url:  returnUrl,
+      type:        "account_onboarding",
     });
 
     return NextResponse.json({ url: accountLink.url });
+
+  } catch (err) {
+    console.error("Stripe Connect onboard error:", err);
+    const message = err instanceof Error ? err.message : "Ismeretlen Stripe hiba";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-
-  // type === "user"
-  const userId = session.user.id;
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    return NextResponse.json({ error: "Felhasználó nem található" }, { status: 404 });
-  }
-
-  let accountId = user.stripeAccountId;
-
-  // Create Stripe Express account if not exists
-  if (!accountId) {
-    const account = await getStripe().accounts.create({
-      type: "express",
-      country: "HU",
-    });
-    accountId = account.id;
-    await prisma.user.update({
-      where: { id: userId },
-      data: { stripeAccountId: accountId },
-    });
-  }
-
-  const returnUrl = `${BASE}/api/stripe/connect/callback?type=user`;
-  const refreshUrl = `${BASE}/api/stripe/connect/onboard`;
-
-  const accountLink = await getStripe().accountLinks.create({
-    account: accountId,
-    refresh_url: refreshUrl,
-    return_url: returnUrl,
-    type: "account_onboarding",
-  });
-
-  return NextResponse.json({ url: accountLink.url });
 }
