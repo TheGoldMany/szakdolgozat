@@ -12,6 +12,19 @@ const bodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("user") }),
 ]);
 
+/** Returns true when a Stripe error indicates the stored account ID is invalid/stale */
+function isInvalidAccountError(err: unknown): boolean {
+  if (err && typeof err === "object" && "type" in err) {
+    const stripeErr = err as { type: string; code?: string; message?: string };
+    if (stripeErr.type === "StripeInvalidRequestError") return true;
+  }
+  if (err instanceof Error) {
+    const msg = err.message.toLowerCase();
+    return msg.includes("not connected to your platform") || msg.includes("does not exist");
+  }
+  return false;
+}
+
 // POST /api/stripe/connect/onboard
 export async function POST(req: NextRequest) {
   try {
@@ -67,12 +80,36 @@ export async function POST(req: NextRequest) {
       const returnUrl  = `${BASE}/api/stripe/connect/callback?type=shelter&shelterId=${shelterId}`;
       const refreshUrl = `${BASE}/dashboard/settings`;
 
-      const accountLink = await getStripe().accountLinks.create({
-        account:     accountId,
-        refresh_url: refreshUrl,
-        return_url:  returnUrl,
-        type:        "account_onboarding",
-      });
+      // Try to create account link; if the stored ID is stale (e.g. from test mode),
+      // reset it, create a fresh account, and retry once.
+      let accountLink;
+      try {
+        accountLink = await getStripe().accountLinks.create({
+          account:     accountId,
+          refresh_url: refreshUrl,
+          return_url:  returnUrl,
+          type:        "account_onboarding",
+        });
+      } catch (linkErr) {
+        if (!isInvalidAccountError(linkErr)) throw linkErr;
+
+        // Stale/test account ID – create a new live account
+        const newAccount = await getStripe().accounts.create({
+          type:    "express",
+          country: "HU",
+        });
+        accountId = newAccount.id;
+        await prisma.shelter.update({
+          where: { id: shelterId },
+          data:  { stripeAccountId: accountId, stripeOnboardingComplete: false },
+        });
+        accountLink = await getStripe().accountLinks.create({
+          account:     accountId,
+          refresh_url: refreshUrl,
+          return_url:  returnUrl,
+          type:        "account_onboarding",
+        });
+      }
 
       return NextResponse.json({ url: accountLink.url });
     }
@@ -101,12 +138,34 @@ export async function POST(req: NextRequest) {
     const returnUrl  = `${BASE}/api/stripe/connect/callback?type=user`;
     const refreshUrl = `${BASE}/profile`;
 
-    const accountLink = await getStripe().accountLinks.create({
-      account:     accountId,
-      refresh_url: refreshUrl,
-      return_url:  returnUrl,
-      type:        "account_onboarding",
-    });
+    // Same stale-account retry for user type
+    let accountLink;
+    try {
+      accountLink = await getStripe().accountLinks.create({
+        account:     accountId,
+        refresh_url: refreshUrl,
+        return_url:  returnUrl,
+        type:        "account_onboarding",
+      });
+    } catch (linkErr) {
+      if (!isInvalidAccountError(linkErr)) throw linkErr;
+
+      const newAccount = await getStripe().accounts.create({
+        type:    "express",
+        country: "HU",
+      });
+      accountId = newAccount.id;
+      await prisma.user.update({
+        where: { id: userId },
+        data:  { stripeAccountId: accountId, stripeOnboardingComplete: false },
+      });
+      accountLink = await getStripe().accountLinks.create({
+        account:     accountId,
+        refresh_url: refreshUrl,
+        return_url:  returnUrl,
+        type:        "account_onboarding",
+      });
+    }
 
     return NextResponse.json({ url: accountLink.url });
 
