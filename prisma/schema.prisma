@@ -155,10 +155,15 @@ model Shelter {
   phone       String?
   email       String?
   website     String?
-  logoUrl     String?
-  coverUrl    String?
-  isVerified  Boolean  @default(false)
-  isActive    Boolean  @default(true)
+  logoUrl          String?
+  coverUrl         String?
+  isVerified       Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  // Fizetési / cégadatok
+  companyName      String?
+  taxNumber        String?
+  bankAccountName  String?
+  bankAccountNumber String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

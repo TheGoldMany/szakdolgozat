@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
-import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint } from "lucide-react";
+import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2 } from "lucide-react";
 
 interface ShelterDoc {
   id:        string;
@@ -19,8 +19,14 @@ interface Props {
     logoUrl:              string | null;
     adoptionRequirements: string | null;
     documents:            ShelterDoc[];
+    companyName:          string | null;
+    taxNumber:            string | null;
+    bankAccountName:      string | null;
+    bankAccountNumber:    string | null;
   };
 }
+
+const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
 export function ShelterSettingsForm({ shelter }: Props) {
   // --- Logo ---
@@ -28,6 +34,15 @@ export function ShelterSettingsForm({ shelter }: Props) {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError,     setLogoError]     = useState("");
   const logoRef = useRef<HTMLInputElement>(null);
+
+  // --- Payment info ---
+  const [companyName,       setCompanyName]       = useState(shelter.companyName       ?? "");
+  const [taxNumber,         setTaxNumber]         = useState(shelter.taxNumber         ?? "");
+  const [bankAccountName,   setBankAccountName]   = useState(shelter.bankAccountName   ?? "");
+  const [bankAccountNumber, setBankAccountNumber] = useState(shelter.bankAccountNumber ?? "");
+  const [paySaving,  setPaySaving]  = useState(false);
+  const [paySaved,   setPaySaved]   = useState(false);
+  const [payError,   setPayError]   = useState("");
 
   // --- Requirements ---
   const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
@@ -51,7 +66,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       const ext  = file.name.split(".").pop() ?? "jpg";
       const blob = await upload(`logo-${Date.now()}.${ext}`, file, {
         access:          "public",
-        handleUploadUrl: "/api/upload/avatar", // reuse: same allowed types
+        handleUploadUrl: "/api/upload/avatar",
       });
       const res = await fetch(`/api/shelters/${shelter.id}/logo`, {
         method:  "PATCH",
@@ -65,6 +80,26 @@ export function ShelterSettingsForm({ shelter }: Props) {
     } finally {
       setLogoUploading(false);
       if (logoRef.current) logoRef.current.value = "";
+    }
+  }
+
+  async function savePaymentInfo() {
+    setPaySaving(true);
+    setPaySaved(false);
+    setPayError("");
+    try {
+      const res = await fetch(`/api/shelters/${shelter.id}/payment-info`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ companyName, taxNumber, bankAccountName, bankAccountNumber }),
+      });
+      if (!res.ok) throw new Error();
+      setPaySaved(true);
+      setTimeout(() => setPaySaved(false), 3000);
+    } catch {
+      setPayError("Mentés sikertelen.");
+    } finally {
+      setPaySaving(false);
     }
   }
 
@@ -132,7 +167,6 @@ export function ShelterSettingsForm({ shelter }: Props) {
           Ez az ikon jelenik meg a menhelyek listáján és az állatok oldalán.
         </p>
         <div className="flex items-center gap-5">
-          {/* Avatar circle */}
           <label className="group relative cursor-pointer shrink-0">
             <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-brand-100 shadow-md">
               {logoPreview ? (
@@ -144,21 +178,14 @@ export function ShelterSettingsForm({ shelter }: Props) {
                 </div>
               )}
             </div>
-            {/* Hover overlay */}
             <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
               {logoUploading
                 ? <Loader2 className="h-6 w-6 animate-spin text-white" />
                 : <Camera className="h-6 w-6 text-white" />
               }
             </div>
-            <input
-              ref={logoRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="sr-only"
-              disabled={logoUploading}
-              onChange={handleLogoChange}
-            />
+            <input ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+              className="sr-only" disabled={logoUploading} onChange={handleLogoChange} />
           </label>
           <div>
             <p className="text-sm font-medium text-gray-700">{shelter.name}</p>
@@ -170,26 +197,62 @@ export function ShelterSettingsForm({ shelter }: Props) {
         </div>
       </div>
 
+      {/* Fizetési adatok */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="mb-4 flex items-center gap-2">
+          <Building2 className="h-4 w-4 text-gray-500" />
+          <h2 className="text-sm font-semibold text-gray-700">Fizetési adatok</h2>
+        </div>
+        <p className="mb-4 text-xs text-gray-400">
+          Ezek az adatok jelennek meg az adományozóknál, amikor előfizetnek a csomagjaidra.
+        </p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">Cégnév / Szervezet neve</label>
+            <input value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+              placeholder="pl. Kis Gömböc Menhely Alapítvány" className={cls} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">Adószám</label>
+            <input value={taxNumber} onChange={(e) => setTaxNumber(e.target.value)}
+              placeholder="pl. 12345678-1-01" className={cls} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">Bankszámla tulajdonosa</label>
+            <input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)}
+              placeholder="pl. Kis Gömböc Menhely Alapítvány" className={cls} />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">Bankszámlaszám</label>
+            <input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)}
+              placeholder="pl. 12345678-12345678-12345678" className={cls} />
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button type="button" onClick={savePaymentInfo} disabled={paySaving}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
+            <Save className="h-4 w-4" />
+            {paySaving ? "Mentés..." : "Mentés"}
+          </button>
+          {paySaved && <span className="text-sm text-brand-600">Elmentve!</span>}
+          {payError && <span className="text-sm text-red-500">{payError}</span>}
+        </div>
+      </div>
+
       {/* Örökbefogadási feltételek */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Örökbefogadási feltételek</h2>
         <p className="mb-4 text-xs text-gray-400">
           Ez a szöveg megjelenik minden általad feltöltött állat oldalán.
         </p>
-        <textarea
-          value={requirements}
-          onChange={(e) => setRequirements(e.target.value)}
-          rows={8}
-          placeholder="Pl. Az örökbefogadó legyen 18 éves. Házi látogatást végzünk. Az örökbefogadási díj 15 000 Ft..."
-          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y"
-        />
+        <textarea value={requirements} onChange={(e) => setRequirements(e.target.value)}
+          rows={8} placeholder="Pl. Az örökbefogadó legyen 18 éves..."
+          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y" />
         <div className="mt-3 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={saveRequirements}
-            disabled={reqSaving}
-            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
-          >
+          <button type="button" onClick={saveRequirements} disabled={reqSaving}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
             <Save className="h-4 w-4" />
             {reqSaving ? "Mentés..." : "Mentés"}
           </button>
@@ -210,20 +273,13 @@ export function ShelterSettingsForm({ shelter }: Props) {
               <li key={doc.id} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5">
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="h-4 w-4 shrink-0 text-brand-500" />
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-sm font-medium text-gray-700 hover:text-brand-600 hover:underline"
-                  >
+                  <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                    className="truncate text-sm font-medium text-gray-700 hover:text-brand-600 hover:underline">
                     {doc.name}
                   </a>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => deleteDoc(doc.id)}
-                  className="shrink-0 text-gray-400 hover:text-red-500 transition-colors"
-                >
+                <button type="button" onClick={() => deleteDoc(doc.id)}
+                  className="shrink-0 text-gray-400 hover:text-red-500 transition-colors">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </li>
@@ -233,25 +289,15 @@ export function ShelterSettingsForm({ shelter }: Props) {
 
         <div className="space-y-3 rounded-xl border border-dashed border-gray-300 p-4">
           <p className="text-xs font-medium text-gray-500">Új dokumentum feltöltése</p>
-          <input
-            type="text"
-            placeholder="Dokumentum neve (pl. Örökbefogadási nyilatkozat)"
-            value={docName}
-            onChange={(e) => setDocName(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-          />
+          <input type="text" placeholder="Dokumentum neve (pl. Örökbefogadási nyilatkozat)"
+            value={docName} onChange={(e) => setDocName(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
           <div className="flex items-center gap-3">
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
               <Upload className="h-4 w-4" />
               {uploading ? "Feltöltés..." : "Fájl kiválasztása"}
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".pdf,.doc,.docx"
-                className="sr-only"
-                disabled={uploading}
-                onChange={handleDocUpload}
-              />
+              <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" className="sr-only"
+                disabled={uploading} onChange={handleDocUpload} />
             </label>
             <span className="text-xs text-gray-400">PDF, DOC, DOCX · Max 10 MB</span>
           </div>

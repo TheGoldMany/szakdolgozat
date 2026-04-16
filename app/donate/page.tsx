@@ -24,7 +24,13 @@ export default async function DonatePage() {
         isActive: true,
         tiers: { some: { isActive: true } },
       },
-      include: {
+      select: {
+        id:                true,
+        name:              true,
+        slug:              true,
+        companyName:       true,
+        bankAccountName:   true,
+        bankAccountNumber: true,
         tiers: {
           where: { isActive: true },
           include: { _count: { select: { subscriptions: true } } },
@@ -105,7 +111,16 @@ export default async function DonatePage() {
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {shelter.tiers.map((tier) => (
-                      <TierCard key={tier.id} tier={tier} />
+                      <TierCard
+                        key={tier.id}
+                        tier={tier}
+                        shelter={{
+                          name:              shelter.name,
+                          companyName:       shelter.companyName,
+                          bankAccountName:   shelter.bankAccountName,
+                          bankAccountNumber: shelter.bankAccountNumber,
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
