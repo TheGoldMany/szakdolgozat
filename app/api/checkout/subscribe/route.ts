@@ -48,33 +48,40 @@ export async function POST(req: NextRequest) {
 
   // Create Stripe Checkout Session for subscription
   // HUF is a zero-decimal currency → pass amount as-is
-  const checkoutSession = await getStripe().checkout.sessions.create({
-    mode:     "subscription",
-    currency: "huf",
-    line_items: [
-      {
-        price_data: {
-          currency:     "huf",
-          product_data: { name: `${tier.shelter.name} – ${tier.name}` },
-          unit_amount:  tier.amount, // HUF, zero-decimal
-          recurring:    { interval: "month" },
+  let checkoutSession;
+  try {
+    checkoutSession = await getStripe().checkout.sessions.create({
+      mode:                 "subscription",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency:     "huf",
+            product_data: { name: `${tier.shelter.name} – ${tier.name}` },
+            unit_amount:  tier.amount,
+            recurring:    { interval: "month" },
+          },
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${BASE}/shelters/${tier.shelter.slug}`,
+      metadata: {
+        tierId,
+        userId: session.user.id,
       },
-    ],
-    success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${BASE}/shelters/${tier.shelter.slug}`,
-    metadata: {
-      tierId,
-      userId: session.user.id,
-    },
-    ...(connectedAccountId && {
-      subscription_data: {
-        application_fee_percent: 1,
-        transfer_data: { destination: connectedAccountId },
-      },
-    }),
-  });
+      ...(connectedAccountId && {
+        subscription_data: {
+          application_fee_percent: 1,
+          transfer_data: { destination: connectedAccountId },
+        },
+      }),
+    });
+  } catch (err) {
+    console.error("Stripe checkout/subscribe error:", err);
+    const msg = err instanceof Error ? err.message : "Stripe hiba";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 
   return NextResponse.json({ url: checkoutSession.url });
 }

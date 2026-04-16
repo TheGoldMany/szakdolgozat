@@ -65,29 +65,36 @@ export async function POST(req: NextRequest) {
   });
 
   // Stripe Checkout – HUF is zero-decimal, pass amount as-is
-  const checkoutSession = await getStripe().checkout.sessions.create({
-    mode:     "payment",
-    currency: "huf",
-    line_items: [
-      {
-        price_data: {
-          currency:     "huf",
-          product_data: { name: campaign.title },
-          unit_amount:  amount,
+  let checkoutSession;
+  try {
+    checkoutSession = await getStripe().checkout.sessions.create({
+      mode:                 "payment",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency:     "huf",
+            product_data: { name: campaign.title },
+            unit_amount:  amount,
+          },
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
-    success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${BASE}/donate/${campaign.id}`,
-    metadata:    { donationId: donation.id },
-    ...(connectedAccountId && {
-      payment_intent_data: {
-        application_fee_amount: applicationFee,
-        transfer_data: { destination: connectedAccountId },
-      },
-    }),
-  });
+      ],
+      success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url:  `${BASE}/donate/${campaign.id}`,
+      metadata:    { donationId: donation.id },
+      ...(connectedAccountId && {
+        payment_intent_data: {
+          application_fee_amount: applicationFee,
+          transfer_data: { destination: connectedAccountId },
+        },
+      }),
+    });
+  } catch (err) {
+    console.error("Stripe checkout/donate error:", err);
+    const msg = err instanceof Error ? err.message : "Stripe hiba";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 
   await prisma.donation.update({
     where: { id: donation.id },
