@@ -50,7 +50,9 @@ export async function POST(req: NextRequest) {
       ? campaign.user.stripeAccountId
       : null;
 
-  const applicationFee = connectedAccountId ? Math.round(amount * 0.01) : undefined;
+  // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit
+  const amountInFiller  = amount * 100;
+  const applicationFee  = connectedAccountId ? Math.round(amountInFiller * 0.01) : undefined;
 
   // Create pending Donation record (paidAt set by webhook after payment)
   const donation = await prisma.donation.create({
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency:     "huf",
             product_data: { name: campaign.title },
-            unit_amount:  amount,
+            unit_amount:  amountInFiller,
           },
           quantity: 1,
         },

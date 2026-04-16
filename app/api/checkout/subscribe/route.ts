@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency:     "huf",
             product_data: { name: `${tier.shelter.name} – ${tier.name}` },
-            unit_amount:  tier.amount,
+            unit_amount:  tier.amount * 100, // Convert HUF to fillér (Stripe smallest unit)
             recurring:    { interval: "month" },
           },
           quantity: 1,
