@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -16,6 +17,11 @@ const donateSchema = z.object({
 
 // POST /api/checkout/donate – create a Stripe Checkout session for a one-time donation
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  if (!checkRateLimit(`donate:${ip}`, 10, 60_000)) {
+    return NextResponse.json({ error: "Túl sok kísérlet. Próbáld újra 1 perc múlva." }, { status: 429 });
+  }
+
   const session = await getServerSession(authOptions);
 
   const parsed = donateSchema.safeParse(await req.json());

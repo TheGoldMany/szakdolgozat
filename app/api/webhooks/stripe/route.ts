@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { sendDonationReceivedEmail, sendSubscriptionConfirmationEmail } from "@/lib/email";
 
 // Disable body parsing — we need the raw body for signature verification
 export const dynamic = "force-dynamic";
@@ -57,10 +58,44 @@ export async function POST(req: NextRequest) {
 
       // Increment campaign raisedAmount if linked
       if (donation.campaignId) {
-        await prisma.campaign.update({
-          where: { id: donation.campaignId },
-          data:  { raisedAmount: { increment: donation.amount } },
+        const campaign = await prisma.campaign.findUnique({
+          where:   { id: donation.campaignId },
+          include: {
+            shelter: {
+              include: {
+                admins: { include: { user: { select: { email: true, name: true } } }, take: 1 },
+              },
+            },
+            user: { select: { email: true, name: true } },
+          },
         });
+
+        if (campaign) {
+          await prisma.campaign.update({
+            where: { id: donation.campaignId },
+            data:  { raisedAmount: { increment: donation.amount } },
+          });
+
+          const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://allatimenhelyek.hu";
+          const recipientEmail = campaign.shelter?.admins[0]?.user.email ?? campaign.user?.email;
+          const recipientName  = campaign.shelter?.admins[0]?.user.name ?? campaign.user?.name ?? "Admin";
+
+          // Notify campaign owner (shelter admin or individual user)
+          if (recipientEmail) {
+            const donorName = donation.isAnonymous
+              ? null
+              : (await prisma.user.findUnique({ where: { id: donation.userId ?? "" }, select: { name: true } }))?.name ?? null;
+
+            sendDonationReceivedEmail({
+              to:            recipientEmail,
+              recipientName,
+              campaignTitle: campaign.title,
+              amount:        donation.amount,
+              donorName,
+              campaignUrl:   `${BASE_URL}/donate/${campaign.id}`,
+            }).catch((err) => console.error("Donation email error:", err));
+          }
+        }
       }
     }
 
@@ -84,6 +119,26 @@ export async function POST(req: NextRequest) {
           stripeSubId: stripeSubId ?? null,
         },
       });
+
+      // Send confirmation email to subscriber
+      const [user, tier] = await Promise.all([
+        prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } }),
+        prisma.donationTier.findUnique({
+          where:   { id: tierId },
+          include: { shelter: { select: { name: true, slug: true } } },
+        }),
+      ]);
+
+      if (user?.email && tier?.shelter) {
+        sendSubscriptionConfirmationEmail({
+          to:          user.email,
+          name:        user.name ?? "Felhasználó",
+          shelterName: tier.shelter.name,
+          tierName:    tier.name,
+          amount:      tier.amount,
+          shelterSlug: tier.shelter.slug,
+        }).catch((err) => console.error("Subscription email error:", err));
+      }
     }
   }
 

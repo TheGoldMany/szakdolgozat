@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatus } from "@prisma/client";
+import { sendApplicationStatusEmail } from "@/lib/email";
 
 const schema = z.object({
   status:      z.enum(["REVIEWING", "APPROVED", "REJECTED"]),
@@ -26,7 +27,10 @@ export async function PATCH(
 
   const application = await prisma.adoptionApplication.findUnique({
     where: { id: params.id },
-    include: { animal: { select: { shelterId: true } } },
+    include: {
+      animal: { select: { shelterId: true, name: true } },
+      user:   { select: { email: true, name: true } },
+    },
   });
 
   if (!application) {
@@ -62,6 +66,20 @@ export async function PATCH(
       reviewedAt:  new Date(),
     },
   });
+
+  // Send email notification when status is final
+  if (
+    (parsed.data.status === "APPROVED" || parsed.data.status === "REJECTED") &&
+    application.user?.email
+  ) {
+    sendApplicationStatusEmail({
+      to:          application.user.email,
+      name:        application.user.name ?? "Felhasználó",
+      animalName:  application.animal.name,
+      status:      parsed.data.status,
+      reviewNotes: parsed.data.reviewNotes ?? null,
+    }).catch((err) => console.error("Application status email error:", err));
+  }
 
   return NextResponse.json({ application: updated });
 }
