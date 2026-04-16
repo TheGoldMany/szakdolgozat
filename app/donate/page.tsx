@@ -5,6 +5,7 @@ import { CampaignCard } from "@/components/donate/campaign-card";
 import { TierCard } from "@/components/donate/tier-card";
 import { Heart, PlusCircle } from "lucide-react";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Adományozás" };
 
 export default async function DonatePage() {

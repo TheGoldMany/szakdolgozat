@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CampaignApprovals } from "@/components/dashboard/campaign-approvals";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Gyűjtések jóváhagyása" };
 
 export default async function CampaignApprovalsPage() {
