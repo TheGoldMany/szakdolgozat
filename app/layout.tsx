@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Header />
           <main>{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>
