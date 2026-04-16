@@ -30,6 +30,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
   }
 
+  // Subscription cancelled/deleted via Stripe Dashboard or API
+  if (event.type === "customer.subscription.deleted") {
+    const stripeSub = event.data.object as Stripe.Subscription;
+    await prisma.subscription.updateMany({
+      where: { stripeSubId: stripeSub.id },
+      data:  { status: "CANCELLED", cancelledAt: new Date() },
+    });
+  }
+
   if (event.type === "checkout.session.completed") {
     const checkoutSession = event.data.object as Stripe.Checkout.Session;
     const metadata = checkoutSession.metadata ?? {};

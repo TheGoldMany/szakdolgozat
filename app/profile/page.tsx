@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { ChangePasswordForm } from "@/components/profile/change-password-form";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
+import { SubscriptionsList } from "@/components/profile/subscriptions-list";
 import { Role } from "@prisma/client";
 
 export const metadata: Metadata = { title: "Profilom" };
@@ -37,6 +38,22 @@ export default async function ProfilePage() {
       password:  true,
       createdAt: true,
       _count: { select: { applications: true } },
+      subscriptions: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id:          true,
+          status:      true,
+          createdAt:   true,
+          cancelledAt: true,
+          tier: {
+            select: {
+              name:    true,
+              amount:  true,
+              shelter: { select: { name: true, slug: true } },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -100,6 +117,18 @@ export default async function ProfilePage() {
               <ChangePasswordForm />
             </div>
           )}
+
+          {/* Előfizetések */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">Előfizetéseim</h2>
+            <SubscriptionsList
+              subscriptions={user.subscriptions.map((s) => ({
+                ...s,
+                createdAt:   s.createdAt.toISOString(),
+                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+              }))}
+            />
+          </div>
 
         </div>
       </div>
