@@ -28,13 +28,29 @@ export async function POST(req: NextRequest) {
 
   const { campaignId, amount, message, isAnonymous } = parsed.data;
 
-  const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: campaignId },
+    include: {
+      shelter: { select: { stripeAccountId: true, stripeOnboardingComplete: true } },
+      user:    { select: { stripeAccountId: true, stripeOnboardingComplete: true } },
+    },
+  });
   if (!campaign) {
     return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
   }
   if (campaign.status !== "ACTIVE") {
     return NextResponse.json({ error: "A kampány nem fogad adományokat" }, { status: 409 });
   }
+
+  // Determine connected Stripe account for automatic transfer
+  const connectedAccountId =
+    (campaign.shelter?.stripeOnboardingComplete && campaign.shelter?.stripeAccountId)
+      ? campaign.shelter.stripeAccountId
+      : (campaign.user?.stripeOnboardingComplete && campaign.user?.stripeAccountId)
+      ? campaign.user.stripeAccountId
+      : null;
+
+  const applicationFee = connectedAccountId ? Math.round(amount * 0.01) : undefined;
 
   // Create pending Donation record (paidAt set by webhook after payment)
   const donation = await prisma.donation.create({
@@ -65,6 +81,12 @@ export async function POST(req: NextRequest) {
     success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${BASE}/donate/${campaign.id}`,
     metadata:    { donationId: donation.id },
+    ...(connectedAccountId && {
+      payment_intent_data: {
+        application_fee_amount: applicationFee,
+        transfer_data: { destination: connectedAccountId },
+      },
+    }),
   });
 
   await prisma.donation.update({

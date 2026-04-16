@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
-import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2 } from "lucide-react";
+import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info } from "lucide-react";
 
 interface ShelterDoc {
   id:        string;
@@ -14,15 +14,17 @@ interface ShelterDoc {
 
 interface Props {
   shelter: {
-    id:                   string;
-    name:                 string;
-    logoUrl:              string | null;
-    adoptionRequirements: string | null;
-    documents:            ShelterDoc[];
-    companyName:          string | null;
-    taxNumber:            string | null;
-    bankAccountName:      string | null;
-    bankAccountNumber:    string | null;
+    id:                      string;
+    name:                    string;
+    logoUrl:                 string | null;
+    adoptionRequirements:    string | null;
+    documents:               ShelterDoc[];
+    companyName:             string | null;
+    taxNumber:               string | null;
+    bankAccountName:         string | null;
+    bankAccountNumber:       string | null;
+    stripeAccountId:         string | null;
+    stripeOnboardingComplete: boolean;
   };
 }
 
@@ -48,6 +50,29 @@ export function ShelterSettingsForm({ shelter }: Props) {
   const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
   const [reqSaving,    setReqSaving]    = useState(false);
   const [reqSaved,     setReqSaved]     = useState(false);
+
+  // --- Stripe Connect ---
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeError,   setStripeError]   = useState("");
+
+  async function handleStripeConnect() {
+    setStripeLoading(true);
+    setStripeError("");
+    try {
+      const res = await fetch("/api/stripe/connect/onboard", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ type: "shelter", shelterId: shelter.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Hiba történt");
+      window.location.href = data.url;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Ismeretlen hiba";
+      setStripeError(message);
+      setStripeLoading(false);
+    }
+  }
 
   // --- Documents ---
   const [docs,        setDocs]        = useState<ShelterDoc[]>(shelter.documents);
@@ -159,6 +184,61 @@ export function ShelterSettingsForm({ shelter }: Props) {
 
   return (
     <div className="space-y-6">
+
+      {/* Stripe Connect */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
+        <p className="mb-4 text-xs text-gray-400">
+          Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (1% platform díj levonásával).
+        </p>
+
+        {shelter.stripeOnboardingComplete ? (
+          <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+            <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+            <p className="text-sm font-medium text-green-800">
+              Stripe fiók aktív – az adományok automatikusan érkeznek a számládra.
+            </p>
+          </div>
+        ) : shelter.stripeAccountId ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
+              <p className="text-sm font-medium text-yellow-800">
+                Az onboarding nem teljes. Kattints a gombra a folytatáshoz.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleStripeConnect}
+              disabled={stripeLoading}
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
+            >
+              {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Info className="h-4 w-4" />}
+              {stripeLoading ? "Átirányítás..." : "Stripe fiók csatlakoztatása"}
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+              <Info className="h-5 w-5 shrink-0 text-blue-600 mt-0.5" />
+              <p className="text-sm text-blue-800">
+                Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (1% platform díj levonásával).
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleStripeConnect}
+              disabled={stripeLoading}
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
+            >
+              {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {stripeLoading ? "Átirányítás..." : "Stripe fiók csatlakoztatása"}
+            </button>
+          </div>
+        )}
+
+        {stripeError && <p className="mt-2 text-xs text-red-500">{stripeError}</p>}
+      </div>
 
       {/* Menhely logó */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">

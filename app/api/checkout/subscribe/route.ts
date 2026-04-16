@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
 
   const { tierId } = parsed.data;
 
-  // Validate tier exists and is active, include shelter name
+  // Validate tier exists and is active, include shelter name and Stripe info
   const tier = await prisma.donationTier.findUnique({
     where:   { id: tierId },
-    include: { shelter: { select: { id: true, name: true, slug: true } } },
+    include: { shelter: { select: { id: true, name: true, slug: true, stripeAccountId: true, stripeOnboardingComplete: true } } },
   });
   if (!tier) {
     return NextResponse.json({ error: "A csomag nem található" }, { status: 404 });
@@ -39,6 +39,12 @@ export async function POST(req: NextRequest) {
   if (!tier.isActive) {
     return NextResponse.json({ error: "A csomag nem aktív" }, { status: 409 });
   }
+
+  // Determine connected Stripe account for automatic transfer
+  const connectedAccountId =
+    (tier.shelter.stripeOnboardingComplete && tier.shelter.stripeAccountId)
+      ? tier.shelter.stripeAccountId
+      : null;
 
   // Create Stripe Checkout Session for subscription
   // HUF is a zero-decimal currency → pass amount as-is
@@ -62,6 +68,12 @@ export async function POST(req: NextRequest) {
       tierId,
       userId: session.user.id,
     },
+    ...(connectedAccountId && {
+      subscription_data: {
+        application_fee_percent: 1,
+        transfer_data: { destination: connectedAccountId },
+      },
+    }),
   });
 
   return NextResponse.json({ url: checkoutSession.url });

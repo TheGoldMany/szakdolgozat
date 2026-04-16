@@ -68,6 +68,8 @@ model User {
   address       String?
   city          String?
   country       String    @default("HU")
+  stripeAccountId          String?
+  stripeOnboardingComplete Boolean @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -164,6 +166,8 @@ model Shelter {
   taxNumber        String?
   bankAccountName  String?
   bankAccountNumber String?
+  stripeAccountId          String?
+  stripeOnboardingComplete Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
