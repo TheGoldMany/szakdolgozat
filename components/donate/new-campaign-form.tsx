@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { upload } from "@vercel/blob/client";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export function NewCampaignForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/shelters/list")
@@ -37,15 +39,17 @@ export function NewCampaignForm() {
     const file = e.target.files?.[0];
     if (!file) return;
     setImageUploading(true);
+    setError(null);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/upload/avatar", { method: "POST", body: form });
-      if (!res.ok) throw new Error("Feltöltés sikertelen");
-      const data = await res.json();
-      setImageUrl(data.url ?? "");
+      const ext  = file.name.split(".").pop() ?? "jpg";
+      const blob = await upload(`campaign-${Date.now()}.${ext}`, file, {
+        access:          "public",
+        handleUploadUrl: "/api/upload/avatar",
+      });
+      setImageUrl(blob.url);
     } catch {
       setError("A kép feltöltése sikertelen volt.");
+      if (fileRef.current) fileRef.current.value = "";
     } finally {
       setImageUploading(false);
     }
@@ -152,10 +156,12 @@ export function NewCampaignForm() {
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">Borítókép (opcionális)</label>
         <input
+          ref={fileRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={imageUploading}
           onChange={handleImageChange}
-          className="block w-full text-sm text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-600 hover:file:bg-brand-100"
+          className="block w-full text-sm text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-600 hover:file:bg-brand-100 disabled:opacity-50"
         />
         {imageUploading && <p className="mt-1 text-xs text-gray-400">Feltöltés…</p>}
         {imageUrl && !imageUploading && (

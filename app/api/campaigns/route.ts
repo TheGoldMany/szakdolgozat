@@ -14,7 +14,7 @@ function slugify(text: string) {
 
 const createSchema = z.object({
   title:        z.string().min(2).max(200),
-  description:  z.string().min(10),
+  description:  z.string().min(2),
   targetAmount: z.number().int().positive(),
   imageUrl:     z.string().url().optional().or(z.literal("")).optional(),
   endsAt:       z.string().datetime().optional().nullable(),
