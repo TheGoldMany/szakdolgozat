@@ -109,7 +109,7 @@ export default async function DonatePage() {
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {shelter.tiers.map((tier) => (
-                      <TierCard key={tier.id} tier={tier}
+                      <TierCard key={tier.id} tier={tier} />
                     ))}
                   </div>
                 </div>
