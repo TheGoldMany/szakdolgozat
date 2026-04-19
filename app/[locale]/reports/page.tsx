@@ -4,14 +4,20 @@ import { Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ReportCard } from "@/components/reports/report-card";
 import { ReportType, ReportStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = { title: "Elveszett és megtalált állatok" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("reports");
+  return { title: t("title") };
+}
 
 interface PageProps {
   searchParams: { type?: string; status?: string };
 }
 
 export default async function ReportsPage({ searchParams }: PageProps) {
+  const t = await getTranslations("reports");
+
   const typeFilter   = searchParams.type   as ReportType   | undefined;
   const statusFilter = searchParams.status as ReportStatus | undefined;
 
@@ -25,16 +31,16 @@ export default async function ReportsPage({ searchParams }: PageProps) {
   });
 
   const typeButtons = [
-    { value: "",      label: "Összes" },
-    { value: "LOST",  label: "Elveszett" },
-    { value: "FOUND", label: "Megtalált" },
-    { value: "STRAY", label: "Kóbor" },
+    { value: "",      label: t("all") },
+    { value: "LOST",  label: t("lost") },
+    { value: "FOUND", label: t("found") },
+    { value: "STRAY", label: t("stray") },
   ];
 
   const statusButtons = [
-    { value: "",         label: "Aktív" },
-    { value: "RESOLVED", label: "Megoldva" },
-    { value: "CLOSED",   label: "Lezárt" },
+    { value: "",         label: t("active") },
+    { value: "RESOLVED", label: t("resolved") },
+    { value: "CLOSED",   label: t("closed") },
   ];
 
   function buildUrl(params: Record<string, string>) {
@@ -50,18 +56,18 @@ export default async function ReportsPage({ searchParams }: PageProps) {
 
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Elveszett és megtalált állatok</h1>
-            <p className="mt-2 text-gray-500">Segíts visszatalálni az elveszett kedvenceknek!</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+            <p className="mt-2 text-gray-500">{t("desc")}</p>
           </div>
           <Link
             href="/reports/new"
             className="shrink-0 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
           >
-            + Bejelentés
+            + {t("newReport")}
           </Link>
         </div>
 
-        {/* Szűrők */}
+        {/* Filters */}
         <div className="mb-6 space-y-3">
           <div className="flex flex-wrap gap-2">
             {typeButtons.map((b) => (
@@ -100,11 +106,11 @@ export default async function ReportsPage({ searchParams }: PageProps) {
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
               <Search className="h-7 w-7 text-gray-400" />
             </div>
-            <p className="mt-4 text-lg font-medium text-gray-700">Nincs bejelentés</p>
-            <p className="mt-1 text-sm text-gray-400">Légy az első, aki bejelent!</p>
+            <p className="mt-4 text-lg font-medium text-gray-700">{t("noReports")}</p>
+            <p className="mt-1 text-sm text-gray-400">{t("noReportsDesc")}</p>
             <Link href="/reports/new"
               className="mt-5 inline-block rounded-xl bg-brand-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
-              Bejelentés indítása
+              {t("newReport")}
             </Link>
           </div>
         ) : (

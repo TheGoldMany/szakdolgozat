@@ -4,11 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { CampaignCard } from "@/components/donate/campaign-card";
 import { TierCard } from "@/components/donate/tier-card";
 import { Heart, PlusCircle } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Adományozás" };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("donate");
+  return { title: t("title") };
+}
 
 export default async function DonatePage() {
+  const t = await getTranslations("donate");
+
   const [campaigns, shelters] = await Promise.all([
     prisma.campaign.findMany({
       where: { status: "ACTIVE" },
@@ -45,17 +52,14 @@ export default async function DonatePage() {
       <div className="bg-gradient-to-br from-brand-500 to-brand-700 py-16 px-4 text-center text-white">
         <div className="mx-auto max-w-2xl">
           <Heart className="mx-auto mb-4 h-10 w-10 opacity-90" />
-          <h1 className="text-3xl font-bold sm:text-4xl">Támogass egy menhelyet</h1>
-          <p className="mt-3 text-base text-brand-100 sm:text-lg">
-            Egyedi adománnyal vagy havi előfizetéssel segítsd a rászoruló állatokat.
-            Minden forint számít!
-          </p>
+          <h1 className="text-3xl font-bold sm:text-4xl">{t("title")}</h1>
+          <p className="mt-3 text-base text-brand-100 sm:text-lg">{t("desc")}</p>
           <Link
             href="/campaigns/new"
             className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 shadow hover:bg-brand-50 transition-colors"
           >
             <PlusCircle className="h-4 w-4" />
-            Saját gyűjtés indítása
+            {t("startCampaign")}
           </Link>
         </div>
       </div>
@@ -64,16 +68,16 @@ export default async function DonatePage() {
 
         {/* Active campaigns */}
         <section>
-          <h2 className="mb-5 text-xl font-bold text-gray-900">Aktív gyűjtések</h2>
+          <h2 className="mb-5 text-xl font-bold text-gray-900">{t("campaigns")}</h2>
           {campaigns.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
               <Heart className="h-10 w-10 text-gray-300" />
-              <p className="mt-3 text-sm text-gray-500">Jelenleg nincs aktív gyűjtés.</p>
+              <p className="mt-3 text-sm text-gray-500">{t("noCampaigns")}</p>
               <Link
                 href="/campaigns/new"
                 className="mt-4 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
               >
-                Indíts egyet!
+                {t("startCampaign")}
               </Link>
             </div>
           ) : (
@@ -94,7 +98,7 @@ export default async function DonatePage() {
         {/* Monthly subscriptions */}
         {shelters.length > 0 && (
           <section>
-            <h2 className="mb-5 text-xl font-bold text-gray-900">Havi előfizetések</h2>
+            <h2 className="mb-5 text-xl font-bold text-gray-900">{t("tiers")}</h2>
             <div className="space-y-8">
               {shelters.map((shelter) => (
                 <div key={shelter.id}>
@@ -104,7 +108,7 @@ export default async function DonatePage() {
                       href={`/shelters/${shelter.slug}`}
                       className="text-xs text-brand-500 hover:underline"
                     >
-                      Menhely oldala →
+                      {t("shelterPage")} →
                     </Link>
                   </div>
                   <div className="flex flex-wrap gap-4">

@@ -1,37 +1,45 @@
+import { NextRequest, NextResponse } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
 import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { routing } from "./i18n/routing";
 import { Role } from "@prisma/client";
 
-export default withAuth(
-  function middleware(req) {
+const intlMiddleware = createIntlMiddleware(routing);
+
+const authMiddleware = withAuth(
+  function onSuccess(req) {
     const { pathname } = req.nextUrl;
     const role = req.nextauth.token?.role as Role | undefined;
-
-    // /dashboard/* csak SHELTER_ADMIN vagy SUPER_ADMIN számára
     if (pathname.startsWith("/dashboard")) {
       if (role !== Role.SHELTER_ADMIN && role !== Role.SUPER_ADMIN) {
         return NextResponse.redirect(new URL("/", req.url));
       }
     }
-
     return NextResponse.next();
   },
   {
     callbacks: {
-      // A middleware csak akkor fut, ha a felhasználó be van jelentkezve
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
-        // Ezek az útvonalak bejelentkezést igényelnek
-        const protectedPaths = ["/dashboard", "/profile", "/applications"];
-        if (protectedPaths.some((p) => pathname.startsWith(p))) {
-          return !!token;
-        }
+        const protectedPaths = ["/dashboard", "/profile", "/applications", "/messages"];
+        if (protectedPaths.some((p) => pathname.startsWith(p))) return !!token;
         return true;
       },
     },
   }
 );
 
+export default function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const isProtected = ["/dashboard", "/profile", "/applications", "/messages"].some((p) =>
+    pathname.startsWith(p)
+  );
+  if (isProtected) {
+    return (authMiddleware as unknown as (req: NextRequest) => NextResponse)(req);
+  }
+  return intlMiddleware(req);
+}
+
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/applications/:path*"],
+  matcher: ["/((?!api|_next|_vercel|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)"],
 };
