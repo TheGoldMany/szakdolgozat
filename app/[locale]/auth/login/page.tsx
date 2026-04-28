@@ -72,9 +72,10 @@ function LoginForm() {
   async function onSubmit(data: LoginInput) {
     setServerError("");
     const res = await signIn("credentials", {
-      email:    data.email,
-      password: data.password,
-      redirect: false,
+      email:      data.email,
+      password:   data.password,
+      rememberMe: data.rememberMe ? "true" : "false",
+      redirect:   false,
     });
     if (res?.error) {
       setServerError("Hibás email cím vagy jelszó.");
@@ -144,6 +145,18 @@ function LoginForm() {
             {...register("password")}
           />
           {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            {...register("rememberMe")}
+            className="h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-500 accent-brand-500 focus:ring-brand-500"
+          />
+          <label htmlFor="rememberMe" className="cursor-pointer select-none text-sm text-gray-600">
+            Jegyezz meg ezen az eszközön
+          </label>
         </div>
 
         <button

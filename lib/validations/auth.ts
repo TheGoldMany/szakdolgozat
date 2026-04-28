@@ -1,8 +1,9 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.string().email("Érvénytelen email cím."),
-  password: z.string().min(1, "A jelszó megadása kötelező."),
+  email:      z.string().email("Érvénytelen email cím."),
+  password:   z.string().min(1, "A jelszó megadása kötelező."),
+  rememberMe: z.boolean().default(false),
 });
 
 export const registerSchema = z
