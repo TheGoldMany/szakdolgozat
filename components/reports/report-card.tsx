@@ -3,21 +3,30 @@ import Image from "next/image";
 import { MapPin, Phone, Mail, Search, Home, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus, AnimalType } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
-const TYPE_CONFIG: Record<ReportType, { label: string; bg: string; text: string; Icon: React.ElementType }> = {
-  LOST:  { label: "Elveszett", bg: "bg-rose-100",   text: "text-rose-700",   Icon: Search     },
-  FOUND: { label: "Megtalált", bg: "bg-emerald-100", text: "text-emerald-700", Icon: Home      },
-  STRAY: { label: "Kóbor",     bg: "bg-amber-100",  text: "text-amber-700",  Icon: Navigation },
+const TYPE_BG: Record<ReportType, string> = {
+  LOST:  "bg-rose-100",
+  FOUND: "bg-emerald-100",
+  STRAY: "bg-amber-100",
 };
 
-const STATUS_LABELS: Record<ReportStatus, { label: string; color: string }> = {
-  ACTIVE:   { label: "Aktív",    color: "bg-sky-100 text-sky-700"     },
-  RESOLVED: { label: "Megoldva", color: "bg-gray-100 text-gray-500"   },
-  CLOSED:   { label: "Lezárt",   color: "bg-gray-100 text-gray-400"   },
+const TYPE_TEXT: Record<ReportType, string> = {
+  LOST:  "text-rose-700",
+  FOUND: "text-emerald-700",
+  STRAY: "text-amber-700",
 };
 
-const ANIMAL_LABELS: Record<AnimalType, string> = {
-  DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb",
+const TYPE_ICON: Record<ReportType, React.ElementType> = {
+  LOST:  Search,
+  FOUND: Home,
+  STRAY: Navigation,
+};
+
+const STATUS_COLOR: Record<ReportStatus, string> = {
+  ACTIVE:   "bg-sky-100 text-sky-700",
+  RESOLVED: "bg-gray-100 text-gray-500",
+  CLOSED:   "bg-gray-100 text-gray-400",
 };
 
 interface ReportCardProps {
@@ -40,10 +49,27 @@ interface ReportCardProps {
   };
 }
 
-export function ReportCard({ report }: ReportCardProps) {
-  const cfg    = TYPE_CONFIG[report.type];
-  const status = STATUS_LABELS[report.status];
-  const Icon   = cfg.Icon;
+export async function ReportCard({ report }: ReportCardProps) {
+  const t = await getTranslations("reports");
+  const ta = await getTranslations("animals");
+
+  const TYPE_LABEL: Record<ReportType, string> = {
+    LOST:  t("lost"),
+    FOUND: t("found"),
+    STRAY: t("stray"),
+  };
+
+  const STATUS_LABEL: Record<ReportStatus, string> = {
+    ACTIVE:   t("active"),
+    RESOLVED: t("resolved"),
+    CLOSED:   t("closed"),
+  };
+
+  const ANIMAL_LABEL: Record<AnimalType, string> = {
+    DOG: ta("dog"), CAT: ta("cat"), RABBIT: ta("rabbit"), BIRD: ta("bird"), OTHER: ta("other"),
+  };
+
+  const Icon = TYPE_ICON[report.type];
 
   return (
     <Link href={`/reports/${report.id}`} className="group block">
@@ -54,7 +80,7 @@ export function ReportCard({ report }: ReportCardProps) {
           <div className="relative h-40 w-full overflow-hidden bg-gray-100">
             <Image
               src={report.imageUrl}
-              alt={report.name ?? report.breed ?? "Bejelentett állat"}
+              alt={report.name ?? report.breed ?? t("unknown")}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 896px) 100vw, 896px"
@@ -67,21 +93,21 @@ export function ReportCard({ report }: ReportCardProps) {
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               {/* Type icon */}
-              <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", cfg.bg, cfg.text)}>
+              <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", TYPE_BG[report.type], TYPE_TEXT[report.type])}>
                 <Icon className="h-4 w-4" />
               </div>
 
               <div className="min-w-0">
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", cfg.bg, cfg.text)}>
-                    {cfg.label}
+                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", TYPE_BG[report.type], TYPE_TEXT[report.type])}>
+                    {TYPE_LABEL[report.type]}
                   </span>
-                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", status.color)}>
-                    {status.label}
+                  <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", STATUS_COLOR[report.status])}>
+                    {STATUS_LABEL[report.status]}
                   </span>
                   <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-500">
-                    {ANIMAL_LABELS[report.animalType]}
+                    {ANIMAL_LABEL[report.animalType]}
                   </span>
                 </div>
 
@@ -89,7 +115,7 @@ export function ReportCard({ report }: ReportCardProps) {
                 <h3 className="mt-1.5 truncate font-semibold text-gray-900 transition-colors group-hover:text-brand-600">
                   {report.name
                     ? (report.breed ? `${report.name} (${report.breed})` : report.name)
-                    : (report.breed ?? "Ismeretlen")}
+                    : (report.breed ?? t("unknown"))}
                 </h3>
               </div>
             </div>

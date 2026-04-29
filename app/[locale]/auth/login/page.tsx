@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { PawPrint, CheckCircle2 } from "lucide-react";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
+import { useTranslations } from "next-intl";
 
 // ── Google icon ──────────────────────────────────────────
 function GoogleIcon() {
@@ -45,20 +46,22 @@ function Divider({ label }: { label: string }) {
 }
 
 // ── Login form ───────────────────────────────────────────
-const OAUTH_ERRORS: Record<string, string> = {
-  Configuration:        "A Google/Facebook bejelentkezés nincs beállítva. Kérjük, használj email-es belépést.",
-  OAuthAccountNotLinked:"Ez az email cím már más bejelentkezési módhoz van kötve. Kérjük, használd azt.",
-  OAuthCallback:        "Hiba a Google/Facebook kapcsolódásnál. Próbáld újra.",
-  OAuthSignin:          "Nem sikerült csatlakozni a Google/Facebook-hoz. Próbáld újra.",
-  Callback:             "Hiba a bejelentkezés során. Próbáld újra.",
-  Default:              "Bejelentkezési hiba. Kérjük, próbáld újra.",
-};
-
 function LoginForm() {
+  const t = useTranslations("auth");
   const router      = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const urlError    = searchParams.get("error");
+
+  const OAUTH_ERRORS: Record<string, string> = {
+    Configuration:        t("oauthErrorConfiguration"),
+    OAuthAccountNotLinked: t("oauthErrorAccountLinked"),
+    OAuthCallback:        t("oauthErrorCallback"),
+    OAuthSignin:          t("oauthErrorSignin"),
+    Callback:             t("oauthErrorCallback"),
+    Default:              t("oauthErrorDefault"),
+  };
+
   const [serverError, setServerError] = useState(
     urlError ? (OAUTH_ERRORS[urlError] ?? OAUTH_ERRORS.Default) : ""
   );
@@ -78,7 +81,7 @@ function LoginForm() {
       redirect:   false,
     });
     if (res?.error) {
-      setServerError("Hibás email cím vagy jelszó.");
+      setServerError(t("loginErrorCredentials"));
       return;
     }
     router.push(callbackUrl);
@@ -113,12 +116,12 @@ function LoginForm() {
         </button>
       </div>
 
-      <Divider label="vagy email-lel" />
+      <Divider label={t("orWithEmail")} />
 
       {/* Credentials form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Email cím</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("emailLabel")}</label>
           <input
             type="email"
             placeholder="pelda@email.hu"
@@ -131,10 +134,10 @@ function LoginForm() {
 
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="text-sm font-medium text-gray-700">Jelszó</label>
+            <label className="text-sm font-medium text-gray-700">{t("password")}</label>
             <Link href="/auth/forgot-password"
               className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
-              Elfelejtett jelszó?
+              {t("forgotPassword")}
             </Link>
           </div>
           <input
@@ -155,7 +158,7 @@ function LoginForm() {
             className="h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-500 accent-brand-500 focus:ring-brand-500"
           />
           <label htmlFor="rememberMe" className="cursor-pointer select-none text-sm text-gray-600">
-            Jegyezz meg ezen az eszközön
+            {t("rememberMe")}
           </label>
         </div>
 
@@ -164,13 +167,13 @@ function LoginForm() {
           disabled={isSubmitting}
           className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
         >
-          {isSubmitting ? "Bejelentkezés..." : "Bejelentkezés"}
+          {isSubmitting ? t("signingIn") : t("loginButton")}
         </button>
 
         <p className="text-center text-sm text-gray-500">
-          Még nincs fiókod?{" "}
+          {t("noAccountText")}{" "}
           <Link href="/auth/register" className="font-semibold text-brand-600 hover:underline">
-            Regisztrálj ingyen
+            {t("registerFreeLink")}
           </Link>
         </p>
       </form>
@@ -180,6 +183,7 @@ function LoginForm() {
 
 // ── Page ─────────────────────────────────────────────────
 export default function LoginPage() {
+  const t = useTranslations("auth");
   return (
     <div className="flex min-h-screen">
       {/* Bal panel */}
@@ -202,13 +206,13 @@ export default function LoginPage() {
             <PawPrint className="h-10 w-10 text-white" />
           </div>
           <h2 className="text-3xl font-bold tracking-tight">ÁllatiMenhelyek.hu</h2>
-          <p className="mt-3 text-base text-white/80">Találd meg leendő kisállatodat</p>
+          <p className="mt-3 text-base text-white/80">{t("loginSubtitle")}</p>
 
           <div className="mt-10 grid grid-cols-3 gap-4">
             {[
-              { value: "500+",   label: "Menhely"       },
-              { value: "7 000+", label: "Állat"         },
-              { value: "500+",   label: "Örökbefogadás" },
+              { value: "500+",   label: t("loginStatShelters") },
+              { value: "7 000+", label: t("loginStatAnimals")  },
+              { value: "500+",   label: t("loginStatAdoptions") },
             ].map(({ value, label }) => (
               <div key={label} className="rounded-2xl bg-white/15 px-4 py-4 backdrop-blur-sm">
                 <div className="text-2xl font-bold">{value}</div>
@@ -218,10 +222,10 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-10 space-y-3 text-sm text-white/80">
-            {["Ingyenes regisztráció", "Közvetlen kapcsolat a menhelyekkel", "Elveszett állat bejelentése"].map((t) => (
-              <div key={t} className="flex items-center gap-2.5">
+            {[t("featureFree"), t("featureContact"), t("featureLost")].map((text) => (
+              <div key={text} className="flex items-center gap-2.5">
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-white/60" />
-                {t}
+                {text}
               </div>
             ))}
           </div>
@@ -239,9 +243,9 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Üdvözlünk vissza!</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("welcomeBackTitle")}</h1>
             <p className="mt-1.5 text-sm text-gray-500">
-              Jelentkezz be a fiókodba a folytatáshoz.
+              {t("welcomeBackDesc")}
             </p>
           </div>
 
@@ -253,7 +257,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
-              ← Vissza a főoldalra
+              {t("backToHome")}
             </Link>
           </div>
         </div>

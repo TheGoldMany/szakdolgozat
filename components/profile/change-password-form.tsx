@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition";
 
 export function ChangePasswordForm() {
+  const t = useTranslations("profile");
   const [current, setCurrent]   = useState("");
   const [next, setNext]         = useState("");
   const [confirm, setConfirm]   = useState("");
@@ -20,11 +22,11 @@ export function ChangePasswordForm() {
     setError("");
 
     if (next !== confirm) {
-      setError("Az új jelszavak nem egyeznek.");
+      setError(t("passwordsDontMatch"));
       return;
     }
     if (next.length < 8) {
-      setError("Az új jelszónak legalább 8 karakter hosszúnak kell lennie.");
+      setError(t("passwordTooShort"));
       return;
     }
 
@@ -37,13 +39,13 @@ export function ChangePasswordForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? "Hiba történt.");
+        setError(json.error ?? t("networkError"));
         return;
       }
       setSuccess(true);
       setCurrent(""); setNext(""); setConfirm("");
     } catch {
-      setError("Hálózati hiba. Próbáld újra.");
+      setError(t("networkError"));
     } finally {
       setLoading(false);
     }
@@ -58,12 +60,12 @@ export function ChangePasswordForm() {
       )}
       {success && (
         <div className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
-          Jelszó sikeresen megváltoztatva.
+          {t("passwordChanged")}
         </div>
       )}
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Jelenlegi jelszó</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("currentPassword")}</label>
         <div className="relative">
           <input type={showPw ? "text" : "password"} value={current}
             onChange={(e) => setCurrent(e.target.value)}
@@ -76,22 +78,22 @@ export function ChangePasswordForm() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Új jelszó</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("newPassword")}</label>
         <input type={showPw ? "text" : "password"} value={next}
           onChange={(e) => setNext(e.target.value)}
-          placeholder="Legalább 8 karakter" required className={cls} />
+          placeholder={t("atLeast8Chars")} required className={cls} />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Új jelszó megerősítése</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("confirmNewPassword")}</label>
         <input type={showPw ? "text" : "password"} value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          placeholder="Ismételd meg" required className={cls} />
+          placeholder={t("repeatPassword")} required className={cls} />
       </div>
 
       <button type="submit" disabled={loading}
         className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
-        {loading ? "Mentés..." : "Jelszó módosítása"}
+        {loading ? t("changingPassword") : t("changePasswordButton")}
       </button>
     </form>
   );

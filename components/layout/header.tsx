@@ -16,10 +16,10 @@ const LOCALE_LABELS: Record<string, { label: string; flag: string }> = {
   pl: { label: "Polski",  flag: "🇵🇱" },
 };
 
-const ROLE_LABELS: Record<string, { label: string; color: string }> = {
-  SUPER_ADMIN:   { label: "Főadmin",       color: "bg-red-100 text-red-700" },
-  SHELTER_ADMIN: { label: "Menhely admin", color: "bg-brand-100 text-brand-700" },
-  USER:          { label: "Felhasználó",   color: "bg-gray-100 text-gray-600" },
+const ROLE_COLOR: Record<string, string> = {
+  SUPER_ADMIN:   "bg-red-100 text-red-700",
+  SHELTER_ADMIN: "bg-brand-100 text-brand-700",
+  USER:          "bg-gray-100 text-gray-600",
 };
 
 export function Header() {
@@ -73,8 +73,14 @@ export function Header() {
     session?.user?.role === "SHELTER_ADMIN" ||
     session?.user?.role === "SUPER_ADMIN";
 
+  const ROLE_LABEL: Record<string, string> = {
+    SUPER_ADMIN:   t("roleSuperAdmin"),
+    SHELTER_ADMIN: t("roleShelterAdmin"),
+    USER:          t("roleUser"),
+  };
+
   const roleInfo = session?.user?.role
-    ? (ROLE_LABELS[session.user.role] ?? ROLE_LABELS.USER)
+    ? { label: ROLE_LABEL[session.user.role] ?? t("roleUser"), color: ROLE_COLOR[session.user.role] ?? "bg-gray-100 text-gray-600" }
     : null;
 
   const currentLocale = LOCALE_LABELS[locale] ?? LOCALE_LABELS.hu;
@@ -233,7 +239,7 @@ export function Header() {
             {/* Language switcher mobile */}
             <hr className="my-2 border-gray-100" />
             <div className="px-3 py-1">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Nyelv / Language</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("language")}</p>
               <div className="flex flex-wrap gap-2">
                 {routing.locales.map((loc) => (
                   <button

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function WithdrawButton({ applicationId }: { applicationId: string }) {
+  const t = useTranslations("applications");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -28,7 +30,7 @@ export function WithdrawButton({ applicationId }: { applicationId: string }) {
           : "border border-gray-200 text-gray-500 hover:bg-gray-50"
       }`}
     >
-      {loading ? "..." : confirmed ? "Biztosan visszavonod?" : "Visszavonás"}
+      {loading ? "..." : confirmed ? t("withdrawConfirm") : t("withdraw")}
     </button>
   );
 }

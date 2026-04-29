@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, PawPrint, BadgeCheck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface ShelterCardProps {
   shelter: {
@@ -15,14 +16,15 @@ interface ShelterCardProps {
   };
 }
 
-export function ShelterCard({ shelter }: ShelterCardProps) {
+export async function ShelterCard({ shelter }: ShelterCardProps) {
+  const t = await getTranslations("shelters");
+
   return (
     <Link href={`/shelters/${shelter.slug}`} className="group flex flex-col">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Gradient top bar */}
         <div className="relative flex h-20 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">
-          {/* Decorative paw prints */}
           <PawPrint className="absolute -left-2 -top-2 h-12 w-12 rotate-[-20deg] text-white/10" />
           <PawPrint className="absolute bottom-0 right-2 h-10 w-10 rotate-[15deg] text-white/10" />
         </div>
@@ -56,7 +58,7 @@ export function ShelterCard({ shelter }: ShelterCardProps) {
             {shelter.isVerified && (
               <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-600">
                 <BadgeCheck className="h-3.5 w-3.5" />
-                Ellenőrzött
+                {t("verified")}
               </span>
             )}
 
@@ -73,10 +75,10 @@ export function ShelterCard({ shelter }: ShelterCardProps) {
                 <span className="text-xl font-black text-brand-600">
                   {shelter._count.animals}
                 </span>
-                <span className="ml-1.5 text-xs text-brand-500">állat vár</span>
+                <span className="ml-1.5 text-xs text-brand-500">{t("animalsWaiting")}</span>
               </div>
               <span className="text-xs font-semibold text-brand-600 transition-colors group-hover:text-brand-800">
-                Megtekintés →
+                {t("view")}
               </span>
             </div>
           </div>

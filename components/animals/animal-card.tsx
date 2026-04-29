@@ -3,21 +3,14 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimalType, AnimalStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
-const STATUS_LABELS: Record<AnimalStatus, { label: string; color: string }> = {
-  AVAILABLE:    { label: "Örökbefogadható", color: "bg-emerald-100 text-emerald-700" },
-  PENDING:      { label: "Folyamatban",     color: "bg-amber-100 text-amber-700"     },
-  ADOPTED:      { label: "Örökbefogadott",  color: "bg-sky-100 text-sky-700"         },
-  FOSTER:       { label: "Ideiglenes",      color: "bg-violet-100 text-violet-700"   },
-  MEDICAL_HOLD: { label: "Kezelés alatt",   color: "bg-rose-100 text-rose-700"       },
-};
-
-const TYPE_LABELS: Record<AnimalType, string> = {
-  DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb",
-};
-
-const SIZE_LABELS: Record<string, string> = {
-  SMALL: "Kis", MEDIUM: "Közepes", LARGE: "Nagy", EXTRA_LARGE: "Extra nagy",
+const STATUS_COLOR: Record<AnimalStatus, string> = {
+  AVAILABLE:    "bg-emerald-100 text-emerald-700",
+  PENDING:      "bg-amber-100 text-amber-700",
+  ADOPTED:      "bg-sky-100 text-sky-700",
+  FOSTER:       "bg-violet-100 text-violet-700",
+  MEDICAL_HOLD: "bg-rose-100 text-rose-700",
 };
 
 interface AnimalCardProps {
@@ -36,24 +29,41 @@ interface AnimalCardProps {
   };
 }
 
-function formatAge(months: number | null) {
-  if (!months) return null;
-  if (months < 12) return `${months} hó`;
-  const years = Math.floor(months / 12);
-  const rem   = months % 12;
-  return rem > 0 ? `${years} év ${rem} hó` : `${years} év`;
-}
+export async function AnimalCard({ animal }: AnimalCardProps) {
+  const t = await getTranslations("animals");
 
-const GENDER_LABEL: Record<string, string> = {
-  MALE: "Hím", FEMALE: "Nőstény", UNKNOWN: "Ismeretlen",
-};
+  const STATUS_LABEL: Record<AnimalStatus, string> = {
+    AVAILABLE:    t("statusAvailable"),
+    PENDING:      t("statusPending"),
+    ADOPTED:      t("statusAdopted"),
+    FOSTER:       t("statusFoster"),
+    MEDICAL_HOLD: t("statusMedicalHold"),
+  };
 
-export function AnimalCard({ animal }: AnimalCardProps) {
-  const status = STATUS_LABELS[animal.status];
+  const TYPE_LABEL: Record<AnimalType, string> = {
+    DOG: t("dog"), CAT: t("cat"), RABBIT: t("rabbit"), BIRD: t("bird"), OTHER: t("other"),
+  };
+
+  const SIZE_LABEL: Record<string, string> = {
+    SMALL: t("small"), MEDIUM: t("medium"), LARGE: t("large"), EXTRA_LARGE: t("extraLarge"),
+  };
+
+  const GENDER_LABEL: Record<string, string> = {
+    MALE: t("male"), FEMALE: t("female"), UNKNOWN: t("unknown"),
+  };
+
+  function formatAge(months: number | null): string | null {
+    if (!months) return null;
+    if (months < 12) return t("ageMonths", { n: months });
+    const years = Math.floor(months / 12);
+    const rem   = months % 12;
+    return rem > 0 ? t("ageYearsMonths", { y: years, m: rem }) : t("ageYears", { n: years });
+  }
+
   const imgUrl = animal.images[0]?.url ?? "/placeholder-animal.jpg";
   const imgAlt = animal.images[0]?.alt ?? animal.name;
   const age    = formatAge(animal.age);
-  const gender = animal.gender ? GENDER_LABEL[animal.gender] : null;
+  const gender = animal.gender ? (GENDER_LABEL[animal.gender] ?? null) : null;
 
   return (
     <Link href={`/animals/${animal.slug}`} className="group flex flex-col">
@@ -73,14 +83,14 @@ export function AnimalCard({ animal }: AnimalCardProps) {
           {/* Status badge */}
           <span className={cn(
             "absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-sm",
-            status.color,
+            STATUS_COLOR[animal.status],
           )}>
-            {status.label}
+            {STATUS_LABEL[animal.status]}
           </span>
 
           {/* Type badge */}
           <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
-            {TYPE_LABELS[animal.type]}
+            {TYPE_LABEL[animal.type]}
           </span>
         </div>
 
@@ -110,7 +120,7 @@ export function AnimalCard({ animal }: AnimalCardProps) {
               )}
               {animal.size && (
                 <span className="rounded-full bg-gray-50 px-2.5 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200">
-                  {SIZE_LABELS[animal.size] ?? animal.size}
+                  {SIZE_LABEL[animal.size] ?? animal.size}
                 </span>
               )}
             </div>
@@ -123,7 +133,7 @@ export function AnimalCard({ animal }: AnimalCardProps) {
               <span className="truncate">{animal.shelter.city}</span>
             </div>
             <span className="shrink-0 text-xs font-semibold text-brand-500 transition-colors group-hover:text-brand-700">
-              Részletek →
+              {t("details")}
             </span>
           </div>
         </div>

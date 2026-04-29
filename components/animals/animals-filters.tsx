@@ -2,36 +2,38 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { SlidersHorizontal, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TYPES = [
-  { value: "",       label: "Minden állat" },
-  { value: "DOG",    label: "🐕 Kutya"     },
-  { value: "CAT",    label: "🐈 Macska"    },
-  { value: "RABBIT", label: "🐇 Nyúl"      },
-  { value: "BIRD",   label: "🐦 Madár"     },
-  { value: "OTHER",  label: "🐾 Egyéb"     },
-];
-
-const SIZES = [
-  { value: "",            label: "Bármilyen méret" },
-  { value: "SMALL",       label: "Kis"             },
-  { value: "MEDIUM",      label: "Közepes"         },
-  { value: "LARGE",       label: "Nagy"            },
-  { value: "EXTRA_LARGE", label: "Extra nagy"      },
-];
-
-const GENDERS = [
-  { value: "",       label: "Mindkettő" },
-  { value: "MALE",   label: "Hím"       },
-  { value: "FEMALE", label: "Nőstény"   },
-];
-
 export function AnimalsFilters() {
+  const t = useTranslations("animals");
   const router       = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
+
+  const TYPES = [
+    { value: "",       label: t("filterAllTypes") },
+    { value: "DOG",    label: `🐕 ${t("dog")}`   },
+    { value: "CAT",    label: `🐈 ${t("cat")}`   },
+    { value: "RABBIT", label: `🐇 ${t("rabbit")}` },
+    { value: "BIRD",   label: `🐦 ${t("bird")}`  },
+    { value: "OTHER",  label: `🐾 ${t("other")}`  },
+  ];
+
+  const SIZES = [
+    { value: "",            label: t("filterAnySize") },
+    { value: "SMALL",       label: t("small")         },
+    { value: "MEDIUM",      label: t("medium")        },
+    { value: "LARGE",       label: t("large")         },
+    { value: "EXTRA_LARGE", label: t("extraLarge")    },
+  ];
+
+  const GENDERS = [
+    { value: "",       label: t("filterBothGenders") },
+    { value: "MALE",   label: t("male")              },
+    { value: "FEMALE", label: t("female")            },
+  ];
 
   const update = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -58,7 +60,7 @@ export function AnimalsFilters() {
       >
         <div className="flex items-center gap-2 font-semibold text-gray-800">
           <SlidersHorizontal className="h-4 w-4 text-brand-500" />
-          Szűrők
+          {t("filterLabel")}
           {hasFilters && (
             <span className="h-2 w-2 rounded-full bg-brand-500" />
           )}
@@ -74,16 +76,16 @@ export function AnimalsFilters() {
         "space-y-5 border-t border-gray-100 p-5 lg:border-t-0",
         !open && "hidden lg:block",
       )}>
-        <h2 className="hidden text-sm font-bold text-gray-800 lg:block">Szűrők</h2>
+        <h2 className="hidden text-sm font-bold text-gray-800 lg:block">{t("filterLabel")}</h2>
 
         {/* Search */}
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Keresés
+            {t("filterSearchLabel")}
           </label>
           <input
             type="search"
-            placeholder="Név, fajta..."
+            placeholder={t("filterSearchPlaceholder")}
             defaultValue={q}
             onChange={(e) => update("q", e.target.value)}
             className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
@@ -93,21 +95,21 @@ export function AnimalsFilters() {
         {/* Type */}
         <div>
           <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Állatfaj
+            {t("filterSpeciesLabel")}
           </label>
           <div className="flex flex-col gap-1">
-            {TYPES.map((t) => (
+            {TYPES.map((item) => (
               <button
-                key={t.value}
-                onClick={() => update("type", t.value)}
+                key={item.value}
+                onClick={() => update("type", item.value)}
                 className={cn(
                   "rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors",
-                  type === t.value
+                  type === item.value
                     ? "bg-brand-500 text-white"
                     : "text-gray-700 hover:bg-gray-50",
                 )}
               >
-                {t.label}
+                {item.label}
               </button>
             ))}
           </div>
@@ -116,7 +118,7 @@ export function AnimalsFilters() {
         {/* Size */}
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Méret
+            {t("filterSizeLabel")}
           </label>
           <select
             value={size}
@@ -132,7 +134,7 @@ export function AnimalsFilters() {
         {/* Gender */}
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Nem
+            {t("filterGenderLabel")}
           </label>
           <div className="grid grid-cols-3 gap-1.5">
             {GENDERS.map((g) => (
@@ -159,7 +161,7 @@ export function AnimalsFilters() {
             className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2 text-sm text-gray-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >
             <X className="h-3.5 w-3.5" />
-            Szűrők törlése
+            {t("clearFilters")}
           </button>
         )}
       </div>

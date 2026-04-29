@@ -8,8 +8,10 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { PawPrint, Heart, Shield, Bell } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
+import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -30,7 +32,7 @@ export default function RegisterPage() {
 
     if (!res.ok) {
       const json = await res.json();
-      setServerError(json.error ?? "Hiba történt a regisztráció során.");
+      setServerError(json.error ?? t("registerErrorGeneric"));
       return;
     }
 
@@ -65,16 +67,16 @@ export default function RegisterPage() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
             <PawPrint className="h-10 w-10 text-white" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">Csatlakozz hozzánk!</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t("joinTitle")}</h2>
           <p className="mt-3 text-base text-white/80">
-            Adj esélyt egy kisállatnak a boldog életre
+            {t("joinSubtitle")}
           </p>
 
           <div className="mt-10 space-y-4 text-left">
             {[
-              { icon: Heart,  title: "Örökbefogadás",   desc: "Böngéssz több száz aranyos állat között" },
-              { icon: Bell,   title: "Értesítések",      desc: "Kapj értesítést új, hozzád illő állatokról" },
-              { icon: Shield, title: "Biztonságos",       desc: "Ellenőrzött menhelyekkel dolgoztunk össze" },
+              { icon: Heart,  title: t("feature1Title"), desc: t("feature1Desc") },
+              { icon: Bell,   title: t("feature2Title"), desc: t("feature2Desc") },
+              { icon: Shield, title: t("feature3Title"), desc: t("feature3Desc") },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex items-start gap-3 rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
@@ -102,9 +104,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Hozz létre fiókot</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("createAccountTitle")}</h1>
             <p className="mt-1.5 text-sm text-gray-500">
-              Regisztrálj ingyenesen és kezdj böngészni!
+              {t("createAccountDesc")}
             </p>
           </div>
 
@@ -112,7 +114,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Teljes név
+                  {t("fullName")}
                 </label>
                 <input
                   placeholder="Kovács János"
@@ -127,7 +129,7 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email cím
+                  {t("emailLabel")}
                 </label>
                 <input
                   type="email"
@@ -143,11 +145,11 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Jelszó
+                  {t("password")}
                 </label>
                 <input
                   type="password"
-                  placeholder="Min. 8 karakter, nagybetű és szám"
+                  placeholder={t("passwordMinHint")}
                   autoComplete="new-password"
                   className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
                   {...register("password")}
@@ -159,7 +161,7 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Jelszó megerősítése
+                  {t("confirmPassword")}
                 </label>
                 <input
                   type="password"
@@ -184,13 +186,13 @@ export default function RegisterPage() {
                 disabled={isSubmitting}
                 className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
               >
-                {isSubmitting ? "Regisztráció..." : "Fiók létrehozása"}
+                {isSubmitting ? t("registering") : t("createAccountButton")}
               </button>
 
               <p className="text-center text-sm text-gray-500">
-                Már van fiókod?{" "}
+                {t("hasAccountText")}{" "}
                 <Link href="/auth/login" className="font-semibold text-brand-500 hover:underline">
-                  Jelentkezz be
+                  {t("signInLink")}
                 </Link>
               </p>
             </form>
@@ -198,7 +200,7 @@ export default function RegisterPage() {
 
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-brand-500 transition-colors">
-              ← Vissza a főoldalra
+              {t("backToHome")}
             </Link>
           </div>
         </div>
