@@ -27,13 +27,16 @@ export default async function SheltersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-          <p className="mt-2 text-gray-500">{t("count", { count: shelters.length })}</p>
+      {/* Page header */}
+      <div className="border-b border-gray-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">{t("count", { count: shelters.length })}</p>
         </div>
+      </div>
 
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {shelters.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
             <Building2 className="h-12 w-12 text-gray-300" />

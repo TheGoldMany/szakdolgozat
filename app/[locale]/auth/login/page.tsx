@@ -206,9 +206,9 @@ export default function LoginPage() {
 
           <div className="mt-10 grid grid-cols-3 gap-4">
             {[
-              { value: "12+",  label: "Menhely" },
-              { value: "200+", label: "Állat" },
-              { value: "50+",  label: "Örökbefogadás" },
+              { value: "500+",   label: "Menhely"       },
+              { value: "7 000+", label: "Állat"         },
+              { value: "500+",   label: "Örökbefogadás" },
             ].map(({ value, label }) => (
               <div key={label} className="rounded-2xl bg-white/15 px-4 py-4 backdrop-blur-sm">
                 <div className="text-2xl font-bold">{value}</div>

@@ -64,12 +64,16 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
-          <p className="mt-2 text-gray-500">{t("showing", { count: total })}</p>
-        </div>
 
+      {/* Page header */}
+      <div className="border-b border-gray-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">{t("showing", { count: total })}</p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="w-full shrink-0 lg:w-64">
             <Suspense>
@@ -125,20 +129,34 @@ function Pagination({
   }
 
   return (
-    <div className="mt-8 flex items-center justify-center gap-2">
-      {page > 1 && (
-        <a href={buildUrl(page - 1)}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-          ← {t("prevPage")}
-        </a>
-      )}
-      <span className="text-sm text-gray-500">{t("page", { current: page, total: totalPages })}</span>
-      {page < totalPages && (
-        <a href={buildUrl(page + 1)}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-          {t("nextPage")} →
-        </a>
-      )}
+    <div className="mt-8 flex items-center justify-center gap-3">
+      <a
+        href={page > 1 ? buildUrl(page - 1) : "#"}
+        aria-disabled={page <= 1}
+        className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
+          page <= 1
+            ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
+            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+        }`}
+      >
+        ← {t("prevPage")}
+      </a>
+
+      <span className="rounded-xl border border-gray-100 bg-white px-4 py-2.5 text-sm font-medium text-gray-500 shadow-sm">
+        {t("page", { current: page, total: totalPages })}
+      </span>
+
+      <a
+        href={page < totalPages ? buildUrl(page + 1) : "#"}
+        aria-disabled={page >= totalPages}
+        className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
+          page >= totalPages
+            ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
+            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+        }`}
+      >
+        {t("nextPage")} →
+      </a>
     </div>
   );
 }
