@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { routing } from "@/i18n/routing";
@@ -25,7 +25,8 @@ const ROLE_COLOR: Record<string, string> = {
 export function Header() {
   const t = useTranslations("nav");
   const locale  = useLocale();
-  const pathname = usePathname();
+  const pathname     = usePathname();
+  const searchParams = useSearchParams();
   const router  = useRouter();
 
   const { data: session } = useSession();
@@ -55,17 +56,18 @@ export function Header() {
 
   function switchLocale(newLocale: string) {
     setLangMenuOpen(false);
-    // Remove current locale prefix from pathname
     const locales = routing.locales as readonly string[];
     const segments = pathname.split("/");
     const hasLocalePrefix = locales.includes(segments[1]);
     const pathWithoutLocale = hasLocalePrefix ? "/" + segments.slice(2).join("/") : pathname;
     const cleanPath = pathWithoutLocale || "/";
+    const qs = searchParams.toString();
+    const suffix = qs ? `?${qs}` : "";
 
     if (newLocale === routing.defaultLocale) {
-      router.push(cleanPath);
+      router.push(`${cleanPath}${suffix}`);
     } else {
-      router.push(`/${newLocale}${cleanPath}`);
+      router.push(`/${newLocale}${cleanPath}${suffix}`);
     }
   }
 

@@ -5,7 +5,8 @@ import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalsFilters } from "@/components/animals/animals-filters";
 import { AnimalStatus, AnimalType, AnimalSize } from "@prisma/client";
 import { PawPrint } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("animals");
@@ -25,7 +26,9 @@ interface PageProps {
 const PAGE_SIZE = 12;
 
 export default async function AnimalsPage({ searchParams }: PageProps) {
-  const t = await getTranslations("animals");
+  const t      = await getTranslations("animals");
+  const locale = await getLocale();
+  const basePath = locale === routing.defaultLocale ? "/animals" : `/${locale}/animals`;
 
   const page   = Math.max(1, Number(searchParams.page ?? 1));
   const search = searchParams.q?.trim();
@@ -97,7 +100,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
                 </div>
 
                 {totalPages > 1 && (
-                  <Pagination page={page} totalPages={totalPages} searchParams={searchParams} t={t} />
+                  <Pagination page={page} totalPages={totalPages} searchParams={searchParams} basePath={basePath} t={t} />
                 )}
               </>
             )}
@@ -112,11 +115,13 @@ function Pagination({
   page,
   totalPages,
   searchParams,
+  basePath,
   t,
 }: {
   page: number;
   totalPages: number;
   searchParams: Record<string, string | undefined>;
+  basePath: string;
   t: Awaited<ReturnType<typeof getTranslations<"animals">>>;
 }) {
   function buildUrl(p: number) {
@@ -125,7 +130,7 @@ function Pagination({
       if (v && k !== "page") params.set(k, v);
     });
     params.set("page", String(p));
-    return `/animals?${params.toString()}`;
+    return `${basePath}?${params.toString()}`;
   }
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback, useState, useTransition, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { SlidersHorizontal, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,8 +9,10 @@ import { cn } from "@/lib/utils";
 export function AnimalsFilters() {
   const t = useTranslations("animals");
   const router       = useRouter();
+  const pathname     = usePathname();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
+  const [, startTransition] = useTransition();
 
   const TYPES = [
     { value: "",       label: t("filterAllTypes") },
@@ -35,20 +37,37 @@ export function AnimalsFilters() {
     { value: "FEMALE", label: t("female")            },
   ];
 
+  const q      = searchParams.get("q")      ?? "";
+  const type   = searchParams.get("type")   ?? "";
+  const size   = searchParams.get("size")   ?? "";
+  const gender = searchParams.get("gender") ?? "";
+  const hasFilters = !!(type || size || gender || q);
+
+  // Local search state with debounce so typing is smooth
+  const [localQ, setLocalQ] = useState(q);
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Sync search input when filters are cleared from outside (URL q → "")
+  useEffect(() => {
+    setLocalQ(q);
+  }, [q]);
+
   const update = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set(key, value);
     else params.delete(key);
     params.delete("page");
-    router.push(`/animals?${params.toString()}`);
-  }, [router, searchParams]);
+    const qs = params.toString();
+    startTransition(() => {
+      router.push(`${pathname}${qs ? `?${qs}` : ""}`);
+    });
+  }, [router, pathname, searchParams]);
 
-  const q      = searchParams.get("q")      ?? "";
-  const type   = searchParams.get("type")   ?? "";
-  const size   = searchParams.get("size")   ?? "";
-  const gender = searchParams.get("gender") ?? "";
-
-  const hasFilters = !!(type || size || gender || q);
+  function handleSearchChange(value: string) {
+    setLocalQ(value);
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => update("q", value), 400);
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
@@ -86,8 +105,8 @@ export function AnimalsFilters() {
           <input
             type="search"
             placeholder={t("filterSearchPlaceholder")}
-            defaultValue={q}
-            onChange={(e) => update("q", e.target.value)}
+            value={localQ}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
           />
         </div>
@@ -157,7 +176,7 @@ export function AnimalsFilters() {
         {/* Clear */}
         {hasFilters && (
           <button
-            onClick={() => router.push("/animals")}
+            onClick={() => startTransition(() => router.push(pathname))}
             className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2 text-sm text-gray-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >
             <X className="h-3.5 w-3.5" />

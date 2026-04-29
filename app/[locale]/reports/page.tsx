@@ -4,7 +4,8 @@ import { Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ReportCard } from "@/components/reports/report-card";
 import { ReportType, ReportStatus } from "@prisma/client";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("reports");
@@ -16,7 +17,9 @@ interface PageProps {
 }
 
 export default async function ReportsPage({ searchParams }: PageProps) {
-  const t = await getTranslations("reports");
+  const t      = await getTranslations("reports");
+  const locale = await getLocale();
+  const basePath = locale === routing.defaultLocale ? "/reports" : `/${locale}/reports`;
 
   const typeFilter   = searchParams.type   as ReportType   | undefined;
   const statusFilter = searchParams.status as ReportStatus | undefined;
@@ -47,7 +50,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
     const p = new URLSearchParams();
     if (params.type)   p.set("type",   params.type);
     if (params.status) p.set("status", params.status);
-    return `/reports?${p.toString()}`;
+    return `${basePath}?${p.toString()}`;
   }
 
   return (

@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { routing } from "@/i18n/routing";
+import { Suspense } from "react";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -37,7 +38,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <Providers>
-            <Header />
+            <Suspense><Header /></Suspense>
             <main>{children}</main>
             <Footer />
           </Providers>
