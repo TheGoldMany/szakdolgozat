@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
-import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart } from "lucide-react";
+import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { AnimalCard } from "@/components/animals/animal-card";
@@ -65,21 +65,33 @@ export default async function HomePage() {
                 {t("heroDesc")}
               </p>
 
-              <div className="mt-6 w-full">
+              <div className="mt-8 w-full">
                 <HomeSearch />
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link
-                  href="/animals"
-                  className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
-                >
-                  {t("allAnimals")}
+              {/* Quick-nav: type links + report */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Link href="/animals"
+                  className="flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
+                  <PawPrint className="h-3.5 w-3.5" /> {t("allAnimals")}
                 </Link>
-                <Link
-                  href="/reports/new"
-                  className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-                >
+                {[
+                  { href: "/animals?type=DOG",    Icon: Dog,      label: t("dog")    },
+                  { href: "/animals?type=CAT",    Icon: Cat,      label: t("cat")    },
+                  { href: "/animals?type=RABBIT", Icon: Rabbit,   label: t("rabbit") },
+                  { href: "/animals?type=BIRD",   Icon: Bird,     label: t("bird")   },
+                  { href: "/animals?type=OTHER",  Icon: PawPrint, label: t("other")  },
+                ].map(({ href, Icon, label }) => (
+                  <Link key={href} href={href}
+                    className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-medium text-gray-600 backdrop-blur-sm transition-colors hover:border-brand-300 hover:bg-white hover:text-brand-600">
+                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                    {label}
+                  </Link>
+                ))}
+                <span className="mx-1 h-4 w-px bg-gray-300" />
+                <Link href="/reports/new"
+                  className="flex items-center gap-1.5 rounded-full border border-dashed border-gray-300 bg-white/60 px-3.5 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:border-brand-300 hover:text-brand-600">
+                  <FileWarning className="h-3.5 w-3.5 shrink-0" />
                   {t("submitReport")}
                 </Link>
               </div>
