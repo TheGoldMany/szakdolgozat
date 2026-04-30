@@ -10,36 +10,55 @@ import { ResolveButton } from "@/components/reports/resolve-button";
 import { StaticMap } from "@/components/ui/static-map";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
-const TYPE_LABELS: Record<ReportType, { label: string; color: string; bgColor: string; Icon: React.ElementType }> = {
-  LOST:  { label: "Elveszett", color: "bg-red-100 text-red-700",       bgColor: "bg-red-50",    Icon: Search },
-  FOUND: { label: "Megtalált", color: "bg-brand-100 text-brand-700",   bgColor: "bg-brand-50",  Icon: Home },
-  STRAY: { label: "Kóbor",     color: "bg-yellow-100 text-yellow-700", bgColor: "bg-yellow-50", Icon: Navigation },
+const TYPE_ICON: Record<ReportType, React.ElementType> = {
+  LOST: Search, FOUND: Home, STRAY: Navigation,
 };
 
-const STATUS_LABELS: Record<ReportStatus, { label: string; color: string }> = {
-  ACTIVE:   { label: "Aktív",    color: "bg-blue-100 text-blue-700" },
-  RESOLVED: { label: "Megoldva", color: "bg-gray-100 text-gray-500" },
-  CLOSED:   { label: "Lezárt",   color: "bg-gray-100 text-gray-400" },
+const TYPE_COLOR: Record<ReportType, { badge: string; bg: string }> = {
+  LOST:  { badge: "bg-red-100 text-red-700",       bg: "bg-red-50"    },
+  FOUND: { badge: "bg-brand-100 text-brand-700",   bg: "bg-brand-50"  },
+  STRAY: { badge: "bg-yellow-100 text-yellow-700", bg: "bg-yellow-50" },
+};
+
+const STATUS_COLOR: Record<ReportStatus, string> = {
+  ACTIVE:   "bg-blue-100 text-blue-700",
+  RESOLVED: "bg-gray-100 text-gray-500",
+  CLOSED:   "bg-gray-100 text-gray-400",
 };
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const r = await prisma.animalReport.findUnique({ where: { id: params.id }, select: { type: true, city: true } });
-  if (!r) return { title: "Nem található" };
-  return { title: `${TYPE_LABELS[r.type].label} – ${r.city}` };
+  const [r, t] = await Promise.all([
+    prisma.animalReport.findUnique({ where: { id: params.id }, select: { type: true, city: true } }),
+    getTranslations("reports"),
+  ]);
+  if (!r) return { title: t("notFound") };
+  const typeLabel = { LOST: t("lost"), FOUND: t("found"), STRAY: t("stray") }[r.type];
+  return { title: `${typeLabel} – ${r.city}` };
 }
 
 export default async function ReportDetailPage({ params }: { params: { id: string } }) {
-  const [report, session] = await Promise.all([
+  const [report, session, t] = await Promise.all([
     prisma.animalReport.findUnique({ where: { id: params.id } }),
     getServerSession(authOptions),
+    getTranslations("reports"),
   ]);
 
   if (!report) notFound();
 
-  const typeConfig = TYPE_LABELS[report.type];
-  const status     = STATUS_LABELS[report.status];
-  const Icon       = typeConfig.Icon;
+  const TYPE_LABEL: Record<ReportType, string> = {
+    LOST: t("lost"), FOUND: t("found"), STRAY: t("stray"),
+  };
+  const STATUS_LABEL: Record<ReportStatus, string> = {
+    ACTIVE: t("active"), RESOLVED: t("resolved"), CLOSED: t("closed"),
+  };
+
+  const typeColor = TYPE_COLOR[report.type];
+  const Icon      = TYPE_ICON[report.type];
+  const typeLabel = TYPE_LABEL[report.type];
+  const statusLabel = STATUS_LABEL[report.status];
+  const statusColor = STATUS_COLOR[report.status];
 
   const isOwner    = session?.user?.id && report.userId === session.user.id;
   const isAdmin    = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "SHELTER_ADMIN";
@@ -50,106 +69,91 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
 
         <nav className="mb-6 text-sm text-gray-500">
-          <Link href="/reports" className="hover:text-brand-500">Bejelentések</Link>
+          <Link href="/reports" className="hover:text-brand-500">{t("title")}</Link>
           <span className="mx-2">›</span>
-          <span className="text-gray-800">{typeConfig.label}</span>
+          <span className="text-gray-800">{typeLabel}</span>
         </nav>
 
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          {/* Fejléc sáv */}
-          <div className={cn("px-6 py-5 flex items-center justify-between gap-3", typeConfig.bgColor)}>
+          {/* Header */}
+          <div className={cn("px-6 py-5 flex items-center justify-between gap-3", typeColor.bg)}>
             <div className="flex items-center gap-3">
-              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", typeConfig.color)}>
+              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", typeColor.badge)}>
                 <Icon className="h-5 w-5" />
               </div>
               <div>
-                <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", typeConfig.color)}>
-                  {typeConfig.label}
+                <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", typeColor.badge)}>
+                  {typeLabel}
                 </span>
                 <h1 className="mt-1 text-xl font-bold text-gray-900">
-                  {report.name ?? report.breed ?? "Ismeretlen állat"}
+                  {report.name ?? report.breed ?? t("unknownAnimal")}
                   {report.name && report.breed && ` (${report.breed})`}
                 </h1>
               </div>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", status.color)}>
-              {status.label}
+            <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
+              {statusLabel}
             </span>
           </div>
 
-          {/* Kép */}
           {report.imageUrl && (
             <div className="relative h-56 w-full sm:h-72 bg-gray-100">
               <Image
                 src={report.imageUrl}
-                alt={report.name ?? report.breed ?? "Bejelentett állat"}
-                fill
-                className="object-cover"
+                alt={report.name ?? report.breed ?? t("unknownAnimal")}
+                fill className="object-cover"
                 sizes="(max-width: 672px) 100vw, 672px"
               />
             </div>
           )}
 
           <div className="p-6 space-y-5">
-            {/* Adatok */}
             <div className="grid grid-cols-2 gap-3 text-sm">
-              {report.color  && (
+              {report.color && (
                 <div>
-                  <span className="text-gray-400">Szín:</span>{" "}
+                  <span className="text-gray-400">{t("colorLabel")}</span>{" "}
                   <span className="font-medium">{report.color}</span>
                 </div>
               )}
               {report.gender && (
                 <div>
-                  <span className="text-gray-400">Nem:</span>{" "}
+                  <span className="text-gray-400">{t("genderLabel")}</span>{" "}
                   <span className="font-medium">
-                    {report.gender === "MALE" ? "Hím" : report.gender === "FEMALE" ? "Nőstény" : "Ismeretlen"}
+                    {report.gender === "MALE" ? t("genderMale") : report.gender === "FEMALE" ? t("genderFemale") : t("genderUnknown")}
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Leírás */}
             <div>
-              <h2 className="mb-2 text-sm font-semibold text-gray-700">Leírás</h2>
+              <h2 className="mb-2 text-sm font-semibold text-gray-700">{t("descSection")}</h2>
               <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">{report.description}</p>
             </div>
 
-            {/* Helyszín */}
             <div className="space-y-2">
               <div className="flex items-start gap-2 text-sm text-gray-600">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                 <span>{report.city}{report.address ? `, ${report.address}` : ""}</span>
               </div>
-              {report.lat && report.lng && (
-                <StaticMap lat={report.lat} lng={report.lng} />
-              )}
+              {report.lat && report.lng && <StaticMap lat={report.lat} lng={report.lng} />}
             </div>
 
-            {/* Dátum */}
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <Calendar className="h-4 w-4" />
-              {new Date(report.createdAt).toLocaleDateString("hu-HU", {
-                year: "numeric", month: "long", day: "numeric",
-              })}
+              {new Date(report.createdAt).toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" })}
             </div>
 
-            {/* Kapcsolat */}
             <div className="rounded-xl bg-gray-50 p-4 space-y-2">
               <p className="text-sm font-semibold text-gray-700">
-                Kapcsolattartó: {report.contactName}
+                {t("contactSection")} {report.contactName}
               </p>
               {report.contactPhone && (
-                <a href={`tel:${report.contactPhone}`}
-                  className="flex items-center gap-2 text-sm text-brand-600 hover:underline">
-                  <Phone className="h-4 w-4" />
-                  {report.contactPhone}
+                <a href={`tel:${report.contactPhone}`} className="flex items-center gap-2 text-sm text-brand-600 hover:underline">
+                  <Phone className="h-4 w-4" />{report.contactPhone}
                 </a>
               )}
-              <a href={`mailto:${report.contactEmail}`}
-                className="flex items-center gap-2 text-sm text-brand-600 hover:underline">
-                <Mail className="h-4 w-4" />
-                {report.contactEmail}
+              <a href={`mailto:${report.contactEmail}`} className="flex items-center gap-2 text-sm text-brand-600 hover:underline">
+                <Mail className="h-4 w-4" />{report.contactEmail}
               </a>
             </div>
 

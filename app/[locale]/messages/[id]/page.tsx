@@ -6,11 +6,18 @@ import { MapPin, Phone, Mail, Globe, ArrowLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/chat-window";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = { title: "Üzenet" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("messages");
+  return { title: t("title") };
+}
 
 export default async function ConversationPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
+  const [session, t] = await Promise.all([
+    getServerSession(authOptions),
+    getTranslations("messages"),
+  ]);
   if (!session?.user?.id) redirect(`/auth/login?callbackUrl=/messages/${params.id}`);
 
   const conversation = await prisma.conversation.findUnique({
@@ -38,7 +45,6 @@ export default async function ConversationPage({ params }: { params: { id: strin
 
   if (!conversation) notFound();
 
-  // Access check
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
   const isConversationUser = conversation.userId === session.user.id;
   let isShelterAdmin = false;
@@ -50,7 +56,6 @@ export default async function ConversationPage({ params }: { params: { id: strin
   }
   if (!isConversationUser && !isShelterAdmin && !isSuperAdmin) redirect("/messages");
 
-  // Mark incoming messages as read
   await prisma.message.updateMany({
     where: { conversationId: params.id, senderId: { not: session.user.id }, readAt: null },
     data: { readAt: new Date() },
@@ -65,15 +70,14 @@ export default async function ConversationPage({ params }: { params: { id: strin
         <div className="mb-4">
           <Link href="/messages" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-500 transition-colors">
             <ArrowLeft className="h-4 w-4" />
-            Vissza az üzenetekhez
+            {t("backToMessages")}
           </Link>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
 
-          {/* ── Chat panel ── */}
+          {/* Chat panel */}
           <div className="lg:col-span-2 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col" style={{ height: "70vh" }}>
-            {/* Chat header */}
             <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                 {img ? (
@@ -91,7 +95,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
               </div>
               {isShelterAdmin && (
                 <div className="ml-auto text-right">
-                  <p className="text-xs text-gray-400">Felhasználó</p>
+                  <p className="text-xs text-gray-400">{t("user")}</p>
                   <p className="text-sm font-medium text-gray-700">{conversation.user.name}</p>
                 </div>
               )}
@@ -103,20 +107,15 @@ export default async function ConversationPage({ params }: { params: { id: strin
               initialMessages={conversation.messages.map((m) => ({
                 ...m,
                 createdAt: m.createdAt.toISOString(),
-                sender: {
-                  ...m.sender,
-                  name: m.sender.name ?? null,
-                  role: m.sender.role as string,
-                },
+                sender: { ...m.sender, name: m.sender.name ?? null, role: m.sender.role as string },
               }))}
             />
           </div>
 
-          {/* ── Info panel ── */}
+          {/* Info panel */}
           <div className="space-y-4">
-            {/* Animal info */}
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-gray-700">Az állat</h2>
+              <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link
                 href={`/animals/${conversation.animal.slug}`}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -131,14 +130,13 @@ export default async function ConversationPage({ params }: { params: { id: strin
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{conversation.animal.name}</p>
-                  <p className="text-xs text-brand-500">Profil megtekintése →</p>
+                  <p className="text-xs text-brand-500">{t("viewProfile")}</p>
                 </div>
               </Link>
             </div>
 
-            {/* Shelter contact */}
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-gray-700">Menhely elérhetőség</h2>
+              <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterContact")}</h2>
               <Link
                 href={`/shelters/${conversation.shelter.slug}`}
                 className="font-medium text-brand-500 hover:underline text-sm"
@@ -168,7 +166,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                 {conversation.shelter.website && (
                   <a href={conversation.shelter.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-brand-500 hover:underline">
                     <Globe className="h-4 w-4 shrink-0" />
-                    Weboldal
+                    {t("website")}
                   </a>
                 )}
               </div>
