@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useCallback, useState, useTransition, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { SlidersHorizontal, ChevronDown, X } from "lucide-react";
+import { SlidersHorizontal, ChevronDown, X, PawPrint, Dog, Cat, Rabbit, Bird } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AnimalsFilters() {
@@ -15,13 +15,13 @@ export function AnimalsFilters() {
   const [open, setOpen] = useState(false);
   const [, startTransition] = useTransition();
 
-  const TYPES = [
+  const TYPES: { value: string; label: string; Icon?: React.ElementType }[] = [
     { value: "",       label: t("filterAllTypes") },
-    { value: "DOG",    label: `🐕 ${t("dog")}`   },
-    { value: "CAT",    label: `🐈 ${t("cat")}`   },
-    { value: "RABBIT", label: `🐇 ${t("rabbit")}` },
-    { value: "BIRD",   label: `🐦 ${t("bird")}`  },
-    { value: "OTHER",  label: `🐾 ${t("other")}`  },
+    { value: "DOG",    label: t("dog"),    Icon: Dog    },
+    { value: "CAT",    label: t("cat"),    Icon: Cat    },
+    { value: "RABBIT", label: t("rabbit"), Icon: Rabbit },
+    { value: "BIRD",   label: t("bird"),   Icon: Bird   },
+    { value: "OTHER",  label: t("other"),  Icon: PawPrint },
   ];
 
   const SIZES = [
@@ -123,12 +123,13 @@ export function AnimalsFilters() {
                 key={item.value}
                 onClick={() => update("type", item.value)}
                 className={cn(
-                  "rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors",
+                  "flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium transition-colors",
                   type === item.value
                     ? "bg-brand-500 text-white"
                     : "text-gray-700 hover:bg-gray-50",
                 )}
               >
+                {item.Icon && <item.Icon className="h-4 w-4 shrink-0" />}
                 {item.label}
               </button>
             ))}
