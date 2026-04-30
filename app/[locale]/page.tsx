@@ -112,6 +112,26 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Latest animals ───────────────────────────────── */}
+      {latestAnimals.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{t("latestAnimals")}</h2>
+              <p className="mt-1 text-sm text-gray-500">{t("latestAnimalsDesc")}</p>
+            </div>
+            <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
+              {t("all")} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {latestAnimals.map((animal) => (
+              <AnimalCard key={animal.id} animal={animal} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ── Stats band ───────────────────────────────────── */}
       <section className="bg-brand-600 py-8 text-white">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -153,26 +173,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── Latest animals ───────────────────────────────── */}
-      {latestAnimals.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{t("latestAnimals")}</h2>
-              <p className="mt-1 text-sm text-gray-500">{t("latestAnimalsDesc")}</p>
-            </div>
-            <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
-              {t("all")} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {latestAnimals.map((animal) => (
-              <AnimalCard key={animal.id} animal={animal} />
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* ── Latest reports ───────────────────────────────── */}
       {latestReports.length > 0 && (
