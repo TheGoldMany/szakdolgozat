@@ -11,8 +11,9 @@ import { getTranslations } from "next-intl/server";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const t = await getTranslations("home");
-  const tNav = await getTranslations("nav");
+  const t        = await getTranslations("home");
+  const tNav     = await getTranslations("nav");
+  const tAnimals = await getTranslations("animals");
 
   const [availableCount, shelterCount, adoptedCount, latestAnimals, latestReports, heroPhotos] =
     await Promise.all([
@@ -76,11 +77,11 @@ export default async function HomePage() {
                   <PawPrint className="h-3.5 w-3.5" /> {t("allAnimals")}
                 </Link>
                 {[
-                  { href: "/animals?type=DOG",    Icon: Dog,      label: t("dog")    },
-                  { href: "/animals?type=CAT",    Icon: Cat,      label: t("cat")    },
-                  { href: "/animals?type=RABBIT", Icon: Rabbit,   label: t("rabbit") },
-                  { href: "/animals?type=BIRD",   Icon: Bird,     label: t("bird")   },
-                  { href: "/animals?type=OTHER",  Icon: PawPrint, label: t("other")  },
+                  { href: "/animals?type=DOG",    Icon: Dog,      label: tAnimals("dog")    },
+                  { href: "/animals?type=CAT",    Icon: Cat,      label: tAnimals("cat")    },
+                  { href: "/animals?type=RABBIT", Icon: Rabbit,   label: tAnimals("rabbit") },
+                  { href: "/animals?type=BIRD",   Icon: Bird,     label: tAnimals("bird")   },
+                  { href: "/animals?type=OTHER",  Icon: PawPrint, label: tAnimals("other")  },
                 ].map(({ href, Icon, label }) => (
                   <Link key={href} href={href}
                     className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-medium text-gray-600 backdrop-blur-sm transition-colors hover:border-brand-300 hover:bg-white hover:text-brand-600">
