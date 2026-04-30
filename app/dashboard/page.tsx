@@ -3,18 +3,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ApplicationStatus } from "@prisma/client";
-import { getTranslations } from "next-intl/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("dashboard");
-  return { title: t("overview") };
-}
+export const metadata: Metadata = { title: "Áttekintés" };
 
 export default async function DashboardPage() {
-  const [session, t] = await Promise.all([
-    getServerSession(authOptions),
-    getTranslations("dashboard"),
-  ]);
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
@@ -39,16 +32,16 @@ export default async function DashboardPage() {
     ]);
 
   const stats = [
-    { label: t("totalAnimals"),  value: totalAnimals,     color: "text-gray-700"   },
-    { label: t("adoptable"),     value: availableAnimals, color: "text-green-700"  },
-    { label: t("adopted"),       value: adoptedAnimals,   color: "text-blue-700"   },
-    { label: t("pendingApps"),   value: pendingApps,      color: "text-yellow-700" },
-    { label: t("totalApps"),     value: totalApps,        color: "text-brand-700"  },
+    { label: "Összes állat",     value: totalAnimals,     color: "text-gray-700"   },
+    { label: "Örökbefogadható",  value: availableAnimals, color: "text-green-700"  },
+    { label: "Örökbefogadott",   value: adoptedAnimals,   color: "text-blue-700"   },
+    { label: "Várakozó kérelem", value: pendingApps,      color: "text-yellow-700" },
+    { label: "Összes kérelem",   value: totalApps,        color: "text-brand-700"  },
   ];
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">{t("overview")}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">Áttekintés</h1>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {stats.map((s) => (
           <div key={s.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
