@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { PawPrint, Heart, Shield, Bell } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";

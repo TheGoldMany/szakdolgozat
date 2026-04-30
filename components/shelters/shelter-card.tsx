@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { MapPin, PawPrint, BadgeCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";

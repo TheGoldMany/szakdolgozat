@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {

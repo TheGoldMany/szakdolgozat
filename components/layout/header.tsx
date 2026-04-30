@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 const LOCALE_LABELS: Record<string, { label: string; flag: string }> = {
@@ -56,19 +56,8 @@ export function Header() {
 
   function switchLocale(newLocale: string) {
     setLangMenuOpen(false);
-    const locales = routing.locales as readonly string[];
-    const segments = pathname.split("/");
-    const hasLocalePrefix = locales.includes(segments[1]);
-    const pathWithoutLocale = hasLocalePrefix ? "/" + segments.slice(2).join("/") : pathname;
-    const cleanPath = pathWithoutLocale || "/";
     const qs = searchParams.toString();
-    const suffix = qs ? `?${qs}` : "";
-
-    if (newLocale === routing.defaultLocale) {
-      router.push(`${cleanPath}${suffix}`);
-    } else {
-      router.push(`/${newLocale}${cleanPath}${suffix}`);
-    }
+    router.push(qs ? `${pathname}?${qs}` : pathname, { locale: newLocale });
   }
 
   const isAdmin =

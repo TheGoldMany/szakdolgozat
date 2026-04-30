@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { CheckCircle2 } from "lucide-react";
 import { getStripe } from "@/lib/stripe";

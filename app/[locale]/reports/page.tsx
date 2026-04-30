@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart } from "lucide-react";
 import { prisma } from "@/lib/prisma";
