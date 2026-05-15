@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createId } from "@paralleldrive/cuid2";
+import { randomUUID } from "crypto";
 
 // POST /api/conversations/[id]/invite
 export async function POST(
@@ -68,7 +68,7 @@ export async function POST(
     return NextResponse.json({ error: "Már létezik aktív kérelem ehhez az állathoz" }, { status: 409 });
   }
 
-  const inviteToken = createId();
+  const inviteToken = randomUUID().replace(/-/g, "");
 
   // Create application with INVITED status and the token
   const application = await prisma.adoptionApplication.create({

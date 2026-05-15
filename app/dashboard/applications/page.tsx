@@ -12,6 +12,7 @@ import { Users, PawPrint } from "lucide-react";
 export const metadata: Metadata = { title: "Kérelmek" };
 
 const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
+  INVITED:   { label: "Meghívva",        color: "bg-purple-100 text-purple-700" },
   PENDING:   { label: "Várakozó",        color: "bg-yellow-100 text-yellow-700" },
   REVIEWING: { label: "Elbírálás alatt", color: "bg-blue-100 text-blue-700" },
   APPROVED:  { label: "Elfogadva",       color: "bg-green-100 text-green-700" },

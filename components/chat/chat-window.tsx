@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { upload } from "@vercel/blob/client";
-import { Send, Paperclip, X, FileText, Image as ImageIcon } from "lucide-react";
+import { Send, Paperclip, X, FileText, Image as ImageIcon, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Sender {
@@ -18,6 +18,8 @@ interface Message {
   attachmentName: string | null;
   senderId: string;
   createdAt: string;
+  type?: string;
+  inviteToken?: string | null;
   sender: Sender;
 }
 
@@ -44,6 +46,39 @@ function isSameDay(a: string, b: string) {
 function isImage(name: string | null) {
   if (!name) return false;
   return /\.(jpe?g|png|webp|gif)$/i.test(name);
+}
+
+function InviteMessageBubble({ token, own }: { token: string; own: boolean }) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl px-4 py-3 text-sm",
+        own
+          ? "bg-brand-500 text-white rounded-br-sm"
+          : "bg-gray-100 text-gray-800 rounded-bl-sm"
+      )}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <ClipboardList className="h-4 w-4 shrink-0" />
+        <span className="font-semibold">Örökbefogadási kérvény meghívó</span>
+      </div>
+      <p className="text-xs mb-2 opacity-80">
+        Kattints a gombra a kérvény kitöltéséhez.
+      </p>
+      <a
+        href={`/apply/${token}`}
+        className={cn(
+          "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+          own
+            ? "bg-white/20 text-white hover:bg-white/30"
+            : "bg-brand-500 text-white hover:bg-brand-600"
+        )}
+      >
+        <ClipboardList className="h-3.5 w-3.5" />
+        Kérvény kitöltése
+      </a>
+    </div>
+  );
 }
 
 function AttachmentBubble({ url, name, own }: { url: string; name: string | null; own: boolean }) {
@@ -219,7 +254,9 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                       )}
                     </span>
                   )}
-                  {(msg.content || msg.attachmentUrl) && (
+                  {msg.type === "INVITE" && msg.inviteToken ? (
+                    <InviteMessageBubble token={msg.inviteToken} own={isOwn} />
+                  ) : (msg.content || msg.attachmentUrl) ? (
                     <div
                       className={cn(
                         "rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
@@ -237,7 +274,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                         />
                       )}
                     </div>
-                  )}
+                  ) : null}
                   <span className="text-[10px] text-gray-400 mx-1">{formatTime(msg.createdAt)}</span>
                 </div>
               </div>

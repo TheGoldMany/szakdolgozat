@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, Globe, ArrowLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/chat-window";
+import { InviteSender } from "@/components/messages/invite-sender";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +32,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
       },
       shelter: {
         select: {
-          name: true, slug: true, phone: true,
+          id: true, name: true, slug: true, phone: true,
           email: true, website: true, city: true, address: true,
         },
       },
@@ -55,6 +56,29 @@ export default async function ConversationPage({ params }: { params: { id: strin
     isShelterAdmin = !!rec;
   }
   if (!isConversationUser && !isShelterAdmin && !isSuperAdmin) redirect("/messages");
+
+  // For shelter admin: fetch approved forms and check if invite can be sent
+  let approvedForms: { id: string; title: string }[] = [];
+  let canSendInvite = false;
+  if (isShelterAdmin) {
+    const [forms, existingApp] = await Promise.all([
+      prisma.applicationForm.findMany({
+        where:   { shelterId: conversation.shelterId, status: "APPROVED" },
+        select:  { id: true, title: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.adoptionApplication.findFirst({
+        where: {
+          animalId: conversation.animal.id,
+          userId:   conversation.userId,
+          status:   { in: ["INVITED", "PENDING", "REVIEWING"] },
+        },
+        select: { id: true },
+      }),
+    ]);
+    approvedForms = forms;
+    canSendInvite = forms.length > 0 && !existingApp;
+  }
 
   await prisma.message.updateMany({
     where: { conversationId: params.id, senderId: { not: session.user.id }, readAt: null },
@@ -106,14 +130,27 @@ export default async function ConversationPage({ params }: { params: { id: strin
               currentUserId={session.user.id}
               initialMessages={conversation.messages.map((m) => ({
                 ...m,
-                createdAt: m.createdAt.toISOString(),
-                sender: { ...m.sender, name: m.sender.name ?? null, role: m.sender.role as string },
+                createdAt:    m.createdAt.toISOString(),
+                type:         m.type,
+                inviteToken:  m.inviteToken ?? null,
+                sender:       { ...m.sender, name: m.sender.name ?? null, role: m.sender.role as string },
               }))}
             />
           </div>
 
           {/* Info panel */}
           <div className="space-y-4">
+            {isShelterAdmin && canSendInvite && (
+              <InviteSender
+                conversationId={params.id}
+                approvedForms={approvedForms}
+              />
+            )}
+            {isShelterAdmin && !canSendInvite && approvedForms.length > 0 && (
+              <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-sm text-gray-500">
+                Már létezik aktív kérvény ehhez a felhasználóhoz és állathoz.
+              </div>
+            )}
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link

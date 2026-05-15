@@ -37,6 +37,7 @@ export default async function ApplicationsPage() {
   });
 
   const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
+    INVITED:   { label: "Meghívva",            color: "bg-purple-100 text-purple-700" },
     PENDING:   { label: t("statusPending"),   color: "bg-yellow-100 text-yellow-700" },
     REVIEWING: { label: t("statusReviewing"), color: "bg-blue-100 text-blue-700"    },
     APPROVED:  { label: t("statusApproved"),  color: "bg-green-100 text-green-700"  },
