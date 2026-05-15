@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { Users, PawPrint } from "lucide-react";
+import { Users, PawPrint, FileText, Clock } from "lucide-react";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
@@ -55,11 +55,13 @@ export default async function DashboardApplicationsPage({
           shelter: { select: { name: true } },
         },
       },
+      _count: { select: { responses: true } },
     },
   });
 
   const statuses: Array<{ value: string; label: string }> = [
     { value: "",          label: "Összes" },
+    { value: "INVITED",   label: "Meghívva" },
     { value: "PENDING",   label: "Várakozó" },
     { value: "REVIEWING", label: "Elbírálás alatt" },
     { value: "APPROVED",  label: "Elfogadott" },
@@ -97,8 +99,10 @@ export default async function DashboardApplicationsPage({
       ) : (
         <div className="space-y-4">
           {applications.map((app) => {
-            const status  = STATUS_LABELS[app.status];
-            const imgUrl  = app.animal.images[0]?.url ?? "/placeholder-animal.jpg";
+            const status       = STATUS_LABELS[app.status];
+            const imgUrl       = app.animal.images[0]?.url ?? "/placeholder-animal.jpg";
+            const hasForm      = !!app.formId;
+            const formFilled   = app._count.responses > 0;
 
             return (
               <div key={app.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
@@ -151,6 +155,34 @@ export default async function DashboardApplicationsPage({
                       <p className="text-xs text-gray-500">
                         <span className="font-medium">Megjegyzés:</span> {app.reviewNotes}
                       </p>
+                    )}
+
+                    {/* Kérvény állapot (form-alapú kérelemnél) */}
+                    {hasForm && (
+                      <div className={cn(
+                        "flex items-center gap-2 rounded-xl px-3 py-2 text-xs",
+                        formFilled
+                          ? "bg-brand-50 border border-brand-100"
+                          : "bg-yellow-50 border border-yellow-100"
+                      )}>
+                        {formFilled ? (
+                          <>
+                            <FileText className="h-3.5 w-3.5 shrink-0 text-brand-500" />
+                            <span className="flex-1 font-medium text-brand-700">A kérvény be lett küldve</span>
+                            <Link
+                              href={`/dashboard/applications/${app.id}`}
+                              className="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-600 transition-colors"
+                            >
+                              Megtekintés
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-3.5 w-3.5 shrink-0 text-yellow-600" />
+                            <span className="text-yellow-700">Még nem küldte be a kérvényt</span>
+                          </>
+                        )}
+                      </div>
                     )}
 
                     <div className="flex items-center justify-between gap-2">
