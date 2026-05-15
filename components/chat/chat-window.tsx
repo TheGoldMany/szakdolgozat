@@ -126,10 +126,18 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
   const bottomRef  = useRef<HTMLDivElement>(null);
   const inputRef   = useRef<HTMLTextAreaElement>(null);
   const fileRef    = useRef<HTMLInputElement>(null);
+  const prevCountRef   = useRef(initialMessages.length);
+  const isFirstRef     = useRef(true);
 
-  // Auto-scroll on new messages
+  // Scroll to bottom only on initial load or when a new message arrives
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isFirstRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "instant" });
+      isFirstRef.current = false;
+    } else if (messages.length > prevCountRef.current) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    prevCountRef.current = messages.length;
   }, [messages]);
 
   // Poll for new messages every 5 seconds

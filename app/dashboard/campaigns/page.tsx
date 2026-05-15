@@ -7,7 +7,7 @@ import { CampaignApprovals } from "@/components/dashboard/campaign-approvals";
 import { FormApprovalActions } from "@/components/dashboard/form-approval-actions";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Gyűjtések jóváhagyása" };
+export const metadata: Metadata = { title: "Jóváhagyások" };
 
 export default async function CampaignApprovalsPage() {
   const session = await getServerSession(authOptions);
@@ -35,8 +35,10 @@ export default async function CampaignApprovalsPage() {
 
   return (
     <div className="space-y-10">
+      <h1 className="text-2xl font-bold text-gray-900">Jóváhagyások</h1>
+
       <div>
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">Gyűjtések jóváhagyása</h1>
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">Gyűjtések</h2>
         <CampaignApprovals
           campaigns={pending.map((c) => ({
             id:           c.id,
@@ -51,7 +53,7 @@ export default async function CampaignApprovalsPage() {
       </div>
 
       <div>
-        <h2 className="mb-4 text-xl font-bold text-gray-900">Kérvény sablonok jóváhagyása</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">Kérvény sablonok</h2>
         {pendingForms.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center shadow-sm">
             <p className="text-sm text-gray-500">Nincs jóváhagyásra váró kérvény sablon.</p>

@@ -20,7 +20,7 @@ const NAV = [
   { href: "/dashboard/settings",     icon: Settings,        label: "Menhely beállítás",      roles: ["SHELTER_ADMIN"] },
   { href: "/dashboard/shelters",     icon: Building2,       label: "Menhelyek",              roles: ["SUPER_ADMIN"] },
   { href: "/dashboard/tiers",        icon: Heart,           label: "Előfizetések",           roles: ["SHELTER_ADMIN"] },
-  { href: "/dashboard/campaigns",    icon: ClipboardCheck,  label: "Gyűjtések jóváhagyása",  roles: ["SUPER_ADMIN"] },
+  { href: "/dashboard/campaigns",    icon: ClipboardCheck,  label: "Jóváhagyások",           roles: ["SUPER_ADMIN"] },
   { href: "/dashboard/forms",        icon: FileText,        label: "Kérvény sablonok",        roles: ["SHELTER_ADMIN"] },
 ];
 
