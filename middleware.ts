@@ -14,8 +14,10 @@ const authMiddleware = withAuth(
       if (role !== Role.SHELTER_ADMIN && role !== Role.SUPER_ADMIN) {
         return NextResponse.redirect(new URL("/", req.url));
       }
+      return NextResponse.next();
     }
-    return NextResponse.next();
+    // locale-aware protected paths: intl middleware must also run for [locale] routing
+    return intlMiddleware(req);
   },
   {
     callbacks: {
@@ -26,6 +28,7 @@ const authMiddleware = withAuth(
         return true;
       },
     },
+    pages: { signIn: "/auth/login" },
   }
 );
 
