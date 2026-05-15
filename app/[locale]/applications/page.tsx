@@ -9,6 +9,7 @@ import { WithdrawButton } from "@/components/applications/withdraw-button";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
+import { ClipboardList, FileText, Clock } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("applications");
@@ -33,6 +34,7 @@ export default async function ApplicationsPage() {
           shelter: { select: { name: true, city: true } },
         },
       },
+      _count: { select: { responses: true } },
     },
   });
 
@@ -73,8 +75,11 @@ export default async function ApplicationsPage() {
         ) : (
           <div className="space-y-4">
             {applications.map((app) => {
-              const status = STATUS_LABELS[app.status];
-              const imgUrl = app.animal.images[0]?.url ?? "/placeholder-animal.jpg";
+              const status      = STATUS_LABELS[app.status];
+              const imgUrl      = app.animal.images[0]?.url ?? "/placeholder-animal.jpg";
+              const hasForm     = !!app.formId;
+              const formFilled  = app._count.responses > 0;
+              const showInvite  = app.status === ApplicationStatus.INVITED && hasForm && !formFilled;
 
               return (
                 <div
@@ -118,14 +123,55 @@ export default async function ApplicationsPage() {
                             year: "numeric", month: "long", day: "numeric",
                           })}
                         </span>
-                        {app.status === ApplicationStatus.PENDING && (
+                        {app.status === ApplicationStatus.PENDING && !hasForm && (
                           <WithdrawButton applicationId={app.id} />
                         )}
                       </div>
                     </div>
                   </div>
 
-                  {(app.message || app.reviewNotes) && (
+                  {/* Form banner */}
+                  {hasForm && (
+                    <div className={cn(
+                      "border-t px-4 py-3 flex items-center gap-3 text-sm",
+                      showInvite
+                        ? "border-purple-100 bg-purple-50"
+                        : formFilled
+                          ? "border-brand-100 bg-brand-50"
+                          : "border-yellow-100 bg-yellow-50"
+                    )}>
+                      {showInvite ? (
+                        <>
+                          <ClipboardList className="h-4 w-4 shrink-0 text-purple-500" />
+                          <span className="flex-1 text-purple-700 font-medium">A menhely kérvény kitöltését kéri</span>
+                          <Link
+                            href={`/apply/${app.inviteToken}`}
+                            className="rounded-lg bg-purple-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-600 transition-colors"
+                          >
+                            Kérvény kitöltése
+                          </Link>
+                        </>
+                      ) : formFilled ? (
+                        <>
+                          <FileText className="h-4 w-4 shrink-0 text-brand-500" />
+                          <span className="flex-1 text-brand-700 font-medium">Kérvény beküldve</span>
+                          <Link
+                            href={`/applications/${app.id}`}
+                            className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition-colors"
+                          >
+                            Megtekintés
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="h-4 w-4 shrink-0 text-yellow-600" />
+                          <span className="text-yellow-700">Kérvény kitöltése folyamatban</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {(app.message || app.reviewNotes) && !hasForm && (
                     <div className="border-t border-gray-100 px-4 py-3 text-xs text-gray-500 space-y-1">
                       {app.message && (
                         <p className="line-clamp-2">
@@ -139,6 +185,15 @@ export default async function ApplicationsPage() {
                           {app.reviewNotes}
                         </p>
                       )}
+                    </div>
+                  )}
+
+                  {app.reviewNotes && hasForm && (
+                    <div className="border-t border-gray-100 px-4 py-3 text-xs text-gray-500">
+                      <p className="line-clamp-2">
+                        <span className="font-medium text-gray-600">{t("shelterNote")} </span>
+                        {app.reviewNotes}
+                      </p>
                     </div>
                   )}
                 </div>
