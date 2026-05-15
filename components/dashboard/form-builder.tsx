@@ -218,6 +218,12 @@ export function FormBuilder({
           </p>
         )}
 
+        {fields.length > 0 && isDraft && (
+          <p className="text-xs text-gray-400">
+            Átírhatod a feliratokat, törölhetsz vagy átrendezhetsz mezőket, és újakat is hozzáadhatsz.
+          </p>
+        )}
+
         <div className="space-y-3">
           {fields.map((field, i) => (
             <div
