@@ -45,11 +45,26 @@ enum AnimalStatus {
 }
 
 enum ApplicationStatus {
+  INVITED
   PENDING
   REVIEWING
   APPROVED
   REJECTED
   WITHDRAWN
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  IMAGE
+  FILE
+}
+
+enum FormStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
 }
 
 // -------------------------------------------------------
@@ -178,6 +193,7 @@ model Shelter {
   adoptionRequirements String?            @db.Text
   tiers                DonationTier[]
   campaigns            Campaign[]
+  applicationForms     ApplicationForm[]
 }
 
 model ShelterDocument {
@@ -271,25 +287,30 @@ model AnimalImage {
 // -------------------------------------------------------
 
 model AdoptionApplication {
-  id          String            @id @default(cuid())
-  userId      String
-  animalId    String
-  status      ApplicationStatus @default(PENDING)
-  message     String?           @db.Text
-  homeType    String?           // "HOUSE" | "APARTMENT" | "OTHER"
-  hasGarden   Boolean?
-  hasChildren Boolean?
-  hasPets     Boolean?
-  experience  String?           @db.Text
-  reviewNotes String?           @db.Text
-  reviewedAt  DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id           String            @id @default(cuid())
+  userId       String
+  animalId     String
+  formId       String?
+  inviteToken  String?           @unique
+  status       ApplicationStatus @default(PENDING)
+  message      String?           @db.Text
+  homeType     String?           // "HOUSE" | "APARTMENT" | "OTHER"
+  hasGarden    Boolean?
+  hasChildren  Boolean?
+  hasPets      Boolean?
+  experience   String?           @db.Text
+  reviewNotes  String?           @db.Text
+  reviewedAt   DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animal    Animal           @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  form      ApplicationForm? @relation(fields: [formId], references: [id], onDelete: SetNull)
+  responses FormFieldResponse[]
 
   @@unique([userId, animalId])
+  @@index([inviteToken])
 }
 
 // -------------------------------------------------------
@@ -384,6 +405,8 @@ model Message {
   attachmentUrl  String?
   attachmentName String?
   readAt         DateTime?
+  type           String    @default("TEXT")
+  inviteToken    String?
   createdAt      DateTime  @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -481,4 +504,48 @@ model Donation {
 
   @@index([campaignId])
   @@index([userId])
+}
+
+// -------------------------------------------------------
+// Application Form System
+// -------------------------------------------------------
+
+model ApplicationForm {
+  id          String     @id @default(cuid())
+  shelterId   String
+  shelter     Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  title       String
+  description String?    @db.Text
+  status      FormStatus @default(DRAFT)
+  fields      FormField[]
+  applications AdoptionApplication[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([shelterId])
+}
+
+model FormField {
+  id        String          @id @default(cuid())
+  formId    String
+  form      ApplicationForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  label     String
+  type      FieldType
+  required  Boolean         @default(false)
+  order     Int             @default(0)
+  responses FormFieldResponse[]
+
+  @@index([formId])
+}
+
+model FormFieldResponse {
+  id            String              @id @default(cuid())
+  applicationId String
+  application   AdoptionApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  fieldId       String
+  field         FormField           @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  value         String?             @db.Text
+  fileUrl       String?
+
+  @@index([applicationId])
 }
