@@ -38,7 +38,13 @@ export default async function DonatePage() {
         slug: true,
         tiers: {
           where: { isActive: true },
-          include: { _count: { select: { subscriptions: true } } },
+          select: {
+            id:          true,
+            name:        true,
+            description: true,
+            amount:      true,
+            _count:      { select: { subscriptions: true } },
+          },
         },
       },
       take: 10,
