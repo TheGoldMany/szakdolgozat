@@ -23,10 +23,12 @@ model DimDate {
   date      DateTime @unique @db.Date
   year      Int
   month     Int
+  monthName String
   day       Int
   quarter   Int
   dayOfWeek Int
   isWeekend Boolean
+  isHoliday Boolean  @default(false)
 
   factAdoptions FactAdoption[]
   factInventory FactAnimalInventory[]
@@ -46,15 +48,16 @@ model DimShelter {
 }
 
 model DimAnimal {
-  id        Int        @id @default(autoincrement())
-  animalId  String     @unique
-  name      String
-  type      String
-  breed     String?
-  size      String?
-  gender    String?
-  shelterId Int
-  shelter   DimShelter @relation(fields: [shelterId], references: [id])
+  id          Int        @id @default(autoincrement())
+  animalId    String     @unique
+  name        String
+  type        String
+  breed       String?
+  size        String?
+  gender      String?
+  ageCategory String?    // PUPPY / YOUNG / ADULT / SENIOR
+  shelterId   Int
+  shelter     DimShelter @relation(fields: [shelterId], references: [id])
 
   factAdoptions FactAdoption[]
 }
@@ -64,6 +67,7 @@ model DimUser {
   userId  String  @unique
   city    String?
   country String  @default("HU")
+  role    String  @default("USER")
 
   factAdoptions FactAdoption[]
 }
@@ -73,28 +77,45 @@ model DimUser {
 // -------------------------------------------------------
 
 model FactAdoption {
-  id            Int        @id @default(autoincrement())
-  applicationId String     @unique
-  dateId        Int
-  date          DimDate    @relation(fields: [dateId], references: [id])
-  animalId      Int
-  animal        DimAnimal  @relation(fields: [animalId], references: [id])
-  shelterId     Int
-  shelter       DimShelter @relation(fields: [shelterId], references: [id])
-  userId        Int
-  user          DimUser    @relation(fields: [userId], references: [id])
-  status        String
-  homeType      String?
-  hasGarden     Boolean?
-  hasChildren   Boolean?
-  hasPets       Boolean?
-  createdAt     DateTime
-  reviewedAt    DateTime?
+  id               Int        @id @default(autoincrement())
+  applicationId    String     @unique
+  dateId           Int
+  date             DimDate    @relation(fields: [dateId], references: [id])
+  animalId         Int
+  animal           DimAnimal  @relation(fields: [animalId], references: [id])
+  shelterId        Int
+  shelter          DimShelter @relation(fields: [shelterId], references: [id])
+  userId           Int
+  user             DimUser    @relation(fields: [userId], references: [id])
+  status           String
+  stayDurationDays Int?
+  applicationCount Int        @default(1)
+  isReturn         Boolean    @default(false)
+  homeType         String?
+  hasGarden        Boolean?
+  hasChildren      Boolean?
+  hasPets          Boolean?
+  createdAt        DateTime
+  reviewedAt       DateTime?
 
   @@index([dateId])
   @@index([shelterId])
   @@index([animalId])
   @@index([status])
+}
+
+// -------------------------------------------------------
+// ETL futásnapló
+// -------------------------------------------------------
+
+model EtlRun {
+  id             Int      @id @default(autoincrement())
+  startedAt      DateTime
+  finishedAt     DateTime
+  elapsedMs      Int
+  adoptionCount  Int
+  inventoryCount Int
+  log            String   @db.Text
 }
 
 // Napi állomány-pillanatkép menhelyenként és státuszonként

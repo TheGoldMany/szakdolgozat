@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ApplicationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { dwh } from "@/lib/dwh";
 
-// -------------------------------------------------------
-// Helper – DimDate upsert
-// -------------------------------------------------------
+const HU_MONTHS = [
+  "január","február","március","április","május","június",
+  "július","augusztus","szeptember","október","november","december",
+];
+
+// Magyar törvényes ünnepnapok (fix, MM-DD)
+const HU_FIXED_HOLIDAYS = new Set([
+  "01-01","03-15","05-01","08-20","10-23","11-01","12-25","12-26",
+]);
+
+function isHungarianHoliday(d: Date): boolean {
+  const mmdd = `${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+  return HU_FIXED_HOLIDAYS.has(mmdd);
+}
+
 function toDateOnly(dt: Date): Date {
   const d = new Date(dt);
   d.setUTCHours(0, 0, 0, 0);
@@ -12,43 +25,67 @@ function toDateOnly(dt: Date): Date {
 }
 
 async function upsertDimDate(dt: Date) {
-  const d = toDateOnly(dt);
+  const d     = toDateOnly(dt);
+  const month = d.getUTCMonth();
   return dwh.dimDate.upsert({
-    where: { date: d },
+    where:  { date: d },
     update: {},
     create: {
       date:      d,
       year:      d.getUTCFullYear(),
-      month:     d.getUTCMonth() + 1,
+      month:     month + 1,
+      monthName: HU_MONTHS[month],
       day:       d.getUTCDate(),
-      quarter:   Math.ceil((d.getUTCMonth() + 1) / 3),
+      quarter:   Math.ceil((month + 1) / 3),
       dayOfWeek: d.getUTCDay(),
       isWeekend: d.getUTCDay() === 0 || d.getUTCDay() === 6,
+      isHoliday: isHungarianHoliday(d),
     },
   });
 }
 
-// -------------------------------------------------------
-// POST /api/etl  – védett: x-etl-token header szükséges
-// -------------------------------------------------------
+function computeAgeCategory(ageMonths: number | null | undefined): string {
+  if (ageMonths == null) return "UNKNOWN";
+  if (ageMonths < 6)    return "PUPPY";
+  if (ageMonths < 24)   return "YOUNG";
+  if (ageMonths < 96)   return "ADULT";
+  return "SENIOR";
+}
+
+// POST /api/etl  – védett: Authorization: Bearer <ETL_SECRET>
 export async function POST(req: NextRequest) {
-  const token = req.headers.get("x-etl-token");
+  const auth  = req.headers.get("authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
   if (!token || token !== process.env.ETL_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const log: string[] = [];
-  const startedAt = Date.now();
+  const startedAt = new Date();
+  const t0 = Date.now();
 
   // ── 1. OLTP adatok betöltése ─────────────────────────
-  const [shelters, animals, users, applications] = await Promise.all([
+  const [shelters, animals, users] = await Promise.all([
     prisma.shelter.findMany(),
     prisma.animal.findMany(),
-    prisma.user.findMany({ select: { id: true, city: true, country: true } }),
-    prisma.adoptionApplication.findMany({
-      include: { animal: { select: { shelterId: true } } },
-    }),
+    prisma.user.findMany({ select: { id: true, city: true, country: true, role: true } }),
   ]);
+
+  // Csak COMPLETED kérelmek a FactAdoption-höz, érkezési sorrendben
+  const completedApps = await prisma.adoptionApplication.findMany({
+    where:   { status: ApplicationStatus.APPROVED },
+    include: { animal: { select: { shelterId: true, arrivedAt: true, createdAt: true, age: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Összes kérelem az applicationCount mértékhez
+  const allApps = await prisma.adoptionApplication.findMany({ select: { animalId: true } });
+
+  // applicationCount: hány kérelem érkezett állatonként (összes státusz)
+  const appCountMap = new Map<string, number>();
+  for (const a of allApps) {
+    appCountMap.set(a.animalId, (appCountMap.get(a.animalId) ?? 0) + 1);
+  }
 
   // ── 2. DimShelter ────────────────────────────────────
   for (const s of shelters) {
@@ -65,10 +102,11 @@ export async function POST(req: NextRequest) {
   for (const a of animals) {
     const ds = await dwh.dimShelter.findUnique({ where: { shelterId: a.shelterId } });
     if (!ds) continue;
+    const ageCategory = computeAgeCategory(a.age);
     await dwh.dimAnimal.upsert({
       where:  { animalId: a.id },
-      update: { name: a.name, type: a.type, breed: a.breed, size: a.size ?? null, gender: a.gender, shelterId: ds.id },
-      create: { animalId: a.id, name: a.name, type: a.type, breed: a.breed, size: a.size ?? null, gender: a.gender, shelterId: ds.id },
+      update: { name: a.name, type: a.type, breed: a.breed, size: a.size ?? null, gender: a.gender, ageCategory, shelterId: ds.id },
+      create: { animalId: a.id, name: a.name, type: a.type, breed: a.breed, size: a.size ?? null, gender: a.gender, ageCategory, shelterId: ds.id },
     });
     animalCount++;
   }
@@ -78,38 +116,61 @@ export async function POST(req: NextRequest) {
   for (const u of users) {
     await dwh.dimUser.upsert({
       where:  { userId: u.id },
-      update: { city: u.city },
-      create: { userId: u.id, city: u.city, country: u.country },
+      update: { city: u.city, role: u.role },
+      create: { userId: u.id, city: u.city, country: u.country, role: u.role },
     });
   }
   log.push(`DimUser: ${users.length} upserted`);
 
   // ── 5. FactAdoption ──────────────────────────────────
+  // Visszakerülés detektálás: ha egy állatnak már volt korábbi COMPLETED kérelme
+  const completedCountByAnimal = new Map<string, number>();
+
   let factAdoptionCount = 0;
-  for (const app of applications) {
-    const dimDate    = await upsertDimDate(app.createdAt);
-    const dimAnimal  = await dwh.dimAnimal.findUnique({ where: { animalId: app.animalId } });
-    const dimShelter = await dwh.dimShelter.findUnique({ where: { shelterId: app.animal.shelterId } });
-    const dimUser    = await dwh.dimUser.findUnique({ where: { userId: app.userId } });
+  for (const app of completedApps) {
+    const adoptDate = app.reviewedAt ?? app.createdAt;
+    const dimDate   = await upsertDimDate(adoptDate);
+    const dimAnimal = await dwh.dimAnimal.findUnique({ where: { animalId: app.animalId } });
+    const dimShelter= await dwh.dimShelter.findUnique({ where: { shelterId: app.animal.shelterId } });
+    const dimUser   = await dwh.dimUser.findUnique({ where: { userId: app.userId } });
 
     if (!dimAnimal || !dimShelter || !dimUser) continue;
 
+    // stayDurationDays: érkezéstől az örökbefogadásig
+    const intakeDate       = app.animal.arrivedAt ?? app.animal.createdAt;
+    const diffMs           = adoptDate.getTime() - intakeDate.getTime();
+    const stayDurationDays = diffMs >= 0 ? Math.round(diffMs / 86_400_000) : null;
+
+    // isReturn: volt-e már korábbi COMPLETED kérelem ehhez az állathoz
+    const prevCompleted = completedCountByAnimal.get(app.animalId) ?? 0;
+    const isReturn      = prevCompleted > 0;
+    completedCountByAnimal.set(app.animalId, prevCompleted + 1);
+
     await dwh.factAdoption.upsert({
       where:  { applicationId: app.id },
-      update: { status: app.status, reviewedAt: app.reviewedAt ?? null },
+      update: {
+        status:           app.status,
+        reviewedAt:       app.reviewedAt ?? null,
+        stayDurationDays,
+        applicationCount: appCountMap.get(app.animalId) ?? 1,
+        isReturn,
+      },
       create: {
-        applicationId: app.id,
-        dateId:        dimDate.id,
-        animalId:      dimAnimal.id,
-        shelterId:     dimShelter.id,
-        userId:        dimUser.id,
-        status:        app.status,
-        homeType:      app.homeType,
-        hasGarden:     app.hasGarden,
-        hasChildren:   app.hasChildren,
-        hasPets:       app.hasPets,
-        createdAt:     app.createdAt,
-        reviewedAt:    app.reviewedAt ?? null,
+        applicationId:    app.id,
+        dateId:           dimDate.id,
+        animalId:         dimAnimal.id,
+        shelterId:        dimShelter.id,
+        userId:           dimUser.id,
+        status:           app.status,
+        homeType:         app.homeType,
+        hasGarden:        app.hasGarden,
+        hasChildren:      app.hasChildren,
+        hasPets:          app.hasPets,
+        createdAt:        app.createdAt,
+        reviewedAt:       app.reviewedAt ?? null,
+        stayDurationDays,
+        applicationCount: appCountMap.get(app.animalId) ?? 1,
+        isReturn,
       },
     });
     factAdoptionCount++;
@@ -119,7 +180,6 @@ export async function POST(req: NextRequest) {
   // ── 6. FactAnimalInventory – mai napi pillanatkép ────
   const dimToday = await upsertDimDate(new Date());
 
-  // Csoportosítás: shelterId → status → darab
   const inv = new Map<string, number>();
   for (const a of animals) {
     const key = `${a.shelterId}::${a.status}`;
@@ -140,8 +200,20 @@ export async function POST(req: NextRequest) {
   }
   log.push(`FactAnimalInventory: ${invCount} sor upserted (mai nap)`);
 
-  const elapsed = Date.now() - startedAt;
-  log.push(`Futási idő: ${elapsed}ms`);
+  const elapsedMs = Date.now() - t0;
+  log.push(`Futási idő: ${elapsedMs}ms`);
+
+  // ── 7. ETL futásnapló mentése ────────────────────────
+  await dwh.etlRun.create({
+    data: {
+      startedAt,
+      finishedAt:    new Date(),
+      elapsedMs,
+      adoptionCount: factAdoptionCount,
+      inventoryCount: invCount,
+      log:           log.join("\n"),
+    },
+  });
 
   return NextResponse.json({ success: true, log });
 }
