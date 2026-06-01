@@ -7,6 +7,18 @@ import Stripe from "stripe";
  */
 export const PLATFORM_FEE_PERCENT = 4;
 
+/**
+ * Platform fee for a given amount, in the same whole-currency unit (HUF).
+ * Rounded to whole forints so charges stay valid for HUF.
+ *
+ * The fee is added on top of the donor's intended amount: the donor pays
+ * `amount + platformFee(amount)`, the connected account receives the full
+ * `amount`, and the platform keeps the fee.
+ */
+export function platformFee(amount: number): number {
+  return Math.round((amount * PLATFORM_FEE_PERCENT) / 100);
+}
+
 // Lazy singleton – only instantiated on first use, never at build time
 let _stripe: Stripe | null = null;
 

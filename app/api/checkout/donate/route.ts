@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -59,13 +59,16 @@ export async function POST(req: NextRequest) {
       : null;
   const connectedAccountId = await resolveTransferDestination(candidateAccountId);
 
-  // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit
-  const amountInFiller  = amount * 100;
-  const applicationFee  = connectedAccountId
-    ? Math.round(amountInFiller * PLATFORM_FEE_PERCENT / 100)
-    : undefined;
+  // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit.
+  // When routing to a connected account, the 4% platform fee is added ON TOP
+  // of the donor's intended amount: the donor pays amount + fee, the shelter
+  // receives the full `amount`, and the platform keeps `fee`.
+  const amountInFiller = amount * 100;
+  const feeForint      = connectedAccountId ? platformFee(amount) : 0;
+  const feeInFiller    = feeForint * 100;
 
-  // Create pending Donation record (paidAt set by webhook after payment)
+  // Create pending Donation record (paidAt set by webhook after payment).
+  // `amount` is the donor's intended donation that goes to the shelter.
   const donation = await prisma.donation.create({
     data: {
       userId:      session?.user?.id ?? null,
@@ -77,7 +80,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Stripe Checkout – HUF is zero-decimal, pass amount as-is
   let checkoutSession;
   try {
     checkoutSession = await getStripe().checkout.sessions.create({
@@ -92,13 +94,24 @@ export async function POST(req: NextRequest) {
           },
           quantity: 1,
         },
+        // Show the platform fee as a separate, transparent line item
+        ...(feeInFiller > 0
+          ? [{
+              price_data: {
+                currency:     "huf",
+                product_data: { name: `Platform díj (${PLATFORM_FEE_PERCENT}%)` },
+                unit_amount:  feeInFiller,
+              },
+              quantity: 1,
+            }]
+          : []),
       ],
       success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE}/donate/${campaign.id}`,
       metadata:    { donationId: donation.id },
       ...(connectedAccountId && {
         payment_intent_data: {
-          application_fee_amount: applicationFee,
+          application_fee_amount: feeInFiller,
           transfer_data: { destination: connectedAccountId },
         },
       }),
