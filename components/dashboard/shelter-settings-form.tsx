@@ -189,7 +189,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
-          Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (1% platform díj levonásával).
+          Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (4% platform díj levonásával).
         </p>
 
         {shelter.stripeOnboardingComplete ? (
@@ -222,7 +222,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
             <div className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
               <Info className="h-5 w-5 shrink-0 text-blue-600 mt-0.5" />
               <p className="text-sm text-blue-800">
-                Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (1% platform díj levonásával).
+                Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (4% platform díj levonásával).
               </p>
             </div>
             <button

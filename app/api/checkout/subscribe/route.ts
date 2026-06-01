@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       },
       ...(connectedAccountId && {
         subscription_data: {
-          application_fee_percent: 1,
+          application_fee_percent: PLATFORM_FEE_PERCENT,
           transfer_data: { destination: connectedAccountId },
         },
       }),

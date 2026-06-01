@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -61,7 +61,9 @@ export async function POST(req: NextRequest) {
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit
   const amountInFiller  = amount * 100;
-  const applicationFee  = connectedAccountId ? Math.round(amountInFiller * 0.01) : undefined;
+  const applicationFee  = connectedAccountId
+    ? Math.round(amountInFiller * PLATFORM_FEE_PERCENT / 100)
+    : undefined;
 
   // Create pending Donation record (paidAt set by webhook after payment)
   const donation = await prisma.donation.create({

@@ -212,7 +212,7 @@ export default function HelpPage() {
                   A <Link href="/donate" className="text-pink-600 hover:underline">Támogatás</Link> oldalon
                   böngészheted az aktív kampányokat. Válassz egyet, add meg az összeget
                   (minimum 175 Ft), és fizess bankkártyával. Az adomány közvetlenül a
-                  menhelyhez kerül (1% platform díj levonásával).
+                  menhelyhez kerül (4% platform díj levonásával).
                 </Step>
                 <Step n={2} title="Havi előfizetés – Csomagok">
                   A menhelyek oldalán előfizetési csomagokat találsz. Egy csomag kiválasztásával
@@ -312,7 +312,7 @@ export default function HelpPage() {
               <p className="text-sm text-gray-600 leading-relaxed">
                 A menhelyek adományokat és előfizetési díjakat fogadhatnak, ha csatlakoztatják
                 Stripe fiókjukat. Az összeg automatikusan a menhely bankszámlájára kerül
-                (a platform 1% kezelési díjat von le).
+                (a platform 4% kezelési díjat von le).
               </p>
               <div className="space-y-5 mt-4">
                 <Step n={1} title="Stripe Connect aktiválása">
@@ -333,8 +333,8 @@ export default function HelpPage() {
                 </Step>
               </div>
               <div className="mt-4 rounded-xl bg-violet-50 border border-violet-100 p-4 text-sm text-violet-800">
-                <strong>Platform díj:</strong> A platform az összeg 1%-át tartja meg a működési
-                költségek fedezésére. Például 10 000 Ft adományból 9 900 Ft kerül a menhelyhez.
+                <strong>Platform díj:</strong> A platform az összeg 4%-át tartja meg a működési
+                költségek fedezésére. Például 10 000 Ft adományból 9 600 Ft kerül a menhelyhez.
               </div>
             </Section>
 

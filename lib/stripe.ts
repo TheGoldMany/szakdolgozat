@@ -1,5 +1,12 @@
 import Stripe from "stripe";
 
+/**
+ * Platform fee taken from every payment (donations + subscriptions).
+ * The remainder is transferred in full to the connected account (shelter /
+ * campaign owner). Change this single value to adjust the platform's cut.
+ */
+export const PLATFORM_FEE_PERCENT = 4;
+
 // Lazy singleton – only instantiated on first use, never at build time
 let _stripe: Stripe | null = null;
 
