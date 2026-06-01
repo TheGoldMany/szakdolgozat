@@ -34,7 +34,7 @@ export async function POST(
       shelter:  {
         select: {
           name:   true,
-          admins: { include: { user: { select: { email: true, name: true } } } },
+          admins: { select: { user: { select: { email: true, name: true } } } },
         },
       },
     },
