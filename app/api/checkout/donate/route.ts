@@ -99,20 +99,7 @@ export async function POST(req: NextRequest) {
       }),
     });
   } catch (err) {
-    const raw = process.env.STRIPE_SECRET_KEY ?? "";
-    console.error("STRIPE_DEBUG", JSON.stringify({
-      keyPresent:   !!raw,
-      rawLength:    raw.length,
-      rawPrefix:    raw.slice(0, 14),
-      rawFirstChar: raw.charCodeAt(0),
-      rawLastChar:  raw.charCodeAt(raw.length - 1),
-      errorType:    err instanceof Error ? err.constructor.name : typeof err,
-      errorMessage: err instanceof Error ? err.message : String(err),
-      // @ts-ignore
-      stripeCode:   err?.code,
-      // @ts-ignore
-      stripeType:   err?.type,
-    }));
+    console.error("Stripe checkout/donate error:", err);
     const msg = err instanceof Error ? err.message : "Stripe hiba";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
