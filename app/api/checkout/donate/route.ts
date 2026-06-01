@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -48,13 +48,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A kampány nem fogad adományokat" }, { status: 409 });
   }
 
-  // Determine connected Stripe account for automatic transfer
-  const connectedAccountId =
+  // Determine connected Stripe account for automatic transfer.
+  // Verify it actually exists in Stripe – otherwise fall back to the platform
+  // account so a stale/invalid acct_… id doesn't break checkout.
+  const candidateAccountId =
     (campaign.shelter?.stripeOnboardingComplete && campaign.shelter?.stripeAccountId)
       ? campaign.shelter.stripeAccountId
       : (campaign.user?.stripeOnboardingComplete && campaign.user?.stripeAccountId)
       ? campaign.user.stripeAccountId
       : null;
+  const connectedAccountId = await resolveTransferDestination(candidateAccountId);
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit
   const amountInFiller  = amount * 100;

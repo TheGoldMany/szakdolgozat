@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -46,11 +46,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A csomag nem aktív" }, { status: 409 });
   }
 
-  // Determine connected Stripe account for automatic transfer
-  const connectedAccountId =
-    (tier.shelter.stripeOnboardingComplete && tier.shelter.stripeAccountId)
-      ? tier.shelter.stripeAccountId
-      : null;
+  // Determine connected Stripe account for automatic transfer.
+  // Verify it actually exists in Stripe – otherwise fall back to the platform
+  // account so a stale/invalid acct_… id doesn't break checkout.
+  const connectedAccountId = await resolveTransferDestination(
+    tier.shelter.stripeOnboardingComplete ? tier.shelter.stripeAccountId : null
+  );
 
   // Create Stripe Checkout Session for subscription
   // HUF is a zero-decimal currency → pass amount as-is
