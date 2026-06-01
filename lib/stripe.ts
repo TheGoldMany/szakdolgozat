@@ -5,10 +5,15 @@ let _stripe: Stripe | null = null;
 
 export function getStripe(): Stripe {
   if (!_stripe) {
-    if (!process.env.STRIPE_SECRET_KEY) {
+    const raw = process.env.STRIPE_SECRET_KEY;
+    if (!raw) {
       throw new Error("STRIPE_SECRET_KEY environment variable is not set");
     }
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    // Defensive: strip surrounding quotes and whitespace that can sneak in
+    // when pasting the value into a hosting provider's env var UI. A literal
+    // leading/trailing quote or newline makes Stripe reject the key as invalid.
+    const key = raw.trim().replace(/^['"]+|['"]+$/g, "");
+    _stripe = new Stripe(key, {
       apiVersion: "2026-03-25.dahlia",
       typescript: true,
     });
