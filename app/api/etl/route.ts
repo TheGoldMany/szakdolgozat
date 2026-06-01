@@ -2,27 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { ApplicationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { dwh } from "@/lib/dwh";
-
-const HU_MONTHS = [
-  "január","február","március","április","május","június",
-  "július","augusztus","szeptember","október","november","december",
-];
-
-// Magyar törvényes ünnepnapok (fix, MM-DD)
-const HU_FIXED_HOLIDAYS = new Set([
-  "01-01","03-15","05-01","08-20","10-23","11-01","12-25","12-26",
-]);
-
-function isHungarianHoliday(d: Date): boolean {
-  const mmdd = `${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
-  return HU_FIXED_HOLIDAYS.has(mmdd);
-}
-
-function toDateOnly(dt: Date): Date {
-  const d = new Date(dt);
-  d.setUTCHours(0, 0, 0, 0);
-  return d;
-}
+import {
+  toDateOnly,
+  monthName,
+  isHungarianHoliday,
+  computeAgeCategory,
+  computeStayDurationDays,
+} from "@/lib/etl-helpers";
 
 async function upsertDimDate(dt: Date) {
   const d     = toDateOnly(dt);
@@ -34,7 +20,7 @@ async function upsertDimDate(dt: Date) {
       date:      d,
       year:      d.getUTCFullYear(),
       month:     month + 1,
-      monthName: HU_MONTHS[month],
+      monthName: monthName(month + 1),
       day:       d.getUTCDate(),
       quarter:   Math.ceil((month + 1) / 3),
       dayOfWeek: d.getUTCDay(),
@@ -42,14 +28,6 @@ async function upsertDimDate(dt: Date) {
       isHoliday: isHungarianHoliday(d),
     },
   });
-}
-
-function computeAgeCategory(ageMonths: number | null | undefined): string {
-  if (ageMonths == null) return "UNKNOWN";
-  if (ageMonths < 6)    return "PUPPY";
-  if (ageMonths < 24)   return "YOUNG";
-  if (ageMonths < 96)   return "ADULT";
-  return "SENIOR";
 }
 
 // POST /api/etl  – védett: Authorization: Bearer <ETL_SECRET>
@@ -138,8 +116,7 @@ export async function POST(req: NextRequest) {
 
     // stayDurationDays: érkezéstől az örökbefogadásig
     const intakeDate       = app.animal.arrivedAt ?? app.animal.createdAt;
-    const diffMs           = adoptDate.getTime() - intakeDate.getTime();
-    const stayDurationDays = diffMs >= 0 ? Math.round(diffMs / 86_400_000) : null;
+    const stayDurationDays = computeStayDurationDays(intakeDate, adoptDate);
 
     // isReturn: volt-e már korábbi COMPLETED kérelem ehhez az állathoz
     const prevCompleted = completedCountByAnimal.get(app.animalId) ?? 0;
