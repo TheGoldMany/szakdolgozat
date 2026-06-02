@@ -376,8 +376,23 @@ async function runSeed() {
     await prisma.animal.createMany({ data: animalRows.slice(i, i + 500), skipDuplicates: true });
   }
   const allAnimals = await prisma.animal.findMany({
-    select: { id: true, shelterId: true, status: true, arrivedAt: true, adoptedAt: true },
+    select: { id: true, shelterId: true, status: true, arrivedAt: true, adoptedAt: true, type: true },
   });
+
+  // ── 6b. Állat képek (1 kép / állat) ──────────────────
+  const IMG_KEYWORDS: Record<AnimalType, string> = {
+    DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "parrot", OTHER: "hamster",
+  };
+  const imgRows = allAnimals.map((a, i) => ({
+    animalId:  a.id,
+    url:       `https://loremflickr.com/640/480/${IMG_KEYWORDS[a.type]}?lock=${i + 1}`,
+    alt:       "Állat fotó",
+    isPrimary: true,
+    order:     0,
+  }));
+  for (let i = 0; i < imgRows.length; i += 500) {
+    await prisma.animalImage.createMany({ data: imgRows.slice(i, i + 500), skipDuplicates: true });
+  }
 
   // ── 7. Örökbefogadási kérelmek ────────────────────────
   const adoptableAnimals = allAnimals.filter(a =>
