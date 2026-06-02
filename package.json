@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && next build",
+    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && prisma db push --accept-data-loss && prisma db push --schema=prisma/dwh.prisma --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
