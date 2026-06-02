@@ -10,6 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test --project=guest",
+    "test:e2e:admin": "playwright test --project=setup --project=admin",
+    "test:e2e:all": "playwright test",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
@@ -48,6 +51,7 @@
     "zod": "^3.23.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.12.7",
     "@types/react": "^18.3.1",

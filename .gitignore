@@ -47,3 +47,8 @@ prisma/*.db-journal
 
 # generated Prisma clients
 lib/generated/
+
+# Playwright
+e2e/.auth/
+playwright-report/
+test-results/
