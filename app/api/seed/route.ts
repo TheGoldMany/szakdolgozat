@@ -190,7 +190,7 @@ async function runSeed() {
         AnimalStatus.AVAILABLE, AnimalStatus.AVAILABLE, AnimalStatus.AVAILABLE,
         AnimalStatus.PENDING, AnimalStatus.ADOPTED, AnimalStatus.FOSTER,
       ]);
-      const arrivedAt = new Date(Date.now() - randomInt(7, 365) * 86400000);
+      const arrivedAt = new Date(Date.now() - randomInt(7, 730) * 86400000);
 
       await prisma.animal.upsert({
         where: { slug },
@@ -221,20 +221,39 @@ async function runSeed() {
   }
 
   // Örökbefogadási kérelmek
+  // A reviewedAt (örökbefogadás dátuma) az állat tényleges adoptedAt-jéhez
+  // igazodik, így a FactAdoption dátumai ~12 hónapra szétszóródnak – ettől
+  // működik a Power BI idő-alapú trend (UC-01) és a stayDurationDays mérték.
   const pendingAnimals = await prisma.animal.findMany({
     where: { status: { in: [AnimalStatus.PENDING, AnimalStatus.ADOPTED] } },
-    take: 30,
+    take: 400,
   });
+  const nowMs = Date.now();
   let appCount = 0;
   for (const animal of pendingAnimals) {
     try {
+      const isApproved = animal.status === AnimalStatus.ADOPTED;
+
+      let createdAt: Date;
+      let reviewedAt: Date | null;
+      if (isApproved && animal.adoptedAt) {
+        const adopted = Math.min(animal.adoptedAt.getTime(), nowMs);
+        reviewedAt = new Date(adopted);
+        createdAt  = new Date(adopted - randomInt(1, 21) * 86400000);
+        if (animal.arrivedAt && createdAt < animal.arrivedAt) createdAt = new Date(animal.arrivedAt.getTime());
+      } else {
+        reviewedAt = null;
+        createdAt  = new Date(nowMs - randomInt(1, 90) * 86400000);
+      }
+
       await prisma.adoptionApplication.create({
         data: {
           userId: randomItem(users).id, animalId: animal.id,
-          status: animal.status === AnimalStatus.ADOPTED ? "APPROVED" : "PENDING",
+          status: isApproved ? "APPROVED" : "PENDING",
           message: "Szeretném örökbefogadni. Házban élek, nagy kerttel.",
           homeType: randomItem(["HOUSE", "APARTMENT"]),
           hasGarden: randomBool(), hasChildren: randomBool(0.4), hasPets: randomBool(0.3),
+          createdAt, reviewedAt,
         },
       });
       appCount++;

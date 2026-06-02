@@ -457,7 +457,7 @@ async function main() {
   // ── 10. Örökbefogadási kérelmek ───────────────────
   const adoptableAnimals = await prisma.animal.findMany({
     where:  { status: { in: [AnimalStatus.PENDING, AnimalStatus.ADOPTED] } },
-    select: { id: true, status: true },
+    select: { id: true, status: true, arrivedAt: true, adoptedAt: true },
     take:   600,
   });
 
@@ -472,25 +472,49 @@ async function main() {
     hasChildren: boolean;
     hasPets:     boolean;
     experience:  string;
+    createdAt:   Date;
+    reviewedAt:  Date | null;
   }[] = [];
+
+  const now = Date.now();
 
   for (const animal of adoptableAnimals) {
     const user = rnd(demoUsers);
     const pair = `${user.id}:${animal.id}`;
     if (seenPairs.has(pair)) continue;
     seenPairs.add(pair);
+
+    const isApproved = animal.status === AnimalStatus.ADOPTED;
+
+    // Az örökbefogadás (reviewedAt) az állat tényleges adoptedAt-jéhez igazodik,
+    // így a FactAdoption dátumai ~24 hónapra szétszóródnak. A kérelem (createdAt)
+    // néhány nappal a jóváhagyás előtt keletkezik. PENDING esetben friss kérelem.
+    let createdAt: Date;
+    let reviewedAt: Date | null;
+
+    if (isApproved && animal.adoptedAt) {
+      const adopted = Math.min(animal.adoptedAt.getTime(), now); // nem a jövőben
+      reviewedAt = new Date(adopted);
+      createdAt  = new Date(adopted - rndInt(1, 21) * 86_400_000);
+      // a kérelem ne legyen korábbi, mint az állat érkezése
+      if (animal.arrivedAt && createdAt < animal.arrivedAt) createdAt = new Date(animal.arrivedAt.getTime());
+    } else {
+      reviewedAt = null;
+      createdAt  = new Date(now - rndInt(1, 90) * 86_400_000);
+    }
+
     appRows.push({
       userId:      user.id,
       animalId:    animal.id,
-      status:      animal.status === AnimalStatus.ADOPTED
-                     ? ApplicationStatus.APPROVED
-                     : ApplicationStatus.PENDING,
+      status:      isApproved ? ApplicationStatus.APPROVED : ApplicationStatus.PENDING,
       message:     "Szeretném örökbefogadni ezt az állatot. Biztonságos, szerető otthont tudok nyújtani.",
       homeType:    rnd(["HOUSE", "APARTMENT", "OTHER"]),
       hasGarden:   rndBool(0.5),
       hasChildren: rndBool(0.4),
       hasPets:     rndBool(0.3),
       experience:  "Volt már állatom, szívesen vállalom a gondozást.",
+      createdAt,
+      reviewedAt,
     });
   }
 
