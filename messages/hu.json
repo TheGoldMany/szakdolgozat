@@ -14,7 +14,8 @@
     "roleUser": "Felhasználó",
     "roleShelterAdmin": "Menhely admin",
     "roleSuperAdmin": "Főadmin",
-    "language": "Nyelv"
+    "language": "Nyelv",
+    "map": "Térkép"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",

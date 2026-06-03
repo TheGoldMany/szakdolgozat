@@ -14,7 +14,8 @@
     "roleUser": "User",
     "roleShelterAdmin": "Shelter admin",
     "roleSuperAdmin": "Super admin",
-    "language": "Language"
+    "language": "Language",
+    "map": "Map"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",

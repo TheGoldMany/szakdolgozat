@@ -176,6 +176,8 @@ model Shelter {
   coverUrl         String?
   isVerified       Boolean  @default(false)
   isActive         Boolean  @default(true)
+  lat              Float?
+  lng              Float?
   // Fizetési / cégadatok
   companyName      String?
   taxNumber        String?

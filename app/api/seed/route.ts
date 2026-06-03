@@ -263,6 +263,8 @@ async function runSeed() {
         description: `${name} 2010 óta működik ${city.name}ban/ben. Több száz állatot mentettünk már meg.`,
         isVerified:  rb(0.85),
         isActive:    true,
+        lat:         city.lat + (Math.random() - 0.5) * 0.05,
+        lng:         city.lng + (Math.random() - 0.5) * 0.05,
       },
     });
 

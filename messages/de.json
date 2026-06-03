@@ -14,7 +14,8 @@
     "roleUser": "Benutzer",
     "roleShelterAdmin": "Tierheim-Admin",
     "roleSuperAdmin": "Super-Admin",
-    "language": "Sprache"
+    "language": "Sprache",
+    "map": "Karte"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",

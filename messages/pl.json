@@ -14,7 +14,8 @@
     "roleUser": "Użytkownik",
     "roleShelterAdmin": "Admin schroniska",
     "roleSuperAdmin": "Super admin",
-    "language": "Język"
+    "language": "Język",
+    "map": "Mapa"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
