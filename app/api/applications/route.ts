@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus } from "@prisma/client";
 import { Prisma } from "@prisma/client";
+import { getMobileUser } from "@/lib/mobile-auth";
 
 const applicationSchema = z.object({
   animalId:    z.string().min(1),
@@ -17,8 +18,10 @@ const applicationSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const session    = await getServerSession(authOptions);
+  const mobileUser = session?.user?.id ? null : await getMobileUser(req);
+  const userId     = session?.user?.id ?? mobileUser?.id;
+  if (!userId) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
@@ -41,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const application = await prisma.adoptionApplication.create({
-      data: { userId: session.user.id, animalId, ...rest },
+      data: { userId, animalId, ...rest },
     });
     return NextResponse.json({ application }, { status: 201 });
   } catch (error) {
