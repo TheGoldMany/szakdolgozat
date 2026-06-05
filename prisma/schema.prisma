@@ -197,6 +197,7 @@ model Shelter {
   bankAccountNumber String?
   stripeAccountId          String?
   stripeOnboardingComplete Boolean @default(false)
+  capacity    Int?     // férőhelyek száma (UC-02 kapacitáskihasználtság)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

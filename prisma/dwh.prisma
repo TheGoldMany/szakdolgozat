@@ -32,6 +32,7 @@ model DimDate {
 
   factAdoptions FactAdoption[]
   factInventory FactAnimalInventory[]
+  factReports   FactAnimalReport[]
 }
 
 model DimShelter {
@@ -41,10 +42,12 @@ model DimShelter {
   city       String
   country    String  @default("HU")
   isVerified Boolean @default(false)
+  capacity   Int?    // max állatok száma
 
-  dimAnimals    DimAnimal[]
-  factAdoptions FactAdoption[]
-  factInventory FactAnimalInventory[]
+  dimAnimals      DimAnimal[]
+  factAdoptions   FactAdoption[]
+  factInventory   FactAnimalInventory[]
+  factReports     FactAnimalReport[]
 }
 
 model DimAnimal {
@@ -120,15 +123,37 @@ model EtlRun {
 
 // Napi állomány-pillanatkép menhelyenként és státuszonként
 model FactAnimalInventory {
-  id        Int        @id @default(autoincrement())
-  dateId    Int
-  date      DimDate    @relation(fields: [dateId], references: [id])
-  shelterId Int
-  shelter   DimShelter @relation(fields: [shelterId], references: [id])
-  status    String
-  count     Int
+  id              Int        @id @default(autoincrement())
+  dateId          Int
+  date            DimDate    @relation(fields: [dateId], references: [id])
+  shelterId       Int
+  shelter         DimShelter @relation(fields: [shelterId], references: [id])
+  status          String
+  count           Int
+  utilizationRate Float?     // (AVAILABLE+PENDING) / capacity, ha van capacity
 
   @@unique([dateId, shelterId, status])
   @@index([dateId])
   @@index([shelterId])
+}
+
+// UC-03: Állat-bejelentések (elveszett / megtalált / kóbor)
+model FactAnimalReport {
+  id        Int         @id @default(autoincrement())
+  reportId  String      @unique
+  dateId    Int
+  date      DimDate     @relation(fields: [dateId], references: [id])
+  shelterId Int?
+  shelter   DimShelter? @relation(fields: [shelterId], references: [id])
+  type      String      // LOST | FOUND | STRAY
+  city      String?
+  lat       Float?
+  lng       Float?
+  status    String      // ACTIVE | RESOLVED | DISMISSED | IN_PROGRESS
+  isMatched Boolean     @default(false)
+  createdAt DateTime
+
+  @@index([dateId])
+  @@index([type])
+  @@index([status])
 }

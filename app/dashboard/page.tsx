@@ -14,6 +14,7 @@ import { KpiCard } from "@/components/dashboard/stats/kpi-card";
 import { AnimalsDonut } from "@/components/dashboard/stats/animals-donut";
 import { ApplicationsBar } from "@/components/dashboard/stats/applications-bar";
 import { AdoptionsLine } from "@/components/dashboard/stats/adoptions-line";
+import { AnalyticsSection } from "@/components/dashboard/analytics-section";
 
 export const metadata: Metadata = { title: "Áttekintés" };
 export const dynamic = "force-dynamic";
@@ -35,7 +36,10 @@ export default async function DashboardPage() {
 
   // ─── SHELTER ADMIN ────────────────────────────────────────────────────────
   if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({ where: { userId: session.user.id } });
+    const admin = await prisma.shelterAdmin.findFirst({
+      where:   { userId: session.user.id },
+      include: { shelter: { select: { id: true, name: true } } },
+    });
     const shelterId = admin?.shelterId;
     if (!shelterId) {
       return (
@@ -44,6 +48,7 @@ export default async function DashboardPage() {
         </div>
       );
     }
+    const adminShelters = admin?.shelter ? [{ id: admin.shelter.id, name: admin.shelter.name }] : [];
 
     const now      = new Date();
     const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
@@ -288,6 +293,9 @@ export default async function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Analytics */}
+        <AnalyticsSection role="SHELTER_ADMIN" shelters={adminShelters} />
       </div>
     );
   }
@@ -297,6 +305,8 @@ export default async function DashboardPage() {
   const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const allShelters = await prisma.shelter.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } });
 
   const [
     totalUsers,
@@ -471,6 +481,9 @@ export default async function DashboardPage() {
           </ul>
         )}
       </div>
+
+      {/* Analytics */}
+      <AnalyticsSection role="SUPER_ADMIN" shelters={allShelters} />
     </div>
   );
 }

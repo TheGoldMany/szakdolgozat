@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const t0 = Date.now();
 
   // ── 1. OLTP adatok egyszeri lekérése ─────────────────
-  const [shelters, animals, users, completedApps, allApps] = await Promise.all([
+  const [shelters, animals, users, completedApps, allApps, reports] = await Promise.all([
     prisma.shelter.findMany(),
     prisma.animal.findMany(),
     prisma.user.findMany({ select: { id: true, city: true, country: true, role: true } }),
@@ -33,6 +33,9 @@ export async function POST(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     }),
     prisma.adoptionApplication.findMany({ select: { animalId: true } }),
+    prisma.animalReport.findMany({
+      select: { id: true, type: true, status: true, city: true, lat: true, lng: true, createdAt: true, userId: true },
+    }),
   ]);
 
   // applicationCount mérték: állatonként hány kérelem érkezett
@@ -42,6 +45,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── 2. DWH tisztítás (tény → dimenzió sorrendben) ────
+  await dwh.factAnimalReport.deleteMany({});
   await dwh.factAnimalInventory.deleteMany({});
   await dwh.factAdoption.deleteMany({});
   await dwh.dimAnimal.deleteMany({});
@@ -58,6 +62,7 @@ export async function POST(req: NextRequest) {
       city:       s.city,
       country:    s.country,
       isVerified: s.isVerified,
+      capacity:   s.capacity ?? null,
     })),
     skipDuplicates: true,
   });
@@ -105,6 +110,9 @@ export async function POST(req: NextRequest) {
   const neededDates = new Set<string>();
   for (const app of completedApps) {
     neededDates.add(toDateOnly(app.reviewedAt ?? app.createdAt).toISOString());
+  }
+  for (const r of reports) {
+    neededDates.add(toDateOnly(r.createdAt).toISOString());
   }
   neededDates.add(toDateOnly(new Date()).toISOString()); // mai nap az inventory-hoz
 
@@ -187,9 +195,11 @@ export async function POST(req: NextRequest) {
   log.push(`FactAdoption: ${factAdoptionData.length} sor`);
 
   // ── 8. FactAnimalInventory – mai pillanatkép ──────────
+  const capacityMap = new Map(shelters.map(s => [s.id, s.capacity ?? null]));
   const todayId = dateMap.get(toDateOnly(new Date()).toISOString());
   let inventoryCount = 0;
   if (todayId) {
+    // count per shelter × status
     const inv = new Map<string, number>();
     for (const a of animals) {
       const dsId = shelterMap.get(a.shelterId);
@@ -197,19 +207,69 @@ export async function POST(req: NextRequest) {
       const key = `${dsId}::${a.status}`;
       inv.set(key, (inv.get(key) ?? 0) + 1);
     }
+    // occupied = AVAILABLE + PENDING per shelter
+    const occupiedMap = new Map<number, number>();
+    for (const a of animals) {
+      const dsId = shelterMap.get(a.shelterId);
+      if (!dsId) continue;
+      if (a.status === "AVAILABLE" || a.status === "PENDING") {
+        occupiedMap.set(dsId, (occupiedMap.get(dsId) ?? 0) + 1);
+      }
+    }
     const invData = [...inv.entries()].map(([key, count]) => {
       const [shelterId, status] = key.split("::");
-      return { dateId: todayId, shelterId: Number(shelterId), status, count };
+      const dsId     = Number(shelterId);
+      const oltpId   = dimShelterRows.find(r => r.id === dsId)?.shelterId;
+      const cap      = oltpId ? (capacityMap.get(oltpId) ?? null) : null;
+      const occupied = occupiedMap.get(dsId) ?? 0;
+      const utilizationRate = cap && cap > 0 ? occupied / cap : null;
+      return { dateId: todayId, shelterId: dsId, status, count, utilizationRate };
     });
     await dwh.factAnimalInventory.createMany({ data: invData, skipDuplicates: true });
     inventoryCount = invData.length;
     log.push(`FactAnimalInventory: ${invData.length} sor`);
   }
 
+  // ── 9. FactAnimalReport ───────────────────────────────
+  type ReportRow = {
+    reportId:  string;
+    dateId:    number;
+    shelterId: number | null;
+    type:      string;
+    city:      string | null;
+    lat:       number | null;
+    lng:       number | null;
+    status:    string;
+    isMatched: boolean;
+    createdAt: Date;
+  };
+  const reportData: ReportRow[] = reports
+    .flatMap(r => {
+      const dateId = dateMap.get(toDateOnly(r.createdAt).toISOString());
+      if (!dateId) return [];
+      return [{
+        reportId:  r.id,
+        dateId,
+        shelterId: null,
+        type:      r.type,
+        city:      r.city ?? null,
+        lat:       r.lat ?? null,
+        lng:       r.lng ?? null,
+        status:    r.status,
+        isMatched: r.status === "RESOLVED",
+        createdAt: r.createdAt,
+      }];
+    });
+
+  for (let i = 0; i < reportData.length; i += 500) {
+    await dwh.factAnimalReport.createMany({ data: reportData.slice(i, i + 500), skipDuplicates: true });
+  }
+  log.push(`FactAnimalReport: ${reportData.length} sor`);
+
   const elapsedMs = Date.now() - t0;
   log.push(`Futási idő: ${elapsedMs}ms`);
 
-  // ── 9. ETL futásnapló ─────────────────────────────────
+  // ── 10. ETL futásnapló ────────────────────────────────
   await dwh.etlRun.create({
     data: {
       startedAt,
