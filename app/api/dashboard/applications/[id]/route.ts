@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatus } from "@prisma/client";
 import { sendApplicationStatusEmail } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({
   status:      z.enum(["REVIEWING", "APPROVED", "REJECTED"]),
@@ -66,6 +67,32 @@ export async function PATCH(
       reviewedAt:  new Date(),
     },
   });
+
+  // In-app notifications for all status transitions
+  const notifMap = {
+    REVIEWING: {
+      type:  "APPLICATION_REVIEWING" as const,
+      title: "Kérelmed elbírálás alatt",
+      body:  `${application.animal.name} – a menhely megkezdte a kérelem feldolgozását.`,
+      href:  "/applications",
+    },
+    APPROVED: {
+      type:  "APPLICATION_APPROVED" as const,
+      title: "Örökbefogadási kérelmed elfogadva",
+      body:  `Gratulálunk! ${application.animal.name} hamarosan a tiéd lehet.`,
+      href:  "/applications",
+    },
+    REJECTED: {
+      type:  "APPLICATION_REJECTED" as const,
+      title: "Örökbefogadási kérelmed elutasítva",
+      body:  parsed.data.reviewNotes
+        ? `${application.animal.name}: ${parsed.data.reviewNotes}`
+        : `${application.animal.name} – a menhely elutasította a kérelmet.`,
+      href:  "/applications",
+    },
+  };
+  createNotification({ userId: application.userId, ...notifMap[parsed.data.status] })
+    .catch((err) => console.error("Application notification error:", err));
 
   // Send email notification when status is final
   if (

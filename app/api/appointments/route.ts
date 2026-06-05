@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 const schema = z.object({
   shelterId:  z.string().min(1),
@@ -49,8 +50,23 @@ export async function POST(req: NextRequest) {
     include: {
       shelter: { select: { name: true, city: true } },
       animal:  { select: { name: true, slug: true } },
+      user:    { select: { name: true } },
     },
   });
+
+  // Notify all shelter admins about new appointment
+  const admins = await prisma.shelterAdmin.findMany({
+    where: { shelterId },
+    select: { userId: true },
+  });
+  const displayDate = new Date(proposedAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  await createNotifications(admins.map(a => ({
+    userId: a.userId,
+    type:   "APPOINTMENT_NEW" as const,
+    title:  "Új időpontfoglalás",
+    body:   `${appointment.user.name ?? "Ismeretlen"} – ${displayDate}${appointment.animal ? ` (${appointment.animal.name})` : ""}`,
+    href:   "/dashboard/appointments",
+  })));
 
   return NextResponse.json(appointment, { status: 201 });
 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotification } from "@/lib/notifications";
 
 const patchSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("CONFIRM"), confirmedAt: z.string().datetime(), adminNote: z.string().max(500).optional() }),
@@ -69,6 +70,14 @@ export async function PATCH(
         confirmedAt: new Date(parsed.data.confirmedAt),
         adminNote:   parsed.data.adminNote ?? null,
       },
+      include: { animal: { select: { name: true } } },
+    });
+    await createNotification({
+      userId: appt.userId,
+      type:   "APPOINTMENT_CONFIRMED",
+      title:  "Időpontod visszaigazolva",
+      body:   `${new Date(parsed.data.confirmedAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}${updated.animal ? ` – ${updated.animal.name}` : ""}`,
+      href:   "/appointments",
     });
     return NextResponse.json(updated);
   }
@@ -81,6 +90,13 @@ export async function PATCH(
         cancelledBy: "ADMIN",
         adminNote: parsed.data.adminNote ?? null,
       },
+    });
+    await createNotification({
+      userId: appt.userId,
+      type:   "APPOINTMENT_CANCELLED",
+      title:  "Időpont elutasítva",
+      body:   parsed.data.adminNote ?? "A menhely nem tudta visszaigazolni az időpontot.",
+      href:   "/appointments",
     });
     return NextResponse.json(updated);
   }

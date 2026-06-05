@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({
   status:    z.enum(["ACTIVE", "INACTIVE", "REJECTED"]),
@@ -40,10 +41,28 @@ export async function PATCH(
     where: { id: params.id },
     data:  { status: parsed.data.status, adminNote: parsed.data.adminNote ?? null },
     include: {
-      user: { select: { name: true, email: true } },
+      user:    { select: { name: true, email: true } },
       shelter: { select: { name: true } },
     },
   });
+
+  if (parsed.data.status === "ACTIVE") {
+    await createNotification({
+      userId: updated.userId,
+      type:   "VOLUNTEER_APPROVED",
+      title:  "Önkéntes jelentkezésed elfogadva",
+      body:   `${updated.shelter.name} visszaigazolta a jelentkezésedet.`,
+      href:   `/shelters/${updated.shelter.name}`,
+    });
+  } else if (parsed.data.status === "REJECTED") {
+    await createNotification({
+      userId: updated.userId,
+      type:   "VOLUNTEER_REJECTED",
+      title:  "Önkéntes jelentkezésed elutasítva",
+      body:   `${updated.shelter.name}${parsed.data.adminNote ? `: ${parsed.data.adminNote}` : ""}`,
+      href:   "/",
+    });
+  }
 
   return NextResponse.json(updated);
 }

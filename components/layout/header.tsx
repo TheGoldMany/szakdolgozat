@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -132,6 +133,9 @@ export function Header() {
 
           {session ? (
             <>
+              {/* Notifications */}
+              <NotificationBell />
+
               {/* Messages */}
               <Link
                 href="/messages"
