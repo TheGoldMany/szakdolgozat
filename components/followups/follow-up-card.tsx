@@ -47,10 +47,6 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
     year: "numeric", month: "long", day: "numeric",
   });
 
-  const weekOffset = Math.round(
-    (new Date(followUp.scheduledAt).getTime() - new Date(followUp.application.animal.slug ? 0 : 0).getTime()) / 86_400_000
-  );
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!wellbeing) { setError("Kérjük adj értékelést!"); return; }
