@@ -9,6 +9,9 @@ import { TierCard } from "@/components/donate/tier-card";
 import { ShelterReviews } from "@/components/reviews/shelter-reviews";
 import { AnimalStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { VolunteerApplyButton } from "@/components/volunteers/volunteer-apply-button";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const [shelter, t] = await Promise.all([
@@ -20,6 +23,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ShelterDetailPage({ params }: { params: { slug: string } }) {
+  const session = await getServerSession(authOptions);
+
   const [shelter, t] = await Promise.all([
     prisma.shelter.findUnique({
       where: { slug: params.slug },
@@ -44,6 +49,16 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
   ]);
 
   if (!shelter) notFound();
+
+  // Check user's volunteer status at this shelter
+  let existingVolStatus: string | null = null;
+  if (session?.user?.id) {
+    const vol = await prisma.volunteer.findUnique({
+      where: { userId_shelterId: { userId: session.user.id, shelterId: shelter.id } },
+      select: { status: true },
+    });
+    existingVolStatus = vol?.status ?? null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -178,6 +193,16 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             </div>
           </div>
         </div>
+
+        {/* Önkéntesség */}
+        {session && (
+          <div className="mx-auto max-w-5xl px-4 pb-4 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-base font-semibold text-gray-800">Önkénteskedj nálunk</h2>
+              <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
+            </div>
+          </div>
+        )}
 
         {/* Értékelések */}
         <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">

@@ -104,6 +104,7 @@ model User {
   reviewsReceived     Review[]              @relation("ReviewTarget")
   healthRecordsAdded  HealthRecord[]        @relation("HealthRecordCreator")
   appointments        Appointment[]
+  volunteering        Volunteer[]
 }
 
 // -------------------------------------------------------
@@ -202,6 +203,8 @@ model Shelter {
   applicationForms     ApplicationForm[]
   reviews              Review[]
   appointments         Appointment[]
+  volunteers           Volunteer[]
+  volunteerTasks       VolunteerTask[]
 }
 
 model ShelterDocument {
@@ -657,4 +660,86 @@ model Appointment {
   @@index([userId])
   @@index([animalId])
   @@index([status])
+}
+
+// -------------------------------------------------------
+// Volunteer Management (Önkéntes kezelés)
+// -------------------------------------------------------
+
+enum VolunteerStatus {
+  PENDING   // Jelentkezett, jóváhagyásra vár
+  ACTIVE    // Visszaigazolt aktív önkéntes
+  INACTIVE  // Inaktív
+  REJECTED  // Elutasított
+}
+
+enum VolunteerTaskStatus {
+  OPEN      // Nyitott feladat
+  ASSIGNED  // Hozzárendelve
+  COMPLETED // Elvégezve
+  CANCELLED // Lemondva
+}
+
+model Volunteer {
+  id           String          @id @default(cuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shelterId    String
+  shelter      Shelter         @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  status       VolunteerStatus @default(PENDING)
+  motivation   String?         @db.Text
+  skills       String?
+  availability String?
+  adminNote    String?         @db.Text
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  attendances  VolunteerAttendance[]
+  assignments  VolunteerTaskAssignment[]
+
+  @@unique([userId, shelterId])
+  @@index([shelterId])
+  @@index([status])
+}
+
+model VolunteerTask {
+  id            String              @id @default(cuid())
+  shelterId     String
+  shelter       Shelter             @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?             @db.Text
+  scheduledAt   DateTime
+  maxVolunteers Int                 @default(1)
+  status        VolunteerTaskStatus @default(OPEN)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  assignments   VolunteerTaskAssignment[]
+
+  @@index([shelterId])
+  @@index([status])
+}
+
+model VolunteerTaskAssignment {
+  id          String        @id @default(cuid())
+  taskId      String
+  task        VolunteerTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  volunteerId String
+  volunteer   Volunteer     @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+
+  @@unique([taskId, volunteerId])
+  @@index([volunteerId])
+}
+
+model VolunteerAttendance {
+  id          String    @id @default(cuid())
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  date        DateTime
+  hours       Float     @default(1)
+  note        String?
+  createdAt   DateTime  @default(now())
+
+  @@index([volunteerId])
 }
