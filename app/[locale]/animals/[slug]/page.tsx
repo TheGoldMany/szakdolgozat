@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
 import { HealthTimeline } from "@/components/health/health-timeline";
+import { AppointmentButton } from "@/components/appointments/appointment-button";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -251,6 +252,13 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 {animal.shelter.email && <div className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" />{animal.shelter.email}</div>}
               </div>
             </div>
+          {session && animal.status === AnimalStatus.AVAILABLE && (
+            <AppointmentButton
+              shelterId={animal.shelter.id}
+              animalId={animal.id}
+              animalName={animal.name}
+            />
+          )}
           </div>
         </div>
 

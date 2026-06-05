@@ -180,6 +180,9 @@ export function Header() {
                     <Link href="/messages" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("myMessages")}
                     </Link>
+                    <Link href="/appointments" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Időpontjaim
+                    </Link>
                     {isAdmin && (
                       <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         {t("adminPanel")}
@@ -273,6 +276,10 @@ export function Header() {
                       {unread}
                     </span>
                   )}
+                </Link>
+                <Link href="/appointments" onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  Időpontjaim
                 </Link>
                 {isAdmin && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}

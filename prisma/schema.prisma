@@ -103,6 +103,7 @@ model User {
   reviewsWritten      Review[]              @relation("ReviewAuthor")
   reviewsReceived     Review[]              @relation("ReviewTarget")
   healthRecordsAdded  HealthRecord[]        @relation("HealthRecordCreator")
+  appointments        Appointment[]
 }
 
 // -------------------------------------------------------
@@ -200,6 +201,7 @@ model Shelter {
   campaigns            Campaign[]
   applicationForms     ApplicationForm[]
   reviews              Review[]
+  appointments         Appointment[]
 }
 
 model ShelterDocument {
@@ -261,6 +263,7 @@ model Animal {
   favorites     Favorite[]
   conversations Conversation[]
   healthRecords HealthRecord[]
+  appointments  Appointment[]
 }
 
 model AnimalDocument {
@@ -590,6 +593,13 @@ model Review {
 // Animal Health Records
 // -------------------------------------------------------
 
+enum AppointmentStatus {
+  PENDING    // User requested, waiting for admin
+  CONFIRMED  // Admin confirmed (with possible time adjustment)
+  CANCELLED  // Cancelled by user or admin
+  COMPLETED  // Meeting took place
+}
+
 enum HealthRecordType {
   VACCINATION
   TREATMENT
@@ -616,4 +626,35 @@ model HealthRecord {
 
   @@index([animalId])
   @@index([date])
+}
+
+// -------------------------------------------------------
+// Appointment (Időpontfoglalás)
+// -------------------------------------------------------
+
+model Appointment {
+  id          String            @id @default(cuid())
+  shelterId   String
+  shelter     Shelter           @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animalId    String?
+  animal      Animal?           @relation(fields: [animalId], references: [id], onDelete: SetNull)
+
+  status      AppointmentStatus @default(PENDING)
+  proposedAt  DateTime          // User's preferred date/time
+  confirmedAt DateTime?         // Admin-set confirmed time (may differ from proposedAt)
+
+  note        String?           @db.Text  // User's message to shelter
+  adminNote   String?           @db.Text  // Admin's reply
+
+  cancelledBy String?           // "USER" | "ADMIN"
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([shelterId])
+  @@index([userId])
+  @@index([animalId])
+  @@index([status])
 }

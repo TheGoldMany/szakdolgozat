@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { Providers } from "@/components/providers";
-import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2, Settings, Heart, ClipboardCheck, ArrowLeft, LogOut, FileText, Users } from "lucide-react";
+import { LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2, Settings, Heart, ClipboardCheck, ArrowLeft, LogOut, FileText, Users, CalendarDays } from "lucide-react";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -23,6 +23,7 @@ const NAV = [
   { href: "/dashboard/campaigns",    icon: ClipboardCheck,  label: "Jóváhagyások",           roles: ["SUPER_ADMIN"] },
   { href: "/dashboard/forms",        icon: FileText,        label: "Kérvény sablonok",        roles: ["SHELTER_ADMIN"] },
   { href: "/dashboard/subscriptions", icon: Users,           label: "Előfizetők",              roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard/appointments", icon: CalendarDays,    label: "Időpontok",               roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
