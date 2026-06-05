@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { MessageCircle, PawPrint } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { RatingStat } from "@/components/reviews/rating-stat";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 
@@ -54,6 +55,30 @@ export default async function MessagesPage() {
     },
     orderBy: { updatedAt: "desc" },
   });
+
+  // Profil-értékelések kötegelt lekérdezése (menhelyek + beszélgetőpartnerek)
+  const convShelterIds = [...new Set(conversations.map((c) => c.shelterId))];
+  const convUserIds    = [...new Set(conversations.map((c) => c.userId))];
+  const [shelterRatingRows, userRatingRows] = await Promise.all([
+    convShelterIds.length
+      ? prisma.review.groupBy({
+          by: ["shelterId"], where: { shelterId: { in: convShelterIds } },
+          _avg: { rating: true }, _count: { rating: true },
+        })
+      : Promise.resolve([]),
+    (isShelterAdmin || isSuperAdmin) && convUserIds.length
+      ? prisma.review.groupBy({
+          by: ["targetUserId"], where: { targetUserId: { in: convUserIds } },
+          _avg: { rating: true }, _count: { rating: true },
+        })
+      : Promise.resolve([]),
+  ]);
+  const shelterRatingMap = new Map(
+    shelterRatingRows.map((r) => [r.shelterId, { avg: r._avg.rating, count: r._count.rating }])
+  );
+  const userRatingMap = new Map(
+    userRatingRows.map((r) => [r.targetUserId, { avg: r._avg.rating, count: r._count.rating }])
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -110,9 +135,23 @@ export default async function MessagesPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs text-gray-500">{conv.shelter.name}</p>
+                    <p className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
+                      {conv.shelter.name}
+                      <RatingStat
+                        avg={shelterRatingMap.get(conv.shelterId)?.avg ?? null}
+                        count={shelterRatingMap.get(conv.shelterId)?.count ?? 0}
+                        hideWhenEmpty
+                      />
+                    </p>
                     {(isShelterAdmin || isSuperAdmin) && (
-                      <p className="text-xs text-gray-400">{conv.user.name ?? conv.user.email}</p>
+                      <p className="flex items-center gap-2 text-xs text-gray-400">
+                        {conv.user.name ?? conv.user.email}
+                        <RatingStat
+                          avg={userRatingMap.get(conv.userId)?.avg ?? null}
+                          count={userRatingMap.get(conv.userId)?.count ?? 0}
+                          hideWhenEmpty
+                        />
+                      </p>
                     )}
                     {lastMsg && (
                       <p className="mt-1 truncate text-sm text-gray-600">{lastMsg.content}</p>

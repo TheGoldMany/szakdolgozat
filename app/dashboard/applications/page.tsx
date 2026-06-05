@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
+import { RatingStat } from "@/components/reviews/rating-stat";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Users, PawPrint, FileText, Clock, ClipboardList } from "lucide-react";
@@ -58,6 +59,20 @@ export default async function DashboardApplicationsPage({
       _count: { select: { responses: true } },
     },
   });
+
+  // Kérelmezők értékelései egy kötegelt lekérdezéssel (N+1 elkerülése)
+  const applicantIds = [...new Set(applications.map((a) => a.userId))];
+  const ratingRows = applicantIds.length
+    ? await prisma.review.groupBy({
+        by:     ["targetUserId"],
+        where:  { targetUserId: { in: applicantIds } },
+        _avg:   { rating: true },
+        _count: { rating: true },
+      })
+    : [];
+  const ratingMap = new Map(
+    ratingRows.map((r) => [r.targetUserId, { avg: r._avg.rating, count: r._count.rating }])
+  );
 
   const statuses: Array<{ value: string; label: string }> = [
     { value: "",          label: "Összes" },
@@ -132,7 +147,19 @@ export default async function DashboardApplicationsPage({
 
                     {/* Kérelmező */}
                     <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600 space-y-0.5">
-                      <p><span className="font-medium">Kérelmező:</span> {app.user.name ?? "–"}</p>
+                      <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span>
+                          <span className="font-medium">Kérelmező:</span>{" "}
+                          <Link href={`/users/${app.userId}`} className="text-brand-600 hover:underline">
+                            {app.user.name ?? "–"}
+                          </Link>
+                        </span>
+                        <RatingStat
+                          avg={ratingMap.get(app.userId)?.avg ?? null}
+                          count={ratingMap.get(app.userId)?.count ?? 0}
+                          hideWhenEmpty
+                        />
+                      </p>
                       <p><span className="font-medium">Email:</span> {app.user.email}</p>
                       {app.user.phone && <p><span className="font-medium">Telefon:</span> {app.user.phone}</p>}
                       {app.homeType && (

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { TierCard } from "@/components/donate/tier-card";
 import { ShelterReviews } from "@/components/reviews/shelter-reviews";
+import { RatingBadge } from "@/components/reviews/rating-stat";
 import { AnimalStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth/next";
@@ -100,10 +101,14 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
                 )}
               </div>
 
-              <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-                <span>{shelter.city}</span>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                  {shelter.city}
+                </span>
                 {shelter.address && <><span className="text-gray-300">·</span><span className="truncate">{shelter.address}</span></>}
+                <span className="text-gray-300">·</span>
+                <RatingBadge shelterId={shelter.id} />
               </div>
             </div>
           </div>

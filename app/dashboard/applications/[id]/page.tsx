@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { ContractDownloadButton } from "@/components/applications/contract-download-button";
+import { RatingBadge } from "@/components/reviews/rating-stat";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, FileText, ImageIcon, Users, PawPrint } from "lucide-react";
 
@@ -109,7 +110,15 @@ export default async function ApplicationDetailPage({
 
             {/* Applicant info */}
             <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600 space-y-0.5">
-              <p><span className="font-medium">Kérelmező:</span> {app.user.name ?? "–"}</p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span>
+                  <span className="font-medium">Kérelmező:</span>{" "}
+                  <Link href={`/users/${app.userId}`} className="text-brand-600 hover:underline">
+                    {app.user.name ?? "–"}
+                  </Link>
+                </span>
+                <RatingBadge targetUserId={app.userId} />
+              </p>
               <p><span className="font-medium">Email:</span> {app.user.email}</p>
               {app.user.phone && <p><span className="font-medium">Telefon:</span> {app.user.phone}</p>}
               {app.homeType && (

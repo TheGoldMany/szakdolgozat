@@ -7,6 +7,7 @@ import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, 
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
+import { RatingBadge } from "@/components/reviews/rating-stat";
 import { HealthTimeline } from "@/components/health/health-timeline";
 import { AppointmentButton } from "@/components/appointments/appointment-button";
 import { AnimalStatus, AnimalType } from "@prisma/client";
@@ -244,7 +245,10 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                     <MapPin className="h-4 w-4 text-brand-400" />
                   )}
                 </div>
-                <span className="font-medium text-brand-500 hover:underline">{animal.shelter.name}</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-medium text-brand-500 hover:underline">{animal.shelter.name}</span>
+                  <RatingBadge shelterId={animal.shelter.id} />
+                </div>
               </Link>
               <div className="mt-3 space-y-1 text-xs text-gray-500">
                 <div className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />{animal.shelter.city}{animal.shelter.address ? `, ${animal.shelter.address}` : ""}</div>

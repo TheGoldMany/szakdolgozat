@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { WithdrawButton } from "@/components/applications/withdraw-button";
+import { RatingStat } from "@/components/reviews/rating-stat";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -31,12 +32,26 @@ export default async function ApplicationsPage() {
       animal: {
         include: {
           images:  { where: { isPrimary: true }, take: 1 },
-          shelter: { select: { name: true, city: true } },
+          shelter: { select: { id: true, name: true, city: true } },
         },
       },
       _count: { select: { responses: true } },
     },
   });
+
+  // Menhelyek értékelései egy kötegelt lekérdezéssel (N+1 elkerülése)
+  const shelterIds = [...new Set(applications.map((a) => a.animal.shelter.id))];
+  const ratingRows = shelterIds.length
+    ? await prisma.review.groupBy({
+        by:     ["shelterId"],
+        where:  { shelterId: { in: shelterIds } },
+        _avg:   { rating: true },
+        _count: { rating: true },
+      })
+    : [];
+  const ratingMap = new Map(
+    ratingRows.map((r) => [r.shelterId, { avg: r._avg.rating, count: r._count.rating }])
+  );
 
   const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
     INVITED:   { label: "Meghívva",            color: "bg-purple-100 text-purple-700" },
@@ -111,6 +126,12 @@ export default async function ApplicationsPage() {
                           <p className="truncate text-xs text-gray-400">
                             {app.animal.shelter.city} · {app.animal.shelter.name}
                           </p>
+                          <RatingStat
+                            avg={ratingMap.get(app.animal.shelter.id)?.avg ?? null}
+                            count={ratingMap.get(app.animal.shelter.id)?.count ?? 0}
+                            hideWhenEmpty
+                            className="mt-0.5"
+                          />
                         </div>
                         <span className={cn("shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium", status.color)}>
                           {status.label}
