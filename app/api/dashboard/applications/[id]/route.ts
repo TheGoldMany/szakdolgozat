@@ -94,6 +94,27 @@ export async function PATCH(
   createNotification({ userId: application.userId, ...notifMap[parsed.data.status] })
     .catch((err) => console.error("Application notification error:", err));
 
+  // Auto-create follow-up schedule when approved
+  if (parsed.data.status === "APPROVED") {
+    const now = Date.now();
+    const days = (d: number) => new Date(now + d * 86_400_000);
+    prisma.adoptionFollowUp.createMany({
+      data: [
+        { applicationId: params.id, scheduledAt: days(7) },
+        { applicationId: params.id, scheduledAt: days(30) },
+        { applicationId: params.id, scheduledAt: days(90) },
+      ],
+    }).then(() =>
+      createNotification({
+        userId: application.userId,
+        type:   "FOLLOW_UP_DUE",
+        title:  "Utánkövetés ütemezve",
+        body:   `${application.animal.name} – 1 hét, 1 hónap és 3 hónap elteltével visszajelzést kérünk.`,
+        href:   "/followups",
+      })
+    ).catch((err) => console.error("Follow-up schedule error:", err));
+  }
+
   // Send email notification when status is final
   if (
     (parsed.data.status === "APPROVED" || parsed.data.status === "REJECTED") &&

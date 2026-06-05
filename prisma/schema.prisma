@@ -53,6 +53,12 @@ enum ApplicationStatus {
   WITHDRAWN
 }
 
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+  OVERDUE
+}
+
 enum FieldType {
   TEXT
   TEXTAREA
@@ -322,9 +328,28 @@ model AdoptionApplication {
   animal    Animal           @relation(fields: [animalId], references: [id], onDelete: Cascade)
   form      ApplicationForm? @relation(fields: [formId], references: [id], onDelete: SetNull)
   responses FormFieldResponse[]
+  followUps AdoptionFollowUp[]
 
   @@unique([userId, animalId])
   @@index([inviteToken])
+}
+
+model AdoptionFollowUp {
+  id            String         @id @default(cuid())
+  applicationId String
+  scheduledAt   DateTime
+  completedAt   DateTime?
+  wellbeing     Int?           // 1-5 csillag
+  notes         String?        @db.Text
+  photoUrl      String?
+  status        FollowUpStatus @default(PENDING)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  application AdoptionApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([status, scheduledAt])
 }
 
 // -------------------------------------------------------
@@ -780,6 +805,9 @@ enum NotificationType {
   SUBSCRIPTION_CANCELLED   // User: subscription cancelled
   // Messages
   NEW_MESSAGE              // User/admin: new unread message
+  // Follow-up
+  FOLLOW_UP_DUE            // User: follow-up questionnaire due
+  FOLLOW_UP_RECEIVED       // Admin: user submitted a follow-up
 }
 
 model Notification {
