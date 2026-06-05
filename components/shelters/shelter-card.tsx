@@ -1,7 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
-import { MapPin, PawPrint, BadgeCheck } from "lucide-react";
+import { MapPin, PawPrint, BadgeCheck, Star } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/prisma";
 
 interface ShelterCardProps {
   shelter: {
@@ -17,7 +18,13 @@ interface ShelterCardProps {
 }
 
 export async function ShelterCard({ shelter }: ShelterCardProps) {
-  const t = await getTranslations("shelters");
+  const [t, reviews] = await Promise.all([
+    getTranslations("shelters"),
+    prisma.review.findMany({ where: { shelterId: shelter.id }, select: { rating: true } }),
+  ]);
+  const avgRating = reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : null;
 
   return (
     <Link href={`/shelters/${shelter.slug}`} className="group flex flex-col">
@@ -66,6 +73,14 @@ export async function ShelterCard({ shelter }: ShelterCardProps) {
               <MapPin className="h-3.5 w-3.5 shrink-0" />
               <span>{shelter.city}</span>
             </div>
+
+            {avgRating !== null && (
+              <div className="mt-1.5 flex items-center justify-center gap-1">
+                <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs font-semibold text-gray-700">{avgRating.toFixed(1)}</span>
+                <span className="text-xs text-gray-400">({reviews.length})</span>
+              </div>
+            )}
           </div>
 
           {/* Animal count CTA */}

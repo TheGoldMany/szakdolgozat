@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2 } from "lucide-react
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { TierCard } from "@/components/donate/tier-card";
+import { ShelterReviews } from "@/components/reviews/shelter-reviews";
 import { AnimalStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -176,6 +177,11 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
               <p className="mt-1 text-center text-sm text-brand-500">{t("animalsWaitingCount", { count: shelter._count.animals })}</p>
             </div>
           </div>
+        </div>
+
+        {/* Értékelések */}
+        <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
+          <ShelterReviews shelterId={shelter.id} />
         </div>
       </div>
     </div>

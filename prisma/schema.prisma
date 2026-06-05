@@ -100,6 +100,8 @@ model User {
   subscriptions       Subscription[]
   donations           Donation[]            @relation("DonationUser")
   campaigns           Campaign[]            @relation("CampaignCreator")
+  reviewsWritten      Review[]              @relation("ReviewAuthor")
+  reviewsReceived     Review[]              @relation("ReviewTarget")
 }
 
 // -------------------------------------------------------
@@ -196,6 +198,7 @@ model Shelter {
   tiers                DonationTier[]
   campaigns            Campaign[]
   applicationForms     ApplicationForm[]
+  reviews              Review[]
 }
 
 model ShelterDocument {
@@ -550,4 +553,33 @@ model FormFieldResponse {
   fileUrl       String?
 
   @@index([applicationId])
+}
+
+// -------------------------------------------------------
+// Reviews
+// -------------------------------------------------------
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Szerző (bejelentkezett user vagy shelter admin)
+  authorId  String
+  author    User    @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Értékelt menhely (user → shelter irány)
+  shelterId String?
+  shelter   Shelter? @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+
+  // Értékelt örökbefogadó (shelter → user irány)
+  targetUserId String?
+  targetUser   User?   @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  @@unique([authorId, shelterId])        // user csak egyszer értékelheti a menhelyet
+  @@unique([authorId, targetUserId])     // shelter csak egyszer értékelheti az örökbefogadót
+  @@index([shelterId])
+  @@index([targetUserId])
 }
