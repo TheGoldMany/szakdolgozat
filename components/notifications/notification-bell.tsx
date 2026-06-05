@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ interface Notification {
 
 export function NotificationBell() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [open,          setOpen]          = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount,   setUnreadCount]   = useState(0);
@@ -32,10 +34,11 @@ export function NotificationBell() {
       .catch(() => {});
 
   useEffect(() => {
+    if (!session?.user?.id) return;
     fetchNotifications();
     const id = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(id);
-  }, []);
+  }, [session?.user?.id]);
 
   // Close on outside click
   useEffect(() => {
