@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
+import { ContractDownloadButton } from "@/components/applications/contract-download-button";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, FileText, ImageIcon, Users, PawPrint } from "lucide-react";
 
@@ -136,15 +137,23 @@ export default async function ApplicationDetailPage({
               <p className="text-xs text-gray-500 italic">"{app.message}"</p>
             )}
 
-            <div className="flex items-center justify-between gap-2 pt-1">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
               <span className="text-xs text-gray-400">
                 Beküldve: {new Date(app.createdAt).toLocaleDateString("hu-HU", {
                   year: "numeric", month: "long", day: "numeric",
                 })}
               </span>
-              {app.status !== "WITHDRAWN" && (
-                <ApplicationReview applicationId={app.id} currentStatus={app.status} />
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {app.status === "APPROVED" && (
+                  <ContractDownloadButton
+                    applicationId={app.id}
+                    animalName={app.animal.name}
+                  />
+                )}
+                {app.status !== "WITHDRAWN" && (
+                  <ApplicationReview applicationId={app.id} currentStatus={app.status} />
+                )}
+              </div>
             </div>
           </div>
         </div>

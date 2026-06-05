@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, FileText } from "lucide-react";
+import { ContractDownloadButton } from "@/components/applications/contract-download-button";
 
 export const metadata: Metadata = { title: "Kérelmem részletei" };
 
@@ -97,6 +98,14 @@ export default async function UserApplicationDetailPage({
             </div>
           </div>
 
+          {app.status === "APPROVED" && (
+            <div className="border-t border-green-50 bg-green-50 px-5 py-3">
+              <p className="mb-2.5 text-xs font-medium text-green-700">
+                Gratulálunk! A kérelmed elfogadva. Töltsd le az örökbefogadási szerződést:
+              </p>
+              <ContractDownloadButton applicationId={app.id} animalName={app.animal.name} />
+            </div>
+          )}
           {app.reviewNotes && (
             <div className="border-t border-gray-100 px-5 py-3">
               <p className="text-xs text-gray-500">
