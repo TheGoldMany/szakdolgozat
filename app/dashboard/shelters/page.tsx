@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Building2, MapPin, Phone, Mail, ExternalLink } from "lucide-react";
+import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck } from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
 
@@ -147,8 +147,8 @@ export default function DashboardSheltersPage() {
                         {shelter.isActive ? "Aktív" : "Inaktív"}
                       </span>
                       {shelter.isVerified && (
-                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-                          ✓ Ellenőrzött
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                          <BadgeCheck className="h-3 w-3" /> Ellenőrzött
                         </span>
                       )}
                     </div>

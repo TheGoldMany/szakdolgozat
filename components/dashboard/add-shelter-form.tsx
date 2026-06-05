@@ -72,7 +72,7 @@ export function AddShelterForm({ onClose }: { onClose: () => void }) {
     return (
       <div className="space-y-5">
         <div className="rounded-xl bg-green-50 border border-green-200 p-5">
-          <p className="font-semibold text-green-800">✓ Menhely sikeresen létrehozva!</p>
+          <p className="flex items-center gap-1.5 font-semibold text-green-800"><Check className="h-4 w-4" /> Menhely sikeresen létrehozva!</p>
           <p className="mt-1 text-sm text-green-700">
             Add át az alábbi belépési adatokat a menhely adminisztrátorának.
           </p>

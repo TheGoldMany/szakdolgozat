@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, X } from "lucide-react";
 
 interface ApplicationReviewProps {
   applicationId: string;
@@ -56,16 +57,16 @@ export function ApplicationReview({ applicationId, currentStatus }: ApplicationR
         <button
           onClick={() => update("APPROVED")}
           disabled={!!loading}
-          className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50"
+          className="inline-flex items-center gap-1 rounded-lg bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50"
         >
-          {loading === "APPROVED" ? "..." : "✓ Elfogad"}
+          {loading === "APPROVED" ? "..." : <><Check className="h-3.5 w-3.5" /> Elfogad</>}
         </button>
         <button
           onClick={() => update("REJECTED")}
           disabled={!!loading}
-          className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+          className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
         >
-          {loading === "REJECTED" ? "..." : "✗ Elutasít"}
+          {loading === "REJECTED" ? "..." : <><X className="h-3.5 w-3.5" /> Elutasít</>}
         </button>
         <button
           onClick={() => setShowNotes((v) => !v)}

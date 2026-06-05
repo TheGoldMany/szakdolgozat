@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { Users, PawPrint, FileText, Clock } from "lucide-react";
+import { Users, PawPrint, FileText, Clock, ClipboardList } from "lucide-react";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
@@ -93,7 +93,7 @@ export default async function DashboardApplicationsPage({
 
       {applications.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-          <span className="text-4xl">📋</span>
+          <ClipboardList className="h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm text-gray-500">Nincs kérelem ebben a kategóriában</p>
         </div>
       ) : (
