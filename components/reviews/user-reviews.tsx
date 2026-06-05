@@ -5,13 +5,13 @@ import { StarRating } from "./star-rating";
 import { ReviewCard } from "./review-card";
 import { ReviewForm } from "./review-form";
 
-interface Props { shelterId: string }
+interface Props { targetUserId: string }
 
-export async function ShelterReviews({ shelterId }: Props) {
+export async function UserReviews({ targetUserId }: Props) {
   const [session, reviews] = await Promise.all([
     getServerSession(authOptions),
     prisma.review.findMany({
-      where:   { shelterId },
+      where:   { targetUserId },
       include: { author: { select: { id: true, name: true, image: true } } },
       orderBy: { createdAt: "desc" },
     }),
@@ -21,11 +21,12 @@ export async function ShelterReviews({ shelterId }: Props) {
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : null;
 
+  const isSelf          = session?.user?.id === targetUserId;
   const alreadyReviewed = reviews.some(r => r.author.id === session?.user?.id);
-  const canReview = !!session?.user?.id && !alreadyReviewed;
+  const canReview       = !!session?.user?.id && !isSelf && !alreadyReviewed;
 
   return (
-    <section className="mt-10">
+    <section className="mt-8">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">
           Értékelések
@@ -41,7 +42,7 @@ export async function ShelterReviews({ shelterId }: Props) {
 
       {canReview && (
         <div className="mb-6">
-          <ReviewForm shelterId={shelterId} />
+          <ReviewForm targetUserId={targetUserId} />
         </div>
       )}
 
@@ -53,7 +54,7 @@ export async function ShelterReviews({ shelterId }: Props) {
 
       {reviews.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
-          Még nincs értékelés. Légy az első!
+          Még nincs értékelés.
         </p>
       ) : (
         <div className="space-y-3">

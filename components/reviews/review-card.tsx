@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,20 +34,24 @@ export function ReviewCard({ review, currentUserId }: ReviewCardProps) {
     <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          {review.author.image ? (
-            <Image
-              src={review.author.image}
-              alt={review.author.name ?? ""}
-              width={36} height={36}
-              className="rounded-full object-cover"
-            />
-          ) : (
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">
-              {review.author.name?.[0]?.toUpperCase() ?? "?"}
-            </div>
-          )}
+          <Link href={`/users/${review.author.id}`}>
+            {review.author.image ? (
+              <Image
+                src={review.author.image}
+                alt={review.author.name ?? ""}
+                width={36} height={36}
+                className="rounded-full object-cover transition hover:opacity-80"
+              />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600 transition hover:opacity-80">
+                {review.author.name?.[0]?.toUpperCase() ?? "?"}
+              </div>
+            )}
+          </Link>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{review.author.name ?? "Névtelen"}</p>
+            <Link href={`/users/${review.author.id}`} className="text-sm font-semibold text-gray-900 hover:text-brand-600 transition-colors">
+              {review.author.name ?? "Névtelen"}
+            </Link>
             <p className="text-xs text-gray-400">
               {new Date(review.createdAt).toLocaleDateString("hu-HU")}
             </p>

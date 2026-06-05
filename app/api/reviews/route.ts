@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ reviews, avg, count: reviews.length });
 }
 
-// POST /api/reviews
+// POST /api/reviews – bármely bejelentkezett user értékelhet bárkit (Uber-modell)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -58,51 +58,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Egyszerre csak egyet értékelhetsz" }, { status: 400 });
   }
 
-  // Menhely értékelés: csak ha volt korábban jóváhagyott kérelme itt
-  if (shelterId) {
-    const hasAdoption = await prisma.adoptionApplication.findFirst({
-      where: {
-        userId:   session.user.id,
-        status:   "APPROVED",
-        animal:   { shelterId },
-      },
-    });
-    if (!hasAdoption) {
-      return NextResponse.json(
-        { error: "Csak olyan menhelyet értékelhetsz, ahol örökbefogadtál" },
-        { status: 403 }
-      );
-    }
-  }
-
-  // Örökbefogadó értékelés: csak shelter admin írhat, és csak olyan usert akitől elfogadtak kérelmet
-  if (targetUserId) {
-    const myShelterId = await prisma.shelterAdmin.findFirst({
-      where:  { userId: session.user.id },
-      select: { shelterId: true },
-    });
-    if (!myShelterId) {
-      return NextResponse.json({ error: "Csak menhely adminok értékelhetnek örökbefogadókat" }, { status: 403 });
-    }
-    const hasAdoption = await prisma.adoptionApplication.findFirst({
-      where: {
-        userId:  targetUserId,
-        status:  "APPROVED",
-        animal:  { shelterId: myShelterId.shelterId },
-      },
-    });
-    if (!hasAdoption) {
-      return NextResponse.json(
-        { error: "Csak olyan örökbefogadót értékelhetsz, aki nálad fogadott örökbe" },
-        { status: 403 }
-      );
-    }
+  // Önértékelés tiltása
+  if (targetUserId === session.user.id) {
+    return NextResponse.json({ error: "Saját magadat nem értékelheted" }, { status: 400 });
   }
 
   try {
     const review = await prisma.review.create({
       data: {
-        authorId: session.user.id,
+        authorId:     session.user.id,
         shelterId:    shelterId    ?? null,
         targetUserId: targetUserId ?? null,
         rating,
@@ -113,7 +77,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ review }, { status: 201 });
   } catch (e: any) {
     if (e?.code === "P2002") {
-      return NextResponse.json({ error: "Már értékelted ezt a menhelyet" }, { status: 409 });
+      return NextResponse.json({ error: "Már értékelted ezt a személyt" }, { status: 409 });
     }
     return NextResponse.json({ error: "Szerverhiba" }, { status: 500 });
   }
