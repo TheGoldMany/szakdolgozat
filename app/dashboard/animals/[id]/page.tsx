@@ -7,6 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalDocuments } from "@/components/dashboard/animal-documents";
+import { HealthManager } from "@/components/health/health-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -30,14 +31,21 @@ export default async function AnimalDocumentsPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
-  const animal = await prisma.animal.findUnique({
-    where:   { id: params.id },
-    include: {
-      shelter:   { select: { id: true, name: true } },
-      images:    { where: { isPrimary: true }, take: 1 },
-      documents: { orderBy: { createdAt: "desc" } },
-    },
-  });
+  const [animal, healthRecords] = await Promise.all([
+    prisma.animal.findUnique({
+      where:   { id: params.id },
+      include: {
+        shelter:   { select: { id: true, name: true } },
+        images:    { where: { isPrimary: true }, take: 1 },
+        documents: { orderBy: { createdAt: "desc" } },
+      },
+    }),
+    prisma.healthRecord.findMany({
+      where:   { animalId: params.id },
+      include: { createdBy: { select: { name: true } } },
+      orderBy: { date: "desc" },
+    }),
+  ]);
 
   if (!animal) notFound();
 
@@ -86,6 +94,18 @@ export default async function AnimalDocumentsPage({
           Oltási könyv, egészségügyi igazolás, mikrochip dokumentum stb.
         </p>
         <AnimalDocuments animalId={animal.id} initialDocs={docs} />
+      </div>
+
+      {/* Health records */}
+      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <HealthManager
+          animalId={animal.id}
+          initial={healthRecords.map(r => ({
+            ...r,
+            date:        r.date.toISOString(),
+            nextDueDate: r.nextDueDate?.toISOString() ?? null,
+          }))}
+        />
       </div>
     </div>
   );

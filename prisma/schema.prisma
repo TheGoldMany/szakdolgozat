@@ -102,6 +102,7 @@ model User {
   campaigns           Campaign[]            @relation("CampaignCreator")
   reviewsWritten      Review[]              @relation("ReviewAuthor")
   reviewsReceived     Review[]              @relation("ReviewTarget")
+  healthRecordsAdded  HealthRecord[]        @relation("HealthRecordCreator")
 }
 
 // -------------------------------------------------------
@@ -259,6 +260,7 @@ model Animal {
   applications  AdoptionApplication[]
   favorites     Favorite[]
   conversations Conversation[]
+  healthRecords HealthRecord[]
 }
 
 model AnimalDocument {
@@ -582,4 +584,36 @@ model Review {
   @@unique([authorId, targetUserId])     // shelter csak egyszer értékelheti az örökbefogadót
   @@index([shelterId])
   @@index([targetUserId])
+}
+
+// -------------------------------------------------------
+// Animal Health Records
+// -------------------------------------------------------
+
+enum HealthRecordType {
+  VACCINATION
+  TREATMENT
+  VET_VISIT
+  SURGERY
+  DEWORMING
+  CHECKUP
+}
+
+model HealthRecord {
+  id          String           @id @default(cuid())
+  animalId    String
+  animal      Animal           @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  type        HealthRecordType
+  title       String
+  description String?          @db.Text
+  date        DateTime
+  nextDueDate DateTime?
+  vetName     String?
+  createdById String?
+  createdBy   User?            @relation("HealthRecordCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([animalId])
+  @@index([date])
 }

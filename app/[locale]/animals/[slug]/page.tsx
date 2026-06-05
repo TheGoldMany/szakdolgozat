@@ -7,6 +7,7 @@ import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, 
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
+import { HealthTimeline } from "@/components/health/health-timeline";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -302,6 +303,10 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
             <AdoptionBlock />
           </div>
         )}
+
+        <div className="mt-8">
+          <HealthTimeline animalId={animal.id} />
+        </div>
 
       </div>
     </div>
