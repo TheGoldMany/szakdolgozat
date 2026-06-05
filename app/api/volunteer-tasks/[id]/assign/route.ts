@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 // POST /api/volunteer-tasks/[id]/assign – active volunteer signs up for a task
 export async function POST(
@@ -35,15 +36,31 @@ export async function POST(
   });
   if (existing) return NextResponse.json({ error: "Már elvállaltad ezt a feladatot" }, { status: 409 });
 
-  const assignment = await prisma.volunteerTaskAssignment.create({
-    data: { taskId: params.id, volunteerId: volunteer.id },
-  });
+  const [assignment, user] = await Promise.all([
+    prisma.volunteerTaskAssignment.create({
+      data: { taskId: params.id, volunteerId: volunteer.id },
+    }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } }),
+  ]);
 
   // Mark ASSIGNED if max reached
   const totalAssigned = task.assignments.length + 1;
   if (totalAssigned >= task.maxVolunteers) {
     await prisma.volunteerTask.update({ where: { id: params.id }, data: { status: "ASSIGNED" } });
   }
+
+  // Notify shelter admins
+  const admins = await prisma.shelterAdmin.findMany({
+    where:  { shelterId: task.shelterId },
+    select: { userId: true },
+  });
+  createNotifications(admins.map((a) => ({
+    userId: a.userId,
+    type:   "TASK_SIGNUP" as const,
+    title:  "Önkéntes elvállalt egy feladatot",
+    body:   `${user?.name ?? "Ismeretlen"} elvállalta: ${task.title}`,
+    href:   "/dashboard/volunteers",
+  }))).catch(() => {});
 
   return NextResponse.json(assignment, { status: 201 });
 }

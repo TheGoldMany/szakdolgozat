@@ -754,13 +754,30 @@ enum NotificationType {
   APPOINTMENT_NEW          // Admin: new booking request
   APPOINTMENT_CONFIRMED    // User: admin confirmed
   APPOINTMENT_CANCELLED    // User/admin: cancelled
-  // Application
+  // Adoption application
+  APPLICATION_SUBMITTED    // Admin: new application submitted
   APPLICATION_REVIEWING    // User: application under review
   APPLICATION_APPROVED     // User: application approved
   APPLICATION_REJECTED     // User: application rejected
   // Volunteer
+  VOLUNTEER_NEW            // Admin: new volunteer application
   VOLUNTEER_APPROVED       // User: volunteer application approved
   VOLUNTEER_REJECTED       // User: volunteer application rejected
+  TASK_SIGNUP              // Admin: volunteer signed up for a task
+  // Campaigns
+  CAMPAIGN_PENDING         // Super admin: campaign awaiting approval
+  CAMPAIGN_APPROVED        // Owner: campaign approved
+  CAMPAIGN_REJECTED        // Owner: campaign rejected
+  // Application forms
+  FORM_PENDING_APPROVAL    // Super admin: form awaiting approval
+  FORM_APPROVED            // Shelter admin: form approved
+  FORM_REJECTED            // Shelter admin: form rejected
+  // Reports
+  REPORT_RESOLVED          // User: report status updated
+  // Donations & subscriptions
+  DONATION_RECEIVED        // Admin: new donation received
+  SUBSCRIPTION_STARTED     // User: subscription confirmed
+  SUBSCRIPTION_CANCELLED   // User: subscription cancelled
   // Messages
   NEW_MESSAGE              // User/admin: new unread message
 }

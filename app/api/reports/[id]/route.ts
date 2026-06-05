@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ReportStatus } from "@prisma/client";
+import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({
   status: z.nativeEnum(ReportStatus),
@@ -35,6 +36,22 @@ export async function PATCH(
     where: { id: params.id },
     data:  { status: parsed.data.status },
   });
+
+  // Notify reporter if logged-in user reported it
+  if (report.userId && report.userId !== session.user.id) {
+    const statusLabel: Record<string, string> = {
+      RESOLVED:   "megoldva",
+      DISMISSED:  "elutasítva",
+      IN_PROGRESS: "folyamatban",
+    };
+    createNotification({
+      userId: report.userId,
+      type:   "REPORT_RESOLVED",
+      title:  "Bejelentésed státusza frissítve",
+      body:   `Állapot: ${statusLabel[parsed.data.status] ?? parsed.data.status}`,
+      href:   "/reports",
+    }).catch(() => {});
+  }
 
   return NextResponse.json({ report: updated });
 }

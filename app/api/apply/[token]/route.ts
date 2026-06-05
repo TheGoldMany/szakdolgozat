@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { createNotifications } from "@/lib/notifications";
 
 // GET /api/apply/[token] – get form and animal info for the token
 export async function GET(
@@ -62,9 +63,8 @@ export async function POST(
   const application = await prisma.adoptionApplication.findUnique({
     where: { inviteToken: params.token },
     include: {
-      form: {
-        include: { fields: true },
-      },
+      form:   { include: { fields: true } },
+      animal: { select: { shelterId: true, name: true } },
     },
   });
 
@@ -123,6 +123,19 @@ export async function POST(
       },
     }),
   ]);
+
+  // Notify shelter admins about new application
+  const admins = await prisma.shelterAdmin.findMany({
+    where:  { shelterId: application.animal.shelterId },
+    select: { userId: true },
+  });
+  createNotifications(admins.map((a) => ({
+    userId: a.userId,
+    type:   "APPLICATION_SUBMITTED" as const,
+    title:  "Új örökbefogadási kérelem érkezett",
+    body:   `Beérkezett kérelem: ${application.animal.name}`,
+    href:   "/dashboard/applications",
+  }))).catch(() => {});
 
   return NextResponse.json({ success: true, animalSlug: application.animalId });
 }

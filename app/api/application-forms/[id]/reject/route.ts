@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 // POST /api/application-forms/[id]/reject – SUPER_ADMIN only
 export async function POST(
@@ -37,6 +38,19 @@ export async function POST(
       ...(reason !== undefined && { description: form.description ? `${form.description}\n\nElutasítás oka: ${reason}` : `Elutasítás oka: ${reason}` }),
     },
   });
+
+  // Notify shelter admins
+  const admins = await prisma.shelterAdmin.findMany({
+    where:  { shelterId: form.shelterId },
+    select: { userId: true },
+  });
+  createNotifications(admins.map((a) => ({
+    userId: a.userId,
+    type:   "FORM_REJECTED" as const,
+    title:  "Kérvénysablon elutasítva",
+    body:   reason ? `${form.title}: ${reason}` : form.title,
+    href:   "/dashboard/application-forms",
+  }))).catch(() => {});
 
   return NextResponse.json(updated);
 }

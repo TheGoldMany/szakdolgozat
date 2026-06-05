@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { createNotification } from "@/lib/notifications";
 
 // POST /api/subscriptions/[id]/cancel
 export async function POST(
@@ -16,7 +17,8 @@ export async function POST(
     }
 
     const subscription = await prisma.subscription.findUnique({
-      where: { id: params.id },
+      where:   { id: params.id },
+      include: { tier: { select: { name: true } } },
     });
 
     if (!subscription) {
@@ -43,6 +45,14 @@ export async function POST(
       where: { id: params.id },
       data:  { status: "CANCELLED", cancelledAt: new Date() },
     });
+
+    createNotification({
+      userId: session.user.id,
+      type:   "SUBSCRIPTION_CANCELLED",
+      title:  "Előfizetés lemondva",
+      body:   subscription.tier?.name ?? "Előfizetés",
+      href:   "/profile",
+    }).catch(() => {});
 
     return NextResponse.json({ ok: true, subscription: updated });
   } catch (err) {

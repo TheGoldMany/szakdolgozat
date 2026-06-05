@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendDonationReceivedEmail, sendSubscriptionConfirmationEmail } from "@/lib/email";
+import { createNotification, createNotifications } from "@/lib/notifications";
 
 // Disable body parsing — we need the raw body for signature verification
 export const dynamic = "force-dynamic";
@@ -81,11 +82,32 @@ export async function POST(req: NextRequest) {
           const recipientName  = campaign.shelter?.admins[0]?.user.name ?? campaign.user?.name ?? "Admin";
 
           // Notify campaign owner (shelter admin or individual user)
-          if (recipientEmail) {
-            const donorName = donation.isAnonymous
-              ? null
-              : (await prisma.user.findUnique({ where: { id: donation.userId ?? "" }, select: { name: true } }))?.name ?? null;
+          const donorName = donation.isAnonymous
+            ? null
+            : (await prisma.user.findUnique({ where: { id: donation.userId ?? "" }, select: { name: true } }))?.name ?? null;
 
+          // In-app notification for shelter admins
+          const shelterAdmins = campaign.shelter
+            ? await prisma.shelterAdmin.findMany({
+                where:  { shelterId: campaign.shelter.id },
+                select: { userId: true },
+              })
+            : [];
+          const ownerUserIds = shelterAdmins.length > 0
+            ? shelterAdmins.map((a) => a.userId)
+            : campaign.userId ? [campaign.userId] : [];
+          const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(donation.amount);
+          if (ownerUserIds.length > 0) {
+            createNotifications(ownerUserIds.map((uid) => ({
+              userId: uid,
+              type:   "DONATION_RECEIVED" as const,
+              title:  "Új adomány érkezett",
+              body:   `${donorName ?? "Névtelen"} – ${amountStr} (${campaign.title})`,
+              href:   `/dashboard`,
+            }))).catch((err) => console.error("Donation notification error:", err));
+          }
+
+          if (recipientEmail) {
             sendDonationReceivedEmail({
               to:            recipientEmail,
               recipientName,
@@ -129,15 +151,40 @@ export async function POST(req: NextRequest) {
         }),
       ]);
 
-      if (user?.email && tier?.shelter) {
-        sendSubscriptionConfirmationEmail({
-          to:          user.email,
-          name:        user.name ?? "Felhasználó",
-          shelterName: tier.shelter.name,
-          tierName:    tier.name,
-          amount:      tier.amount,
-          shelterSlug: tier.shelter.slug,
-        }).catch((err) => console.error("Subscription email error:", err));
+      if (user && tier?.shelter) {
+        const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(tier.amount);
+        // In-app notification for subscriber
+        createNotification({
+          userId: userId,
+          type:   "SUBSCRIPTION_STARTED",
+          title:  "Előfizetés aktiválva",
+          body:   `${tier.name} – ${amountStr}/hó (${tier.shelter.name})`,
+          href:   `/shelters/${tier.shelter.slug}`,
+        }).catch((err) => console.error("Subscription notification error:", err));
+
+        // Notify shelter admins about new subscriber
+        const subAdmins = await prisma.shelterAdmin.findMany({
+          where:  { shelterId: tier.shelterId },
+          select: { userId: true },
+        });
+        createNotifications(subAdmins.map((a) => ({
+          userId: a.userId,
+          type:   "DONATION_RECEIVED" as const,
+          title:  "Új előfizető",
+          body:   `${user.name ?? "Ismeretlen"} – ${tier.name} (${amountStr}/hó)`,
+          href:   "/dashboard/subscribers",
+        }))).catch((err) => console.error("Subscription admin notification error:", err));
+
+        if (user.email) {
+          sendSubscriptionConfirmationEmail({
+            to:          user.email,
+            name:        user.name ?? "Felhasználó",
+            shelterName: tier.shelter.name,
+            tierName:    tier.name,
+            amount:      tier.amount,
+            shelterSlug: tier.shelter.slug,
+          }).catch((err) => console.error("Subscription email error:", err));
+        }
       }
     }
   }

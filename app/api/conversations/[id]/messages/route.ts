@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { sendNewMessageEmail } from "@/lib/email";
+import { createNotification, createNotifications } from "@/lib/notifications";
 
 const schema = z.object({
   content:        z.string().max(2000).optional(),
@@ -34,7 +35,7 @@ export async function POST(
       shelter:  {
         select: {
           name:   true,
-          admins: { select: { user: { select: { email: true, name: true } } } },
+          admins: { select: { userId: true, user: { select: { email: true, name: true } } } },
         },
       },
     },
@@ -81,7 +82,7 @@ export async function POST(
     }),
   ]);
 
-  // Send email notification to the other party (fire-and-forget)
+  // Notify the other party (email + in-app, fire-and-forget)
   const BASE        = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
   const convUrl     = `${BASE}/messages/${params.id}`;
   const animalName  = conversation.animal?.name ?? "Ismeretlen állat";
@@ -95,6 +96,16 @@ export async function POST(
     try {
       if (senderIsUser) {
         // Notify shelter admins
+        const adminIds = (conversation.shelter?.admins ?? []).map((a) => a.userId).filter(Boolean) as string[];
+        if (adminIds.length > 0) {
+          await createNotifications(adminIds.map((uid) => ({
+            userId: uid,
+            type:   "NEW_MESSAGE" as const,
+            title:  "Új üzenet",
+            body:   `${senderName}: ${preview.slice(0, 80)}`,
+            href:   `/messages/${params.id}`,
+          })));
+        }
         for (const admin of conversation.shelter?.admins ?? []) {
           if (admin.user.email) {
             await sendNewMessageEmail({
@@ -109,6 +120,13 @@ export async function POST(
         }
       } else {
         // Notify the conversation user
+        await createNotification({
+          userId: conversation.userId,
+          type:   "NEW_MESSAGE",
+          title:  "Új üzenet",
+          body:   `${senderName}: ${preview.slice(0, 80)}`,
+          href:   `/messages/${params.id}`,
+        });
         if (conversation.user?.email) {
           await sendNewMessageEmail({
             to:              conversation.user.email,
@@ -121,7 +139,7 @@ export async function POST(
         }
       }
     } catch (err) {
-      console.error("Message notification email failed:", err);
+      console.error("Message notification failed:", err);
     }
   })();
 

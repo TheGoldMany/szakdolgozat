@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 const schema = z.object({
   shelterId:    z.string().min(1),
@@ -38,8 +39,21 @@ export async function POST(req: NextRequest) {
 
   const volunteer = await prisma.volunteer.create({
     data: { userId: session.user.id, shelterId, motivation, skills, availability },
-    include: { shelter: { select: { name: true } } },
+    include: { shelter: { select: { name: true } }, user: { select: { name: true } } },
   });
+
+  // Notify shelter admins about new volunteer application
+  const admins = await prisma.shelterAdmin.findMany({
+    where: { shelterId },
+    select: { userId: true },
+  });
+  createNotifications(admins.map((a) => ({
+    userId: a.userId,
+    type:   "VOLUNTEER_NEW" as const,
+    title:  "Új önkéntes jelentkezés",
+    body:   `${volunteer.user.name ?? "Ismeretlen"} szeretne önkénteskedni a menhelynél.`,
+    href:   "/dashboard/volunteers",
+  }))).catch(() => {});
 
   return NextResponse.json(volunteer, { status: 201 });
 }

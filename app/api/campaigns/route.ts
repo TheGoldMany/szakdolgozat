@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 function slugify(text: string) {
   return text
     .toLowerCase()
@@ -67,6 +68,19 @@ export async function POST(req: NextRequest) {
       status:       "PENDING",
     },
   });
+
+  // Notify super admins about new pending campaign
+  const superAdmins = await prisma.user.findMany({
+    where:  { role: "SUPER_ADMIN" },
+    select: { id: true },
+  });
+  createNotifications(superAdmins.map((u) => ({
+    userId: u.id,
+    type:   "CAMPAIGN_PENDING" as const,
+    title:  "Új kampány jóváhagyásra vár",
+    body:   campaign.title,
+    href:   "/dashboard/approvals",
+  }))).catch(() => {});
 
   return NextResponse.json(campaign, { status: 201 });
 }

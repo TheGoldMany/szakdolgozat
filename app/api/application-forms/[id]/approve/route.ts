@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 // POST /api/application-forms/[id]/approve – SUPER_ADMIN only
 export async function POST(
@@ -25,6 +26,19 @@ export async function POST(
     where: { id: params.id },
     data: { status: "APPROVED" },
   });
+
+  // Notify shelter admins
+  const admins = await prisma.shelterAdmin.findMany({
+    where:  { shelterId: form.shelterId },
+    select: { userId: true },
+  });
+  createNotifications(admins.map((a) => ({
+    userId: a.userId,
+    type:   "FORM_APPROVED" as const,
+    title:  "Kérvénysablon jóváhagyva",
+    body:   form.title,
+    href:   "/dashboard/application-forms",
+  }))).catch(() => {});
 
   return NextResponse.json(updated);
 }

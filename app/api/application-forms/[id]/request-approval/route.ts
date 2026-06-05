@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createNotifications } from "@/lib/notifications";
 
 // POST /api/application-forms/[id]/request-approval
 export async function POST(
@@ -36,6 +37,19 @@ export async function POST(
     where: { id: params.id },
     data: { status: "PENDING_APPROVAL" },
   });
+
+  // Notify all super admins
+  const superAdmins = await prisma.user.findMany({
+    where:  { role: "SUPER_ADMIN" },
+    select: { id: true },
+  });
+  createNotifications(superAdmins.map((u) => ({
+    userId: u.id,
+    type:   "FORM_PENDING_APPROVAL" as const,
+    title:  "Kérvénysablon jóváhagyásra vár",
+    body:   form.title,
+    href:   "/dashboard/approvals",
+  }))).catch(() => {});
 
   return NextResponse.json(updated);
 }
