@@ -17,6 +17,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "prisma:seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts",
     "db:reset": "prisma migrate reset --force && npm run prisma:seed",
     "dwh:generate": "prisma generate --schema=prisma/dwh.prisma",
     "dwh:push": "prisma db push --schema=prisma/dwh.prisma --accept-data-loss"
