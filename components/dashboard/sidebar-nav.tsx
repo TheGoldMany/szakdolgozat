@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
-  ListChecks, Package, DoorOpen,
+  ListChecks, Package, DoorOpen, Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +28,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/animals",      icon: PawPrint,      label: "Állatok",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/appointments", icon: CalendarDays,  label: "Időpontok",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/volunteers",   icon: HandHeart,     label: "Önkéntesek",       roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/foster",       icon: Home,          label: "Ideiglenes befogadók", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/followups",    icon: ListChecks,    label: "Utánkövetések",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/inventory",    icon: Package,       label: "Készlet",           roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/kennels",      icon: DoorOpen,      label: "Férőhelyek",        roles: ["SHELTER_ADMIN"] },

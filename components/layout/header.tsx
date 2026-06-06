@@ -193,6 +193,9 @@ export function Header() {
                     <Link href="/volunteers" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Önkéntességem
                     </Link>
+                    <Link href="/foster" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Ideiglenes befogadásaim
+                    </Link>
                     {isAdmin && (
                       <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         {t("adminPanel")}
@@ -298,6 +301,10 @@ export function Header() {
                 <Link href="/volunteers" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   Önkéntességem
+                </Link>
+                <Link href="/foster" onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  Ideiglenes befogadásaim
                 </Link>
                 {isAdmin && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}

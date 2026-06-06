@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalDocuments } from "@/components/dashboard/animal-documents";
 import { HealthManager } from "@/components/health/health-manager";
 import { BehaviorManager } from "@/components/behavior/behavior-manager";
+import { FosterAssign } from "@/components/foster/foster-assign";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,17 @@ export default async function AnimalDocumentsPage({
     if (!admin) redirect("/dashboard/animals");
   }
 
+  // Aktív ideiglenes befogadók a kihelyezéshez
+  const activeFosters = await prisma.fosterProfile.findMany({
+    where:   { shelterId: animal.shelterId, status: "ACTIVE" },
+    include: { user: { select: { name: true, email: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  const fosterOptions = activeFosters.map(f => ({
+    id:    f.id,
+    label: f.user.name ?? f.user.email,
+  }));
+
   const imgUrl = animal.images[0]?.url ?? "/placeholder-animal.jpg";
 
   const docs = animal.documents.map((d) => ({
@@ -111,6 +123,15 @@ export default async function AnimalDocumentsPage({
             date:        r.date.toISOString(),
             nextDueDate: r.nextDueDate?.toISOString() ?? null,
           }))}
+        />
+      </div>
+
+      {/* Foster placement */}
+      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <FosterAssign
+          animalId={animal.id}
+          currentFosterId={animal.fosterId}
+          fosters={fosterOptions}
         />
       </div>
 

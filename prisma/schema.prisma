@@ -129,6 +129,8 @@ model User {
   notifications       Notification[]
   inventoryTxs        InventoryTransaction[] @relation("InventoryTxCreator")
   behaviorLogsAdded   BehaviorLog[]          @relation("BehaviorLogAuthor")
+  fosterProfiles      FosterProfile[]
+  fosterSupplyLogs    FosterSupplyLog[]      @relation("FosterSupplyCreator")
 }
 
 // -------------------------------------------------------
@@ -232,6 +234,7 @@ model Shelter {
   volunteerTasks       VolunteerTask[]
   inventoryItems       InventoryItem[]
   kennels              Kennel[]
+  fosterProfiles       FosterProfile[]
 }
 
 model ShelterDocument {
@@ -284,6 +287,7 @@ model Animal {
   flags          AnimalFlag[] @default([])  // belső, csak adminoknak látható kockázati címkék
   progressLevel  Int?                       // szubjektív rehabilitációs fejlődési szint (0-100)
   kennelId       String?                    // fizikai férőhely a menhelyen belül
+  fosterId       String?                    // ideiglenes befogadó, akinél az állat fizikailag van
   arrivedAt      DateTime?
   adoptedAt      DateTime?
   createdAt      DateTime     @default(now())
@@ -291,6 +295,7 @@ model Animal {
 
   shelter       Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
   kennel        Kennel?               @relation(fields: [kennelId], references: [id], onDelete: SetNull)
+  foster        FosterProfile?        @relation(fields: [fosterId], references: [id], onDelete: SetNull)
   images        AnimalImage[]
   documents     AnimalDocument[]
   applications  AdoptionApplication[]
@@ -301,6 +306,7 @@ model Animal {
   behaviorLogs  BehaviorLog[]
 
   @@index([kennelId])
+  @@index([fosterId])
 }
 
 // -------------------------------------------------------
@@ -875,6 +881,11 @@ enum NotificationType {
   VOLUNTEER_APPROVED       // User: volunteer application approved
   VOLUNTEER_REJECTED       // User: volunteer application rejected
   TASK_SIGNUP              // Admin: volunteer signed up for a task
+  // Foster (ideiglenes befogadó)
+  FOSTER_NEW               // Admin: new foster application
+  FOSTER_APPROVED          // User: foster application approved
+  FOSTER_REJECTED          // User: foster application rejected
+  FOSTER_PLACEMENT         // User: an animal was placed in their care
   // Campaigns
   CAMPAIGN_PENDING         // Super admin: campaign awaiting approval
   CAMPAIGN_APPROVED        // Owner: campaign approved
@@ -933,6 +944,7 @@ model InventoryItem {
   updatedAt   DateTime          @updatedAt
 
   transactions InventoryTransaction[]
+  fosterSupplyLogs FosterSupplyLog[]
 
   @@index([shelterId])
   @@index([category])
@@ -952,4 +964,54 @@ model InventoryTransaction {
 
   @@index([itemId])
   @@index([createdAt])
+}
+
+// -------------------------------------------------------
+// Foster (Ideiglenes befogadó)
+// -------------------------------------------------------
+
+enum FosterStatus {
+  PENDING   // Jelentkezett, jóváhagyásra vár
+  ACTIVE    // Aktív, visszaigazolt ideiglenes befogadó
+  INACTIVE  // Inaktív
+  REJECTED  // Elutasított
+}
+
+model FosterProfile {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shelterId      String
+  shelter        Shelter      @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  status         FosterStatus @default(PENDING)
+  preferredTypes AnimalType[] @default([])  // milyen állatot fogadna (üres = bármi)
+  maxWeightKg    Float?                      // maximális súly, amit vállal
+  canQuarantine  Boolean      @default(false) // tud-e karantént / izolációt biztosítani
+  motivation     String?      @db.Text
+  adminNote      String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  fosteredAnimals Animal[]
+  supplyLogs      FosterSupplyLog[]
+
+  @@unique([userId, shelterId])
+  @@index([shelterId])
+  @@index([status])
+}
+
+model FosterSupplyLog {
+  id          String        @id @default(cuid())
+  fosterId    String
+  foster      FosterProfile @relation(fields: [fosterId], references: [id], onDelete: Cascade)
+  itemId      String
+  item        InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  quantity    Float         // kiadott mennyiség (a központi készletből levonva)
+  note        String?
+  createdById String?
+  createdBy   User?         @relation("FosterSupplyCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+
+  @@index([fosterId])
+  @@index([itemId])
 }

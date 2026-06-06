@@ -13,6 +13,8 @@ import { getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { VolunteerApplyButton } from "@/components/volunteers/volunteer-apply-button";
+import { FosterApplyButton } from "@/components/foster/foster-apply-button";
+import type { FosterStatus } from "@prisma/client";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const [shelter, t] = await Promise.all([
@@ -51,14 +53,22 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
   if (!shelter) notFound();
 
-  // Check user's volunteer status at this shelter
+  // Check user's volunteer & foster status at this shelter
   let existingVolStatus: string | null = null;
+  let existingFosterStatus: FosterStatus | null = null;
   if (session?.user?.id) {
-    const vol = await prisma.volunteer.findUnique({
-      where: { userId_shelterId: { userId: session.user.id, shelterId: shelter.id } },
-      select: { status: true },
-    });
+    const [vol, foster] = await Promise.all([
+      prisma.volunteer.findUnique({
+        where: { userId_shelterId: { userId: session.user.id, shelterId: shelter.id } },
+        select: { status: true },
+      }),
+      prisma.fosterProfile.findUnique({
+        where: { userId_shelterId: { userId: session.user.id, shelterId: shelter.id } },
+        select: { status: true },
+      }),
+    ]);
     existingVolStatus = vol?.status ?? null;
+    existingFosterStatus = foster?.status ?? null;
   }
 
   return (
@@ -205,6 +215,13 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-base font-semibold text-gray-800">Önkénteskedj nálunk</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
+            </div>
+            <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <h2 className="mb-1 text-base font-semibold text-gray-800">Légy ideiglenes befogadó</h2>
+              <p className="mb-3 text-sm text-gray-500">
+                Segíts egy állaton anélkül, hogy véglegesen örökbe fogadnád – adj otthont ideiglenesen.
+              </p>
+              <FosterApplyButton shelterId={shelter.id} existingStatus={existingFosterStatus} />
             </div>
           </div>
         )}

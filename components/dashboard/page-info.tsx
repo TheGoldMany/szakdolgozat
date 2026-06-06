@@ -16,6 +16,17 @@ interface InfoContent {
 }
 
 const PAGE_INFO: Record<string, InfoContent> = {
+  foster: {
+    title: "Ideiglenes befogadók",
+    intro: "Itt kezeled azokat a felhasználókat, akik ideiglenesen otthont adnának egy állatnak. Jóváhagyhatod a jelentkezőket, és nyomon követheted a kiadott készleteket.",
+    points: [
+      { label: "Jóváhagyás / elutasítás", desc: "A jelentkezőknél a Jóváhagyás gombbal teszed aktívvá a befogadót; csak aktív befogadóhoz lehet állatot kihelyezni." },
+      { label: "Preferenciák", desc: "Minden jelentkezőnél látod, milyen állatfajtát és mekkora súlyhatárig vállal, illetve tud-e karantént biztosítani." },
+      { label: "Állat kihelyezése", desc: "Az állat részletoldalán (Állatok → adott állat) választhatod ki, melyik aktív befogadóhoz kerül fizikailag." },
+      { label: "Készlet kiadása", desc: "Aktív befogadónál a „Készlet kiadása” gombbal rögzíthetsz tápot/gyógyszert – a mennyiség automatikusan levonódik a központi raktárkészletből." },
+    ],
+    tip: "A kiadott készlet OUT tranzakcióként jelenik meg a készletmodulban is, így a leltár pontos marad.",
+  },
   kennels: {
     title: "Férőhelyek kezelése",
     intro: "Itt képezed le a menhely fizikai férőhelyeit – kenneleket, karanténokat, macskaszobákat – és követed, hol van fizikailag az adott állat.",
