@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { MessageCircle, PawPrint } from "lucide-react";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,7 @@ export default async function DashboardMessagesPage() {
               </span>
             )}
           </h1>
+          <PageInfo page="messages" />
         </div>
       </div>
 
