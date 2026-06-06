@@ -16,6 +16,17 @@ interface InfoContent {
 }
 
 const PAGE_INFO: Record<string, InfoContent> = {
+  kennels: {
+    title: "Férőhelyek kezelése",
+    intro: "Itt képezed le a menhely fizikai férőhelyeit – kenneleket, karanténokat, macskaszobákat – és követed, hol van fizikailag az adott állat.",
+    points: [
+      { label: "Új férőhely", desc: "Az „Új férőhely” gombbal hozz létre egy egységet: megnevezés, típus (kennel, karantén, macskaszoba stb.) és maximális kapacitás." },
+      { label: "Foglaltság", desc: "Minden kártyán látod a kihasználtságot (foglalt/kapacitás) és a szabad helyek számát. Megtelt férőhely pirossal jelölve." },
+      { label: "Áthelyezés", desc: "Az állat melletti legördülő listával egy mozdulattal áthelyezheted másik férőhelyre. A rendszer megakadályozza, ha a cél már megtelt." },
+      { label: "Férőhely nélküliek", desc: "Az alsó szekcióban látod a férőhelyhez még nem rendelt állatokat, és onnan is beoszthatod őket." },
+    ],
+    tip: "A férőhely törlésekor a benne lévő állatok nem törlődnek, csak férőhely nélkül maradnak.",
+  },
   inventory: {
     title: "Készletkezelés",
     intro: "Itt tartod nyilván a menhely takarmány-, gyógyszer-, kellék- és eszközkészletét. A rendszer figyeli a minimum szintet és a lejárati dátumokat.",

@@ -231,6 +231,7 @@ model Shelter {
   volunteers           Volunteer[]
   volunteerTasks       VolunteerTask[]
   inventoryItems       InventoryItem[]
+  kennels              Kennel[]
 }
 
 model ShelterDocument {
@@ -282,12 +283,14 @@ model Animal {
   status         AnimalStatus @default(AVAILABLE)
   flags          AnimalFlag[] @default([])  // belső, csak adminoknak látható kockázati címkék
   progressLevel  Int?                       // szubjektív rehabilitációs fejlődési szint (0-100)
+  kennelId       String?                    // fizikai férőhely a menhelyen belül
   arrivedAt      DateTime?
   adoptedAt      DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   shelter       Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  kennel        Kennel?               @relation(fields: [kennelId], references: [id], onDelete: SetNull)
   images        AnimalImage[]
   documents     AnimalDocument[]
   applications  AdoptionApplication[]
@@ -296,6 +299,37 @@ model Animal {
   healthRecords HealthRecord[]
   appointments  Appointment[]
   behaviorLogs  BehaviorLog[]
+
+  @@index([kennelId])
+}
+
+// -------------------------------------------------------
+// Kennel (Férőhely / Kennel / Karantén / Macskaszoba)
+// -------------------------------------------------------
+
+enum KennelType {
+  KENNEL      // Kennel (kutya)
+  CAT_ROOM    // Macskaszoba
+  QUARANTINE  // Karantén
+  AVIARY      // Madárház / röpde
+  OUTDOOR     // Kültéri kifutó
+  OTHER       // Egyéb
+}
+
+model Kennel {
+  id        String     @id @default(cuid())
+  shelterId String
+  shelter   Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  name      String
+  type      KennelType @default(KENNEL)
+  capacity  Int        @default(1)  // maximális férőhely
+  note      String?    @db.Text
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  animals   Animal[]
+
+  @@index([shelterId])
 }
 
 // -------------------------------------------------------
