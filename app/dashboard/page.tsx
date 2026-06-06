@@ -16,7 +16,6 @@ import { AnimalsDonut } from "@/components/dashboard/stats/animals-donut";
 import { ApplicationsBar } from "@/components/dashboard/stats/applications-bar";
 import { AdoptionsLine } from "@/components/dashboard/stats/adoptions-line";
 import { AnalyticsSection } from "@/components/dashboard/analytics-section";
-import { SeedPanel } from "@/components/dashboard/seed-panel";
 
 export const metadata: Metadata = { title: "Áttekintés" };
 export const dynamic = "force-dynamic";
@@ -492,9 +491,6 @@ export default async function DashboardPage() {
 
       {/* Analytics */}
       <AnalyticsSection role="SUPER_ADMIN" shelters={allShelters} />
-
-      {/* Seed panel */}
-      <SeedPanel />
     </div>
   );
 }
