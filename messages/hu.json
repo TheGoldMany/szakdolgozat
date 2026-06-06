@@ -139,7 +139,20 @@
     "shelterContactTitle": "Menhely elérhetősége",
     "sendMessage": "Üzenet küldése a menhelynek",
     "opening": "Megnyitás...",
-    "networkError": "Hálózati hiba. Kérlek próbáld újra."
+    "networkError": "Hálózati hiba. Kérlek próbáld újra.",
+    "virtualAdoption": "Virtuális örökbefogadás",
+    "virtualAdoptionDesc": "Támogasd {name} ellátását havi rendszeres adománnyal, anélkül hogy fizikailag örökbe fogadnád.",
+    "sponsorsCount": "{count} virtuális gazdi támogatja",
+    "sponsorsMore": "és még {count}",
+    "monthlyAmountLabel": "Havi támogatás összege",
+    "customAmountPlaceholder": "Egyéni összeg (Ft)",
+    "showNameLabel": "Jelenjen meg a nevem „Virtuális gazdi\"-ként",
+    "displayNamePlaceholder": "Megjelenítendő név (opcionális, alapból a profilneved)",
+    "virtualAdoptButton": "Virtuális örökbefogadás",
+    "loginToAdopt": "A virtuális örökbefogadáshoz be kell jelentkezned.",
+    "redirecting": "Átirányítás…",
+    "supportButton": "Támogatás {amount} Ft/hó",
+    "virtualError": "Hiba történt"
   },
   "shelters": {
     "title": "Menhelyek",
@@ -363,7 +376,16 @@
     "cancelled": "Lemondva",
     "activeStatus": "Aktív",
     "cancelSubscription": "Lemondás",
-    "subscribedSince": "Feliratkozva:"
+    "subscribedSince": "Feliratkozva:",
+    "mySponsorships": "Virtuális örökbefogadásaim",
+    "noSponsorships": "Még nincs virtuális örökbefogadásod.",
+    "cancelSponsorConfirm": "Biztosan lemondod a virtuális örökbefogadást?",
+    "anonSponsor": "Anonim támogató",
+    "publicSponsor": "Nyilvános virtuális gazdi",
+    "sponsoredSince": "óta",
+    "unknownAnimal": "Ismeretlen állat",
+    "perMonth": "Ft / hó",
+    "cancelSponsorship": "Lemondás"
   },
   "messages": {
     "title": "Üzenetek",
@@ -392,5 +414,28 @@
     "adopted": "Örökbefogadott",
     "pendingApps": "Várakozó kérelem",
     "totalApps": "Összes kérelem"
+  },
+  "foster": {
+    "title": "Ideiglenes befogadásaim",
+    "noFosters": "Még nem jelentkeztél ideiglenes befogadónak.",
+    "browseShelters": "Menhelyek böngészése →",
+    "preferred": "Preferált:",
+    "anything": "bármi",
+    "maxWeight": "Max súly:",
+    "animalsInCare": "Nálad lévő állatok:",
+    "fosterStatus": "Ideiglenes befogadó: {status}",
+    "applyButton": "Ideiglenes befogadónak jelentkezem",
+    "formTitle": "Ideiglenes befogadói jelentkezés",
+    "animalTypesLabel": "Milyen állatot fogadnál? (opcionális)",
+    "maxWeightLabel": "Maximális súly (kg, opcionális)",
+    "weightPlaceholder": "pl. 10",
+    "quarantineLabel": "Tudok karantént / elkülönítést biztosítani",
+    "motivationLabel": "Motiváció (opcionális)",
+    "motivationPlaceholder": "Miért szeretnél ideiglenes befogadó lenni?",
+    "submitting": "Küldés...",
+    "submitButton": "Jelentkezés elküldése",
+    "successTitle": "Jelentkezés elküldve!",
+    "successDesc": "A menhely hamarosan visszajelez.",
+    "error": "Hiba"
   }
 }

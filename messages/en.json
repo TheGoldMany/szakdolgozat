@@ -139,7 +139,20 @@
     "shelterContactTitle": "Shelter contact",
     "sendMessage": "Send message to shelter",
     "opening": "Opening...",
-    "networkError": "Network error. Please try again."
+    "networkError": "Network error. Please try again.",
+    "virtualAdoption": "Virtual adoption",
+    "virtualAdoptionDesc": "Support {name}'s care with a monthly donation, without physically adopting them.",
+    "sponsorsCount": "{count} virtual parents support them",
+    "sponsorsMore": "and {count} more",
+    "monthlyAmountLabel": "Monthly support amount",
+    "customAmountPlaceholder": "Custom amount (HUF)",
+    "showNameLabel": "Show my name as virtual parent",
+    "displayNamePlaceholder": "Display name (optional, defaults to your profile name)",
+    "virtualAdoptButton": "Virtual adoption",
+    "loginToAdopt": "You must be logged in for virtual adoption.",
+    "redirecting": "Redirecting…",
+    "supportButton": "Support {amount} HUF/month",
+    "virtualError": "An error occurred"
   },
   "shelters": {
     "title": "Shelters",
@@ -363,7 +376,16 @@
     "cancelled": "Cancelled",
     "activeStatus": "Active",
     "cancelSubscription": "Cancel",
-    "subscribedSince": "Subscribed:"
+    "subscribedSince": "Subscribed:",
+    "mySponsorships": "My virtual adoptions",
+    "noSponsorships": "You have no virtual adoptions yet.",
+    "cancelSponsorConfirm": "Are you sure you want to cancel this virtual adoption?",
+    "anonSponsor": "Anonymous supporter",
+    "publicSponsor": "Public virtual parent",
+    "sponsoredSince": "since",
+    "unknownAnimal": "Unknown animal",
+    "perMonth": "HUF / month",
+    "cancelSponsorship": "Cancel"
   },
   "messages": {
     "title": "Messages",
@@ -392,5 +414,28 @@
     "adopted": "Adopted",
     "pendingApps": "Pending applications",
     "totalApps": "Total applications"
+  },
+  "foster": {
+    "title": "My foster applications",
+    "noFosters": "You haven't applied as a foster carer yet.",
+    "browseShelters": "Browse shelters →",
+    "preferred": "Preferred:",
+    "anything": "any",
+    "maxWeight": "Max weight:",
+    "animalsInCare": "Animals in your care:",
+    "fosterStatus": "Foster carer: {status}",
+    "applyButton": "Apply as foster carer",
+    "formTitle": "Foster carer application",
+    "animalTypesLabel": "Which animal types? (optional)",
+    "maxWeightLabel": "Maximum weight (kg, optional)",
+    "weightPlaceholder": "e.g. 10",
+    "quarantineLabel": "I can provide quarantine / isolation",
+    "motivationLabel": "Motivation (optional)",
+    "motivationPlaceholder": "Why do you want to be a foster carer?",
+    "submitting": "Submitting...",
+    "submitButton": "Submit application",
+    "successTitle": "Application submitted!",
+    "successDesc": "The shelter will get back to you soon.",
+    "error": "Error"
   }
 }

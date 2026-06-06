@@ -139,7 +139,20 @@
     "shelterContactTitle": "Kontakt ze schroniskiem",
     "sendMessage": "Wyślij wiadomość do schroniska",
     "opening": "Otwieranie...",
-    "networkError": "Błąd sieci. Spróbuj ponownie."
+    "networkError": "Błąd sieci. Spróbuj ponownie.",
+    "virtualAdoption": "Wirtualna adopcja",
+    "virtualAdoptionDesc": "Wspieraj opiekę nad {name} miesięczną darowizną, bez fizycznej adopcji.",
+    "sponsorsCount": "{count} wirtualnych opiekunów wspiera",
+    "sponsorsMore": "i {count} więcej",
+    "monthlyAmountLabel": "Miesięczna kwota wsparcia",
+    "customAmountPlaceholder": "Własna kwota (HUF)",
+    "showNameLabel": "Wyświetlaj moje imię jako wirtualnego opiekuna",
+    "displayNamePlaceholder": "Nazwa wyświetlana (opcjonalnie, domyślnie nazwa profilu)",
+    "virtualAdoptButton": "Wirtualna adopcja",
+    "loginToAdopt": "Musisz być zalogowany, aby wirtualnie adoptować.",
+    "redirecting": "Przekierowanie…",
+    "supportButton": "Wsparcie {amount} HUF/miesiąc",
+    "virtualError": "Wystąpił błąd"
   },
   "shelters": {
     "title": "Schroniska",
@@ -363,7 +376,16 @@
     "cancelled": "Anulowana",
     "activeStatus": "Aktywna",
     "cancelSubscription": "Anuluj",
-    "subscribedSince": "Subskrybujesz od:"
+    "subscribedSince": "Subskrybujesz od:",
+    "mySponsorships": "Moje wirtualne adopcje",
+    "noSponsorships": "Nie masz jeszcze wirtualnych adopcji.",
+    "cancelSponsorConfirm": "Czy na pewno chcesz anulować tę wirtualną adopcję?",
+    "anonSponsor": "Anonimowy wspierający",
+    "publicSponsor": "Publiczny wirtualny opiekun",
+    "sponsoredSince": "od",
+    "unknownAnimal": "Nieznane zwierzę",
+    "perMonth": "HUF / miesiąc",
+    "cancelSponsorship": "Anuluj"
   },
   "messages": {
     "title": "Wiadomości",
@@ -392,5 +414,28 @@
     "adopted": "Adoptowane",
     "pendingApps": "Oczekujące wnioski",
     "totalApps": "Wszystkie wnioski"
+  },
+  "foster": {
+    "title": "Moje wnioski o opiekę tymczasową",
+    "noFosters": "Nie złożyłeś jeszcze wniosku o opiekę tymczasową.",
+    "browseShelters": "Przeglądaj schroniska →",
+    "preferred": "Preferowane:",
+    "anything": "dowolne",
+    "maxWeight": "Maks. waga:",
+    "animalsInCare": "Zwierzęta pod twoją opieką:",
+    "fosterStatus": "Opiekun tymczasowy: {status}",
+    "applyButton": "Zgłoś się jako opiekun tymczasowy",
+    "formTitle": "Wniosek o opiekę tymczasową",
+    "animalTypesLabel": "Jakie typy zwierząt? (opcjonalnie)",
+    "maxWeightLabel": "Maksymalna waga (kg, opcjonalnie)",
+    "weightPlaceholder": "np. 10",
+    "quarantineLabel": "Mogę zapewnić kwarantannę / izolację",
+    "motivationLabel": "Motywacja (opcjonalnie)",
+    "motivationPlaceholder": "Dlaczego chcesz być opiekunem tymczasowym?",
+    "submitting": "Wysyłanie...",
+    "submitButton": "Wyślij wniosek",
+    "successTitle": "Wniosek złożony!",
+    "successDesc": "Schronisko wkrótce się odezwie.",
+    "error": "Błąd"
   }
 }

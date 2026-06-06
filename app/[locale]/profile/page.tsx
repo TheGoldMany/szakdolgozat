@@ -151,7 +151,7 @@ export default async function ProfilePage() {
 
           {/* Virtual adoptions */}
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-sm font-semibold text-gray-700">Virtuális örökbefogadásaim</h2>
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySponsorships")}</h2>
             <SponsorshipsList
               sponsorships={user.sponsorships.map((s) => ({
                 ...s,

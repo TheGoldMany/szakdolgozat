@@ -139,7 +139,20 @@
     "shelterContactTitle": "Tierheimdaten",
     "sendMessage": "Nachricht ans Tierheim senden",
     "opening": "Öffnen...",
-    "networkError": "Netzwerkfehler. Bitte versuche es erneut."
+    "networkError": "Netzwerkfehler. Bitte versuche es erneut.",
+    "virtualAdoption": "Virtuelle Adoption",
+    "virtualAdoptionDesc": "Unterstütze die Pflege von {name} mit einer monatlichen Spende, ohne ihn physisch zu adoptieren.",
+    "sponsorsCount": "{count} virtuelle Paten unterstützen ihn",
+    "sponsorsMore": "und {count} weitere",
+    "monthlyAmountLabel": "Monatlicher Spendenbetrag",
+    "customAmountPlaceholder": "Eigener Betrag (HUF)",
+    "showNameLabel": "Meinen Namen als virtuellen Paten anzeigen",
+    "displayNamePlaceholder": "Anzeigename (optional, standardmäßig dein Profilname)",
+    "virtualAdoptButton": "Virtuelle Adoption",
+    "loginToAdopt": "Du musst eingeloggt sein, um virtuell zu adoptieren.",
+    "redirecting": "Weiterleitung…",
+    "supportButton": "Spenden {amount} HUF/Monat",
+    "virtualError": "Ein Fehler ist aufgetreten"
   },
   "shelters": {
     "title": "Tierheime",
@@ -363,7 +376,16 @@
     "cancelled": "Gekündigt",
     "activeStatus": "Aktiv",
     "cancelSubscription": "Kündigen",
-    "subscribedSince": "Abonniert:"
+    "subscribedSince": "Abonniert:",
+    "mySponsorships": "Meine virtuellen Adoptionen",
+    "noSponsorships": "Du hast noch keine virtuellen Adoptionen.",
+    "cancelSponsorConfirm": "Möchtest du diese virtuelle Adoption wirklich kündigen?",
+    "anonSponsor": "Anonymer Unterstützer",
+    "publicSponsor": "Öffentlicher virtueller Pate",
+    "sponsoredSince": "seit",
+    "unknownAnimal": "Unbekanntes Tier",
+    "perMonth": "HUF / Monat",
+    "cancelSponsorship": "Kündigen"
   },
   "messages": {
     "title": "Nachrichten",
@@ -392,5 +414,28 @@
     "adopted": "Adoptiert",
     "pendingApps": "Ausstehende Anträge",
     "totalApps": "Alle Anträge"
+  },
+  "foster": {
+    "title": "Meine Pflegeanträge",
+    "noFosters": "Du hast dich noch nicht als Pflegeperson beworben.",
+    "browseShelters": "Tierheime durchsuchen →",
+    "preferred": "Bevorzugt:",
+    "anything": "beliebig",
+    "maxWeight": "Max. Gewicht:",
+    "animalsInCare": "Tiere in deiner Obhut:",
+    "fosterStatus": "Pflegeperson: {status}",
+    "applyButton": "Als Pflegeperson bewerben",
+    "formTitle": "Bewerbung als Pflegeperson",
+    "animalTypesLabel": "Welche Tierarten? (optional)",
+    "maxWeightLabel": "Maximales Gewicht (kg, optional)",
+    "weightPlaceholder": "z.B. 10",
+    "quarantineLabel": "Ich kann Quarantäne / Isolation bereitstellen",
+    "motivationLabel": "Motivation (optional)",
+    "motivationPlaceholder": "Warum möchtest du Pflegeperson werden?",
+    "submitting": "Senden...",
+    "submitButton": "Bewerbung absenden",
+    "successTitle": "Bewerbung eingereicht!",
+    "successDesc": "Das Tierheim wird sich bald melden.",
+    "error": "Fehler"
   }
 }
