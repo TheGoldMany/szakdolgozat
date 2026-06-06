@@ -59,6 +59,21 @@ enum FollowUpStatus {
   OVERDUE
 }
 
+enum InventoryCategory {
+  FOOD       // Takarmány
+  MEDICINE   // Gyógyszer
+  SUPPLIES   // Kellékek
+  CLEANING   // Tisztítószer
+  EQUIPMENT  // Eszköz / felszerelés
+  OTHER      // Egyéb
+}
+
+enum InventoryTxType {
+  IN     // Bevételezés
+  OUT    // Felhasználás
+  ADJUST // Leltári korrekció (tényleges értékre állít)
+}
+
 enum FieldType {
   TEXT
   TEXTAREA
@@ -112,6 +127,7 @@ model User {
   appointments        Appointment[]
   volunteering        Volunteer[]
   notifications       Notification[]
+  inventoryTxs        InventoryTransaction[] @relation("InventoryTxCreator")
 }
 
 // -------------------------------------------------------
@@ -213,6 +229,7 @@ model Shelter {
   appointments         Appointment[]
   volunteers           Volunteer[]
   volunteerTasks       VolunteerTask[]
+  inventoryItems       InventoryItem[]
 }
 
 model ShelterDocument {
@@ -809,6 +826,9 @@ enum NotificationType {
   // Follow-up
   FOLLOW_UP_DUE            // User: follow-up questionnaire due
   FOLLOW_UP_RECEIVED       // Admin: user submitted a follow-up
+  // Inventory
+  INVENTORY_LOW_STOCK      // Admin: item quantity fell below minimum
+  INVENTORY_EXPIRING_SOON  // Admin: item expiring within 7 days
 }
 
 model Notification {
@@ -824,4 +844,44 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+// -------------------------------------------------------
+// Inventory (Készletkezelés)
+// -------------------------------------------------------
+
+model InventoryItem {
+  id          String            @id @default(cuid())
+  shelterId   String
+  shelter     Shelter           @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  name        String
+  category    InventoryCategory @default(OTHER)
+  unit        String            @default("db")  // "kg", "liter", "db", stb.
+  quantity    Float             @default(0)      // aktuális készlet
+  minQuantity Float?                             // riasztási küszöb
+  expiresAt   DateTime?                          // szavatossági dátum
+  note        String?           @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  transactions InventoryTransaction[]
+
+  @@index([shelterId])
+  @@index([category])
+}
+
+model InventoryTransaction {
+  id          String          @id @default(cuid())
+  itemId      String
+  item        InventoryItem   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type        InventoryTxType
+  // delta: pozitív = növekedés, negatív = csökkenés (ADJUST esetén is a valós eltérés)
+  quantity    Float
+  note        String?
+  createdById String?
+  createdBy   User?           @relation("InventoryTxCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+
+  @@index([itemId])
+  @@index([createdAt])
 }
