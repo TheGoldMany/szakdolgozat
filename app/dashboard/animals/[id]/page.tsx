@@ -76,6 +76,15 @@ export default async function AnimalDocumentsPage({
     label: f.user.name ?? f.user.email,
   }));
 
+  // Virtuális gazdik (szponzorok) statisztika
+  const sponsorAgg = await prisma.sponsorship.aggregate({
+    where:  { animalId: animal.id, status: "ACTIVE" },
+    _count: { id: true },
+    _sum:   { amount: true },
+  });
+  const sponsorCount   = sponsorAgg._count.id;
+  const sponsorRevenue = sponsorAgg._sum.amount ?? 0;
+
   const imgUrl = animal.images[0]?.url ?? "/placeholder-animal.jpg";
 
   const docs = animal.documents.map((d) => ({
@@ -124,6 +133,26 @@ export default async function AnimalDocumentsPage({
             nextDueDate: r.nextDueDate?.toISOString() ?? null,
           }))}
         />
+      </div>
+
+      {/* Virtual adoption stats */}
+      <div className="mt-6 rounded-2xl border border-pink-100 bg-pink-50 p-6">
+        <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-pink-800">
+          Virtuális gazdik
+        </h2>
+        <div className="flex flex-wrap gap-8">
+          <div>
+            <p className="text-xs font-medium text-pink-600">Aktív virtuális gazdi</p>
+            <p className="mt-1 text-2xl font-bold text-pink-700">{sponsorCount}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-pink-600">Havi bevétel</p>
+            <p className="mt-1 text-2xl font-bold text-pink-700">
+              {sponsorRevenue.toLocaleString("hu-HU")}
+              <span className="ml-1 text-sm font-medium text-pink-400">HUF</span>
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Foster placement */}

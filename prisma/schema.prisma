@@ -131,6 +131,7 @@ model User {
   behaviorLogsAdded   BehaviorLog[]          @relation("BehaviorLogAuthor")
   fosterProfiles      FosterProfile[]
   fosterSupplyLogs    FosterSupplyLog[]      @relation("FosterSupplyCreator")
+  sponsorships        Sponsorship[]
 }
 
 // -------------------------------------------------------
@@ -304,9 +305,32 @@ model Animal {
   healthRecords HealthRecord[]
   appointments  Appointment[]
   behaviorLogs  BehaviorLog[]
+  sponsorships  Sponsorship[]
 
   @@index([kennelId])
   @@index([fosterId])
+}
+
+// -------------------------------------------------------
+// Sponsorship / Virtual Adoption (Virtuális örökbefogadás)
+// -------------------------------------------------------
+
+model Sponsorship {
+  id          String             @id @default(cuid())
+  animalId    String
+  animal      Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Int                // havi támogatás (HUF)
+  isPublic    Boolean            @default(true)   // megjelenjen-e „Virtuális gazdi”-ként
+  displayName String?            // opcionális publikus név (ha null és isPublic → user neve)
+  status      SubscriptionStatus @default(ACTIVE)
+  stripeSubId String?            @unique
+  createdAt   DateTime           @default(now())
+  cancelledAt DateTime?
+
+  @@index([animalId, status])
+  @@index([userId])
 }
 
 // -------------------------------------------------------
@@ -900,6 +924,9 @@ enum NotificationType {
   DONATION_RECEIVED        // Admin: new donation received
   SUBSCRIPTION_STARTED     // User: subscription confirmed
   SUBSCRIPTION_CANCELLED   // User: subscription cancelled
+  // Virtual adoption / sponsorship
+  SPONSORSHIP_STARTED      // User: virtual adoption confirmed
+  SPONSOR_UPDATE           // Virtual owner: sponsored animal updated (health/photo/adopted)
   // Messages
   NEW_MESSAGE              // User/admin: new unread message
   // Follow-up

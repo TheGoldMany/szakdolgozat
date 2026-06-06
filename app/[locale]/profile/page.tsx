@@ -8,6 +8,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { ChangePasswordForm } from "@/components/profile/change-password-form";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { SubscriptionsList } from "@/components/profile/subscriptions-list";
+import { SponsorshipsList } from "@/components/profile/sponsorships-list";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -52,6 +53,18 @@ export default async function ProfilePage() {
               shelter: { select: { name: true, slug: true } },
             },
           },
+        },
+      },
+      sponsorships: {
+        orderBy: { createdAt: "desc" },
+        select: {
+          id:          true,
+          status:      true,
+          amount:      true,
+          isPublic:    true,
+          createdAt:   true,
+          cancelledAt: true,
+          animal:      { select: { name: true, slug: true } },
         },
       },
     },
@@ -129,6 +142,18 @@ export default async function ProfilePage() {
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySubscriptions")}</h2>
             <SubscriptionsList
               subscriptions={user.subscriptions.map((s) => ({
+                ...s,
+                createdAt:   s.createdAt.toISOString(),
+                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+              }))}
+            />
+          </div>
+
+          {/* Virtual adoptions */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">Virtuális örökbefogadásaim</h2>
+            <SponsorshipsList
+              sponsorships={user.sponsorships.map((s) => ({
                 ...s,
                 createdAt:   s.createdAt.toISOString(),
                 cancelledAt: s.cancelledAt?.toISOString() ?? null,

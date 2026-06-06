@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyAnimalSponsors } from "@/lib/notifications";
 import { AnimalStatus } from "@prisma/client";
 
 const schema = z.object({
@@ -50,6 +51,16 @@ export async function PATCH(
       adoptedAt: parsed.data.status === AnimalStatus.ADOPTED ? new Date() : undefined,
     },
   });
+
+  // Ha az állat gazdira talált, értesítjük a virtuális gazdikat
+  if (parsed.data.status === AnimalStatus.ADOPTED && animal.status !== AnimalStatus.ADOPTED) {
+    notifyAnimalSponsors(
+      params.id,
+      `${updated.name} gazdira talált! 🎉`,
+      "A virtuális örökbefogadásoddal támogatott állat új otthonba került. Köszönjük a segítséget!",
+      `/animals/${updated.slug}`,
+    ).catch(() => {});
+  }
 
   return NextResponse.json({ animal: updated });
 }

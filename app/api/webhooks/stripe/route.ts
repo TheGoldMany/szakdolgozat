@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
       where: { stripeSubId: stripeSub.id },
       data:  { status: "CANCELLED", cancelledAt: new Date() },
     });
+    await prisma.sponsorship.updateMany({
+      where: { stripeSubId: stripeSub.id },
+      data:  { status: "CANCELLED", cancelledAt: new Date() },
+    });
   }
 
   if (event.type === "checkout.session.completed") {
@@ -185,6 +189,60 @@ export async function POST(req: NextRequest) {
             shelterSlug: tier.shelter.slug,
           }).catch((err) => console.error("Subscription email error:", err));
         }
+      }
+    }
+
+    // ----------------------------------------------------------------
+    // Case 3: Virtual adoption (sponsorship) checkout completed
+    // ----------------------------------------------------------------
+    if (metadata.sponsorAnimalId && metadata.userId) {
+      const { sponsorAnimalId, userId } = metadata;
+      const amount      = parseInt(metadata.sponsorAmount ?? "0", 10) || 0;
+      const isPublic    = metadata.sponsorPublic !== "0";
+      const displayName = metadata.sponsorName || null;
+      const stripeSubId = checkoutSession.subscription
+        ? String(checkoutSession.subscription)
+        : undefined;
+
+      await prisma.sponsorship.upsert({
+        where:  { stripeSubId: stripeSubId ?? "" },
+        update: {},
+        create: {
+          animalId: sponsorAnimalId,
+          userId,
+          amount,
+          isPublic,
+          displayName,
+          status:   "ACTIVE",
+          stripeSubId: stripeSubId ?? null,
+        },
+      });
+
+      const animal = await prisma.animal.findUnique({
+        where:  { id: sponsorAnimalId },
+        select: { name: true, slug: true, shelterId: true },
+      });
+      if (animal) {
+        const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(amount);
+        createNotification({
+          userId,
+          type:  "SPONSORSHIP_STARTED",
+          title: "Virtuális örökbefogadás aktiválva",
+          body:  `${animal.name} – ${amountStr}/hó. Köszönjük a támogatást!`,
+          href:  `/animals/${animal.slug}`,
+        }).catch((err) => console.error("Sponsorship notification error:", err));
+
+        const sponsorAdmins = await prisma.shelterAdmin.findMany({
+          where:  { shelterId: animal.shelterId },
+          select: { userId: true },
+        });
+        createNotifications(sponsorAdmins.map((a) => ({
+          userId: a.userId,
+          type:   "DONATION_RECEIVED" as const,
+          title:  "Új virtuális gazdi",
+          body:   `${animal.name} – ${amountStr}/hó`,
+          href:   "/dashboard/animals",
+        }))).catch((err) => console.error("Sponsorship admin notification error:", err));
       }
     }
   }

@@ -10,6 +10,7 @@ import { AdoptionContact } from "@/components/animals/adoption-contact";
 import { RatingBadge } from "@/components/reviews/rating-stat";
 import { HealthTimeline } from "@/components/health/health-timeline";
 import { AppointmentButton } from "@/components/appointments/appointment-button";
+import { VirtualAdoptionCard } from "@/components/animals/virtual-adoption-card";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -89,6 +90,16 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
     });
     existingConvId = conv?.id ?? null;
   }
+
+  // Virtuális gazdik (szponzorok)
+  const activeSponsors = await prisma.sponsorship.findMany({
+    where:   { animalId: animal.id, status: "ACTIVE" },
+    include: { user: { select: { name: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+  const publicSponsors = activeSponsors
+    .filter((s) => s.isPublic)
+    .map((s) => ({ name: s.displayName ?? s.user.name ?? "Virtuális gazdi" }));
 
   const primaryImage = animal.images[0];
   const extraImages  = animal.images.slice(1);
@@ -261,6 +272,16 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
               shelterId={animal.shelter.id}
               animalId={animal.id}
               animalName={animal.name}
+            />
+          )}
+          {animal.status !== AnimalStatus.ADOPTED && (
+            <VirtualAdoptionCard
+              animalId={animal.id}
+              animalName={animal.name}
+              slug={animal.slug}
+              loggedIn={!!session}
+              sponsorCount={activeSponsors.length}
+              publicSponsors={publicSponsors}
             />
           )}
           </div>

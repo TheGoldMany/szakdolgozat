@@ -17,3 +17,30 @@ export async function createNotifications(inputs: CreateNotificationInput[]) {
   if (inputs.length === 0) return;
   return prisma.notification.createMany({ data: inputs });
 }
+
+/**
+ * Értesíti egy állat összes aktív virtuális gazdiját (szponzorát).
+ * Pl. egészségügyi napló frissült, új fotó, vagy gazdira talált.
+ */
+export async function notifyAnimalSponsors(
+  animalId: string,
+  title:    string,
+  body?:    string,
+  href?:    string,
+) {
+  const sponsors = await prisma.sponsorship.findMany({
+    where:  { animalId, status: "ACTIVE" },
+    select: { userId: true },
+  });
+  if (sponsors.length === 0) return;
+
+  // Egy user több szponzorációja esetén is csak egy értesítés
+  const uniqueUserIds = [...new Set(sponsors.map((s) => s.userId))];
+  return createNotifications(uniqueUserIds.map((userId) => ({
+    userId,
+    type: "SPONSOR_UPDATE" as NotificationType,
+    title,
+    body,
+    href,
+  })));
+}

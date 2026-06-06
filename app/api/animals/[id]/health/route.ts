@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyAnimalSponsors } from "@/lib/notifications";
 import { HealthRecordType } from "@prisma/client";
 
 const schema = z.object({
@@ -67,6 +68,20 @@ export async function POST(
     },
     include: { createdBy: { select: { name: true } } },
   });
+
+  // Virtuális gazdik értesítése az egészségügyi napló frissüléséről
+  const animalInfo = await prisma.animal.findUnique({
+    where:  { id: params.id },
+    select: { name: true, slug: true },
+  });
+  if (animalInfo) {
+    notifyAnimalSponsors(
+      params.id,
+      `Frissült ${animalInfo.name} egészségügyi naplója`,
+      record.title,
+      `/animals/${animalInfo.slug}`,
+    ).catch(() => {});
+  }
 
   return NextResponse.json(record, { status: 201 });
 }
