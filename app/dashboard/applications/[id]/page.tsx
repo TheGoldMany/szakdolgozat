@@ -8,8 +8,9 @@ import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { ContractDownloadButton } from "@/components/applications/contract-download-button";
 import { RatingBadge } from "@/components/reviews/rating-stat";
+import { detectConflicts } from "@/lib/behavior";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, FileText, ImageIcon, Users, PawPrint } from "lucide-react";
+import { ArrowLeft, FileText, Users, PawPrint, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = { title: "Kérelem részletei" };
 
@@ -72,6 +73,15 @@ export default async function ApplicationDetailPage({
   const status = STATUS_LABELS[app.status] ?? { label: app.status, color: "bg-gray-100 text-gray-500" };
   const imgUrl = app.animal.images[0]?.url ?? "/placeholder-animal.jpg";
 
+  // Viselkedési ütközések ellenőrzése (belső flag-ek vs. jelentkező válaszai)
+  const conflicts = detectConflicts(app.animal.flags, {
+    hasChildren: app.hasChildren,
+    hasPets:     app.hasPets,
+    homeType:    app.homeType,
+    hasGarden:   app.hasGarden,
+    experience:  app.experience,
+  });
+
   return (
     <div className="space-y-6">
       {/* Back link */}
@@ -82,6 +92,27 @@ export default async function ApplicationDetailPage({
         <ArrowLeft className="h-4 w-4" />
         Vissza a kérelmekhez
       </Link>
+
+      {/* Viselkedési ütközés figyelmeztetés */}
+      {conflicts.length > 0 && (
+        <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+            <div>
+              <h2 className="text-sm font-bold text-red-800">
+                Figyelem – lehetséges összeférhetetlenség
+              </h2>
+              <p className="mt-0.5 text-xs text-red-600">
+                A jelentkező válaszai ütköznek az állat belső viselkedési címkéivel.
+                Kérjük, körültekintően bírálja el a kérelmet.
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-red-700">
+                {conflicts.map((c, i) => <li key={i}>{c}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header card */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">

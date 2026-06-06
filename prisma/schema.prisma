@@ -128,6 +128,7 @@ model User {
   volunteering        Volunteer[]
   notifications       Notification[]
   inventoryTxs        InventoryTransaction[] @relation("InventoryTxCreator")
+  behaviorLogsAdded   BehaviorLog[]          @relation("BehaviorLogAuthor")
 }
 
 // -------------------------------------------------------
@@ -279,6 +280,8 @@ model Animal {
   isGoodWithDogs Boolean?
   isGoodWithCats Boolean?
   status         AnimalStatus @default(AVAILABLE)
+  flags          AnimalFlag[] @default([])  // belső, csak adminoknak látható kockázati címkék
+  progressLevel  Int?                       // szubjektív rehabilitációs fejlődési szint (0-100)
   arrivedAt      DateTime?
   adoptedAt      DateTime?
   createdAt      DateTime     @default(now())
@@ -292,6 +295,37 @@ model Animal {
   conversations Conversation[]
   healthRecords HealthRecord[]
   appointments  Appointment[]
+  behaviorLogs  BehaviorLog[]
+}
+
+// -------------------------------------------------------
+// Behavior & Rehabilitation (Viselkedési és rehabilitációs napló)
+// -------------------------------------------------------
+
+enum AnimalFlag {
+  ESCAPE_ARTIST            // Szökőművész
+  FOOD_AGGRESSIVE          // Élelemirigy
+  NOT_GOOD_WITH_CHILDREN   // Gyerekekkel nem barátságos
+  NOT_GOOD_WITH_DOGS       // Kutyákkal nem barátságos
+  NOT_GOOD_WITH_CATS       // Macskákkal nem barátságos
+  NEEDS_EXPERIENCED_OWNER  // Tapasztalt gazdát igényel
+  REACTIVE                 // Reaktív / ingerlékeny
+  ANXIOUS                  // Szorongó
+  MEDICAL_NEEDS            // Speciális orvosi ellátást igényel
+  NO_APARTMENT             // Lakásba nem ajánlott (kert szükséges)
+}
+
+model BehaviorLog {
+  id            String   @id @default(cuid())
+  animalId      String
+  animal        Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  note          String   @db.Text
+  progressLevel Int?     // ehhez a bejegyzéshez tartozó fejlődési pillanatkép (0-100)
+  authorId      String?
+  author        User?    @relation("BehaviorLogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@index([animalId, createdAt])
 }
 
 model AnimalDocument {

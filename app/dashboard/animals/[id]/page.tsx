@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalDocuments } from "@/components/dashboard/animal-documents";
 import { HealthManager } from "@/components/health/health-manager";
+import { BehaviorManager } from "@/components/behavior/behavior-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function AnimalDocumentsPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
-  const [animal, healthRecords] = await Promise.all([
+  const [animal, healthRecords, behaviorLogs] = await Promise.all([
     prisma.animal.findUnique({
       where:   { id: params.id },
       include: {
@@ -44,6 +45,11 @@ export default async function AnimalDocumentsPage({
       where:   { animalId: params.id },
       include: { createdBy: { select: { name: true } } },
       orderBy: { date: "desc" },
+    }),
+    prisma.behaviorLog.findMany({
+      where:   { animalId: params.id },
+      include: { author: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
     }),
   ]);
 
@@ -104,6 +110,19 @@ export default async function AnimalDocumentsPage({
             ...r,
             date:        r.date.toISOString(),
             nextDueDate: r.nextDueDate?.toISOString() ?? null,
+          }))}
+        />
+      </div>
+
+      {/* Behavior & rehabilitation */}
+      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <BehaviorManager
+          animalId={animal.id}
+          initialFlags={animal.flags}
+          initialProgressLevel={animal.progressLevel}
+          initialLogs={behaviorLogs.map(r => ({
+            ...r,
+            createdAt: r.createdAt.toISOString(),
           }))}
         />
       </div>
