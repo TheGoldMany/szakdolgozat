@@ -8,8 +8,30 @@ import {
   ReportType,
   ReportStatus,
   CampaignStatus,
+  HealthRecordType,
+  AppointmentStatus,
+  VolunteerStatus,
+  InventoryCategory,
+  InventoryTxType,
+  FollowUpStatus,
+  NotificationType,
 } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { existsSync, readFileSync } from "fs";
+import { resolve } from "path";
+
+// DATABASE_URL betöltése .env / .env.local fájlból (ts-node nem tölti auto)
+for (const envFile of [".env", ".env.local"]) {
+  const fp = resolve(process.cwd(), envFile);
+  if (!existsSync(fp)) continue;
+  readFileSync(fp, "utf8").split("\n").forEach(line => {
+    const m = line.match(/^([^#=][^=]*)=(.+)$/);
+    if (!m) return;
+    const key = m[1].trim();
+    const val = m[2].trim().replace(/^["']|["']$/g, "");
+    if (!process.env[key]) process.env[key] = val;
+  });
+}
 
 const prisma = new PrismaClient();
 
@@ -647,6 +669,235 @@ async function main() {
 
   await prisma.animalReport.createMany({ data: reportRows, skipDuplicates: true });
   console.log(`✅ ${reportRows.length} bejelentés`);
+
+  // ── 14. Egészségügyi bejegyzések ──────────────────────────────────────────
+  console.log("\n🏥 Egészségügyi bejegyzések...");
+  const HR_TYPE_POOL: HealthRecordType[] = [
+    HealthRecordType.VACCINATION, HealthRecordType.VACCINATION,
+    HealthRecordType.DEWORMING,   HealthRecordType.CHECKUP,
+    HealthRecordType.TREATMENT,   HealthRecordType.VET_VISIT,
+  ];
+  const HR_TITLES: Record<HealthRecordType, string> = {
+    VACCINATION: "Védőoltás",   DEWORMING: "Féregtelenítés",
+    CHECKUP: "Szűrővizsgálat", TREATMENT: "Kezelés",
+    VET_VISIT: "Állatorvosi vizit", SURGERY: "Műtét",
+  };
+  const VET_NAMES = ["Dr. Nagy Péter", "Dr. Kiss Anna", "Dr. Szabó Gábor", "Dr. Varga Éva", "Dr. Molnár Zoltán"];
+  const hrRows = allAnimals.slice(0, 1200).map(a => {
+    const type = rnd(HR_TYPE_POOL);
+    const date = new Date(Date.now() - rndInt(1, 365) * 86_400_000);
+    return {
+      animalId: a.id, type, title: HR_TITLES[type],
+      description: `${HR_TITLES[type]} sikeresen elvégezve.`,
+      date,
+      nextDueDate: (type === HealthRecordType.VACCINATION || type === HealthRecordType.DEWORMING)
+        ? new Date(date.getTime() + 365 * 86_400_000) : null,
+      vetName: rnd(VET_NAMES),
+    };
+  });
+  for (let i = 0; i < hrRows.length; i += BATCH) await prisma.healthRecord.createMany({ data: hrRows.slice(i, i + BATCH) });
+  console.log(`✅ ${hrRows.length} egészségügyi bejegyzés`);
+
+  // ── 15. Értékelések (user → menhely) ──────────────────────────────────────
+  const REVIEW_COMMENTS_POOL = [
+    "Kiváló menhely, nagyon segítőkész személyzet!", null,
+    "Tiszta, rendezett hely, gondozott állatok.", null,
+    "Az örökbefogadási folyamat átlátható és gyors volt.",
+    "Kedves csapat, szívesen ajánlom mindenkinek.",
+    "Kicsit lassú volt a válasz, de végül minden rendben lett.",
+    "Profi szervezet, megbízható és gondoskodó.",
+    "Minden kérdésemre válaszoltak, elégedett vagyok.",
+  ];
+  const reviewPairsSeen = new Set<string>();
+  const reviewRows: { authorId: string; shelterId: string; rating: number; comment: string | null }[] = [];
+  for (let i = 0; reviewRows.length < 300 && i < 800; i++) {
+    const user    = rnd(demoUsers);
+    const shelter = rnd(shelters.slice(0, 120));
+    const key     = `${user.id}:${shelter.id}`;
+    if (reviewPairsSeen.has(key)) continue;
+    reviewPairsSeen.add(key);
+    reviewRows.push({ authorId: user.id, shelterId: shelter.id, rating: rnd([3, 4, 4, 5, 5, 5]), comment: rnd(REVIEW_COMMENTS_POOL) });
+  }
+  await prisma.review.createMany({ data: reviewRows, skipDuplicates: true });
+  console.log(`✅ ${reviewRows.length} értékelés`);
+
+  // ── 16. Önkéntesek ────────────────────────────────────────────────────────
+  const VOL_MOTIVATIONS = [
+    "Szeretek állatokkal foglalkozni, és így hasznosan töltöm a szabad időmet.",
+    "Az állatvédelem közel áll a szívemhez – segíteni szeretnék.",
+    "Korábbi állatmentési tapasztalataim vannak.",
+    "Fotós vagyok, az állatokról szívesen készítek minőségi képeket.",
+  ];
+  const VOL_SKILLS = ["Sétáltatás, szocializáció", "Fotózás, közösségi média", "Adminisztráció", "Állatorvosi asszisztencia"];
+  const VOL_AVAIL  = ["Hétvégente", "Hétköznap este", "Rugalmas", "Szombat délelőtt"];
+  const volPairsSeen = new Set<string>();
+  const volRows: { userId: string; shelterId: string; status: VolunteerStatus; motivation: string; skills: string; availability: string }[] = [];
+  for (const vShelter of shelters.slice(0, 80)) {
+    for (let i = 0; i < rndInt(2, 4); i++) {
+      const user = rnd(demoUsers);
+      const key  = `${user.id}:${vShelter.id}`;
+      if (volPairsSeen.has(key)) continue;
+      volPairsSeen.add(key);
+      volRows.push({ userId: user.id, shelterId: vShelter.id, status: rnd([VolunteerStatus.ACTIVE, VolunteerStatus.ACTIVE, VolunteerStatus.PENDING]), motivation: rnd(VOL_MOTIVATIONS), skills: rnd(VOL_SKILLS), availability: rnd(VOL_AVAIL) });
+    }
+  }
+  await prisma.volunteer.createMany({ data: volRows, skipDuplicates: true });
+  const createdVols = await prisma.volunteer.findMany({ where: { shelterId: { in: shelters.slice(0, 80).map(s => s.id) } }, select: { id: true, status: true } });
+  const attRows: { volunteerId: string; date: Date; hours: number; note: string | null }[] =
+    createdVols.filter(v => v.status === VolunteerStatus.ACTIVE).flatMap(v => ([
+      { volunteerId: v.id, date: new Date(Date.now() - rndInt(1, 30)  * 86_400_000), hours: rndInt(2, 5), note: rndBool(0.6) ? rnd(["Sétáltatás", "Takarítás", "Etetés", "Fotózás"]) : null },
+      { volunteerId: v.id, date: new Date(Date.now() - rndInt(31, 60) * 86_400_000), hours: rndInt(2, 4), note: rndBool(0.4) ? rnd(["Sétáltatás", "Takarítás"]) : null },
+    ]));
+  for (let i = 0; i < attRows.length; i += BATCH) await prisma.volunteerAttendance.createMany({ data: attRows.slice(i, i + BATCH) });
+  console.log(`✅ ${volRows.length} önkéntes + ${attRows.length} jelenlét`);
+
+  // ── 17. Önkéntes feladatok ────────────────────────────────────────────────
+  const TASK_TITLES_LIST = [
+    "Hétvégi sétáltatás", "Menhelynyitva tartás segítése",
+    "Örökbefogadási vásár", "Fotózás az állatokról",
+    "Kennel takarítás", "Szocializációs foglalkozás",
+    "Állatszállítás segítése", "Adománygyűjtő akció",
+  ];
+  const taskRows = shelters.slice(0, 50).flatMap(s =>
+    Array.from({ length: rndInt(1, 2) }, (_, j) => ({
+      shelterId:     s.id,
+      title:         TASK_TITLES_LIST[(j * 3) % TASK_TITLES_LIST.length],
+      description:   "Önkéntes segítség szükséges ehhez a feladathoz.",
+      scheduledAt:   new Date(Date.now() + rndInt(3, 60) * 86_400_000),
+      maxVolunteers: rndInt(2, 5),
+    }))
+  );
+  await prisma.volunteerTask.createMany({ data: taskRows });
+  console.log(`✅ ${taskRows.length} önkéntes feladat`);
+
+  // ── 18. Időpontfoglalások ─────────────────────────────────────────────────
+  const aptRows: { shelterId: string; userId: string; animalId: string | null; status: AppointmentStatus; proposedAt: Date; confirmedAt: Date | null; note: string | null; adminNote: string | null; cancelledBy: string | null }[] = [];
+  for (let i = 0; i < 200; i++) {
+    const shelter  = rnd(shelters.slice(0, 80));
+    const user     = rnd(demoUsers);
+    const animal   = rndBool(0.65) ? rnd(allAnimals) : null;
+    const proposed = new Date(Date.now() + rndInt(-14, 45) * 86_400_000);
+    const status   = rnd([AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED]);
+    aptRows.push({ shelterId: shelter.id, userId: user.id, animalId: animal?.id ?? null, status, proposedAt: proposed, confirmedAt: (status === AppointmentStatus.CONFIRMED || status === AppointmentStatus.COMPLETED) ? proposed : null, note: rndBool(0.7) ? "Személyesen szeretném megismerni az állatot." : null, adminNote: status === AppointmentStatus.CONFIRMED ? "Visszaigazolva, várjuk!" : null, cancelledBy: status === AppointmentStatus.CANCELLED ? rnd(["USER", "ADMIN"]) : null });
+  }
+  for (let i = 0; i < aptRows.length; i += BATCH) await prisma.appointment.createMany({ data: aptRows.slice(i, i + BATCH) });
+  console.log(`✅ ${aptRows.length} időpontfoglalás`);
+
+  // ── 19. Utánkövetések ─────────────────────────────────────────────────────
+  const approvedApps = await prisma.adoptionApplication.findMany({ where: { status: ApplicationStatus.APPROVED }, select: { id: true, reviewedAt: true } });
+  const fuRows = approvedApps.flatMap(app => {
+    const base = (app.reviewedAt ?? new Date()).getTime();
+    return [
+      { applicationId: app.id, scheduledAt: new Date(base + 30 * 86_400_000), completedAt: rndBool(0.65) ? new Date(base + 30 * 86_400_000) : null as Date | null, wellbeing: rndBool(0.65) ? rnd([3, 4, 4, 5, 5]) : null as number | null, notes: rndBool(0.5) ? "Az állat szépen beilleszkedett az új otthonba." : null as string | null, status: rndBool(0.65) ? FollowUpStatus.COMPLETED : FollowUpStatus.PENDING },
+      { applicationId: app.id, scheduledAt: new Date(base + 90 * 86_400_000), completedAt: null as Date | null, wellbeing: null as number | null, notes: null as string | null, status: new Date(base + 90 * 86_400_000) < new Date() ? FollowUpStatus.OVERDUE : FollowUpStatus.PENDING },
+    ];
+  });
+  for (let i = 0; i < fuRows.length; i += BATCH) await prisma.adoptionFollowUp.createMany({ data: fuRows.slice(i, i + BATCH) });
+  console.log(`✅ ${fuRows.length} utánkövetés (${approvedApps.length} jóváhagyott kérelemhez)`);
+
+  // ── 20. Készlettételek ────────────────────────────────────────────────────
+  console.log("\n📦 Készlet generálása...");
+  const INV_TEMPLATES = [
+    { name: "Royal Canin Adult",     cat: InventoryCategory.FOOD,      unit: "kg",       qty: 50, min: 10 },
+    { name: "Kölyöktáp",             cat: InventoryCategory.FOOD,      unit: "kg",       qty: 20, min: 5  },
+    { name: "Macska alapétel",       cat: InventoryCategory.FOOD,      unit: "kg",       qty: 15, min: 5  },
+    { name: "Antibiotikum tabletta", cat: InventoryCategory.MEDICINE,  unit: "tabletta", qty: 30, min: 20 },
+    { name: "Féregtelenítő",         cat: InventoryCategory.MEDICINE,  unit: "tabletta", qty: 40, min: 15 },
+    { name: "Fertőtlenítő spray",    cat: InventoryCategory.CLEANING,  unit: "liter",    qty: 8,  min: 3  },
+    { name: "Mosószer",              cat: InventoryCategory.CLEANING,  unit: "kg",       qty: 5          },
+    { name: "Póráz (vegyes méret)",  cat: InventoryCategory.SUPPLIES,  unit: "db",       qty: 20         },
+    { name: "Macska homok",          cat: InventoryCategory.SUPPLIES,  unit: "kg",       qty: 50, min: 10 },
+    { name: "Kutyaágy",              cat: InventoryCategory.EQUIPMENT, unit: "db",       qty: 15         },
+  ];
+  const invItemRows: { shelterId: string; name: string; category: InventoryCategory; unit: string; quantity: number; minQuantity: number | null }[] = [];
+  for (const invS of shelters.slice(0, 100)) {
+    const picked = [...INV_TEMPLATES].sort(() => Math.random() - 0.5).slice(0, rndInt(3, 5));
+    for (const t of picked) {
+      const rawQty = rndBool(0.15) && t.min ? Math.max(0, t.min - rndInt(1, t.min)) : t.qty + rndInt(-10, 15);
+      invItemRows.push({ shelterId: invS.id, name: t.name, category: t.cat, unit: t.unit, quantity: Math.max(0, rawQty), minQuantity: t.min ?? null });
+    }
+  }
+  await prisma.inventoryItem.createMany({ data: invItemRows });
+  const createdInvItems = await prisma.inventoryItem.findMany({ where: { shelterId: { in: shelters.slice(0, 100).map(s => s.id) } }, select: { id: true, quantity: true } });
+  const openingTxRows = createdInvItems.filter(i => i.quantity > 0).map(i => ({ itemId: i.id, type: InventoryTxType.IN, quantity: Number(i.quantity), note: "Nyitókészlet" }));
+  for (let i = 0; i < openingTxRows.length; i += BATCH) await prisma.inventoryTransaction.createMany({ data: openingTxRows.slice(i, i + BATCH) });
+  console.log(`✅ ${invItemRows.length} készlettétel + ${openingTxRows.length} nyitótranzakció`);
+
+  // ── 21. Előfizetések ──────────────────────────────────────────────────────
+  const allTiers = await prisma.donationTier.findMany({ select: { id: true } });
+  if (allTiers.length > 0) {
+    const subPairsSeen = new Set<string>();
+    const subRows: { userId: string; tierId: string }[] = [];
+    for (let i = 0; subRows.length < 60 && i < 300; i++) {
+      const user = rnd(demoUsers);
+      const tier = rnd(allTiers);
+      const key  = `${user.id}:${tier.id}`;
+      if (subPairsSeen.has(key)) continue;
+      subPairsSeen.add(key);
+      subRows.push({ userId: user.id, tierId: tier.id });
+    }
+    await prisma.subscription.createMany({ data: subRows, skipDuplicates: true });
+    console.log(`✅ ${subRows.length} előfizetés`);
+  }
+
+  // ── 22. Adományok ─────────────────────────────────────────────────────────
+  const activeCampaigns = await prisma.campaign.findMany({ where: { status: CampaignStatus.ACTIVE }, select: { id: true }, take: 50 });
+  if (activeCampaigns.length > 0) {
+    const AMOUNTS = [500, 1000, 2500, 5000, 10000, 20000];
+    const donRows = Array.from({ length: 120 }, () => ({ userId: rndBool(0.8) ? rnd(demoUsers).id : null, campaignId: rnd(activeCampaigns).id, amount: rnd(AMOUNTS), isAnonymous: rndBool(0.2), paidAt: new Date(Date.now() - rndInt(1, 180) * 86_400_000) }));
+    await prisma.donation.createMany({ data: donRows });
+    console.log(`✅ ${donRows.length} adomány`);
+  }
+
+  // ── 23. Üzenetek és beszélgetések ─────────────────────────────────────────
+  console.log("\n💬 Üzenetek generálása...");
+  const convAnimals = await prisma.animal.findMany({ where: { shelterId: { in: shelters.slice(0, 50).map(s => s.id) } }, select: { id: true, shelterId: true }, take: 100 });
+  const convPairsSeen = new Set<string>();
+  const convRows: { animalId: string; userId: string; shelterId: string }[] = [];
+  for (const ca of convAnimals) {
+    const user = rnd(demoUsers);
+    const key  = `${ca.id}:${user.id}`;
+    if (convPairsSeen.has(key)) continue;
+    convPairsSeen.add(key);
+    convRows.push({ animalId: ca.id, userId: user.id, shelterId: ca.shelterId });
+  }
+  await prisma.conversation.createMany({ data: convRows, skipDuplicates: true });
+  const createdConvs = await prisma.conversation.findMany({ where: { animalId: { in: convRows.map(c => c.animalId) } }, select: { id: true, userId: true, shelterId: true } });
+  const MSG_USER  = ["Érdeklődöm az állat iránt – mikor lehet megnézni?", "Van-e lehetőség hétvégén látogatást szervezni?", "Örökbefogadható még az állat?"];
+  const MSG_ADMIN = ["Persze, szívesen fogadjuk! Kérem hívjon: +36301234567.", "Hétvégén 10-12 között foglalkozunk látogatókkal.", "Az állat jó egészségnek örvend."];
+  const msgRows: { conversationId: string; senderId: string; content: string; readAt: Date | null }[] = [];
+  for (const conv of createdConvs) {
+    const adminEmail  = shelterIdToAdminEmail[conv.shelterId];
+    const adminUserId = adminEmail ? adminIdByEmail[adminEmail] : null;
+    if (!adminUserId) continue;
+    msgRows.push(
+      { conversationId: conv.id, senderId: conv.userId, content: rnd(MSG_USER),  readAt: new Date() },
+      { conversationId: conv.id, senderId: adminUserId, content: rnd(MSG_ADMIN), readAt: new Date() },
+      { conversationId: conv.id, senderId: conv.userId, content: "Köszönöm a gyors választ!", readAt: null },
+    );
+  }
+  for (let i = 0; i < msgRows.length; i += BATCH) await prisma.message.createMany({ data: msgRows.slice(i, i + BATCH) });
+  console.log(`✅ ${convRows.length} beszélgetés + ${msgRows.length} üzenet`);
+
+  // ── 24. Értesítések ───────────────────────────────────────────────────────
+  const NOTIF_POOL = [
+    { type: NotificationType.APPLICATION_APPROVED,  title: "Kérelmét jóváhagyták!",         body: "Örömmel értesítjük, hogy örökbefogadási kérelme elfogadásra került.",       href: "/applications" },
+    { type: NotificationType.APPLICATION_REVIEWING, title: "Kérelme áttekintés alatt",       body: "Kérelme aktívan feldolgozás alatt van a menhely részéről.",                  href: "/applications" },
+    { type: NotificationType.APPOINTMENT_CONFIRMED, title: "Időpontja visszaigazolva",       body: "A menhely megerősítette az időpontját.",                                      href: "/appointments" },
+    { type: NotificationType.NEW_MESSAGE,           title: "Új üzenet érkezett",              body: "Új üzenete van a menhelytől.",                                               href: "/messages" },
+    { type: NotificationType.FOLLOW_UP_DUE,         title: "Utánkövetési kérdőív esedékes", body: "Kérjük, töltse ki az örökbefogadás utáni kérdőívet.",                        href: "/followups" },
+    { type: NotificationType.VOLUNTEER_APPROVED,    title: "Önkéntes kérelmét elfogadták",   body: "Sikeresen csatlakoztál az önkéntes csapathoz!",                              href: "/volunteers" },
+    { type: NotificationType.INVENTORY_LOW_STOCK,   title: "Alacsony készletszint!",          body: "Egy vagy több készlettétel elérte a minimális szintet.",                     href: "/dashboard/inventory" },
+  ];
+  const notifRows: { userId: string; type: NotificationType; title: string; body: string; href: string | null; readAt: Date | null }[] = [];
+  for (const user of demoUsers.slice(0, 50)) {
+    for (let i = 0; i < rndInt(3, 6); i++) {
+      const tmpl = rnd(NOTIF_POOL);
+      notifRows.push({ userId: user.id, type: tmpl.type, title: tmpl.title, body: tmpl.body, href: tmpl.href, readAt: rndBool(0.55) ? new Date(Date.now() - rndInt(1, 30) * 86_400_000) : null });
+    }
+  }
+  for (let i = 0; i < notifRows.length; i += BATCH) await prisma.notification.createMany({ data: notifRows.slice(i, i + BATCH) });
+  console.log(`✅ ${notifRows.length} értesítés`);
 
   // ── Összefoglalás ─────────────────────────────────
   const [uCount, sCount, aCount] = await Promise.all([

@@ -1,27 +1,70 @@
-import type { Metadata } from "next";
-import { Link } from "@/i18n/navigation";
-import {
-  PawPrint, Search, FileText, Heart, Bell, Building2,
-  CreditCard, Upload, MessageCircle, ChevronRight, Users,
-} from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Útmutató",
-  description: "Hogyan működik az ÁllatiMenhelyek.hu platform – lépésről lépésre.",
-};
+import { useState } from "react";
+import Link from "next/link";
+import {
+  PawPrint, Search, FileText, Heart, Bell, Building2, CreditCard, Upload,
+  MessageCircle, ChevronRight, Users, CalendarDays, HandHeart, Package,
+  ListChecks, BarChart2, Settings, ShieldCheck, AlertTriangle, CheckCircle2,
+  Clock, ArrowDownCircle, ArrowUpCircle, RotateCcw, Info,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// ── Types & primitives ────────────────────────────────────────────────────
+
+type TabId = "user" | "admin" | "superadmin";
+
+interface TocItem { id: string; label: string; icon: React.ElementType }
+
+const TABS: { id: TabId; label: string; icon: React.ElementType; color: string }[] = [
+  { id: "user",       label: "Sima felhasználó",  icon: Users,       color: "text-brand-600 border-brand-500 bg-brand-50" },
+  { id: "admin",      label: "Menhely admin",       icon: Building2,   color: "text-emerald-700 border-emerald-500 bg-emerald-50" },
+  { id: "superadmin", label: "Super admin",          icon: ShieldCheck, color: "text-violet-700 border-violet-500 bg-violet-50" },
+];
+
+const TOC_USER: TocItem[] = [
+  { id: "u-orokbefogadas", label: "Örökbefogadás menete",    icon: PawPrint       },
+  { id: "u-kerelem",       label: "Kérelmeim kezelése",       icon: FileText       },
+  { id: "u-ertesitesek",   label: "Értesítések",              icon: Bell           },
+  { id: "u-idopontok",     label: "Időpontfoglalás",          icon: CalendarDays   },
+  { id: "u-onkentesseg",   label: "Önkéntesség",              icon: HandHeart      },
+  { id: "u-utankovetes",   label: "Utánkövetés",              icon: ListChecks     },
+  { id: "u-adomanyozas",   label: "Adományozás",              icon: Heart          },
+  { id: "u-bejelentes",    label: "Kóbor állat bejelentése",  icon: Bell           },
+  { id: "u-uzenetek",      label: "Üzenetváltás",             icon: MessageCircle  },
+];
+
+const TOC_ADMIN: TocItem[] = [
+  { id: "a-attekinto",    label: "Dashboard áttekintő",     icon: BarChart2    },
+  { id: "a-allatok",      label: "Állatok kezelése",         icon: PawPrint     },
+  { id: "a-kerelmek",     label: "Kérelmek kezelése",        icon: FileText     },
+  { id: "a-idopontok",    label: "Időpontok kezelése",       icon: CalendarDays },
+  { id: "a-onkentesek",   label: "Önkéntesek kezelése",      icon: HandHeart    },
+  { id: "a-keszlet",      label: "Készletkezelés",           icon: Package      },
+  { id: "a-ertesitesek",  label: "Értesítések és riasztások", icon: Bell        },
+  { id: "a-utankovetes",  label: "Utánkövetések",            icon: ListChecks   },
+  { id: "a-adomanyok",    label: "Adományok és kampányok",   icon: Heart        },
+  { id: "a-elemzesek",    label: "Elemzések (Analytics)",   icon: BarChart2    },
+  { id: "a-beallitasok",  label: "Menhely beállításai",      icon: Settings     },
+];
+
+const TOC_SUPER: TocItem[] = [
+  { id: "s-platform",     label: "Platform menedzsment",  icon: ShieldCheck  },
+  { id: "s-jovahagyasok", label: "Jóváhagyások",           icon: CheckCircle2 },
+  { id: "s-menhelyek",    label: "Menhelyek kezelése",      icon: Building2    },
+  { id: "s-elemzesek",    label: "Teljes analitika",        icon: BarChart2    },
+];
+
+// ── Reusable layout components ────────────────────────────────────────────
 
 function Section({ id, icon: Icon, title, color, children }: {
-  id:       string;
-  icon:     React.ElementType;
-  title:    string;
-  color:    string;
-  children: React.ReactNode;
+  id: string; icon: React.ElementType; title: string; color: string; children: React.ReactNode;
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <div className={`mb-6 flex items-center gap-3 rounded-2xl ${color} px-6 py-4`}>
-        <Icon className="h-6 w-6 shrink-0" />
-        <h2 className="text-xl font-bold">{title}</h2>
+      <div className={cn("mb-5 flex items-center gap-3 rounded-2xl px-5 py-4", color)}>
+        <Icon className="h-5 w-5 shrink-0" />
+        <h2 className="text-lg font-bold">{title}</h2>
       </div>
       <div className="space-y-4 px-1">{children}</div>
     </section>
@@ -31,328 +74,743 @@ function Section({ id, icon: Icon, title, color, children }: {
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-4">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">
-        {n}
-      </div>
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">{n}</div>
       <div>
-        <p className="font-semibold text-gray-800">{title}</p>
+        <p className="font-semibold text-gray-800 text-sm">{title}</p>
         <p className="mt-0.5 text-sm text-gray-500 leading-relaxed">{children}</p>
       </div>
     </div>
   );
 }
 
-function Card({ icon: Icon, title, href }: { icon: React.ElementType; title: string; href: string }) {
+function Note({ type = "info", children }: { type?: "info" | "warn" | "tip"; children: React.ReactNode }) {
+  const styles = {
+    info: "bg-blue-50 border-blue-100 text-blue-800",
+    warn: "bg-amber-50 border-amber-100 text-amber-800",
+    tip:  "bg-brand-50 border-brand-100 text-brand-800",
+  };
+  const icons = { info: Info, warn: AlertTriangle, tip: PawPrint };
+  const Icon = icons[type];
   return (
-    <Link
-      href={href}
-      className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:border-brand-200 hover:shadow-md transition-all"
-    >
+    <div className={cn("flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm", styles[type])}>
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+      <span className="leading-relaxed">{children}</span>
+    </div>
+  );
+}
+
+function QuickLink({ icon: Icon, label, href }: { icon: React.ElementType; label: string; href: string }) {
+  return (
+    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm hover:border-brand-200 hover:shadow-md transition-all">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50">
-          <Icon className="h-5 w-5 text-brand-600" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50">
+          <Icon className="h-4 w-4 text-brand-600" />
         </div>
-        <span className="text-sm font-medium text-gray-700">{title}</span>
+        <span className="text-sm font-medium text-gray-700">{label}</span>
       </div>
       <ChevronRight className="h-4 w-4 text-gray-400" />
     </Link>
   );
 }
 
-const TOC = [
-  { id: "orokbefogadas", label: "Örökbefogadás menete",    icon: PawPrint   },
-  { id: "kerelem",       label: "Kérelem küldése",          icon: FileText   },
-  { id: "bejelentes",    label: "Kóbor állat bejelentése",  icon: Bell       },
-  { id: "adomanyozas",   label: "Adományozás és előfizetés", icon: Heart     },
-  { id: "uzenetek",      label: "Üzenetváltás",             icon: MessageCircle },
-  { id: "menhely",       label: "Menhelyeknek",             icon: Building2  },
-  { id: "iratok",        label: "Iratok és dokumentumok",   icon: Upload     },
-  { id: "fizetes",       label: "Fizetési beállítások",     icon: CreditCard },
-];
+function Badge({ label, color }: { label: string; color: string }) {
+  return <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", color)}>{label}</span>;
+}
+
+// ── Content sections ──────────────────────────────────────────────────────
+
+function UserContent() {
+  return (
+    <div className="space-y-10">
+
+      {/* Örökbefogadás */}
+      <Section id="u-orokbefogadas" icon={PawPrint} title="Örökbefogadás menete" color="bg-brand-50 text-brand-800">
+        <div className="space-y-4">
+          <Step n={1} title="Böngéssz az állatok között">
+            Nyisd meg az <strong>Állatok</strong> oldalt és szűrj faj, méret, kor, helyszín alapján.
+            Minden állatnál megtalálod a részletes leírást, fotókat, egészségügyi adatokat (oltott, ivartalanított, mikrochipes).
+          </Step>
+          <Step n={2} title="Nézd meg a menhely profilját">
+            Az állat oldalán kattints a menhely nevére. Ott láthatod az örökbefogadási feltételeket,
+            értékeléseket, és felveheted a kapcsolatot kérelem beadása előtt.
+          </Step>
+          <Step n={3} title="Regisztrálj / Jelentkezz be">
+            A kérelem beadásához fiók szükséges. A regisztráció ingyenes, e-mailben visszaigazolják.
+          </Step>
+          <Step n={4} title="Küldj örökbefogadási kérelmet">
+            Az állat oldalán kattints az <strong>„Örökbefogadási kérelem"</strong> gombra.
+            Töltsd ki az adatlapot (lakókörülmények, tapasztalat, háztartás). Minél részletesebb, annál jobb.
+          </Step>
+          <Step n={5} title="Kövesd a kérelem állapotát">
+            A <strong>Kérelmeim</strong> oldalon követheted a folyamatot: <Badge label="Folyamatban" color="bg-yellow-100 text-yellow-700" />,
+            {" "}<Badge label="Értékelés alatt" color="bg-blue-100 text-blue-700" />,
+            {" "}<Badge label="Jóváhagyva" color="bg-green-100 text-green-700" />,
+            {" "}<Badge label="Elutasítva" color="bg-red-100 text-red-700" />.
+            Minden változásról értesítést kapsz.
+          </Step>
+          <Step n={6} title="Személyes látogatás és átvétel">
+            Jóváhagyás után a menhely időpontot egyeztet veled az állat személyes megtekintésére,
+            majd az átvételre. Az időpontot a platformon is le lehet foglalni.
+          </Step>
+        </div>
+        <Note type="tip">Üzenj a menhelynek az üzenetrendszeren keresztül, ha kérdésed van az állat kapcsán — még a kérelem beadása előtt.</Note>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <QuickLink icon={PawPrint} label="Állatok böngészése" href="/animals" />
+          <QuickLink icon={FileText} label="Kérelmeim" href="/applications" />
+        </div>
+      </Section>
+
+      {/* Kérelmeim */}
+      <Section id="u-kerelem" icon={FileText} title="Kérelmeim kezelése" color="bg-blue-50 text-blue-800">
+        <div className="space-y-4">
+          <Step n={1} title="Kérelem visszavonása">
+            Amíg a kérelem <Badge label="Folyamatban" color="bg-yellow-100 text-yellow-700" /> státuszban van,
+            a Kérelmeim oldalon visszavonhatod. Visszavont kérelem nem nyitható meg újra.
+          </Step>
+          <Step n={2} title="Egyidejű kérelmek">
+            Egyszerre több menhelyhez is adhatnak be kérelmet, de egy adott állathoz csak egyet.
+            Ha jóváhagyást kapsz az egyiken, a többi automatikusan lejár.
+          </Step>
+          <Step n={3} title="Menhely megjegyzése">
+            Elutasítás esetén a menhely indoklást fűzhet a döntéséhez. Ez az üzeneteid között jelenik meg.
+          </Step>
+        </div>
+        <Note type="info">A kérelem adatai (lakókörülmények, tapasztalat) bizalmasan kezeltek – csak a menhely adminjei látják.</Note>
+      </Section>
+
+      {/* Értesítések */}
+      <Section id="u-ertesitesek" icon={Bell} title="Értesítések" color="bg-amber-50 text-amber-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A platform automatikusan értesít az összes fontos eseményről. Az értesítések a fejlécben a csengő ikon mellett jelennek meg.
+        </p>
+        <div className="mt-4 space-y-3 rounded-xl border border-gray-100 bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Mit vált ki értesítést?</p>
+          {[
+            { icon: CheckCircle2, color: "text-green-500", label: "Kérelmed jóváhagyták" },
+            { icon: Info,         color: "text-blue-500",  label: "Kérelmed elbírálás alatt van" },
+            { icon: CalendarDays, color: "text-brand-500", label: "Időpontod visszaigazolták" },
+            { icon: MessageCircle,color: "text-purple-500",label: "Új üzeneted érkezett" },
+            { icon: ListChecks,   color: "text-orange-500",label: "Utánkövetési kérdőív esedékes" },
+            { icon: HandHeart,    color: "text-pink-500",  label: "Önkéntes kérelmét jóváhagyták" },
+          ].map(({ icon: Icon, color, label }) => (
+            <div key={label} className="flex items-center gap-2.5 text-sm text-gray-700">
+              <Icon className={cn("h-4 w-4 shrink-0", color)} />
+              {label}
+            </div>
+          ))}
+        </div>
+        <div className="space-y-4 mt-4">
+          <Step n={1} title="Értesítések megtekintése">
+            Kattints a fejléc csengő ikonjára. Az olvasatlan értesítések száma pirossal jelenik meg.
+            Egy értesítésre kattintva az érintett oldalra navigál.
+          </Step>
+          <Step n={2} title="Értesítések olvasottnak jelölése">
+            Az összes értesítés olvasottnak jelölhető egyszerre a „Mind olvasva" gombbal, vagy egyenként.
+          </Step>
+        </div>
+        <Note type="info">E-mail értesítők is küldésre kerülnek a fontos eseményekről (jóváhagyás, elutasítás, üzenet). Az e-mail küldés a menhely e-mail beállításaitól függ.</Note>
+      </Section>
+
+      {/* Időpontfoglalás */}
+      <Section id="u-idopontok" icon={CalendarDays} title="Időpontfoglalás" color="bg-sky-50 text-sky-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Meglátogathatod a menhelyet és személyesen megismerheted az állat(oka)t, mielőtt kérelmet adsz be.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Időpont kérése">
+            A menhely profiloldalán vagy egy állat részleteknél kattints az <strong>„Időpontfoglalás"</strong> gombra.
+            Add meg a kívánt dátumot és időpontot, írd le a célod (pl. „Bodrit szeretném megismerni").
+          </Step>
+          <Step n={2} title="Visszaigazolás várása">
+            A menhely adminisztrátor megerősíti, módosítja vagy visszautasítja az időpontot.
+            Visszaigazolásról <Badge label="Időpontja visszaigazolva" color="bg-green-100 text-green-700" /> értesítést kapsz.
+          </Step>
+          <Step n={3} title="Időpontjaim megtekintése">
+            Minden foglalásod az <strong>Időpontjaim</strong> oldalon látható státusszal:
+            <Badge label="Függőben" color="bg-yellow-100 text-yellow-700 mx-1" />,
+            <Badge label="Visszaigazolva" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Teljesítve" color="bg-blue-100 text-blue-700 mx-1" />,
+            <Badge label="Lemondva" color="bg-red-100 text-red-700 mx-1" />.
+          </Step>
+          <Step n={4} title="Lemondás">
+            A visszaigazolt időpontot a <strong>Időpontjaim</strong> oldalon mondhatod le. Kérlek a menhely
+            munkaterhelésére való tekintettel legalább 24 órával korábban tedd meg.
+          </Step>
+        </div>
+        <QuickLink icon={CalendarDays} label="Időpontjaim" href="/appointments" />
+      </Section>
+
+      {/* Önkéntesség */}
+      <Section id="u-onkentesseg" icon={HandHeart} title="Önkéntesség" color="bg-pink-50 text-pink-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Ha szeretnél rendszeresen segíteni egy menhelynek, önkéntesnek jelentkezhetsz. Az önkéntesek
+          sétáltatnak, szocializálnak, segítenek rendezvényeken vagy adminisztrációban.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Jelentkezés">
+            A menhely profiloldalán kattints az <strong>„Önkéntesnek jelentkezem"</strong> gombra.
+            Add meg a motivációdat, képességeidet és mikor érsz rá. Minél részletesebb, annál jobb.
+          </Step>
+          <Step n={2} title="Jóváhagyás">
+            A menhely admin átnézi a kérelmedet és jóváhagyja vagy elutasítja.
+            Jóváhagyásról <Badge label="Önkéntes kérelme elfogadva" color="bg-green-100 text-green-700" /> értesítést kapsz.
+          </Step>
+          <Step n={3} title="Feladatok megtekintése">
+            Aktív önkéntesként látod a menhely meghirdetett feladatait az <strong>Önkéntességem</strong> oldalon.
+            Feladatra feljelentkezés után a menhely látja a részvételed.
+          </Step>
+          <Step n={4} title="Jelenléti napló">
+            Minden alkalom után a menhely rögzíti a jelenlétedet és az eltöltött órákat. A saját statisztikád az önkéntesség oldalon látható.
+          </Step>
+        </div>
+        <Note type="tip">Egy fiókkal több menhelyen is önkénteskedhetsz – minden menhelynél külön státusszal.</Note>
+        <QuickLink icon={HandHeart} label="Önkéntességem" href="/volunteers" />
+      </Section>
+
+      {/* Utánkövetés */}
+      <Section id="u-utankovetes" icon={ListChecks} title="Utánkövetés örökbefogadás után" color="bg-orange-50 text-orange-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Az örökbefogadás után a menhely rövid utánkövetési kérdőíveket küld, hogy megbizonyosodjon
+          az állat jóllétéről az új otthonban.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Mikor kapok kérdőívet?">
+            Az első utánkövetés általában 30 nappal az örökbefogadás után esedékes, majd 90 nappal.
+            Ha esedékessé válik, <Badge label="Utánkövetési kérdőív esedékes" color="bg-orange-100 text-orange-700" /> értesítést kapsz.
+          </Step>
+          <Step n={2} title="Kitöltés">
+            Az <strong>Utánkövetéseim</strong> oldalon töltsd ki: adj 1–5 csillagos értékelést az állat közérzetéről,
+            és írj rövid szöveges megjegyzést (opcionális: fotó feltöltése).
+          </Step>
+          <Step n={3} title="Lejárt kérdőív">
+            Ha a határidő elmúlt és még nem töltötted ki, az állapot <Badge label="Lejárt" color="bg-red-100 text-red-700" /> lesz.
+            Ettől függetlenül ki lehet tölteni utólag is.
+          </Step>
+        </div>
+        <QuickLink icon={ListChecks} label="Utánkövetéseim" href="/followups" />
+      </Section>
+
+      {/* Adományozás */}
+      <Section id="u-adomanyozas" icon={Heart} title="Adományozás és előfizetés" color="bg-rose-50 text-rose-800">
+        <div className="space-y-4">
+          <Step n={1} title="Egyszeri adomány – Kampányok">
+            A <strong>Támogatás</strong> oldalon böngészheted az aktív kampányokat. Válassz egyet, add meg
+            az összeget (minimum 175 Ft) és fizess bankkártyával Stripe-on keresztül.
+          </Step>
+          <Step n={2} title="Havi előfizetés">
+            A menhely profilján válaszd ki az előfizetési csomagot (pl. Barát: 2 500 Ft/hó).
+            Az összeg havonta automatikusan levonódik. Bármikor lemondható a Profilodban.
+          </Step>
+          <Step n={3} title="Előfizetés lemondása">
+            Profil → Előfizetéseim → Lemondás. A már kifizetett hónap végéig aktív marad.
+          </Step>
+        </div>
+        <Note type="info">Minden fizetés biztonságos Stripe-on keresztül zajlik. Kártyaadataidat soha nem tároljuk.</Note>
+      </Section>
+
+      {/* Bejelentés */}
+      <Section id="u-bejelentes" icon={Bell} title="Kóbor állat bejelentése" color="bg-orange-50 text-orange-800">
+        <div className="space-y-4">
+          <Step n={1} title="Bejelentés indítása">
+            A <strong>Bejelentések</strong> menüpontban kattints az „Új bejelentés" gombra.
+            Válaszd ki a típust: Elveszett / Megtalált / Kóbor.
+          </Step>
+          <Step n={2} title="Adatok megadása">
+            Adj meg annyit, amennyit tudsz: faj, szín, helyszín, leírás.
+            Töltsd fel a fotót – ez a legfontosabb a megtaláláshoz.
+          </Step>
+          <Step n={3} title="Bejelentés kezelése">
+            Ha valaki ráismer az állatodra, üzenetet tud küldeni. Ha megoldódott, zárd le a bejelentést.
+          </Step>
+        </div>
+        <Note type="tip">A bejelentés regisztráció nélkül is benyújtható!</Note>
+      </Section>
+
+      {/* Üzenetek */}
+      <Section id="u-uzenetek" icon={MessageCircle} title="Üzenetváltás" color="bg-purple-50 text-purple-800">
+        <div className="space-y-4">
+          <Step n={1} title="Üzenet küldése">
+            Egy állat profiloldalán kattints az <strong>„Üzenet a menhelynek"</strong> gombra.
+            A beszélgetés megjelenik az Üzeneteim oldalon.
+          </Step>
+          <Step n={2} title="Olvasatlan üzenetek">
+            Az olvasatlan üzenetek száma pirossal jelenik meg a fejlécben az üzenet ikonjánál.
+            Minden új üzenetről értesítést kapsz.
+          </Step>
+          <Step n={3} title="Csatolt fájlok">
+            Üzenetekbe PDF-et, képet (max. 10 MB) is csatolhatsz.
+            Például orvosi igazolást, vagy kérdőív-kitöltési segítséget.
+          </Step>
+        </div>
+        <QuickLink icon={MessageCircle} label="Üzeneteim" href="/messages" />
+      </Section>
+
+    </div>
+  );
+}
+
+function AdminContent() {
+  return (
+    <div className="space-y-10">
+
+      {/* Dashboard áttekintő */}
+      <Section id="a-attekinto" icon={BarChart2} title="Dashboard áttekintő" color="bg-emerald-50 text-emerald-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Bejelentkezés után az Admin dashboardon rögtön látod a legfontosabb mutatókat: aktív állatok száma,
+          beérkező kérelmek, közelgő időpontok, alacsony készletriasztások és az analitikai panelek.
+        </p>
+        <div className="mt-3 space-y-4">
+          <Step n={1} title="KPI kártyák">
+            A tetején láthatók az összesített számok: összes állat, aktuálisan elérhető, örökbefogadásra váró kérelmek, aktív önkéntesek.
+          </Step>
+          <Step n={2} title="Analytics panelek (UC-01–04)">
+            Görögj le az Elemzések szekcióhoz: örökbefogadási trend havi bontásban, kapacitáskihasználtság,
+            bejelentési statisztikák, visszakerülési ráta. A szűrővel menhelyt választhatsz.
+          </Step>
+          <Step n={3} title="Gyors navigáció">
+            A bal oldalsáv minden szekciót tartalmaz. Az értesítések csengője és a bejövő üzenetek ikonja
+            a fejlécben mindig látható.
+          </Step>
+        </div>
+      </Section>
+
+      {/* Állatok kezelése */}
+      <Section id="a-allatok" icon={PawPrint} title="Állatok kezelése" color="bg-brand-50 text-brand-800">
+        <div className="space-y-4">
+          <Step n={1} title="Új állat hozzáadása">
+            Dashboard → Állatok → <strong>„Állat hozzáadása"</strong>. Töltsd ki az adatokat (faj, fajta, kor, súly, leírás),
+            töltsd fel a fotókat (min. 1, max. 6), jelöld az egészségügyi adatokat. Az állat azonnal megjelenik a listán.
+          </Step>
+          <Step n={2} title="Státusz frissítése">
+            Állat szerkesztésénél változtasd meg a státuszt:
+            <Badge label="Elérhető" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Függőben" color="bg-yellow-100 text-yellow-700 mx-1" />,
+            <Badge label="Örökbefogadva" color="bg-blue-100 text-blue-700 mx-1" />,
+            <Badge label="Átmeneti gondozás" color="bg-purple-100 text-purple-700 mx-1" />,
+            <Badge label="Állatorvosi megfigyelés" color="bg-red-100 text-red-700 mx-1" />.
+          </Step>
+          <Step n={3} title="Egészségügyi bejegyzések">
+            Az állat részletes oldalán az „Egészségügyi napló" szekciónál adhatod hozzá a bejegyzéseket:
+            oltás, féregtelenítés, kezelés, állatorvosi vizit. Minden bejegyzéshez megadható az állatorvos neve és a következő esedékesség dátuma.
+          </Step>
+          <Step n={4} title="Dokumentumok feltöltése">
+            Az állat profiljánál az Iratok fülön feltölthetsz PDF dokumentumokat (oltási könyv, ivartalanítási igazolás, stb.).
+          </Step>
+        </div>
+        <Note type="tip">A jó leírás és minőségi fotók szignifikánsan növelik az örökbefogadás esélyét.</Note>
+      </Section>
+
+      {/* Kérelmek */}
+      <Section id="a-kerelmek" icon={FileText} title="Kérelmek kezelése" color="bg-blue-50 text-blue-800">
+        <div className="space-y-4">
+          <Step n={1} title="Beérkező kérelmek">
+            Dashboard → Kérelmek. Az összes beérkező kérelem listázódik, láthatod a kérelmező nevét, az állatot
+            és a benyújtás idejét. Kérelmező profiljára kattintva megtekintheted az értékeléseit is.
+          </Step>
+          <Step n={2} title="Státusz kezelés">
+            Kérelem részletesén: Módosítsd a státuszt Értékelés alatt → Jóváhagyva / Elutasítva.
+            Megjegyzést is hozzáfűzhetsz az elutasítás okáról. A kérelmező azonnal értesítést kap.
+          </Step>
+          <Step n={3} title="Kérvény sablon (Application Form)">
+            Dashboard → Kérvény sablonok → Új sablon. Készíthetsz egyedi kérdőívet az örökbefogadóknak
+            (szöveges mezők, fájl feltöltés). A sablon jóváhagyás után rendelhető hozzá állathoz.
+          </Step>
+          <Step n={4} title="Meghívó link küldése">
+            Kérelem részletesén küldhetsz meghívó linket közvetlenül egy érdeklődőnek —
+            a link automatikus kérelmet nyit meg a megadott állathoz.
+          </Step>
+        </div>
+      </Section>
+
+      {/* Időpontok */}
+      <Section id="a-idopontok" icon={CalendarDays} title="Időpontok kezelése" color="bg-sky-50 text-sky-800">
+        <div className="space-y-4">
+          <Step n={1} title="Bejövő kérések">
+            Dashboard → Időpontok. Az összes foglalási kérés látható
+            <Badge label="Függőben" color="bg-yellow-100 text-yellow-700 mx-1" /> státusszal.
+            Minden kérésnél látod a kért időpontot, az érintett állatot és a felhasználó üzenetét.
+          </Step>
+          <Step n={2} title="Visszaigazolás / Módosítás">
+            Kattints a kérésre, és erősítsd vissza az időpontot (esetleg módosítsd a dátumot),
+            adj admin megjegyzést (pl. „Szombaton 10:00 rendben"). A felhasználó értesítést kap.
+          </Step>
+          <Step n={3} title="Lemondás és lezárás">
+            Ha az időpont megtörtént, jelöld <Badge label="Teljesítve" color="bg-blue-100 text-blue-700" /> státuszba.
+            Lemondható az időpont is — ebben az esetben adj indoklást (a felhasználó megkapja üzenetben).
+          </Step>
+        </div>
+        <Note type="warn">A visszaigazolt időpontok után a felhasználó kötelező érvényűnek tekinti — ha le kell mondani, értesítsd időben.</Note>
+      </Section>
+
+      {/* Önkéntesek */}
+      <Section id="a-onkentesek" icon={HandHeart} title="Önkéntesek kezelése" color="bg-pink-50 text-pink-800">
+        <div className="space-y-4">
+          <Step n={1} title="Kérelmek jóváhagyása">
+            Dashboard → Önkéntesek → Függőben lévők tab. Olvasd el a motivációt és képességeket,
+            majd fogadd el vagy utasítsd el a kérelmet. A felhasználó értesítést kap.
+          </Step>
+          <Step n={2} title="Feladatok meghirdetése">
+            Önkéntesek → <strong>„Új feladat"</strong>. Add meg a feladat nevét, leírását,
+            időpontját és a max. létszámot. Az aktív önkéntesek látják és feljelentkezhetnek.
+          </Step>
+          <Step n={3} title="Jelenléti napló rögzítése">
+            Az önkéntes sorában kattints a + Jelenlét gombra. Add meg a dátumot,
+            az eltöltött órákat és egy rövid megjegyzést (pl. „Sétáltatás, takarítás").
+          </Step>
+          <Step n={4} title="Inaktívvá tétel">
+            Ha egy önkéntes már nem aktív, módosítsd az állapotát
+            <Badge label="Inaktív" color="bg-gray-100 text-gray-600 mx-1" /> státuszba.
+            Így nem jelenik meg a feladatoknál, de az adatai megmaradnak.
+          </Step>
+        </div>
+      </Section>
+
+      {/* Készletkezelés */}
+      <Section id="a-keszlet" icon={Package} title="Készletkezelés" color="bg-teal-50 text-teal-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A menhelyen nyilvántarthatod a takarmány-, gyógyszer-, kellék- és eszközkészletet.
+          A rendszer figyeli a minimális szintet és a lejárati dátumokat.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Új tétel felvétele">
+            Dashboard → Készlet → <strong>„Tétel hozzáadása"</strong>.
+            Add meg a nevet, kategóriát (Takarmány / Gyógyszer / Kellékek / Tisztítószer / Eszköz / Egyéb),
+            mértékegységet (kg, liter, db, tabletta stb.), nyitókészletet és opcionálisan a minimum szintet és a lejárati dátumot.
+          </Step>
+          <Step n={2} title="Mozgás rögzítése (IN / OUT / ADJUST)">
+            A tétel sorában kattints a <strong>„Mozgás"</strong> gombra, vagy nyisd meg a részleteket:
+            <ul className="mt-2 ml-3 space-y-1 text-xs text-gray-500 list-disc">
+              <li><span className="flex items-center gap-1 inline-flex"><ArrowDownCircle className="h-3.5 w-3.5 text-green-500" /> <strong>Bevételezés (IN)</strong></span> — készletre vett mennyiség (pl. szállítmány érkezett)</li>
+              <li><span className="flex items-center gap-1 inline-flex"><ArrowUpCircle className="h-3.5 w-3.5 text-red-500" /> <strong>Felhasználás (OUT)</strong></span> — kivett mennyiség (pl. heti adagolás); ha kevesebb a készlet, mint a kivét, a rendszer hibaüzenetet ad</li>
+              <li><span className="flex items-center gap-1 inline-flex"><RotateCcw className="h-3.5 w-3.5 text-blue-500" /> <strong>Leltári korrekció (ADJUST)</strong></span> — beállítja a tényleges darabszámot; a rendszer kiszámolja az eltérést</li>
+            </ul>
+          </Step>
+          <Step n={3} title="Riasztások értelmezése">
+            A Készlet főoldalon piros badge jelzi az alacsony készletet (jelenlegi &lt; minimum),
+            sárga badge a hamarosan lejáró tételt (7 napon belül). Ezekhez automatikus push-értesítés is küldésre kerül a menhely adminoknak.
+          </Step>
+          <Step n={4} title="Mozgástörténet">
+            Minden tétel részletoldalán megtalálható a teljes mozgástörténet (ki, mikor, mennyit rögzített),
+            így bármikor ellenőrizhető a nyilvántartás pontossága.
+          </Step>
+          <Step n={5} title="Szerkesztés és törlés">
+            Szerkesztéssel módosíthatók a metaadatok (név, minimum, lejárat, megjegyzés),
+            de a tényleges mennyiség csak mozgás rögzítésével változtatható. Törléskor a mozgástörténet is elvész.
+          </Step>
+        </div>
+        <Note type="warn">A lejárati dátum riasztás csak akkor küldődik, ha egy mozgást rögzítesz az adott tétel kapcsán. Időszakos leltározást javasolt végezni ADJUST típusú korrekciókkal.</Note>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <QuickLink icon={Package} label="Készlet" href="/dashboard/inventory" />
+          <QuickLink icon={Package} label="Új tétel" href="/dashboard/inventory/new" />
+        </div>
+      </Section>
+
+      {/* Értesítések admin */}
+      <Section id="a-ertesitesek" icon={Bell} title="Értesítések és riasztások" color="bg-amber-50 text-amber-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Az admin a saját menhelyére vonatkozó összes fontos eseményről értesítést kap.
+        </p>
+        <div className="mt-3 space-y-3 rounded-xl border border-gray-100 bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Admin értesítések típusai</p>
+          {[
+            { icon: FileText,     color: "text-blue-500",   label: "Új örökbefogadási kérelem érkezett" },
+            { icon: CalendarDays, color: "text-sky-500",    label: "Új időpontfoglalási kérés" },
+            { icon: HandHeart,    color: "text-pink-500",   label: "Új önkéntes kérelmezte" },
+            { icon: Package,      color: "text-red-500",    label: "Alacsony készletszint (ha minimum be van állítva)" },
+            { icon: Clock,        color: "text-amber-500",  label: "Készlettétel hamarosan lejár (7 napon belül)" },
+            { icon: Heart,        color: "text-rose-500",   label: "Új adomány érkezett" },
+            { icon: MessageCircle,color: "text-purple-500", label: "Új üzenet a felhasználótól" },
+            { icon: ListChecks,   color: "text-orange-500", label: "Utánkövetés érkezett (az örökbefogadó kitöltötte)" },
+          ].map(({ icon: Icon, color, label }) => (
+            <div key={label} className="flex items-center gap-2.5 text-sm text-gray-700">
+              <Icon className={cn("h-4 w-4 shrink-0", color)} />
+              {label}
+            </div>
+          ))}
+        </div>
+        <div className="space-y-3 mt-4">
+          <Step n={1} title="Értesítések helye">
+            A fejléc csengő ikonjánál jelennek meg. A számlálón az olvasatlan értesítések darabszáma látható.
+            Egy értesítésre kattintva az érintett oldalra navigál (pl. Kérelmek, Készlet).
+          </Step>
+          <Step n={2} title="Riasztások kezelése">
+            Alacsony készlet riasztásnál navigálj a Készlet oldalra és rögzítsd a bevételezést, vagy módosítsd a minimum értéket.
+            Lejárati riasztásnál döntsd el, hogy felhasználod-e a tételt, vagy törölni kell.
+          </Step>
+        </div>
+      </Section>
+
+      {/* Utánkövetések */}
+      <Section id="a-utankovetes" icon={ListChecks} title="Utánkövetések kezelése" color="bg-orange-50 text-orange-800">
+        <div className="space-y-4">
+          <Step n={1} title="Automatikus ütemezés">
+            Amikor egy kérelmet <Badge label="Jóváhagyva" color="bg-green-100 text-green-700" /> státuszba helyezel,
+            a rendszer automatikusan ütemez két utánkövetési kérdőívet (30 és 90 napra).
+          </Step>
+          <Step n={2} title="Esedékes utánkövetések">
+            Dashboard → Utánkövetések. Látod az összes esedékes, teljesített és lejárt utánkövetést.
+            A lejártak piros jelzéssel kiemeltek — emlékeztetheted a felhasználót üzenet küldésével.
+          </Step>
+          <Step n={3} title="Kitöltött kérdőívek megtekintése">
+            Utánkövetés sorában kattints a részletekre. Látod a közérzet-értékelést (1–5 csillag),
+            a szöveges megjegyzést és az esetleg feltöltött fotót.
+          </Step>
+          <Step n={4} title="Manuális utánkövetés hozzáadása">
+            A kérelem részletoldalán lehetőség van manuálisan is hozzáadni utánkövetési rekordot
+            (pl. telefonos visszajelzés alapján).
+          </Step>
+        </div>
+      </Section>
+
+      {/* Adományok */}
+      <Section id="a-adomanyok" icon={Heart} title="Adományok és kampányok" color="bg-rose-50 text-rose-800">
+        <div className="space-y-4">
+          <Step n={1} title="Előfizetési csomagok létrehozása">
+            Dashboard → Előfizetési csomagok → Csomag hozzáadása.
+            Add meg a csomag nevét, leírását és összegét (minimum 175 Ft/hó).
+            Az aktív csomagok megjelennek a menhely publikus profilján.
+          </Step>
+          <Step n={2} title="Kampány indítása">
+            Dashboard → (Kampányok menü a navigációban). Új kampány célja, leírása, célosszege és
+            határideje adható meg. A kampány Super Admin jóváhagyás után válik aktívvá és publikusan elérhetővé.
+          </Step>
+          <Step n={3} title="Előfizetők listája">
+            Dashboard → Előfizetők. Látod az aktív előfizetőket, a csomag típusát és az előfizetés kezdetét.
+            Egyénileg nem módosítható — a felhasználó saját profilján mondhatja le.
+          </Step>
+          <Step n={4} title="Stripe Connect beállítása">
+            Dashboard → Menhely beállítások → Stripe fiók csatlakoztatása.
+            Ez szükséges az adományok fogadásához. Az összeg automatikusan a menhely bankszámlájára kerül
+            (4% platform kezelési díj levonásával).
+          </Step>
+        </div>
+      </Section>
+
+      {/* Elemzések */}
+      <Section id="a-elemzesek" icon={BarChart2} title="Elemzések (Analytics)" color="bg-indigo-50 text-indigo-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A dashboard alján négy analitikai panel segíti a döntéshozatalt:
+        </p>
+        <div className="mt-3 space-y-3 rounded-xl border border-gray-100 bg-white p-4 text-sm">
+          {[
+            { title: "UC-01 Örökbefogadási trend", desc: "Havi lebontásban mutatja, hány állat lett örökbe fogadva, fajonkénti bontásban. Területdiagram + fajta-donut." },
+            { title: "UC-02 Kapacitáskihasználtság", desc: "Menhelyenként mutatja az aktuális kihasználtságot a férőhelyek százalékában. Tartózkodási idő-histogram + SVG mérőóra." },
+            { title: "UC-03 Bejelentési statisztika", desc: "Elveszett/megtalált/kóbor bejelentések megoszlása és városonkénti eloszlás." },
+            { title: "UC-04 Visszakerülési ráta", desc: "Hány örökbefogadott állat kerül vissza. Lakástípus szerinti bontás és örökbefogadó-profil radarok." },
+          ].map(({ title, desc }) => (
+            <div key={title} className="border-b border-gray-50 last:border-0 pb-2 last:pb-0">
+              <p className="font-semibold text-gray-800">{title}</p>
+              <p className="text-gray-500 mt-0.5">{desc}</p>
+            </div>
+          ))}
+        </div>
+        <Note type="info">A Super Admin az összes menhely adatát együtt vagy külön-külön szűrheti. A Menhely Admin csak a saját menhelyét látja.</Note>
+      </Section>
+
+      {/* Beállítások */}
+      <Section id="a-beallitasok" icon={Settings} title="Menhely beállításai" color="bg-gray-50 text-gray-800">
+        <div className="space-y-4">
+          <Step n={1} title="Alap adatok">
+            Dashboard → Menhely beállítás: Cím, telefonszám, e-mail, weboldal, leírás és örökbefogadási feltételek szerkesztése.
+            A módosítások azonnal megjelennek a publikus profilon.
+          </Step>
+          <Step n={2} title="Logó és borítókép">
+            A beállítások oldalon tölthető fel logó és borítókép.
+            Javasolt méretek: logó 200×200 px, borítókép 1200×400 px.
+          </Step>
+          <Step n={3} title="Stripe Connect">
+            A Stripe fiók csatlakoztatása nélkül az adományok és előfizetések nem működnek.
+            Csatlakoztatás → Stripe onboarding felületen add meg a bankszámlát és cégadatokat.
+          </Step>
+          <Step n={4} title="Kapacitás beállítás">
+            Add meg a menhely tényleges férőhelyei számát — ez jelenik meg a kapacitáskihasználtság panelen (UC-02).
+          </Step>
+        </div>
+        <QuickLink icon={Settings} label="Menhely beállítások" href="/dashboard/settings" />
+      </Section>
+
+    </div>
+  );
+}
+
+function SuperAdminContent() {
+  return (
+    <div className="space-y-10">
+
+      {/* Platform menedzsment */}
+      <Section id="s-platform" icon={ShieldCheck} title="Platform menedzsment" color="bg-violet-50 text-violet-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A Super Admin a teljes platform felett rendelkezik: látja az összes menhelyt, felhasználót és tartalmat.
+          A dashboard szűrővel bármely menhely adatait megtekintheti.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Összes menhely kezelése">
+            Dashboard → Platform → Menhelyek. Látod a teljes listát (aktív, inaktív, hitelesített).
+            Bármelyik menhely oldalára navigálhatsz, megnyithatod a dashboardjukat szűrővel.
+          </Step>
+          <Step n={2} title="Menhely létrehozása">
+            A Menhelyek oldalon Super Adminként felvehetsz új menhelyt és kötheted össze a már regisztrált
+            SHELTER_ADMIN jogosultságú felhasználóval (ShelterAdmin kapcsolat).
+          </Step>
+          <Step n={3} title="Menhely hitelesítése">
+            A menhely profiljánál engedélyezheted vagy visszavonhatod a
+            <Badge label="Hitelesített" color="bg-green-100 text-green-700 mx-1" /> státuszt.
+            A hitelesített menhelyek külön jelzéssel jelennek meg a publikus listán.
+          </Step>
+          <Step n={4} title="Analytics összes menhelyre">
+            A dashboard Analytics szekciójában a Super Admin az összes menhelyre kiterjedő adatokat lát.
+            A menhely-jelölőnégyzetekkel szűkítheti az elemzést tetszőleges kombinációra.
+          </Step>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <QuickLink icon={Building2} label="Menhelyek (Platform)" href="/dashboard/shelters" />
+          <QuickLink icon={BarChart2} label="Dashboard" href="/dashboard" />
+        </div>
+      </Section>
+
+      {/* Jóváhagyások */}
+      <Section id="s-jovahagyasok" icon={CheckCircle2} title="Jóváhagyások" color="bg-blue-50 text-blue-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Két típusú tartalom kerül Super Admin jóváhagyásra: kampányok és kérvény sablonok (ApplicationForm).
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Kampányok jóváhagyása">
+            Dashboard → Jóváhagyások. A PENDING státuszú kampányok itt jelennek meg.
+            Olvasd el a kampány leírását és ellenőrizd a célt. Fogadd el (ACTIVE) vagy utasítsd el (REJECTED)
+            — a menhely adminisztrátora értesítést kap a döntésről.
+          </Step>
+          <Step n={2} title="Kérvény sablonok jóváhagyása">
+            Ugyanitt jelennek meg a PENDING_APPROVAL státuszú kérdőív-sablonok is.
+            Ellenőrizd a mezőket (nincs-e szenzitív vagy jogellenesen gyűjtött adat),
+            majd fogadd el vagy utasítsd el.
+          </Step>
+          <Step n={3} title="Értesítés a várakozókról">
+            Ha új jóváhagyásra váró elem érkezik, a Super Admin push-értesítést kap
+            <Badge label="Kampány jóváhagyásra vár" color="bg-yellow-100 text-yellow-700 mx-1" /> és
+            <Badge label="Sablon jóváhagyásra vár" color="bg-yellow-100 text-yellow-700" /> típussal.
+          </Step>
+        </div>
+        <QuickLink icon={CheckCircle2} label="Jóváhagyások" href="/dashboard/campaigns" />
+      </Section>
+
+      {/* Menhelyek kezelése */}
+      <Section id="s-menhelyek" icon={Building2} title="Menhelyek kezelése" color="bg-emerald-50 text-emerald-800">
+        <div className="space-y-4">
+          <Step n={1} title="Menhely profil szerkesztése">
+            A Super Admin bármely menhely adatait szerkesztheti (pl. helycím, kapacitás javítása),
+            ha az adminisztrátor nem elérhető.
+          </Step>
+          <Step n={2} title="Admin hozzárendelése">
+            A menhelyhez több SHELTER_ADMIN felhasználó rendelhető. Mindegyik teljes hozzáféréssel bír
+            az adott menhely dashboardjához.
+          </Step>
+          <Step n={3} title="Menhely deaktiválása">
+            Az isActive jelző kikapcsolásával a menhely eltűnik a publikus listáról,
+            de az adatok megmaradnak és az admin bejelentkezhet.
+          </Step>
+        </div>
+        <Note type="warn">A menhely törlése az összes kapcsolódó adatot (állatok, kérelmek, üzenetek, készlet) véglegesen törli. Inkább deaktiválást javasolt alkalmazni.</Note>
+      </Section>
+
+      {/* Elemzések */}
+      <Section id="s-elemzesek" icon={BarChart2} title="Teljes analitika" color="bg-indigo-50 text-indigo-800">
+        <div className="space-y-4">
+          <Step n={1} title="Összes menhely egyidőben">
+            A dashboard Analytics szekciójában alapértelmezetten az összes menhely adatai összesítve jelennek meg.
+            A szűrőpanelen pipáld ki/be az egyes menhelyeket.
+          </Step>
+          <Step n={2} title="ETL frissítés">
+            Az analitikai adatok az adattárházból (DWH) érkeznek. Az ETL-futtatással frissíthetők:
+            <code className="ml-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">POST /api/etl</code>
+            (védett endpoint, ETL_SECRET szükséges). Érdemes napi ütemezésbe tenni.
+          </Step>
+          <Step n={3} title="UC-01 – UC-04 értelmezése">
+            Lásd a Menhely Admin Analytics szekcióban a részletes magyarázatot.
+            Super Adminként az összes menhely cross-filter-ezhető.
+          </Step>
+        </div>
+      </Section>
+
+    </div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────
 
 export default function HelpPage() {
+  const [tab, setTab] = useState<TabId>("user");
+  const toc = tab === "user" ? TOC_USER : tab === "admin" ? TOC_ADMIN : TOC_SUPER;
+
   return (
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
-        <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6 text-center">
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600">
             <PawPrint className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900">Útmutató</h1>
-          <p className="mt-3 text-lg text-gray-500">
-            Minden, amit az ÁllatiMenhelyek.hu használatához tudni kell.
+          <h1 className="text-3xl font-bold text-gray-900">Ismerd meg a platformot</h1>
+          <p className="mt-2 text-gray-500">
+            Válaszd ki a szerepkörödet, és lépj tovább a vonatkozó útmutatóhoz.
           </p>
+
+          {/* Tab selector */}
+          <div className="mt-6 inline-flex gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all",
+                  tab === t.id ? t.color + " border shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                )}
+              >
+                <t.icon className="h-4 w-4" />
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
 
-          {/* Sidebar TOC */}
+          {/* Sticky TOC */}
           <aside className="lg:col-span-1">
             <div className="sticky top-24 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Tartalom</p>
-              <nav className="space-y-1">
-                {TOC.map(({ id, label, icon: Icon }) => (
-                  <a
-                    key={id}
-                    href={`#${id}`}
+              <nav className="space-y-0.5">
+                {toc.map(({ id, label, icon: Icon }) => (
+                  <a key={id} href={`#${id}`}
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-brand-50 hover:text-brand-700 transition-colors"
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {label}
+                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{label}</span>
                   </a>
                 ))}
               </nav>
             </div>
           </aside>
 
-          {/* Content */}
-          <div className="space-y-12 lg:col-span-3">
+          {/* Main content */}
+          <main className="lg:col-span-3">
+            {tab === "user"       && <UserContent />}
+            {tab === "admin"      && <AdminContent />}
+            {tab === "superadmin" && <SuperAdminContent />}
 
-            {/* Örökbefogadás */}
-            <Section id="orokbefogadas" icon={PawPrint} title="Örökbefogadás menete" color="bg-brand-50 text-brand-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Az örökbefogadás egy egyszerű, átlátható folyamat. Az alábbi lépéseket kell követned:
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Böngéssz az állatok között">
-                  Látogass el az <strong>Állatok</strong> oldalra és szűrj faj, méret, kor vagy
-                  helyszín alapján. Minden állatnál megtalálod a részletes leírást, fotókat és
-                  egészségügyi információkat (oltott, ivartalanított, mikrochipes).
-                </Step>
-                <Step n={2} title="Nézd meg a menhely oldalát">
-                  Az állat profilján megtalálod, melyik menhelyhez tartozik. A menhely oldalán
-                  megtudhatod az örökbefogadási feltételeket és az esetleges dokumentumokat.
-                </Step>
-                <Step n={3} title="Regisztrálj vagy jelentkezz be">
-                  Kérelem küldéséhez szükséges egy fiók. A regisztráció ingyenes – e-mail cím
-                  és jelszó, vagy Google/Facebook bejelentkezés.
-                </Step>
-                <Step n={4} title="Küldj örökbefogadási kérelmet">
-                  Az állat oldalán kattints az <strong>„Örökbefogadási kérelem"</strong> gombra,
-                  töltsd ki az adatlapot, és küldd el. A menhely e-mailben kap értesítést.
-                </Step>
-                <Step n={5} title="Várd meg a visszajelzést">
-                  A kérelem állapotát a <strong>Kérelmeimben</strong> követheted nyomon. A menhely
-                  jóváhagyás vagy elutasítás esetén e-mailben értesít.
-                </Step>
-                <Step n={6} title="Átvétel">
-                  Jóváhagyott kérelem után a menhely felveszi veled a kapcsolatot az állat
-                  átadásának megszervezéséhez.
-                </Step>
-              </div>
-              <div className="mt-6 rounded-xl bg-brand-50 border border-brand-100 p-4 text-sm text-brand-800">
-                <strong>Tipp:</strong> Üzenj a menhelynek az üzenetrendszeren keresztül,
-                ha kérdésed van az állat kapcsán, még kérelem beadása előtt.
-              </div>
-            </Section>
-
-            {/* Kérelem */}
-            <Section id="kerelem" icon={FileText} title="Kérelem küldése és kezelése" color="bg-blue-50 text-blue-800">
-              <div className="space-y-5">
-                <Step n={1} title="Kérelem beadása">
-                  Az állat profilján töltsd ki az örökbefogadási adatlapot: lakókörülmények,
-                  tapasztalat állatokkal, háztartás összetétele. Minél részletesebb, annál
-                  nagyobb az esélyünk.
-                </Step>
-                <Step n={2} title="Kérelem nyomon követése">
-                  A <Link href="/applications" className="text-blue-600 hover:underline">Kérelmeimben</Link> látod
-                  az összes benyújtott kérelmed és azok státuszát:
-                  <span className="ml-1 inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">Folyamatban</span>,
-                  <span className="ml-1 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Jóváhagyva</span>,
-                  <span className="ml-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">Elutasítva</span>.
-                </Step>
-                <Step n={3} title="Kérelem visszavonása">
-                  Amíg a kérelem <em>Folyamatban</em> státuszban van, vissza lehet vonni
-                  a Kérelmeim oldalon.
-                </Step>
-              </div>
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Card icon={FileText} title="Kérelmeim" href="/applications" />
-                <Card icon={Search}   title="Állatok böngészése" href="/animals" />
-              </div>
-            </Section>
-
-            {/* Bejelentés */}
-            <Section id="bejelentes" icon={Bell} title="Kóbor állat bejelentése" color="bg-orange-50 text-orange-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Ha elveszett, talált vagy veszélyeztetett állatot látsz, tegyél bejelentést –
-                regisztráció nélkül is!
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Menj a Bejelentések oldalra">
-                  Kattints a <Link href="/reports" className="text-orange-600 hover:underline">Bejelentések</Link> menüpontra
-                  a fejlécben.
-                </Step>
-                <Step n={2} title="Töltsd ki az adatlapot">
-                  Adj meg annyit amennyit tudsz: helyszín, leírás, fénykép. A pontos helyszín
-                  megjelölése sokat segít a megtalálásban.
-                </Step>
-                <Step n={3} title="Fénykép feltöltése">
-                  Tölts fel fotót az állatról – ez jelentősen növeli a megtalálás esélyét.
-                </Step>
-                <Step n={4} title="Üzenetváltás">
-                  Ha valaki ráismer az állatodra, üzenetet küldhet a bejelentésedre.
-                  E-mailben értesítünk.
-                </Step>
-              </div>
-            </Section>
-
-            {/* Adományozás */}
-            <Section id="adomanyozas" icon={Heart} title="Adományozás és előfizetés" color="bg-pink-50 text-pink-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                A menhelyeket egyszeri adománnyal vagy havi előfizetéssel is támogathatod.
-                A fizetés biztonságos Stripe-on keresztül történik.
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Egyszeri adomány – Kampányok">
-                  A <Link href="/donate" className="text-pink-600 hover:underline">Támogatás</Link> oldalon
-                  böngészheted az aktív kampányokat. Válassz egyet, add meg az összeget
-                  (minimum 175 Ft), és fizess bankkártyával. Az adomány közvetlenül a
-                  menhelyhez kerül (4% platform díj levonásával).
-                </Step>
-                <Step n={2} title="Havi előfizetés – Csomagok">
-                  A menhelyek oldalán előfizetési csomagokat találsz. Egy csomag kiválasztásával
-                  havonta automatikusan levonásra kerül az összeg. Az előfizetést bármikor
-                  lemondhatod a <Link href="/profile" className="text-pink-600 hover:underline">Profilodban</Link>.
-                </Step>
-                <Step n={3} title="Előfizetés lemondása">
-                  Profil → Előfizetéseim → Lemondás gomb. A már kifizetett időszak végéig
-                  az előfizetés aktív marad, utána automatikusan megszűnik.
-                </Step>
-              </div>
-              <div className="mt-5 rounded-xl bg-pink-50 border border-pink-100 p-4 text-sm text-pink-800">
-                <strong>Biztonság:</strong> Minden fizetés a Stripe biztonságos fizetési
-                rendszerén keresztül zajlik. Kártyaadataidat soha nem tároljuk.
-              </div>
-            </Section>
-
-            {/* Üzenetek */}
-            <Section id="uzenetek" icon={MessageCircle} title="Üzenetváltás" color="bg-purple-50 text-purple-800">
-              <div className="space-y-5">
-                <Step n={1} title="Üzenet küldése menhelynek">
-                  Az állat profilján, az örökbefogadási kérelem gomb mellett lehetőség van
-                  üzenetet küldeni a menhelynek. Kérdések, egyeztetések intézhetők itt.
-                </Step>
-                <Step n={2} title="Értesítések">
-                  Új üzenetnél e-mailt kapsz értesítőt. Az olvasatlan üzenetek száma
-                  megjelenik a fejlécben az üzenet ikon mellett.
-                </Step>
-                <Step n={3} title="Üzenetek megtekintése">
-                  Az összes beszélgetés a <Link href="/messages" className="text-purple-600 hover:underline">Üzeneteim</Link> oldalon
-                  található.
-                </Step>
-              </div>
-            </Section>
-
-            {/* Menhelyeknek */}
-            <Section id="menhely" icon={Building2} title="Menhelyeknek – Admin felület" color="bg-emerald-50 text-emerald-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Ha te vagy a menhely üzemeltetője, a következő funkciók állnak rendelkezésre
-                az admin dashboardon.
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Regisztráció és hozzáférés">
-                  Regisztrálj a platformra, majd kérj SHELTER_ADMIN jogosultságot a menhelyedhez
-                  a főadmintól. Bejelentkezés után az <strong>Admin felület</strong> link
-                  jelenik meg a profilmenüdben.
-                </Step>
-                <Step n={2} title="Állatok hozzáadása">
-                  Dashboard → Állatok → <em>„Állat hozzáadása"</em> gomb. Töltsd ki az adatokat,
-                  tölts fel fotókat (max. 6), és az állat azonnal megjelenik a listán.
-                </Step>
-                <Step n={3} title="Kérelmek kezelése">
-                  Dashboard → Kérelmek. Minden beérkező kérelmet itt látsz. Jóváhagyhatod,
-                  elutasíthatod vagy „Folyamatban" státuszba helyezheted. Az örökbefogadónak
-                  minden státuszváltásról e-mail értesítés megy.
-                </Step>
-                <Step n={4} title="Előfizetési csomagok">
-                  Dashboard → Előfizetések → csomag hozzáadása (minimum 175 Ft/hó).
-                  A támogatók havi rendszerességgel fizetnek a csomagért.
-                </Step>
-                <Step n={5} title="Menhely beállításai">
-                  Dashboard → Menhely beállítás: profilkép, leírás, cím, telefonszám,
-                  weboldal és Stripe Connect beállítás.
-                </Step>
-              </div>
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Card icon={Building2} title="Admin dashboard"  href="/dashboard"         />
-                <Card icon={Users}     title="Kérelmek"         href="/dashboard/applications" />
-              </div>
-            </Section>
-
-            {/* Iratok */}
-            <Section id="iratok" icon={Upload} title="Iratok és dokumentumok" color="bg-sky-50 text-sky-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Az állatokhoz feltöltheted az egészségügyi dokumentumokat: oltási könyvet,
-                mikrochip igazolást, ivartalanítási dokumentumot stb.
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Dokumentum feltöltése">
-                  Dashboard → Állatok → az állat sorában kattints az <strong>„Iratok"</strong> linkre.
-                  Az megnyíló oldalon a <em>„Dokumentum feltöltése"</em> gombra kattintva
-                  PDF, DOC és DOCX fájlokat tudsz feltölteni (max. 10 MB).
-                </Step>
-                <Step n={2} title="Dokumentumok kezelése">
-                  A feltöltött fájlok listázódnak: látod a nevet, típust, méretet és a feltöltés
-                  dátumát. Megnyithatod és törölheted is őket.
-                </Step>
-              </div>
-              <div className="mt-4 rounded-xl bg-sky-50 border border-sky-100 p-4 text-sm text-sky-800">
-                <strong>Megjegyzés:</strong> A dokumentumok egyelőre csak az admin számára
-                láthatók. A nyilvános megjelenítés a jövőben kerül bevezetésre.
-              </div>
-            </Section>
-
-            {/* Fizetési beállítások */}
-            <Section id="fizetes" icon={CreditCard} title="Stripe Connect – Fizetési beállítások" color="bg-violet-50 text-violet-800">
-              <p className="text-sm text-gray-600 leading-relaxed">
-                A menhelyek adományokat és előfizetési díjakat fogadhatnak, ha csatlakoztatják
-                Stripe fiókjukat. Az összeg automatikusan a menhely bankszámlájára kerül
-                (a platform 4% kezelési díjat von le).
-              </p>
-              <div className="space-y-5 mt-4">
-                <Step n={1} title="Stripe Connect aktiválása">
-                  Dashboard → Menhely beállítás → <em>„Stripe fiók csatlakoztatása"</em> gomb.
-                  Ez megnyitja a Stripe biztonságos onboarding felületét.
-                </Step>
-                <Step n={2} title="Adatok megadása a Stripe-on">
-                  A Stripe felületén add meg a bankszámlaszámot, vállalkozás adatokat és
-                  személyazonosságot. Ez egy egyszeri folyamat.
-                </Step>
-                <Step n={3} title="Visszairányítás és aktiválás">
-                  Az onboarding befejezése után visszakerülsz a menhely beállítások oldalára.
-                  A <em>„Csatlakoztatva"</em> státusz jelzi, hogy aktív a fizetési kapcsolat.
-                </Step>
-                <Step n={4} title="Kifizetések">
-                  Az adományok és előfizetési díjak automatikusan a te Stripe-fiókodra kerülnek.
-                  A kifizetések kezelése a Stripe dashboardon történik.
-                </Step>
-              </div>
-              <div className="mt-4 rounded-xl bg-violet-50 border border-violet-100 p-4 text-sm text-violet-800">
-                <strong>Platform díj:</strong> A platform az összeg 4%-át tartja meg a működési
-                költségek fedezésére. Például 10 000 Ft adományból 9 600 Ft kerül a menhelyhez.
-              </div>
-            </Section>
-
-            {/* Contact CTA */}
-            <div className="rounded-2xl bg-brand-600 p-8 text-center text-white">
+            {/* Footer CTA */}
+            <div className="mt-10 rounded-2xl bg-brand-600 p-8 text-center text-white">
               <h3 className="text-xl font-bold">Nem találtad meg a választ?</h3>
-              <p className="mt-2 text-sm text-brand-100">
-                Írj nekünk és segítünk!
-              </p>
-              <a
-                href="mailto:info@allatimenhelyek.hu"
+              <p className="mt-2 text-sm text-brand-100">Írj nekünk és segítünk!</p>
+              <a href="mailto:info@allatimenhelyek.hu"
                 className="mt-4 inline-block rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
               >
                 info@allatimenhelyek.hu
               </a>
             </div>
-
-          </div>
+          </main>
         </div>
       </div>
     </div>

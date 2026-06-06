@@ -9,6 +9,21 @@
  *   Demo userek:    user1@example.com .. user6@example.com / User1234!
  */
 
+import { existsSync, readFileSync } from "fs";
+import { resolve } from "path";
+// DATABASE_URL betöltése .env / .env.local fájlból (ts-node nem tölti auto)
+for (const envFile of [".env", ".env.local"]) {
+  const fp = resolve(process.cwd(), envFile);
+  if (!existsSync(fp)) continue;
+  readFileSync(fp, "utf8").split("\n").forEach(line => {
+    const m = line.match(/^([^#=][^=]*)=(.+)$/);
+    if (!m) return;
+    const key = m[1].trim();
+    const val = m[2].trim().replace(/^["']|["']$/g, "");
+    if (!process.env[key]) process.env[key] = val;
+  });
+}
+
 import {
   PrismaClient,
   AnimalType,
