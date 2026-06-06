@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import {
   AnimalType, AnimalSize, AnimalStatus, Role, ApplicationStatus,
   CampaignStatus, SubscriptionStatus, ReportType, ReportStatus,
+  HealthRecordType, AppointmentStatus, VolunteerStatus,
+  InventoryCategory, InventoryTxType, FollowUpStatus, NotificationType,
 } from "@prisma/client";
 
 const CORS = {
@@ -17,10 +21,17 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
+  // Accept either SUPER_ADMIN session or the secret token header
   const token = req.headers.get("x-seed-token");
-  if (!process.env.SEED_SECRET || token !== process.env.SEED_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS });
+  const tokenOk = process.env.SEED_SECRET && token === process.env.SEED_SECRET;
+
+  if (!tokenOk) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS });
+    }
   }
+
   if (process.env.NODE_ENV === "production" && !process.env.ALLOW_SEED_IN_PROD) {
     return NextResponse.json(
       { error: "Seeding disabled in production. Set ALLOW_SEED_IN_PROD=true to override." },
@@ -32,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, ...result }, { headers: CORS });
   } catch (error) {
     console.error("Seed error:", error);
-    return NextResponse.json({ error: "Seed failed", detail: String(error) }, { status: 500 });
+    return NextResponse.json({ error: "Seed failed", detail: String(error) }, { status: 500, headers: CORS });
   }
 }
 
@@ -45,16 +56,13 @@ function rb(p = 0.5) { return Math.random() < p; }
 const START = new Date("2025-01-01T00:00:00.000Z");
 const NOW   = new Date();
 
-/** Véletlen dátum START és NOW között, tavaszi/nyári szezonális súlyozással */
 function rndDate(from = START, to = NOW): Date {
   return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
 }
 
-/** Szezonálisan súlyozott dátum (tavasz-nyár 2× valószínűbb) */
 function seasonalDate(): Date {
   const d = rndDate();
-  const m = d.getUTCMonth(); // 0-11
-  // Ha ősz/tél (9-11, 0-1) → 40% eséllyel csere tavasz/nyárra
+  const m = d.getUTCMonth();
   if ((m >= 9 || m <= 1) && rb(0.4)) {
     const springStart = new Date(d.getUTCFullYear(), 2, 1);
     const springEnd   = new Date(d.getUTCFullYear(), 8, 30);
@@ -159,7 +167,7 @@ const MSG_TEXTS = [
   "Van-e lehetőség próbaidős befogadásra?",
   "Köszönöm a gyors választ! Mikor mehetünk?",
   "Sajnos végül nem tudtuk vállalni, de köszönöm a segítséget.",
-  "Megérkezett hozzánk és nagyon jól érzi magát, köszönjük!",
+  "Megérkezett hozzánk és nagyon jól érzi magát, köszönöm!",
   "Rendben, akkor szombaton délután 3-ra megállapodunk.",
   "Kérlek küldd el az örökbefogadási papírokat e-mailben is.",
 ];
@@ -174,7 +182,18 @@ const TIER_TEMPLATES = [
 // ─── Fő seed logika ───────────────────────────────────────────────────────────
 
 async function runSeed() {
-  // ── Törlés (tiszta újraindítás) ──────────────────────
+  // ── Törlés (újabb modellek először) ──────────────────────────────────────
+  await prisma.notification.deleteMany({});
+  await prisma.inventoryTransaction.deleteMany({});
+  await prisma.inventoryItem.deleteMany({});
+  await prisma.volunteerAttendance.deleteMany({});
+  await prisma.volunteerTaskAssignment.deleteMany({});
+  await prisma.volunteerTask.deleteMany({});
+  await prisma.volunteer.deleteMany({});
+  await prisma.appointment.deleteMany({});
+  await prisma.adoptionFollowUp.deleteMany({});
+  await prisma.healthRecord.deleteMany({});
+  await prisma.review.deleteMany({});
   await prisma.message.deleteMany({});
   await prisma.conversation.deleteMany({});
   await prisma.donation.deleteMany({});
@@ -184,6 +203,7 @@ async function runSeed() {
   await prisma.donationTier.deleteMany({});
   await prisma.animalReport.deleteMany({});
   await prisma.favorite.deleteMany({});
+  await prisma.animalImage.deleteMany({});
   await prisma.animal.deleteMany({});
   await prisma.shelterAdmin.deleteMany({});
   await prisma.shelter.deleteMany({});
@@ -191,11 +211,11 @@ async function runSeed() {
   await prisma.account.deleteMany({});
   await prisma.user.deleteMany({});
 
-  // ── Jelszavak ────────────────────────────────────────
+  // ── Jelszavak ────────────────────────────────────────────────────────────
   const adminPwd = await hash("Admin1234!", 10);
   const userPwd  = await hash("User1234!",  10);
 
-  // ── 1. Superadmin ────────────────────────────────────
+  // ── 1. Superadmin ────────────────────────────────────────────────────────
   await prisma.user.create({
     data: {
       name: "Rendszergazda", email: "admin@menhely.hu",
@@ -204,7 +224,7 @@ async function runSeed() {
     },
   });
 
-  // ── 2. Normál felhasználók (300 db) ──────────────────
+  // ── 2. Normál felhasználók (300 db) ──────────────────────────────────────
   const userRows = Array.from({ length: 300 }, (_, i) => ({
     name:          `${ri(HU_FIRST)} ${ri(HU_LAST)}`,
     email:         `user${i + 1}@example.com`,
@@ -222,7 +242,7 @@ async function runSeed() {
     select: { id: true, city: true },
   });
 
-  // ── 3. Menhelyek + menhely adminok (30 db) ───────────
+  // ── 3. Menhelyek + menhely adminok (30 db) ───────────────────────────────
   const shelterAdminEmails = SHELTER_NAMES.map((_, i) => `shelteradmin${i + 1}@menhely.hu`);
   await prisma.user.createMany({
     data: shelterAdminEmails.map((email, i) => ({
@@ -278,7 +298,7 @@ async function runSeed() {
     shelters.push({ id: s.id, adminId });
   }
 
-  // ── 4. Adományozási szintek (4 per menhely = 120 db) ─
+  // ── 4. Adományozási szintek (4 per menhely = 120 db) ────────────────────
   const tierRows = shelters.flatMap(s =>
     TIER_TEMPLATES.map(t => ({
       shelterId:   s.id,
@@ -291,7 +311,7 @@ async function runSeed() {
   await prisma.donationTier.createMany({ data: tierRows });
   const allTiers = await prisma.donationTier.findMany({ select: { id: true, shelterId: true } });
 
-  // ── 5. Kampányok (2 per menhely = 60 db) ─────────────
+  // ── 5. Kampányok (2 per menhely = 60 db) ─────────────────────────────────
   const campaignRows = shelters.flatMap((s, si) =>
     [0, 1].map(ci => {
       const title     = ri(CAMPAIGN_TITLES);
@@ -318,7 +338,7 @@ async function runSeed() {
   await prisma.campaign.createMany({ data: campaignRows });
   const allCampaigns = await prisma.campaign.findMany({ select: { id: true, shelterId: true } });
 
-  // ── 6. Állatok (~55 per menhely ≈ 1 650 db) ──────────
+  // ── 6. Állatok (~55 per menhely ≈ 1 650 db) ──────────────────────────────
   const animalRows: {
     shelterId: string; name: string; slug: string; type: AnimalType;
     breed: string | null; age: number; size: AnimalSize; gender: string;
@@ -373,7 +393,6 @@ async function runSeed() {
     }
   }
 
-  // Batch insert (500-asával)
   for (let i = 0; i < animalRows.length; i += 500) {
     await prisma.animal.createMany({ data: animalRows.slice(i, i + 500), skipDuplicates: true });
   }
@@ -381,7 +400,7 @@ async function runSeed() {
     select: { id: true, shelterId: true, status: true, arrivedAt: true, adoptedAt: true, type: true },
   });
 
-  // ── 6b. Állat képek (1 kép / állat) ──────────────────
+  // ── 6b. Állat képek (1 kép / állat) ──────────────────────────────────────
   const IMG_KEYWORDS: Record<AnimalType, string> = {
     DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "parrot", OTHER: "hamster",
   };
@@ -396,7 +415,7 @@ async function runSeed() {
     await prisma.animalImage.createMany({ data: imgRows.slice(i, i + 500), skipDuplicates: true });
   }
 
-  // ── 7. Örökbefogadási kérelmek ────────────────────────
+  // ── 7. Örökbefogadási kérelmek ────────────────────────────────────────────
   const adoptableAnimals = allAnimals.filter(a =>
     a.status === AnimalStatus.ADOPTED || a.status === AnimalStatus.PENDING
   );
@@ -447,7 +466,6 @@ async function runSeed() {
       });
     }
   }
-  // Extra PENDING kérelmek az AVAILABLE állatokhoz
   const availableAnimals = allAnimals.filter(a => a.status === AnimalStatus.AVAILABLE);
   for (const animal of availableAnimals.slice(0, 300)) {
     const u = ri(allUsers);
@@ -469,7 +487,7 @@ async function runSeed() {
     await prisma.adoptionApplication.createMany({ data: appRows.slice(i, i + 500), skipDuplicates: true });
   }
 
-  // ── 8. Előfizetések (600 db) ──────────────────────────
+  // ── 8. Előfizetések (600 db) ──────────────────────────────────────────────
   const subPairs = new Set<string>();
   const subRows: {
     userId: string; tierId: string; status: SubscriptionStatus;
@@ -497,7 +515,7 @@ async function runSeed() {
   }
   await prisma.subscription.createMany({ data: subRows, skipDuplicates: true });
 
-  // ── 9. Adományok (2 000 db) ───────────────────────────
+  // ── 9. Adományok (2 000 db) ───────────────────────────────────────────────
   const AMOUNTS = [500,1000,1500,2000,3000,5000,8000,10000,15000,20000,25000,50000];
   const donRows: {
     userId: string | null; campaignId: string; amount: number;
@@ -520,7 +538,6 @@ async function runSeed() {
       createdAt:       paidAt,
     });
   }
-  // raisedAmount frissítése kampányonként
   const donBycamp = new Map<string, number>();
   for (const d of donRows) {
     donBycamp.set(d.campaignId, (donBycamp.get(d.campaignId) ?? 0) + d.amount);
@@ -532,7 +549,7 @@ async function runSeed() {
     await prisma.campaign.update({ where: { id: campaignId }, data: { raisedAmount: raised } });
   }
 
-  // ── 10. Bejelentések (elveszett/megtalált) – 500 db ───
+  // ── 10. Bejelentések (500 db) ─────────────────────────────────────────────
   const reportRows = Array.from({ length: 500 }, (_, i) => {
     const city    = ri(CITIES);
     const isDog   = rb(0.6);
@@ -563,7 +580,7 @@ async function runSeed() {
     await prisma.animalReport.createMany({ data: reportRows.slice(i, i + 500) });
   }
 
-  // ── 11. Üzenetek / Beszélgetések (300 konverzáció) ────
+  // ── 11. Üzenetek / Beszélgetések (300 konverzáció) ────────────────────────
   const convPairs   = new Set<string>();
   const convRecords: { id: string; senderId: string; shelterAdminId: string; createdAt: Date }[] = [];
 
@@ -593,7 +610,6 @@ async function runSeed() {
     convRecords.push({ id: conv.id, senderId: user.id, shelterAdminId: shelter.adminId, createdAt: convAt });
   }
 
-  // Üzenetek batch (2–6 üzenet per konverzáció)
   const msgRows: {
     conversationId: string; senderId: string; content: string;
     readAt: Date | null; createdAt: Date;
@@ -617,17 +633,348 @@ async function runSeed() {
     await prisma.message.createMany({ data: msgRows.slice(i, i + 500) });
   }
 
+  // ── 12. HealthRecord ──────────────────────────────────────────────────────
+  const HR_TYPES: HealthRecordType[] = [
+    HealthRecordType.VACCINATION, HealthRecordType.DEWORMING, HealthRecordType.CHECKUP,
+    HealthRecordType.TREATMENT, HealthRecordType.VET_VISIT, HealthRecordType.SURGERY,
+  ];
+  const HR_TITLES: Record<HealthRecordType, string[]> = {
+    VACCINATION: ["Veszettség oltás", "Kombinált oltás", "Kennel cough oltás"],
+    DEWORMING:   ["Féregtelenítés", "Bolha-kullancs kezelés"],
+    CHECKUP:     ["Éves szűrővizsgálat", "Fogászati ellenőrzés"],
+    TREATMENT:   ["Sebkezelés", "Gyógyszeres kezelés", "Bőrkezelés"],
+    VET_VISIT:   ["Általános vizsgálat", "Konzultáció", "Vérvétel"],
+    SURGERY:     ["Ivartalanítás", "Daganat eltávolítás"],
+  };
+
+  const animals1200 = allAnimals.slice(0, 1200);
+  const hrRows: {
+    animalId: string; type: HealthRecordType; title: string;
+    description: string | null; date: Date; nextDueDate: Date | null;
+    vetName: string | null; createdById: string | null;
+  }[] = [];
+
+  for (const animal of animals1200) {
+    const numRecords = rn(1, 3);
+    for (let r = 0; r < numRecords; r++) {
+      const type  = ri(HR_TYPES);
+      const date  = rndDate(new Date("2024-06-01"), NOW);
+      hrRows.push({
+        animalId:    animal.id,
+        type,
+        title:       ri(HR_TITLES[type]),
+        description: rb(0.6) ? `${type} kezelés elvégezve, az állat jól tűrte.` : null,
+        date,
+        nextDueDate: rb(0.4) ? new Date(date.getTime() + rn(30, 365) * 86_400_000) : null,
+        vetName:     rb(0.7) ? `Dr. ${ri(HU_LAST)} ${ri(HU_FIRST).slice(0, 1)}.` : null,
+        createdById: null,
+      });
+    }
+  }
+  for (let i = 0; i < hrRows.length; i += 500) {
+    await prisma.healthRecord.createMany({ data: hrRows.slice(i, i + 500) });
+  }
+
+  // ── 13. Review ────────────────────────────────────────────────────────────
+  const reviewPairs = new Set<string>();
+  const reviewRows: {
+    authorId: string; shelterId: string; rating: number; comment: string | null;
+  }[] = [];
+  const REVIEW_COMMENTS = [
+    "Kiváló menhely, kedves dolgozók!",
+    "Nagyon segítőkészek, ajánlom mindenkinek.",
+    "Szép környezet, gondos ápolás.",
+    "Kicsit sokáig tartott, de végül minden rendben.",
+    "Örülünk az új kedvencünknek, köszönöm a segítséget!",
+    "Profi csapat, átlátható folyamat.",
+  ];
+
+  let reviewAttempts = 0;
+  while (reviewRows.length < 300 && reviewAttempts < 3000) {
+    reviewAttempts++;
+    const user    = ri(allUsers);
+    const shelter = ri(shelters);
+    const pair    = `${user.id}:${shelter.id}`;
+    if (reviewPairs.has(pair)) continue;
+    reviewPairs.add(pair);
+    reviewRows.push({
+      authorId:  user.id,
+      shelterId: shelter.id,
+      rating:    rn(3, 5),
+      comment:   rb(0.6) ? ri(REVIEW_COMMENTS) : null,
+    });
+  }
+  await prisma.review.createMany({ data: reviewRows, skipDuplicates: true });
+
+  // ── 14. Volunteer + VolunteerAttendance ───────────────────────────────────
+  const VOL_STATUS_POOL: VolunteerStatus[] = [
+    VolunteerStatus.ACTIVE, VolunteerStatus.ACTIVE, VolunteerStatus.ACTIVE,
+    VolunteerStatus.PENDING, VolunteerStatus.INACTIVE, VolunteerStatus.REJECTED,
+  ];
+  const volPairs = new Set<string>();
+  const volRows: {
+    userId: string; shelterId: string; status: VolunteerStatus;
+    motivation: string | null; skills: string | null; availability: string | null;
+  }[] = [];
+
+  for (const shelter of shelters) {
+    const numVols = rn(2, 5);
+    for (let v = 0; v < numVols; v++) {
+      const user = ri(allUsers);
+      const pair = `${user.id}:${shelter.id}`;
+      if (volPairs.has(pair)) continue;
+      volPairs.add(pair);
+      volRows.push({
+        userId:       user.id,
+        shelterId:    shelter.id,
+        status:       ri(VOL_STATUS_POOL),
+        motivation:   rb(0.7) ? "Szeretem az állatokat és szeretnék segíteni." : null,
+        skills:       rb(0.5) ? ri(["Állatorvosi alapismeretek","Kutyakiképzés","Fotózás","Sofőr","Takarítás"]) : null,
+        availability: rb(0.6) ? ri(["Hétvégén","Hétköznap reggel","Bármikor","Havonta egyszer"]) : null,
+      });
+    }
+  }
+  for (let i = 0; i < volRows.length; i += 500) {
+    await prisma.volunteer.createMany({ data: volRows.slice(i, i + 500), skipDuplicates: true });
+  }
+
+  const activeVolunteers = await prisma.volunteer.findMany({
+    where:  { status: VolunteerStatus.ACTIVE },
+    select: { id: true },
+  });
+
+  const attRows: {
+    volunteerId: string; date: Date; hours: number; note: string | null;
+  }[] = [];
+  for (const vol of activeVolunteers) {
+    for (let a = 0; a < 2; a++) {
+      attRows.push({
+        volunteerId: vol.id,
+        date:        rndDate(new Date("2025-01-01"), NOW),
+        hours:       ri([1, 2, 3, 4]),
+        note:        rb(0.3) ? "Állatok etetése és takarítás." : null,
+      });
+    }
+  }
+  if (attRows.length > 0) {
+    await prisma.volunteerAttendance.createMany({ data: attRows });
+  }
+
+  // ── 15. VolunteerTask ─────────────────────────────────────────────────────
+  const TASK_TITLES = [
+    "Kutyák sétáltatása","Etetés","Kennelek takarítása","Szocializáció macskákkal",
+    "Fotózás állományhoz","Örökbefogadási esemény segítség","Szállítás állatorvoshoz",
+    "Adományok rendezése","Online kampány segítség",
+  ];
+  const taskRows: {
+    shelterId: string; title: string; description: string | null;
+    scheduledAt: Date; maxVolunteers: number;
+  }[] = [];
+
+  for (const shelter of shelters) {
+    const numTasks = rn(1, 3);
+    for (let t = 0; t < numTasks; t++) {
+      taskRows.push({
+        shelterId:     shelter.id,
+        title:         ri(TASK_TITLES),
+        description:   rb(0.5) ? "Segítség szükséges az állatok gondozásához." : null,
+        scheduledAt:   rndDate(new Date("2025-01-01"), new Date(NOW.getTime() + 60 * 86_400_000)),
+        maxVolunteers: rn(1, 5),
+      });
+    }
+  }
+  await prisma.volunteerTask.createMany({ data: taskRows });
+
+  // ── 16. Appointment ───────────────────────────────────────────────────────
+  const AP_STATUS_POOL: AppointmentStatus[] = [
+    AppointmentStatus.PENDING, AppointmentStatus.PENDING,
+    AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED,
+    AppointmentStatus.CANCELLED,
+  ];
+  const apptRows: {
+    shelterId: string; userId: string; animalId: string | null;
+    status: AppointmentStatus; proposedAt: Date; confirmedAt: Date | null;
+    note: string | null; adminNote: string | null; cancelledBy: string | null;
+  }[] = [];
+
+  for (let i = 0; i < 200; i++) {
+    const user    = ri(allUsers);
+    const shelter = ri(shelters);
+    const status  = ri(AP_STATUS_POOL);
+    const proposed = rndDate(new Date("2025-01-01"), new Date(NOW.getTime() + 30 * 86_400_000));
+    apptRows.push({
+      shelterId:   shelter.id,
+      userId:      user.id,
+      animalId:    null,
+      status,
+      proposedAt:  proposed,
+      confirmedAt: (status === AppointmentStatus.CONFIRMED || status === AppointmentStatus.COMPLETED)
+                     ? proposed : null,
+      note:        rb(0.5) ? "Érdeklődöm egy állat megtekintéséről." : null,
+      adminNote:   status !== AppointmentStatus.PENDING ? (rb(0.4) ? "Várjuk!" : null) : null,
+      cancelledBy: status === AppointmentStatus.CANCELLED ? ri(["USER","ADMIN"]) : null,
+    });
+  }
+  await prisma.appointment.createMany({ data: apptRows });
+
+  // ── 17. AdoptionFollowUp ──────────────────────────────────────────────────
+  const approvedApps = await prisma.adoptionApplication.findMany({
+    where:  { status: ApplicationStatus.APPROVED },
+    select: { id: true, createdAt: true },
+    take:   300,
+  });
+
+  const followUpRows: {
+    applicationId: string; scheduledAt: Date; status: FollowUpStatus;
+    completedAt: Date | null; wellbeing: number | null; notes: string | null;
+  }[] = [];
+
+  for (const app of approvedApps) {
+    for (const daysOffset of [30, 90]) {
+      const scheduledAt = new Date(app.createdAt.getTime() + daysOffset * 86_400_000);
+      const isPast      = scheduledAt <= NOW;
+      const fuStatus    = isPast
+        ? (rb(0.8) ? FollowUpStatus.COMPLETED : FollowUpStatus.OVERDUE)
+        : FollowUpStatus.PENDING;
+      followUpRows.push({
+        applicationId: app.id,
+        scheduledAt,
+        status:        fuStatus,
+        completedAt:   fuStatus === FollowUpStatus.COMPLETED ? scheduledAt : null,
+        wellbeing:     fuStatus === FollowUpStatus.COMPLETED ? rn(3, 5) : null,
+        notes:         fuStatus === FollowUpStatus.COMPLETED
+          ? ri(["Nagyon jól érzi magát!","Beilleszkedett a családba.","Kiváló egészségi állapot."])
+          : null,
+      });
+    }
+  }
+  if (followUpRows.length > 0) {
+    for (let i = 0; i < followUpRows.length; i += 500) {
+      await prisma.adoptionFollowUp.createMany({ data: followUpRows.slice(i, i + 500), skipDuplicates: true });
+    }
+  }
+
+  // ── 18. InventoryItem + InventoryTransaction ──────────────────────────────
+  const INV_CATEGORIES: InventoryCategory[] = [
+    InventoryCategory.FOOD, InventoryCategory.MEDICINE, InventoryCategory.SUPPLIES,
+    InventoryCategory.CLEANING, InventoryCategory.EQUIPMENT, InventoryCategory.OTHER,
+  ];
+  const ITEM_NAMES: Record<InventoryCategory, string[]> = {
+    FOOD:      ["Száraztáp kutya","Száraztáp macska","Konzervtáp","Jutalomfalat"],
+    MEDICINE:  ["Bolha-kullancs spray","Féregtelenítő tabletta","Sebtapasz","Fertőtlenítő"],
+    SUPPLIES:  ["Pórázok","Nyakörv","Hordozó kosár","Etetőtál"],
+    CLEANING:  ["Fertőtlenítő oldat","Papírtörlő","Szemetes zsák","Söprű"],
+    EQUIPMENT: ["Karabiner","Tolókocsi","Mérleg","Hőmérő"],
+    OTHER:     ["Ajándékkártya","Prospektus","Egyéb kellék"],
+  };
+
+  const invRows: {
+    shelterId: string; name: string; category: InventoryCategory;
+    unit: string; quantity: number; minQuantity: number | null;
+    expiresAt: Date | null; note: string | null;
+  }[] = [];
+
+  for (const shelter of shelters) {
+    const numItems = rn(3, 6);
+    for (let item = 0; item < numItems; item++) {
+      const category = ri(INV_CATEGORIES);
+      invRows.push({
+        shelterId:   shelter.id,
+        name:        ri(ITEM_NAMES[category]),
+        category,
+        unit:        ri(["kg","liter","db","csomag"]),
+        quantity:    rn(0, 200),
+        minQuantity: rb(0.6) ? rn(5, 30) : null,
+        expiresAt:   rb(0.3) ? new Date(NOW.getTime() + rn(30, 365) * 86_400_000) : null,
+        note:        null,
+      });
+    }
+  }
+  await prisma.inventoryItem.createMany({ data: invRows });
+
+  const allInvItems = await prisma.inventoryItem.findMany({
+    select: { id: true, quantity: true },
+  });
+  const txRows: {
+    itemId: string; type: InventoryTxType; quantity: number; note: string | null;
+  }[] = allInvItems
+    .filter(item => item.quantity > 0)
+    .map(item => ({
+      itemId:   item.id,
+      type:     InventoryTxType.IN,
+      quantity: item.quantity,
+      note:     "Nyitókészlet",
+    }));
+
+  for (let i = 0; i < txRows.length; i += 500) {
+    await prisma.inventoryTransaction.createMany({ data: txRows.slice(i, i + 500) });
+  }
+
+  // ── 19. Notification ─────────────────────────────────────────────────────
+  const NT_POOL: NotificationType[] = [
+    NotificationType.APPLICATION_SUBMITTED,
+    NotificationType.APPLICATION_APPROVED,
+    NotificationType.APPOINTMENT_NEW,
+    NotificationType.APPOINTMENT_CONFIRMED,
+    NotificationType.VOLUNTEER_APPROVED,
+    NotificationType.DONATION_RECEIVED,
+    NotificationType.NEW_MESSAGE,
+  ];
+  const NOTIF_TITLES: Record<string, string> = {
+    APPLICATION_SUBMITTED: "Új kérelem érkezett",
+    APPLICATION_APPROVED:  "Kérelmed elfogadva",
+    APPOINTMENT_NEW:       "Új időpontfoglalás",
+    APPOINTMENT_CONFIRMED: "Időpontod visszaigazolva",
+    VOLUNTEER_APPROVED:    "Önkéntességed jóváhagyva",
+    DONATION_RECEIVED:     "Adomány beérkezett",
+    NEW_MESSAGE:           "Új üzeneted van",
+  };
+
+  const notifRows: {
+    userId: string; type: NotificationType; title: string;
+    body: string | null; href: string | null; readAt: Date | null; createdAt: Date;
+  }[] = [];
+
+  const first50Users = allUsers.slice(0, Math.min(50, allUsers.length));
+  for (const user of first50Users) {
+    const numNotifs = rn(3, 7);
+    for (let n = 0; n < numNotifs; n++) {
+      const type      = ri(NT_POOL);
+      const createdAt = rndDate(new Date("2025-01-01"), NOW);
+      notifRows.push({
+        userId:    user.id,
+        type,
+        title:     NOTIF_TITLES[type] ?? "Értesítés",
+        body:      rb(0.5) ? "Kattints a részletekért." : null,
+        href:      rb(0.6) ? "/dashboard" : null,
+        readAt:    rb(0.5) ? createdAt : null,
+        createdAt,
+      });
+    }
+  }
+  await prisma.notification.createMany({ data: notifRows });
+
   return {
-    users:         allUsers.length + 1 + SHELTER_NAMES.length,
-    shelters:      shelters.length,
-    animals:       animalRows.length,
-    applications:  appRows.length,
-    tiers:         tierRows.length,
-    campaigns:     campaignRows.length,
-    subscriptions: subRows.length,
-    donations:     donRows.length,
-    reports:       reportRows.length,
-    conversations: convRecords.length,
-    messages:      msgRows.length,
+    users:          allUsers.length + 1 + SHELTER_NAMES.length,
+    shelters:       shelters.length,
+    animals:        animalRows.length,
+    applications:   appRows.length,
+    tiers:          tierRows.length,
+    campaigns:      campaignRows.length,
+    subscriptions:  subRows.length,
+    donations:      donRows.length,
+    reports:        reportRows.length,
+    conversations:  convRecords.length,
+    messages:       msgRows.length,
+    healthRecords:  hrRows.length,
+    reviews:        reviewRows.length,
+    volunteers:     volRows.length,
+    attendances:    attRows.length,
+    tasks:          taskRows.length,
+    appointments:   apptRows.length,
+    followUps:      followUpRows.length,
+    inventoryItems: invRows.length,
+    transactions:   txRows.length,
+    notifications:  notifRows.length,
   };
 }
