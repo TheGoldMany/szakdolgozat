@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ClipboardCheck, Star, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -91,7 +92,10 @@ export default async function FollowUpsAdminPage() {
       <div className="flex items-center gap-3">
         <ClipboardCheck className="h-6 w-6 text-brand-500" />
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Utánkövetések</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold text-gray-900">Utánkövetések</h1>
+            <PageInfo page="followups" />
+          </div>
           <p className="text-sm text-gray-500">Elfogadott örökbefogadások utáni visszajelzések</p>
         </div>
       </div>

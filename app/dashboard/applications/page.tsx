@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
 import { RatingStat } from "@/components/reviews/rating-stat";
@@ -86,7 +87,10 @@ export default async function DashboardApplicationsPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Kérelmek</h1>
+      <div className="mb-6 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">Kérelmek</h1>
+        <PageInfo page="applications" />
+      </div>
 
       {/* Státusz szűrő */}
       <div className="mb-5 flex flex-wrap gap-2">

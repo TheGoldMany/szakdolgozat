@@ -3,6 +3,7 @@ import { HandHeart } from "lucide-react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterVolunteers } from "@/components/volunteers/shelter-volunteers";
 import type { VolunteerEntry, TaskEntry } from "@/components/volunteers/shelter-volunteers";
@@ -87,7 +88,10 @@ export default async function DashboardVolunteersPage() {
       <div className="mb-6 flex items-center gap-3">
         <HandHeart className="h-6 w-6 text-brand-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Önkéntesek</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">Önkéntesek</h1>
+            <PageInfo page="volunteers" />
+          </div>
           <p className="text-sm text-gray-500">
             {volunteers.filter(v => v.status === "ACTIVE").length} aktív önkéntes &bull; {Math.round(totalHours)} óra teljesítve összesen
           </p>

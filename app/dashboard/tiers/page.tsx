@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { TiersManager } from "@/components/dashboard/tiers-manager";
 
@@ -33,7 +34,10 @@ export default async function TiersPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Előfizetési csomagok</h1>
+      <div className="mb-6 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">Előfizetési csomagok</h1>
+        <PageInfo page="tiers" />
+      </div>
       <TiersManager tiers={tiers} shelterId={admin.shelterId} />
     </div>
   );

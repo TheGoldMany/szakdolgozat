@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionCancelButton } from "@/components/dashboard/subscription-cancel-button";
 import { cn } from "@/lib/utils";
@@ -59,7 +60,10 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Előfizetők</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">Előfizetők</h1>
+        <PageInfo page="subscriptions" />
+      </div>
 
       {/* Filter row */}
       <div className="flex gap-2">

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { CampaignApprovals } from "@/components/dashboard/campaign-approvals";
 import { FormApprovalActions } from "@/components/dashboard/form-approval-actions";
@@ -35,7 +36,10 @@ export default async function CampaignApprovalsPage() {
 
   return (
     <div className="space-y-10">
-      <h1 className="text-2xl font-bold text-gray-900">Jóváhagyások</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">Jóváhagyások</h1>
+        <PageInfo page="campaigns" />
+      </div>
 
       <div>
         <h2 className="mb-4 text-lg font-semibold text-gray-700">Gyűjtések</h2>

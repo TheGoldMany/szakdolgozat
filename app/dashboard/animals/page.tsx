@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatusSelect } from "@/components/dashboard/animal-status-select";
 import { AddAnimalPanel } from "@/components/dashboard/add-animal-panel";
@@ -70,7 +71,10 @@ export default async function DashboardAnimalsPage({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Állatok</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">Állatok</h1>
+          <PageInfo page="animals" />
+        </div>
         <AddAnimalPanel />
       </div>
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck } from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
+import { PageInfo } from "@/components/dashboard/page-info";
 
 interface ShelterAdmin {
   user: { name: string | null; email: string };
@@ -49,7 +50,10 @@ export default function DashboardSheltersPage() {
       {/* Fejléc */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Menhelyek</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">Menhelyek</h1>
+            <PageInfo page="shelters" />
+          </div>
           <p className="mt-1 text-sm text-gray-500">{shelters.length} menhely a rendszerben</p>
         </div>
         <button

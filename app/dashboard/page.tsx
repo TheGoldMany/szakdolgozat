@@ -6,6 +6,7 @@ import {
   TrendingUp, Building2, Users, DollarSign,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ApplicationStatus, SubscriptionStatus, CampaignStatus, FormStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
@@ -137,7 +138,10 @@ export default async function DashboardPage() {
 
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Áttekintés</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">Áttekintés</h1>
+          <PageInfo page="overview" />
+        </div>
 
         {/* KPI cards */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -376,7 +380,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900">Főadmin áttekintés</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">Főadmin áttekintés</h1>
+        <PageInfo page="overview" />
+      </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

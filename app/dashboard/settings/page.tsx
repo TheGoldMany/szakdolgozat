@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterSettingsForm } from "@/components/dashboard/shelter-settings-form";
 
@@ -45,7 +46,10 @@ export default async function ShelterSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Menhely beállítások</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">Menhely beállítások</h1>
+          <PageInfo page="settings" />
+        </div>
         <p className="mt-1 text-sm text-gray-500">{shelter.name}</p>
       </div>
       <ShelterSettingsForm shelter={shelter} />

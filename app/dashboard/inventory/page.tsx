@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { Package, AlertTriangle, Clock, Tag, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { KpiCard } from "@/components/dashboard/stats/kpi-card";
 import { InventoryList } from "@/components/inventory/inventory-list";
@@ -86,7 +87,10 @@ export default async function InventoryPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Készlet</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">Készlet</h1>
+          <PageInfo page="inventory" />
+        </div>
         <Link
           href={`/dashboard/inventory/new${shelterId ? `?shelterId=${shelterId}` : ""}`}
           className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"

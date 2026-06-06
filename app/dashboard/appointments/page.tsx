@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { CalendarDays } from "lucide-react";
 import type { Metadata } from "next";
 import { authOptions } from "@/lib/auth";
+import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterAppointments } from "@/components/appointments/shelter-appointments";
 
@@ -52,7 +53,10 @@ export default async function DashboardAppointmentsPage() {
       <div className="mb-6 flex items-center gap-3">
         <CalendarDays className="h-6 w-6 text-brand-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Időpontok</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">Időpontok</h1>
+            <PageInfo page="appointments" />
+          </div>
           {pending > 0 && (
             <p className="text-sm text-amber-600 font-medium">{pending} új foglalás vár visszaigazolásra</p>
           )}
