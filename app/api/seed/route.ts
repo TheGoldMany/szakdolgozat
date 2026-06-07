@@ -9,6 +9,7 @@ import {
   HealthRecordType, AppointmentStatus, VolunteerStatus,
   InventoryCategory, InventoryTxType, FollowUpStatus, NotificationType,
 } from "@prisma/client";
+import { seedNewModules } from "@/lib/seed-extras";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -184,6 +185,13 @@ const TIER_TEMPLATES = [
 async function runSeed() {
   // ── Törlés (újabb modellek először) ──────────────────────────────────────
   await prisma.notification.deleteMany({});
+  await prisma.eventRegistration.deleteMany({});
+  await prisma.event.deleteMany({});
+  await prisma.sponsorship.deleteMany({});
+  await prisma.fosterSupplyLog.deleteMany({});
+  await prisma.fosterProfile.deleteMany({});
+  await prisma.behaviorLog.deleteMany({});
+  await prisma.kennel.deleteMany({});
   await prisma.inventoryTransaction.deleteMany({});
   await prisma.inventoryItem.deleteMany({});
   await prisma.volunteerAttendance.deleteMany({});
@@ -954,6 +962,13 @@ async function runSeed() {
   }
   await prisma.notification.createMany({ data: notifRows });
 
+  // ── 20–24. Új ERP modulok (kennel, foster, sponsorship, behavior, events) ──
+  const newModuleStats = await seedNewModules({
+    shelters:  shelters.map(s => ({ id: s.id, adminId: s.adminId })),
+    allAnimals,
+    allUsers,
+  });
+
   return {
     users:          allUsers.length + 1 + SHELTER_NAMES.length,
     shelters:       shelters.length,
@@ -976,5 +991,6 @@ async function runSeed() {
     inventoryItems: invRows.length,
     transactions:   txRows.length,
     notifications:  notifRows.length,
+    ...newModuleStats,
   };
 }
