@@ -15,7 +15,8 @@
     "roleShelterAdmin": "Menhely admin",
     "roleSuperAdmin": "Főadmin",
     "language": "Nyelv",
-    "map": "Térkép"
+    "map": "Térkép",
+    "events": "Események"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
@@ -437,5 +438,32 @@
     "successTitle": "Jelentkezés elküldve!",
     "successDesc": "A menhely hamarosan visszajelez.",
     "error": "Hiba"
+  },
+  "events": {
+    "listTitle": "Közelgő események",
+    "listSubtitle": "Örökbefogadási napok, adománygyűjtések és nyílt napok a menhelyeknél.",
+    "empty": "Jelenleg nincs meghirdetett esemény. Nézz vissza később!",
+    "registrants": "{count} jelentkező",
+    "breadcrumb": "Események",
+    "aboutEvent": "Az eseményről",
+    "cancelledNotice": "Ez az esemény sajnos elmaradt.",
+    "endsAt": "Vége:",
+    "participants": "{count} résztvevő",
+    "pastNotice": "Ez az esemény már lezajlott.",
+    "full": "Az esemény betelt.",
+    "registered": "Jelentkezésed rögzítve",
+    "registeredDesc": "Ott találkozunk! Az eseményre {count} főre jelentkeztél.",
+    "cancelParticipation": "Részvétel lemondása",
+    "cancelConfirm": "Biztosan lemondod a részvételt?",
+    "loginToRegister": "A jelentkezéshez be kell jelentkezned.",
+    "registerButton": "Jelentkezem az eseményre",
+    "registerTitle": "Jelentkezés",
+    "guestsLabel": "Hány kísérőt hozol magaddal?",
+    "guestsHint": "+ te magad = {count} fő",
+    "noteLabel": "Megjegyzés (opcionális)",
+    "notePlaceholder": "Bármi, amit a szervezőknek tudniuk kell",
+    "submitRegister": "Jelentkezés véglegesítése",
+    "submitting": "Küldés…",
+    "error": "Hiba történt"
   }
 }

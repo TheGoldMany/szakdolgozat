@@ -15,7 +15,8 @@
     "roleShelterAdmin": "Admin schroniska",
     "roleSuperAdmin": "Super admin",
     "language": "Język",
-    "map": "Mapa"
+    "map": "Mapa",
+    "events": "Wydarzenia"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
@@ -437,5 +438,32 @@
     "successTitle": "Wniosek złożony!",
     "successDesc": "Schronisko wkrótce się odezwie.",
     "error": "Błąd"
+  },
+  "events": {
+    "listTitle": "Nadchodzące wydarzenia",
+    "listSubtitle": "Dni adopcyjne, zbiórki i dni otwarte w schroniskach.",
+    "empty": "Obecnie nie ma opublikowanych wydarzeń. Zajrzyj później!",
+    "registrants": "{count} zapisanych",
+    "breadcrumb": "Wydarzenia",
+    "aboutEvent": "O wydarzeniu",
+    "cancelledNotice": "To wydarzenie zostało niestety odwołane.",
+    "endsAt": "Koniec:",
+    "participants": "{count} uczestników",
+    "pastNotice": "To wydarzenie już się odbyło.",
+    "full": "To wydarzenie jest pełne.",
+    "registered": "Twoja rejestracja została potwierdzona",
+    "registeredDesc": "Do zobaczenia! Zapisałeś {count} osób na wydarzenie.",
+    "cancelParticipation": "Anuluj udział",
+    "cancelConfirm": "Czy na pewno chcesz anulować udział?",
+    "loginToRegister": "Musisz być zalogowany, aby się zapisać.",
+    "registerButton": "Zapisz się na wydarzenie",
+    "registerTitle": "Rejestracja",
+    "guestsLabel": "Ilu towarzyszy zabierasz?",
+    "guestsHint": "+ ty = {count} osób",
+    "noteLabel": "Uwaga (opcjonalnie)",
+    "notePlaceholder": "Wszystko, co organizatorzy powinni wiedzieć",
+    "submitRegister": "Potwierdź rejestrację",
+    "submitting": "Wysyłanie…",
+    "error": "Wystąpił błąd"
   }
 }

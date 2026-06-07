@@ -132,6 +132,7 @@ model User {
   fosterProfiles      FosterProfile[]
   fosterSupplyLogs    FosterSupplyLog[]      @relation("FosterSupplyCreator")
   sponsorships        Sponsorship[]
+  eventRegistrations  EventRegistration[]
 }
 
 // -------------------------------------------------------
@@ -236,6 +237,7 @@ model Shelter {
   inventoryItems       InventoryItem[]
   kennels              Kennel[]
   fosterProfiles       FosterProfile[]
+  events               Event[]
 }
 
 model ShelterDocument {
@@ -927,6 +929,10 @@ enum NotificationType {
   // Virtual adoption / sponsorship
   SPONSORSHIP_STARTED      // User: virtual adoption confirmed
   SPONSOR_UPDATE           // Virtual owner: sponsored animal updated (health/photo/adopted)
+  // Events (örökbefogadási nap / esemény)
+  EVENT_REGISTRATION       // Admin: new event registration
+  EVENT_UPDATED            // Registrant: event details changed
+  EVENT_CANCELLED          // Registrant: event was cancelled
   // Messages
   NEW_MESSAGE              // User/admin: new unread message
   // Follow-up
@@ -1041,4 +1047,70 @@ model FosterSupplyLog {
 
   @@index([fosterId])
   @@index([itemId])
+}
+
+// -------------------------------------------------------
+// Events (Örökbefogadási nap / esemény modul)
+// -------------------------------------------------------
+
+enum EventType {
+  ADOPTION_DAY   // Örökbefogadási nap
+  FUNDRAISER     // Adománygyűjtő esemény
+  VOLUNTEER_DAY  // Önkéntes nap
+  OPEN_DAY       // Nyílt nap
+  EDUCATION      // Oktatás / előadás
+  OTHER          // Egyéb
+}
+
+enum EventStatus {
+  DRAFT       // Vázlat, csak az admin látja
+  PUBLISHED   // Közzétéve, publikus
+  CANCELLED   // Lemondva
+  COMPLETED   // Lezárult
+}
+
+enum EventRegistrationStatus {
+  REGISTERED  // Jelentkezett
+  CANCELLED   // Lemondta
+  ATTENDED    // Megjelent (utólag jelölhető)
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  shelterId   String
+  shelter     Shelter     @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String      @unique
+  description String      @db.Text
+  type        EventType   @default(ADOPTION_DAY)
+  location    String
+  startsAt    DateTime
+  endsAt      DateTime?
+  capacity    Int?        // null = korlátlan
+  imageUrl    String?
+  status      EventStatus @default(DRAFT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  registrations EventRegistration[]
+
+  @@index([shelterId])
+  @@index([status, startsAt])
+}
+
+model EventRegistration {
+  id        String                  @id @default(cuid())
+  eventId   String
+  event     Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    EventRegistrationStatus @default(REGISTERED)
+  guests    Int                     @default(0) // kísérők száma a jelentkezőn felül
+  note      String?                 @db.Text
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
 }

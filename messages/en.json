@@ -15,7 +15,8 @@
     "roleShelterAdmin": "Shelter admin",
     "roleSuperAdmin": "Super admin",
     "language": "Language",
-    "map": "Map"
+    "map": "Map",
+    "events": "Events"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
@@ -437,5 +438,32 @@
     "successTitle": "Application submitted!",
     "successDesc": "The shelter will get back to you soon.",
     "error": "Error"
+  },
+  "events": {
+    "listTitle": "Upcoming events",
+    "listSubtitle": "Adoption days, fundraisers and open days at the shelters.",
+    "empty": "There are no published events right now. Check back later!",
+    "registrants": "{count} registered",
+    "breadcrumb": "Events",
+    "aboutEvent": "About the event",
+    "cancelledNotice": "Unfortunately this event has been cancelled.",
+    "endsAt": "Ends:",
+    "participants": "{count} participants",
+    "pastNotice": "This event has already taken place.",
+    "full": "This event is full.",
+    "registered": "Your registration is confirmed",
+    "registeredDesc": "See you there! You registered {count} people for the event.",
+    "cancelParticipation": "Cancel participation",
+    "cancelConfirm": "Are you sure you want to cancel your participation?",
+    "loginToRegister": "You must be logged in to register.",
+    "registerButton": "Register for the event",
+    "registerTitle": "Registration",
+    "guestsLabel": "How many companions are you bringing?",
+    "guestsHint": "+ yourself = {count} people",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Anything the organisers should know",
+    "submitRegister": "Confirm registration",
+    "submitting": "Sending…",
+    "error": "An error occurred"
   }
 }

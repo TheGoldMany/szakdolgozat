@@ -15,7 +15,8 @@
     "roleShelterAdmin": "Tierheim-Admin",
     "roleSuperAdmin": "Super-Admin",
     "language": "Sprache",
-    "map": "Karte"
+    "map": "Karte",
+    "events": "Events"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
@@ -437,5 +438,32 @@
     "successTitle": "Bewerbung eingereicht!",
     "successDesc": "Das Tierheim wird sich bald melden.",
     "error": "Fehler"
+  },
+  "events": {
+    "listTitle": "Kommende Events",
+    "listSubtitle": "Adoptionstage, Spendenaktionen und Tage der offenen Tür in den Tierheimen.",
+    "empty": "Derzeit gibt es keine veröffentlichten Events. Schau später wieder vorbei!",
+    "registrants": "{count} Anmeldungen",
+    "breadcrumb": "Events",
+    "aboutEvent": "Über das Event",
+    "cancelledNotice": "Dieses Event wurde leider abgesagt.",
+    "endsAt": "Ende:",
+    "participants": "{count} Teilnehmer",
+    "pastNotice": "Dieses Event hat bereits stattgefunden.",
+    "full": "Dieses Event ist ausgebucht.",
+    "registered": "Deine Anmeldung ist bestätigt",
+    "registeredDesc": "Wir sehen uns dort! Du hast {count} Personen für das Event angemeldet.",
+    "cancelParticipation": "Teilnahme stornieren",
+    "cancelConfirm": "Möchtest du deine Teilnahme wirklich stornieren?",
+    "loginToRegister": "Du musst angemeldet sein, um dich anzumelden.",
+    "registerButton": "Für das Event anmelden",
+    "registerTitle": "Anmeldung",
+    "guestsLabel": "Wie viele Begleiter bringst du mit?",
+    "guestsHint": "+ du selbst = {count} Personen",
+    "noteLabel": "Anmerkung (optional)",
+    "notePlaceholder": "Alles, was die Organisatoren wissen sollten",
+    "submitRegister": "Anmeldung bestätigen",
+    "submitting": "Senden…",
+    "error": "Ein Fehler ist aufgetreten"
   }
 }

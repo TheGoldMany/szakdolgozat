@@ -16,6 +16,17 @@ interface InfoContent {
 }
 
 const PAGE_INFO: Record<string, InfoContent> = {
+  events: {
+    title: "Események",
+    intro: "Itt hirdetsz meg örökbefogadási napokat, adománygyűjtéseket és nyílt napokat, valamint követed a jelentkezőket.",
+    points: [
+      { label: "Új esemény", desc: "Az „Új esemény” gombbal add meg a címet, típust, helyszínt, kezdő- és záró időpontot, opcionális létszámkorlátot és borítóképet." },
+      { label: "Vázlat vs. közzététel", desc: "Vázlatként mentve csak te látod; a „Közzététel” gombbal válik publikussá és jelentkezhetővé az Események oldalon." },
+      { label: "Jelentkezők", desc: "Minden eseménynél kibontható a jelentkezők listája a kísérők számával és megjegyzéseikkel együtt." },
+      { label: "Lemondás / lezárás", desc: "Lemondáskor minden jelentkező automatikus értesítést kap; a lezárás archiválja a megtörtént eseményt." },
+    ],
+    tip: "A létszámkorlát a kísérőket is beleszámolja – ha betelt, a felhasználók már nem tudnak jelentkezni.",
+  },
   foster: {
     title: "Ideiglenes befogadók",
     intro: "Itt kezeled azokat a felhasználókat, akik ideiglenesen otthont adnának egy állatnak. Jóváhagyhatod a jelentkezőket, és nyomon követheted a kiadott készleteket.",

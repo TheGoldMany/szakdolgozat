@@ -39,6 +39,7 @@ export function Header() {
   const NAV_LINKS = [
     { href: "/animals",  label: t("animals")  },
     { href: "/shelters", label: t("shelters") },
+    { href: "/events",   label: t("events")   },
     { href: "/reports",  label: t("reports")  },
     { href: "/map",      label: t("map")      },
     { href: "/donate",   label: t("donate")   },
