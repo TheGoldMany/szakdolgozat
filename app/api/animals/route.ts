@@ -80,6 +80,15 @@ const createSchema = z.object({
   isGoodWithDogs:  z.boolean().nullable().optional(),
   isGoodWithCats:  z.boolean().nullable().optional(),
   imageUrls:       z.array(z.string().url()).optional(),
+}).superRefine((data, ctx) => {
+  // "Egyéb" faj esetén kötelező a faj megnevezése (breed mező)
+  if (data.type === AnimalType.OTHER && !data.breed?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["breed"],
+      message: "Egyéb faj esetén kötelező megadni a faj megnevezését",
+    });
+  }
 });
 
 function slugify(text: string) {

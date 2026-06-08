@@ -25,6 +25,15 @@ const schema = z.object({
   isGoodWithDogs: z.boolean().nullable().optional(),
   isGoodWithCats: z.boolean().nullable().optional(),
   imageUrls:      z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+  // "Egyéb" faj esetén kötelező megadni a konkrét fajt a "Fajta" mezőben
+  if (data.type === "OTHER" && !data.breed?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["breed"],
+      message: "Egyéb faj esetén kötelező megadni a faj megnevezését",
+    });
+  }
 });
 
 type FormData = z.infer<typeof schema>;
@@ -45,13 +54,15 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { register, handleSubmit, control, formState: { errors, isSubmitting } } =
+  const { register, handleSubmit, control, watch, formState: { errors, isSubmitting } } =
     useForm<FormData>({
       resolver: zodResolver(schema),
       defaultValues: {
         type: "DOG", isVaccinated: false, isNeutered: false, isMicrochipped: false, imageUrls: [],
       },
     });
+
+  const isOther = watch("type") === "OTHER";
 
   async function onSubmit(data: FormData) {
     setServerError(null);
@@ -92,8 +103,12 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Fajta" error={errors.breed?.message}>
-              <input {...register("breed")} placeholder="pl. Labrador" className={cls} />
+            <Field label={isOther ? "Faj megnevezése *" : "Fajta"} error={errors.breed?.message}>
+              <input
+                {...register("breed")}
+                placeholder={isOther ? "pl. görög teknős, leguán" : "pl. Labrador"}
+                className={cls}
+              />
             </Field>
             <Field label="Szín" error={errors.color?.message}>
               <input {...register("color")} placeholder="pl. barna" className={cls} />
