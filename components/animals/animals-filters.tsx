@@ -4,10 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useCallback, useState, useTransition, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { SlidersHorizontal, ChevronDown, X, PawPrint, Dog, Cat, Rabbit, Bird } from "lucide-react";
+import { SlidersHorizontal, ChevronDown, X, PawPrint, Dog, Cat, Rabbit, Bird, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function AnimalsFilters() {
+export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
   const t = useTranslations("animals");
   const router       = useRouter();
   const pathname     = usePathname();
@@ -38,11 +38,21 @@ export function AnimalsFilters() {
     { value: "FEMALE", label: t("female")            },
   ];
 
+  const PROPS: { key: string; label: string }[] = [
+    { key: "vaccinated",   label: t("propVaccinated")   },
+    { key: "neutered",     label: t("propNeutered")     },
+    { key: "goodWithKids", label: t("propGoodWithKids") },
+    { key: "goodWithDogs", label: t("propGoodWithDogs") },
+    { key: "goodWithCats", label: t("propGoodWithCats") },
+  ];
+
   const q      = searchParams.get("q")      ?? "";
   const type   = searchParams.get("type")   ?? "";
   const size   = searchParams.get("size")   ?? "";
   const gender = searchParams.get("gender") ?? "";
-  const hasFilters = !!(type || size || gender || q);
+  const city   = searchParams.get("city")   ?? "";
+  const activeProps = PROPS.filter((p) => searchParams.get(p.key) === "1").map((p) => p.key);
+  const hasFilters = !!(type || size || gender || q || city || activeProps.length);
 
   // Local search state with debounce so typing is smooth
   const [localQ, setLocalQ] = useState(q);
@@ -69,6 +79,10 @@ export function AnimalsFilters() {
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => update("q", value), 400);
   }
+
+  const toggleProp = useCallback((key: string) => {
+    update(key, searchParams.get(key) === "1" ? "" : "1");
+  }, [update, searchParams]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
@@ -172,6 +186,57 @@ export function AnimalsFilters() {
                 {g.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Area (city) */}
+        {cities.length > 0 && (
+          <div>
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">
+              <MapPin className="h-3.5 w-3.5" />
+              {t("filterAreaLabel")}
+            </label>
+            <select
+              value={city}
+              onChange={(e) => update("city", e.target.value)}
+              className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
+            >
+              <option value="">{t("filterAllAreas")}</option>
+              {cities.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Properties */}
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">
+            {t("filterPropsLabel")}
+          </label>
+          <div className="flex flex-col gap-1.5">
+            {PROPS.map((p) => {
+              const active = activeProps.includes(p.key);
+              return (
+                <label
+                  key={p.key}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-sm transition-colors",
+                    active
+                      ? "border-brand-300 bg-brand-50 text-brand-700"
+                      : "border-gray-200 text-gray-700 hover:bg-gray-50",
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    checked={active}
+                    onChange={() => toggleProp(p.key)}
+                    className="h-4 w-4 rounded border-gray-300 text-brand-500"
+                  />
+                  {p.label}
+                </label>
+              );
+            })}
           </div>
         </div>
 

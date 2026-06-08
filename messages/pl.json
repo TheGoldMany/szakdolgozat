@@ -153,7 +153,15 @@
     "loginToAdopt": "Musisz być zalogowany, aby wirtualnie adoptować.",
     "redirecting": "Przekierowanie…",
     "supportButton": "Wsparcie {amount} HUF/miesiąc",
-    "virtualError": "Wystąpił błąd"
+    "virtualError": "Wystąpił błąd",
+    "filterAreaLabel": "Obszar",
+    "filterAllAreas": "Wszystkie obszary",
+    "filterPropsLabel": "Cechy",
+    "propVaccinated": "Zaszczepiony",
+    "propNeutered": "Wykastrowany",
+    "propGoodWithKids": "Lubi dzieci",
+    "propGoodWithDogs": "Lubi psy",
+    "propGoodWithCats": "Lubi koty"
   },
   "shelters": {
     "title": "Schroniska",

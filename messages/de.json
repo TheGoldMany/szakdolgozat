@@ -153,7 +153,15 @@
     "loginToAdopt": "Du musst eingeloggt sein, um virtuell zu adoptieren.",
     "redirecting": "Weiterleitung…",
     "supportButton": "Spenden {amount} HUF/Monat",
-    "virtualError": "Ein Fehler ist aufgetreten"
+    "virtualError": "Ein Fehler ist aufgetreten",
+    "filterAreaLabel": "Region",
+    "filterAllAreas": "Alle Regionen",
+    "filterPropsLabel": "Eigenschaften",
+    "propVaccinated": "Geimpft",
+    "propNeutered": "Kastriert",
+    "propGoodWithKids": "Kinderfreundlich",
+    "propGoodWithDogs": "Hundefreundlich",
+    "propGoodWithCats": "Katzenfreundlich"
   },
   "shelters": {
     "title": "Tierheime",

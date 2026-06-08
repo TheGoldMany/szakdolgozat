@@ -19,6 +19,12 @@ interface PageProps {
     type?: string;
     size?: string;
     gender?: string;
+    city?: string;
+    vaccinated?: string;
+    neutered?: string;
+    goodWithKids?: string;
+    goodWithDogs?: string;
+    goodWithCats?: string;
     page?: string;
   };
 }
@@ -35,12 +41,19 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
   const type   = searchParams.type as AnimalType | undefined;
   const size   = searchParams.size as AnimalSize | undefined;
   const gender = searchParams.gender;
+  const city   = searchParams.city?.trim();
 
   const where = {
     status: AnimalStatus.AVAILABLE,
     ...(type   && { type }),
     ...(size   && { size }),
     ...(gender && { gender }),
+    ...(city   && { shelter: { is: { city } } }),
+    ...(searchParams.vaccinated   === "1" && { isVaccinated:   true }),
+    ...(searchParams.neutered     === "1" && { isNeutered:     true }),
+    ...(searchParams.goodWithKids === "1" && { isGoodWithKids: true }),
+    ...(searchParams.goodWithDogs === "1" && { isGoodWithDogs: true }),
+    ...(searchParams.goodWithCats === "1" && { isGoodWithCats: true }),
     ...(search && {
       OR: [
         { name:  { contains: search, mode: "insensitive" as const } },
@@ -49,7 +62,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
     }),
   };
 
-  const [animals, total] = await Promise.all([
+  const [animals, total, cityRows] = await Promise.all([
     prisma.animal.findMany({
       where,
       skip: (page - 1) * PAGE_SIZE,
@@ -61,7 +74,16 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
       },
     }),
     prisma.animal.count({ where }),
+    // Csak azok a városok, ahol van örökbefogadható állat
+    prisma.shelter.findMany({
+      where:    { isActive: true, animals: { some: { status: AnimalStatus.AVAILABLE } } },
+      select:   { city: true },
+      distinct: ["city"],
+      orderBy:  { city: "asc" },
+    }),
   ]);
+
+  const cities = cityRows.map((r) => r.city).filter(Boolean);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -80,7 +102,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="w-full shrink-0 lg:w-64">
             <Suspense>
-              <AnimalsFilters />
+              <AnimalsFilters cities={cities} />
             </Suspense>
           </aside>
 

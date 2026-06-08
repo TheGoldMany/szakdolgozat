@@ -153,7 +153,15 @@
     "loginToAdopt": "A virtuális örökbefogadáshoz be kell jelentkezned.",
     "redirecting": "Átirányítás…",
     "supportButton": "Támogatás {amount} Ft/hó",
-    "virtualError": "Hiba történt"
+    "virtualError": "Hiba történt",
+    "filterAreaLabel": "Terület",
+    "filterAllAreas": "Minden terület",
+    "filterPropsLabel": "Tulajdonságok",
+    "propVaccinated": "Oltott",
+    "propNeutered": "Ivartalanított",
+    "propGoodWithKids": "Gyerekbarát",
+    "propGoodWithDogs": "Kutyabarát",
+    "propGoodWithCats": "Macskabarát"
   },
   "shelters": {
     "title": "Menhelyek",

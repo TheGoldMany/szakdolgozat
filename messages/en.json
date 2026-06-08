@@ -153,7 +153,15 @@
     "loginToAdopt": "You must be logged in for virtual adoption.",
     "redirecting": "Redirecting…",
     "supportButton": "Support {amount} HUF/month",
-    "virtualError": "An error occurred"
+    "virtualError": "An error occurred",
+    "filterAreaLabel": "Area",
+    "filterAllAreas": "All areas",
+    "filterPropsLabel": "Properties",
+    "propVaccinated": "Vaccinated",
+    "propNeutered": "Neutered",
+    "propGoodWithKids": "Good with kids",
+    "propGoodWithDogs": "Good with dogs",
+    "propGoodWithCats": "Good with cats"
   },
   "shelters": {
     "title": "Shelters",
