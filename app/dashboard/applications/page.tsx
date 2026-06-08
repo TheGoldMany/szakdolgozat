@@ -10,6 +10,7 @@ import { RatingStat } from "@/components/reviews/rating-stat";
 import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Users, PawPrint, FileText, Clock, ClipboardList } from "lucide-react";
+import { ExportButton } from "@/components/dashboard/export-button";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
@@ -87,9 +88,12 @@ export default async function DashboardApplicationsPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Kérelmek</h1>
-        <PageInfo page="applications" />
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">Kérelmek</h1>
+          <PageInfo page="applications" />
+        </div>
+        <ExportButton type="applications" label="CSV export" />
       </div>
 
       {/* Státusz szűrő */}

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { EventsManager } from "@/components/events/events-manager";
 import type { EventEntry } from "@/components/events/events-manager";
+import { ExportButton } from "@/components/dashboard/export-button";
 
 export const metadata: Metadata = { title: "Események" };
 export const dynamic = "force-dynamic";
@@ -66,17 +67,20 @@ export default async function DashboardEventsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center gap-3">
-        <CalendarHeart className="h-6 w-6 text-brand-500" />
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Események</h1>
-            <PageInfo page="events" />
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <CalendarHeart className="h-6 w-6 text-brand-500" />
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900">Események</h1>
+              <PageInfo page="events" />
+            </div>
+            <p className="text-sm text-gray-500">
+              {events.length} esemény &bull; {upcoming} közelgő, meghirdetett
+            </p>
           </div>
-          <p className="text-sm text-gray-500">
-            {events.length} esemény &bull; {upcoming} közelgő, meghirdetett
-          </p>
         </div>
+        <ExportButton type="events" label="CSV export" />
       </div>
 
       <EventsManager shelterId={shelterId} events={serialized} />

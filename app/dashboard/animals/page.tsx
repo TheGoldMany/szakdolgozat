@@ -10,6 +10,8 @@ import { AddAnimalPanel } from "@/components/dashboard/add-animal-panel";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { PawPrint, FileText } from "lucide-react";
+import { ExportButton } from "@/components/dashboard/export-button";
+import { TransferRequestButton } from "@/components/transfers/transfer-request-button";
 
 export const metadata: Metadata = { title: "Állatok" };
 
@@ -45,6 +47,12 @@ export default async function DashboardAnimalsPage({
 
   const statusFilter = searchParams.status as AnimalStatus | undefined;
 
+  const otherShelters = await prisma.shelter.findMany({
+    where:  { isActive: true, ...(shelterId && { NOT: { id: shelterId } }) },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
   const animals = await prisma.animal.findMany({
     where: {
       ...(shelterId && { shelterId }),
@@ -75,7 +83,10 @@ export default async function DashboardAnimalsPage({
           <h1 className="text-2xl font-bold text-gray-900">Állatok</h1>
           <PageInfo page="animals" />
         </div>
-        <AddAnimalPanel />
+        <div className="flex items-center gap-2">
+          <ExportButton type="animals" label="CSV export" />
+          <AddAnimalPanel />
+        </div>
       </div>
 
       {/* Státusz szűrő */}
@@ -111,6 +122,7 @@ export default async function DashboardAnimalsPage({
                 <th className="hidden px-4 py-3 text-left md:table-cell">Menhely</th>
                 <th className="px-4 py-3 text-left">Kérelmek</th>
                 <th className="px-4 py-3 text-left">Státusz</th>
+                <th className="hidden px-4 py-3 text-left lg:table-cell">Áthelyezés</th>
                 <th className="px-4 py-3 text-left">Iratok</th>
               </tr>
             </thead>
@@ -151,6 +163,15 @@ export default async function DashboardAnimalsPage({
                         animalId={animal.id}
                         currentStatus={animal.status}
                       />
+                    </td>
+                    <td className="hidden px-4 py-3 lg:table-cell">
+                      {otherShelters.length > 0 && (
+                        <TransferRequestButton
+                          animalId={animal.id}
+                          animalName={animal.name}
+                          shelters={otherShelters}
+                        />
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <Link

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { sendSponsorshipCancelledEmail } from "@/lib/email";
 
 // POST /api/sponsorships/[id]/cancel – virtuális örökbefogadás lemondása
 export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
@@ -32,7 +33,20 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
     const updated = await prisma.sponsorship.update({
       where: { id: params.id },
       data:  { status: "CANCELLED", cancelledAt: new Date() },
+      include: {
+        animal: { select: { name: true } },
+        user:   { select: { email: true, name: true } },
+      },
     });
+
+    if (updated.user?.email) {
+      sendSponsorshipCancelledEmail({
+        to:         updated.user.email,
+        name:       updated.user.name ?? "Felhasználó",
+        animalName: updated.animal?.name ?? "az állat",
+        amount:     updated.amount,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ ok: true, sponsorship: updated });
   } catch (err) {

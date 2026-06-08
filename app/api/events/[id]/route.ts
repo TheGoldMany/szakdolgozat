@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
+import { sendEventCancelledEmail } from "@/lib/email";
 
 const patchSchema = z.object({
   title:       z.string().min(2).max(200).optional(),
@@ -75,8 +76,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   // Notify registrants on cancellation or on key detail change
   if (becameCancelled || detailsChanged) {
     const regs = await prisma.eventRegistration.findMany({
-      where:  { eventId: params.id, status: "REGISTERED" },
-      select: { userId: true },
+      where:   { eventId: params.id, status: "REGISTERED" },
+      include: { user: { select: { id: true, email: true, name: true } } },
     });
     const userIds = [...new Set(regs.map(r => r.userId))];
     if (userIds.length > 0) {
@@ -85,10 +86,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         type:  becameCancelled ? ("EVENT_CANCELLED" as const) : ("EVENT_UPDATED" as const),
         title: becameCancelled ? "Esemény lemondva" : "Esemény módosítva",
         body:  becameCancelled
-          ? `A(z) „${updated.title}” esemény sajnos elmaradt.`
-          : `A(z) „${updated.title}” esemény részletei megváltoztak.`,
+          ? `A(z) "${updated.title}" esemény sajnos elmaradt.`
+          : `A(z) "${updated.title}" esemény részletei megváltoztak.`,
         href:  `/events/${updated.slug}`,
       }))).catch(() => {});
+
+      if (becameCancelled) {
+        const dateStr = event.startsAt.toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
+        for (const reg of regs) {
+          if (reg.user?.email) {
+            sendEventCancelledEmail({
+              to:         reg.user.email,
+              name:       reg.user.name ?? "Felhasználó",
+              eventTitle: updated.title,
+              eventDate:  dateStr,
+            }).catch(() => {});
+          }
+        }
+      }
     }
   }
 

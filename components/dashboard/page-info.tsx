@@ -148,6 +148,17 @@ const PAGE_INFO: Record<string, InfoContent> = {
       { label: "Olvasatlanok", desc: "Az olvasatlan üzenetek számlálója a fejlécben látható." },
     ],
   },
+  transfers: {
+    title: "Athelyezesek",
+    intro: "Menhelyek kozotti allat-athelyezesi kerelmek kezelese.",
+    points: [
+      { label: "Kerelem kuldese", desc: "Az Allatok oldalon, az allat melletti gombbal kuldhetsz kerelmet egy masik menhelynek." },
+      { label: "Bejovo kerelmek", desc: "Ha a te menhelyedre akarnak atkuldeni egy allatot, itt jelenik meg – jovahagyhatod vagy elutasithatod." },
+      { label: "Jovahagyas", desc: "Jovahagyaskor az allat automatikusan atkerul a celmenhely allomanyaba, es mindket fel ertesitест kap." },
+      { label: "Visszavonas", desc: "A kerelmező a dontes elott visszavonhatja a kerelmet." },
+    ],
+    tip: "Egyszerre csak egy aktiv (varakozó) kerelem lehet egy allathoz.",
+  },
   shelters: {
     title: "Menhelyek (Platform)",
     intro: "Super Admin nézet: az összes menhely kezelése a platformon.",

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/notifications";
+import { sendFosterStatusEmail } from "@/lib/email";
 import { FosterStatus } from "@prisma/client";
 
 const schema = z.object({
@@ -60,6 +61,20 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         title:  "Ideiglenes befogadás elutasítva",
         body:   `A(z) ${updated.shelter.name} sajnos elutasította a jelentkezésedet.`,
         href:   "/foster",
+      }).catch(() => {});
+    }
+    // Send status email to the applicant
+    const fosterUser = await prisma.user.findUnique({
+      where:  { id: foster.userId },
+      select: { email: true, name: true },
+    });
+    if (fosterUser?.email && (parsed.data.status === "ACTIVE" || parsed.data.status === "REJECTED")) {
+      sendFosterStatusEmail({
+        to:          fosterUser.email,
+        name:        fosterUser.name ?? "Felhasználó",
+        shelterName: updated.shelter.name,
+        status:      parsed.data.status as "ACTIVE" | "REJECTED",
+        adminNote:   parsed.data.adminNote ?? null,
       }).catch(() => {});
     }
   }

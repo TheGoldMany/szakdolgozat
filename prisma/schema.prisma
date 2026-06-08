@@ -133,6 +133,8 @@ model User {
   fosterSupplyLogs    FosterSupplyLog[]      @relation("FosterSupplyCreator")
   sponsorships        Sponsorship[]
   eventRegistrations  EventRegistration[]
+  transferRequests    AnimalTransfer[]    @relation("TransferRequester")
+  transferResolutions AnimalTransfer[]    @relation("TransferResolver")
 }
 
 // -------------------------------------------------------
@@ -238,6 +240,8 @@ model Shelter {
   kennels              Kennel[]
   fosterProfiles       FosterProfile[]
   events               Event[]
+  transfersFrom        AnimalTransfer[]   @relation("TransferFrom")
+  transfersTo          AnimalTransfer[]   @relation("TransferTo")
 }
 
 model ShelterDocument {
@@ -308,6 +312,7 @@ model Animal {
   appointments  Appointment[]
   behaviorLogs  BehaviorLog[]
   sponsorships  Sponsorship[]
+  transfers     AnimalTransfer[]
 
   @@index([kennelId])
   @@index([fosterId])
@@ -941,6 +946,10 @@ enum NotificationType {
   // Inventory
   INVENTORY_LOW_STOCK      // Admin: item quantity fell below minimum
   INVENTORY_EXPIRING_SOON  // Admin: item expiring within 7 days
+  // Animal transfers (menhelyek közötti áthelyezés)
+  TRANSFER_REQUESTED       // Target shelter admin: new transfer request
+  TRANSFER_APPROVED        // Requester: transfer was approved
+  TRANSFER_REJECTED        // Requester: transfer was rejected
 }
 
 model Notification {
@@ -1113,4 +1122,38 @@ model EventRegistration {
   @@unique([eventId, userId])
   @@index([eventId])
   @@index([userId])
+}
+
+// -------------------------------------------------------
+// Animal Transfer (Menhelyek közötti áthelyezés)
+// -------------------------------------------------------
+
+enum TransferStatus {
+  PENDING    // Jóváhagyásra vár
+  APPROVED   // Jóváhagyva, áthelyezés megtörtént
+  REJECTED   // Elutasítva
+  CANCELLED  // Visszavonva a kérelmező által
+}
+
+model AnimalTransfer {
+  id            String         @id @default(cuid())
+  animalId      String
+  animal        Animal         @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  fromShelterId String
+  fromShelter   Shelter        @relation("TransferFrom", fields: [fromShelterId], references: [id], onDelete: Cascade)
+  toShelterId   String
+  toShelter     Shelter        @relation("TransferTo", fields: [toShelterId], references: [id], onDelete: Cascade)
+  requestedById String
+  requestedBy   User           @relation("TransferRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  resolvedById  String?
+  resolvedBy    User?          @relation("TransferResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  status        TransferStatus @default(PENDING)
+  note          String?        @db.Text
+  requestedAt   DateTime       @default(now())
+  resolvedAt    DateTime?
+
+  @@index([animalId])
+  @@index([fromShelterId])
+  @@index([toShelterId])
+  @@index([status])
 }

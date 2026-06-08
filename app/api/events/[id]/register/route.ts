@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
+import { sendEventRegistrationEmail } from "@/lib/email";
 
 const schema = z.object({
   guests: z.number().int().min(0).max(20).optional(),
@@ -64,19 +65,32 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     create: { eventId: params.id, userId: session.user.id, status: "REGISTERED", guests, note: note ?? null },
   });
 
-  // Notify shelter admins only on a genuinely new registration
+  // Notify shelter admins + send confirmation email on a genuinely new registration
   if (!existing || existing.status !== "REGISTERED") {
     const [admins, user] = await Promise.all([
       prisma.shelterAdmin.findMany({ where: { shelterId: event.shelterId }, select: { userId: true } }),
-      prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } }),
+      prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, email: true } }),
     ]);
     createNotifications(admins.map(a => ({
       userId: a.userId,
       type:   "EVENT_REGISTRATION" as const,
       title:  "Új esemény-jelentkezés",
-      body:   `${user?.name ?? "Egy felhasználó"} jelentkezett: „${event.title}”.`,
+      body:   `${user?.name ?? "Egy felhasználó"} jelentkezett: "${event.title}".`,
       href:   "/dashboard/events",
     }))).catch(() => {});
+
+    if (user?.email) {
+      const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
+      sendEventRegistrationEmail({
+        to:            user.email,
+        name:          user.name ?? "Felhasználó",
+        eventTitle:    event.title,
+        eventDate:     event.startsAt.toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }),
+        eventLocation: event.location,
+        guests,
+        eventUrl:      `${BASE}/events/${event.slug}`,
+      }).catch(() => {});
+    }
   }
 
   return NextResponse.json(registration, { status: 201 });

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendDonationReceivedEmail, sendSubscriptionConfirmationEmail } from "@/lib/email";
+import { sendDonationReceivedEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
 // Disable body parsing — we need the raw body for signature verification
@@ -243,6 +243,21 @@ export async function POST(req: NextRequest) {
           body:   `${animal.name} – ${amountStr}/hó`,
           href:   "/dashboard/animals",
         }))).catch((err) => console.error("Sponsorship admin notification error:", err));
+
+        // Send confirmation email to the sponsor
+        const sponsor = await prisma.user.findUnique({
+          where:  { id: userId },
+          select: { email: true, name: true },
+        });
+        if (sponsor?.email) {
+          sendSponsorshipStartedEmail({
+            to:         sponsor.email,
+            name:       sponsor.name ?? "Felhasználó",
+            animalName: animal.name,
+            animalSlug: animal.slug,
+            amount,
+          }).catch((err) => console.error("Sponsorship email error:", err));
+        }
       }
     }
   }
