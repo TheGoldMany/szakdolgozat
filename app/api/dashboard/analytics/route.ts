@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { dwh } from "@/lib/dwh";
 
 // GET /api/dashboard/analytics?shelterIds=id1,id2
 export async function GET(req: NextRequest) {
@@ -267,10 +268,105 @@ export async function GET(req: NextRequest) {
     withPets:     profileBase > 0 ? Math.round(allApproved.filter((a) => a.hasPets).length / profileBase * 100) : 0,
   };
 
+  // ────────────────────────────────────────────────────────
+  // UC-05: Korfaj profil es versenyhely (DWH-alapu)
+  // ────────────────────────────────────────────────────────
+
+  type Uc05Data = {
+    ageCategoryDist: Array<{ category: string; label: string; count: number }>;
+    appCountDist: Array<{ label: string; count: number }>;
+    speciesAgeCross: Array<{ type: string; label: string; PUPPY: number; YOUNG: number; ADULT: number; SENIOR: number; UNKNOWN: number }>;
+    dwhAvailable: boolean;
+  };
+
+  let uc05: Uc05Data = {
+    ageCategoryDist: [],
+    appCountDist:    [],
+    speciesAgeCross: [],
+    dwhAvailable:    false,
+  };
+
+  try {
+    // DWH shelter IDs for the selected OLTP shelter IDs
+    const dwhShelters = await dwh.dimShelter.findMany({
+      where:  { shelterId: { in: shelterIds } },
+      select: { id: true },
+    });
+    const dwhShelterIds = dwhShelters.map((s) => s.id);
+
+    const [dwhAdoptions] = await Promise.all([
+      dwh.factAdoption.findMany({
+        where:  { shelterId: { in: dwhShelterIds } },
+        select: {
+          applicationCount: true,
+          animal: { select: { type: true, ageCategory: true } },
+        },
+      }),
+    ]);
+
+    const AGE_LABELS: Record<string, string> = {
+      PUPPY:   "Kolyok / kicsi (< 6 ho)",
+      YOUNG:   "Fiatal (6-24 ho)",
+      ADULT:   "Felnott (2-8 ev)",
+      SENIOR:  "Idosebb (8+ ev)",
+      UNKNOWN: "Ismeretlen kor",
+    };
+    const SPECIES_LABELS_UC05: Record<string, string> = {
+      DOG: "Kutya", CAT: "Macska", RABBIT: "Nyul", BIRD: "Madar", OTHER: "Egyeb",
+    };
+
+    // Age category distribution
+    const ageBucket: Record<string, number> = {};
+    for (const a of dwhAdoptions) {
+      const cat = a.animal?.ageCategory ?? "UNKNOWN";
+      ageBucket[cat] = (ageBucket[cat] ?? 0) + 1;
+    }
+    const ageCategoryDist = Object.entries(ageBucket)
+      .map(([category, count]) => ({ category, label: AGE_LABELS[category] ?? category, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // Application count distribution (1 / 2-3 / 4-5 / 6+)
+    const appBucket = { "1": 0, "2-3": 0, "4-5": 0, "6+": 0 };
+    for (const a of dwhAdoptions) {
+      const c = a.applicationCount ?? 1;
+      if (c === 1)       appBucket["1"]++;
+      else if (c <= 3)   appBucket["2-3"]++;
+      else if (c <= 5)   appBucket["4-5"]++;
+      else               appBucket["6+"]++;
+    }
+    const appCountDist = Object.entries(appBucket).map(([label, count]) => ({ label, count }));
+
+    // Species × age cross table
+    const crossMap: Record<string, Record<string, number>> = {};
+    for (const a of dwhAdoptions) {
+      const type = a.animal?.type ?? "OTHER";
+      const cat  = a.animal?.ageCategory ?? "UNKNOWN";
+      if (!crossMap[type]) crossMap[type] = { PUPPY: 0, YOUNG: 0, ADULT: 0, SENIOR: 0, UNKNOWN: 0 };
+      crossMap[type][cat] = (crossMap[type][cat] ?? 0) + 1;
+    }
+    const speciesAgeCross = Object.entries(crossMap)
+      .filter(([, row]) => Object.values(row).some((v) => v > 0))
+      .map(([type, row]) => ({
+        type,
+        label:   SPECIES_LABELS_UC05[type] ?? type,
+        PUPPY:   row.PUPPY   ?? 0,
+        YOUNG:   row.YOUNG   ?? 0,
+        ADULT:   row.ADULT   ?? 0,
+        SENIOR:  row.SENIOR  ?? 0,
+        UNKNOWN: row.UNKNOWN ?? 0,
+      }));
+
+    uc05 = { ageCategoryDist, appCountDist, speciesAgeCross, dwhAvailable: true };
+  } catch {
+    // DWH not reachable (suspended Neon DB) – return empty placeholder
+    uc05 = { ageCategoryDist: [], appCountDist: [], speciesAgeCross: [], dwhAvailable: false };
+  }
+
   return NextResponse.json({
     uc01: { totalAdoptions, yoyGrowth, thisYearApps, lastYearApps, monthlyTrend, bySpecies },
     uc02: { avgStayBySpecies, stayCategories, shelterUtil, avgUtilization },
     uc03: { lostCount, foundCount, strayCount, matchRate, lostMinusFound, byReportType, reportsByCity },
     uc04: { returnRate, yoyReturnRateChange, returnAnimals, uniqueAnimals, adoptionsByHomeType, adoptionsByProfile },
+    uc05,
   });
 }

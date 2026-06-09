@@ -21,6 +21,7 @@ export default async function ShelterSettingsPage() {
           name:                    true,
           logoUrl:                 true,
           adoptionRequirements:    true,
+          capacity:                true,
           companyName:             true,
           taxNumber:               true,
           bankAccountName:         true,

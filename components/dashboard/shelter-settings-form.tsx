@@ -18,6 +18,7 @@ interface Props {
     name:                    string;
     logoUrl:                 string | null;
     adoptionRequirements:    string | null;
+    capacity:                number | null;
     documents:               ShelterDoc[];
     companyName:             string | null;
     taxNumber:               string | null;
@@ -45,6 +46,12 @@ export function ShelterSettingsForm({ shelter }: Props) {
   const [paySaving,  setPaySaving]  = useState(false);
   const [paySaved,   setPaySaved]   = useState(false);
   const [payError,   setPayError]   = useState("");
+
+  // --- Capacity ---
+  const [capacity,     setCapacity]     = useState<string>(shelter.capacity != null ? String(shelter.capacity) : "");
+  const [capSaving,    setCapSaving]    = useState(false);
+  const [capSaved,     setCapSaved]     = useState(false);
+  const [capError,     setCapError]     = useState("");
 
   // --- Requirements ---
   const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
@@ -125,6 +132,32 @@ export function ShelterSettingsForm({ shelter }: Props) {
       setPayError("Mentés sikertelen.");
     } finally {
       setPaySaving(false);
+    }
+  }
+
+  async function saveCapacity() {
+    setCapSaving(true);
+    setCapSaved(false);
+    setCapError("");
+    const parsed = capacity.trim() === "" ? null : parseInt(capacity, 10);
+    if (capacity.trim() !== "" && (isNaN(parsed as number) || (parsed as number) < 1)) {
+      setCapError("Adj meg egy pozitiv egesz szamot.");
+      setCapSaving(false);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/shelters/${shelter.id}/capacity`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ capacity: parsed }),
+      });
+      if (!res.ok) throw new Error();
+      setCapSaved(true);
+      setTimeout(() => setCapSaved(false), 3000);
+    } catch {
+      setCapError("Mentes sikertelen.");
+    } finally {
+      setCapSaving(false);
     }
   }
 
@@ -318,6 +351,35 @@ export function ShelterSettingsForm({ shelter }: Props) {
           </button>
           {paySaved && <span className="text-sm text-brand-600">Elmentve!</span>}
           {payError && <span className="text-sm text-red-500">{payError}</span>}
+        </div>
+      </div>
+
+      {/* Kapacitás */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">Menhelyi kapacitas</h2>
+        <p className="mb-4 text-xs text-gray-400">
+          Hany allat befogadasara alkalmas a menhely? Ez az ertek jelenik meg a kihasznaltsagi mutatoban.
+        </p>
+        <div className="flex items-center gap-3">
+          <input
+            type="number"
+            min={1}
+            max={10000}
+            placeholder="pl. 120"
+            value={capacity}
+            onChange={(e) => setCapacity(e.target.value)}
+            className={`w-40 ${cls}`}
+          />
+          <span className="text-sm text-gray-400">ferojhely</span>
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <button type="button" onClick={saveCapacity} disabled={capSaving}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
+            <Save className="h-4 w-4" />
+            {capSaving ? "Mentes..." : "Mentes"}
+          </button>
+          {capSaved && <span className="text-sm text-brand-600">Elmentve!</span>}
+          {capError && <span className="text-sm text-red-500">{capError}</span>}
         </div>
       </div>
 

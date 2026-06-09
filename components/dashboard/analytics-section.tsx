@@ -6,6 +6,7 @@ import { Uc01AdoptionsTrend } from "./stats/uc01-adoptions-trend";
 import { Uc02CapacityPanel } from "./stats/uc02-capacity-panel";
 import { Uc03ReportsPanel } from "./stats/uc03-reports-panel";
 import { Uc04ReturnRate } from "./stats/uc04-return-rate";
+import { Uc05AgeProfile } from "./stats/uc05-age-profile";
 
 interface Shelter { id: string; name: string }
 
@@ -40,6 +41,12 @@ interface AnalyticsData {
     uniqueAnimals: number;
     adoptionsByHomeType: Array<{ homeType: string; label: string; count: number }>;
     adoptionsByProfile: { withGarden: number; withChildren: number; withPets: number };
+  };
+  uc05: {
+    ageCategoryDist: Array<{ category: string; label: string; count: number }>;
+    appCountDist:    Array<{ label: string; count: number }>;
+    speciesAgeCross: Array<{ type: string; label: string; PUPPY: number; YOUNG: number; ADULT: number; SENIOR: number; UNKNOWN: number }>;
+    dwhAvailable:    boolean;
   };
 }
 
@@ -178,6 +185,9 @@ export function AnalyticsSection({ role, shelters }: Props) {
           </div>
           <div className={loading ? "opacity-60 pointer-events-none" : ""}>
             <Uc04ReturnRate {...data.uc04} />
+          </div>
+          <div className={loading ? "opacity-60 pointer-events-none" : ""}>
+            <Uc05AgeProfile {...data.uc05} />
           </div>
         </div>
       )}
