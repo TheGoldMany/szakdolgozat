@@ -25,7 +25,8 @@ export default async function ProfilePage() {
     redirect("/auth/login?callbackUrl=/profile");
   }
 
-  const user = await prisma.user.findUnique({
+  const [user, adoptedApps] = await Promise.all([
+    prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
       id:        true,
@@ -68,7 +69,23 @@ export default async function ProfilePage() {
         },
       },
     },
-  });
+  }),
+    prisma.adoptionApplication.findMany({
+      where:   { userId: session.user.id, status: "APPROVED" },
+      orderBy: { reviewedAt: "desc" },
+      select: {
+        id:         true,
+        reviewedAt: true,
+        animal: {
+          select: {
+            name: true, slug: true, type: true, adoptedAt: true,
+            images:  { where: { isPrimary: true }, take: 1, select: { url: true } },
+            shelter: { select: { name: true } },
+          },
+        },
+      },
+    }),
+  ]);
 
   if (!user) redirect("/auth/login");
 
@@ -159,6 +176,48 @@ export default async function ProfilePage() {
                 cancelledAt: s.cancelledAt?.toISOString() ?? null,
               }))}
             />
+          </div>
+
+          {/* Adoption history */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("adoptionHistory")}</h2>
+            {adoptedApps.length === 0 ? (
+              <p className="text-sm text-gray-400">{t("noAdoptions")}</p>
+            ) : (
+              <ul className="space-y-3">
+                {adoptedApps.map((app) => {
+                  const img = app.animal.images[0];
+                  const date = app.animal.adoptedAt ?? app.reviewedAt;
+                  return (
+                    <li key={app.id}>
+                      <Link
+                        href={`/animals/${app.animal.slug}`}
+                        className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 transition-colors hover:bg-gray-50"
+                      >
+                        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                          {img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={img.url} alt={app.animal.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-lg">🐾</div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-gray-900">{app.animal.name}</p>
+                          <p className="truncate text-xs text-gray-400">{app.animal.shelter.name}</p>
+                        </div>
+                        {date && (
+                          <span className="shrink-0 text-xs text-gray-400">
+                            {t("adoptedOn")}{" "}
+                            {new Date(date).toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" })}
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
         </div>

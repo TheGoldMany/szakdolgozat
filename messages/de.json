@@ -412,7 +412,10 @@
     "sponsoredSince": "seit",
     "unknownAnimal": "Unbekanntes Tier",
     "perMonth": "HUF / Monat",
-    "cancelSponsorship": "Kündigen"
+    "cancelSponsorship": "Kündigen",
+    "adoptionHistory": "Meine Adoptionen",
+    "noAdoptions": "Du hast noch kein Tier adoptiert.",
+    "adoptedOn": "Adoptiert am:"
   },
   "messages": {
     "title": "Nachrichten",

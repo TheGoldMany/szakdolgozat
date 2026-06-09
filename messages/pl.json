@@ -412,7 +412,10 @@
     "sponsoredSince": "od",
     "unknownAnimal": "Nieznane zwierzę",
     "perMonth": "HUF / miesiąc",
-    "cancelSponsorship": "Anuluj"
+    "cancelSponsorship": "Anuluj",
+    "adoptionHistory": "Moje adopcje",
+    "noAdoptions": "Nie adoptowałeś jeszcze żadnego zwierzęcia.",
+    "adoptedOn": "Adoptowano:"
   },
   "messages": {
     "title": "Wiadomości",

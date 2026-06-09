@@ -412,7 +412,10 @@
     "sponsoredSince": "óta",
     "unknownAnimal": "Ismeretlen állat",
     "perMonth": "Ft / hó",
-    "cancelSponsorship": "Lemondás"
+    "cancelSponsorship": "Lemondás",
+    "adoptionHistory": "Örökbefogadásaim",
+    "noAdoptions": "Még nem fogadtál örökbe állatot.",
+    "adoptedOn": "Örökbefogadva:"
   },
   "messages": {
     "title": "Üzenetek",
