@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimalType, AnimalStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
+import { FavoriteButton } from "@/components/animals/favorite-button";
 
 const STATUS_COLOR: Record<AnimalStatus, string> = {
   AVAILABLE:    "bg-emerald-100 text-emerald-700",
@@ -27,9 +28,10 @@ interface AnimalCardProps {
     images: { url: string; alt: string | null }[];
     shelter: { name: string; city: string };
   };
+  isFavorited?: boolean;
 }
 
-export async function AnimalCard({ animal }: AnimalCardProps) {
+export async function AnimalCard({ animal, isFavorited = false }: AnimalCardProps) {
   const t = await getTranslations("animals");
 
   const STATUS_LABEL: Record<AnimalStatus, string> = {
@@ -66,7 +68,7 @@ export async function AnimalCard({ animal }: AnimalCardProps) {
   const gender = animal.gender ? (GENDER_LABEL[animal.gender] ?? null) : null;
 
   return (
-    <Link href={`/animals/${animal.slug}`} className="group flex flex-col">
+    <div className="group relative flex flex-col">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Image */}
@@ -82,16 +84,21 @@ export async function AnimalCard({ animal }: AnimalCardProps) {
 
           {/* Status badge */}
           <span className={cn(
-            "absolute left-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-sm",
+            "absolute left-3 top-3 z-20 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-sm",
             STATUS_COLOR[animal.status],
           )}>
             {STATUS_LABEL[animal.status]}
           </span>
 
           {/* Type badge */}
-          <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
+          <span className="absolute left-3 bottom-3 z-20 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
             {TYPE_LABEL[animal.type]}
           </span>
+
+          {/* Favorite heart (above the stretched link) */}
+          <div className="relative z-20">
+            <FavoriteButton animalId={animal.id} initialFavorited={isFavorited} />
+          </div>
         </div>
 
         {/* Body */}
@@ -138,6 +145,13 @@ export async function AnimalCard({ animal }: AnimalCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+
+      {/* Stretched link – covers the whole card for navigation, sits below the heart (z-20) */}
+      <Link
+        href={`/animals/${animal.slug}`}
+        aria-label={animal.name}
+        className="absolute inset-0 z-10 rounded-2xl"
+      />
+    </div>
   );
 }

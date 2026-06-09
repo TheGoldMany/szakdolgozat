@@ -161,7 +161,9 @@
     "propNeutered": "Neutered",
     "propGoodWithKids": "Good with kids",
     "propGoodWithDogs": "Good with dogs",
-    "propGoodWithCats": "Good with cats"
+    "propGoodWithCats": "Good with cats",
+    "favoriteAdd": "Add to favorites",
+    "favoriteRemove": "Remove from favorites"
   },
   "shelters": {
     "title": "Shelters",
@@ -473,5 +475,11 @@
     "submitRegister": "Confirm registration",
     "submitting": "Sending…",
     "error": "An error occurred"
+  },
+  "favorites": {
+    "title": "My favorites",
+    "emptyTitle": "No favorites yet",
+    "emptyDesc": "Browse the animals and tap the heart icon to save your favorites.",
+    "browseAnimals": "Browse animals"
   }
 }

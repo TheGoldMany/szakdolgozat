@@ -161,7 +161,9 @@
     "propNeutered": "Wykastrowany",
     "propGoodWithKids": "Lubi dzieci",
     "propGoodWithDogs": "Lubi psy",
-    "propGoodWithCats": "Lubi koty"
+    "propGoodWithCats": "Lubi koty",
+    "favoriteAdd": "Dodaj do ulubionych",
+    "favoriteRemove": "Usuń z ulubionych"
   },
   "shelters": {
     "title": "Schroniska",
@@ -473,5 +475,11 @@
     "submitRegister": "Potwierdź rejestrację",
     "submitting": "Wysyłanie…",
     "error": "Wystąpił błąd"
+  },
+  "favorites": {
+    "title": "Moje ulubione",
+    "emptyTitle": "Brak ulubionych",
+    "emptyDesc": "Przeglądaj zwierzęta i kliknij ikonę serca, aby zapisać ulubione.",
+    "browseAnimals": "Przeglądaj zwierzęta"
   }
 }

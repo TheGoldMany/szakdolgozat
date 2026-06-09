@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Menu, X, PawPrint, MessageCircle, Globe, Bell } from "lucide-react";
+import { Menu, X, PawPrint, MessageCircle, Globe, Bell, Heart } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -194,6 +194,9 @@ export function Header() {
                     <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("profile")}
                     </Link>
+                    <Link href="/favorites" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Kedvenceim
+                    </Link>
                     <Link href="/messages" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("myMessages")}
                     </Link>
@@ -305,6 +308,11 @@ export function Header() {
                       {unread}
                     </span>
                   )}
+                </Link>
+                <Link href="/favorites" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  <Heart className="h-4 w-4" />
+                  Kedvenceim
                 </Link>
                 <Link href="/notifications" onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">

@@ -161,7 +161,9 @@
     "propNeutered": "Kastriert",
     "propGoodWithKids": "Kinderfreundlich",
     "propGoodWithDogs": "Hundefreundlich",
-    "propGoodWithCats": "Katzenfreundlich"
+    "propGoodWithCats": "Katzenfreundlich",
+    "favoriteAdd": "Zu Favoriten hinzufügen",
+    "favoriteRemove": "Aus Favoriten entfernen"
   },
   "shelters": {
     "title": "Tierheime",
@@ -473,5 +475,11 @@
     "submitRegister": "Anmeldung bestätigen",
     "submitting": "Senden…",
     "error": "Ein Fehler ist aufgetreten"
+  },
+  "favorites": {
+    "title": "Meine Favoriten",
+    "emptyTitle": "Noch keine Favoriten",
+    "emptyDesc": "Durchsuche die Tiere und tippe auf das Herzsymbol, um deine Favoriten zu speichern.",
+    "browseAnimals": "Tiere durchsuchen"
   }
 }

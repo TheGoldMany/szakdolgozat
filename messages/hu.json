@@ -161,7 +161,9 @@
     "propNeutered": "Ivartalanított",
     "propGoodWithKids": "Gyerekbarát",
     "propGoodWithDogs": "Kutyabarát",
-    "propGoodWithCats": "Macskabarát"
+    "propGoodWithCats": "Macskabarát",
+    "favoriteAdd": "Kedvencekhez ad",
+    "favoriteRemove": "Eltávolítás a kedvencekből"
   },
   "shelters": {
     "title": "Menhelyek",
@@ -473,5 +475,11 @@
     "submitRegister": "Jelentkezés véglegesítése",
     "submitting": "Küldés…",
     "error": "Hiba történt"
+  },
+  "favorites": {
+    "title": "Kedvenceim",
+    "emptyTitle": "Még nincsenek kedvenceid",
+    "emptyDesc": "Böngészd az állatokat, és a szív ikonra kattintva mentsd el a kedvenceidet.",
+    "browseAnimals": "Állatok böngészése"
   }
 }

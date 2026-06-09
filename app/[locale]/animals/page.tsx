@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { AnimalsFilters } from "@/components/animals/animals-filters";
@@ -85,6 +87,17 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
 
   const cities = cityRows.map((r) => r.city).filter(Boolean);
 
+  // A bejelentkezett felhasználó kedvencei (a szív ikon kezdőállapotához)
+  const session = await getServerSession(authOptions);
+  let favoriteIds = new Set<string>();
+  if (session?.user?.id && animals.length > 0) {
+    const favs = await prisma.favorite.findMany({
+      where:  { userId: session.user.id, animalId: { in: animals.map((a) => a.id) } },
+      select: { animalId: true },
+    });
+    favoriteIds = new Set(favs.map((f) => f.animalId));
+  }
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
@@ -117,7 +130,7 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
               <>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {animals.map((animal) => (
-                    <AnimalCard key={animal.id} animal={animal} />
+                    <AnimalCard key={animal.id} animal={animal} isFavorited={favoriteIds.has(animal.id)} />
                   ))}
                 </div>
 

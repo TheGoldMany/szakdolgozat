@@ -11,6 +11,7 @@ import { RatingBadge } from "@/components/reviews/rating-stat";
 import { HealthTimeline } from "@/components/health/health-timeline";
 import { AppointmentButton } from "@/components/appointments/appointment-button";
 import { VirtualAdoptionCard } from "@/components/animals/virtual-adoption-card";
+import { FavoriteButton } from "@/components/animals/favorite-button";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
@@ -49,6 +50,12 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
   ]);
 
   if (!animal) notFound();
+
+  const isFavorited = session?.user?.id
+    ? !!(await prisma.favorite.findUnique({
+        where: { userId_animalId: { userId: session.user.id, animalId: animal.id } },
+      }))
+    : false;
 
   const STATUS_COLOR: Record<AnimalStatus, string> = {
     AVAILABLE:    "bg-brand-100 text-brand-700",
@@ -242,6 +249,10 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 <Trait ok={animal.isGoodWithKids} label={t("goodWithKids")} />
                 <Trait ok={animal.isGoodWithDogs} label={t("goodWithDogs")} />
                 <Trait ok={animal.isGoodWithCats} label={t("goodWithCats")} />
+              </div>
+
+              <div className="mt-4">
+                <FavoriteButton animalId={animal.id} initialFavorited={isFavorited} variant="button" />
               </div>
             </div>
 
