@@ -53,8 +53,16 @@ export function Header() {
         .then((d) => setUnread(d.count ?? 0))
         .catch(() => {});
     fetch_();
-    const id = setInterval(fetch_, 30_000);
-    return () => clearInterval(id);
+    // Csak aktív fülnél pollozunk
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") fetch_();
+    }, 30_000);
+    const onVisible = () => { if (document.visibilityState === "visible") fetch_(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [session?.user?.id]);
 
   function switchLocale(newLocale: string) {

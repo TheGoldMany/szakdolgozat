@@ -37,8 +37,16 @@ export function NotificationBell() {
   useEffect(() => {
     if (!session?.user?.id) return;
     fetchNotifications();
-    const id = setInterval(fetchNotifications, 30_000);
-    return () => clearInterval(id);
+    // Csak akkor pollozunk, ha a böngészőfül aktív (nem terheli a hátteret)
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") fetchNotifications();
+    }, 30_000);
+    const onVisible = () => { if (document.visibilityState === "visible") fetchNotifications(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [session?.user?.id]);
 
   // Close on outside click

@@ -10,6 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
+// ISR: a menhelylista ritkán változik, 2 percenként frissül (gyors betöltés cache-ből)
+export const revalidate = 120;
+
 export default async function SheltersPage() {
   const t = await getTranslations("shelters");
 

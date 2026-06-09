@@ -10,7 +10,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
   return { title: t("events") };
 }
-export const dynamic = "force-dynamic";
+// ISR: az eseménylista 5 percenként frissül (gyors betöltés cache-ből)
+export const revalidate = 300;
 
 export default async function EventsListPage() {
   const t = await getTranslations("events");
