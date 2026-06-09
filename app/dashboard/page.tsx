@@ -317,6 +317,10 @@ export default async function DashboardPage() {
     totalShelters,
     totalAnimals,
     totalApplications,
+    activeShelters,
+    suspendedShelters,
+    unverifiedShelters,
+    unverifiedUsers,
     activeSubs,
     paidDonationsAgg,
     pendingCampaigns,
@@ -331,6 +335,10 @@ export default async function DashboardPage() {
     prisma.shelter.count(),
     prisma.animal.count(),
     prisma.adoptionApplication.count(),
+    prisma.shelter.count({ where: { isActive: true } }),
+    prisma.shelter.count({ where: { isActive: false } }),
+    prisma.shelter.count({ where: { isVerified: false } }),
+    prisma.user.count({ where: { emailVerified: null, password: { not: null } } }),
     prisma.subscription.findMany({
       where:   { status: SubscriptionStatus.ACTIVE },
       include: { tier: { select: { amount: true } } },
@@ -398,6 +406,37 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <KpiCard label="Havi előfizetési bevétel" value={monthlyRevenue}       icon={TrendingUp}   iconBg="bg-purple-50" iconColor="text-purple-500" suffix="HUF" />
         <KpiCard label="Összes adomány"           value={totalDonationsAmount} icon={DollarSign}   iconBg="bg-emerald-50" iconColor="text-emerald-500" suffix="HUF" />
+      </div>
+
+      {/* Platform health */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-sm font-bold text-gray-900">Platform állapot</h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-xl bg-green-50 p-3.5">
+            <p className="text-2xl font-bold text-green-600">{activeShelters}</p>
+            <p className="mt-0.5 text-xs font-medium text-green-700">Aktív menhely</p>
+          </div>
+          <div className="rounded-xl bg-gray-50 p-3.5">
+            <p className="text-2xl font-bold text-gray-500">{suspendedShelters}</p>
+            <p className="mt-0.5 text-xs font-medium text-gray-600">Felfüggesztett menhely</p>
+          </div>
+          <div className="rounded-xl bg-amber-50 p-3.5">
+            <p className="text-2xl font-bold text-amber-600">{unverifiedShelters}</p>
+            <p className="mt-0.5 text-xs font-medium text-amber-700">Hitelesítésre vár</p>
+          </div>
+          <div className="rounded-xl bg-rose-50 p-3.5">
+            <p className="text-2xl font-bold text-rose-600">{unverifiedUsers}</p>
+            <p className="mt-0.5 text-xs font-medium text-rose-700">Nem megerősített e-mail</p>
+          </div>
+        </div>
+        <div className="mt-3 flex gap-3">
+          <Link href="/dashboard/shelters" className="text-xs font-medium text-brand-600 hover:underline">
+            Menhelyek kezelése →
+          </Link>
+          <Link href="/dashboard/users" className="text-xs font-medium text-brand-600 hover:underline">
+            Felhasználók kezelése →
+          </Link>
+        </div>
       </div>
 
       {/* Pending approvals */}

@@ -287,6 +287,8 @@
     "closed": "Closed",
     "noReports": "No reports",
     "noReportsDesc": "Be the first to submit a report!",
+    "myReports": "My reports",
+    "myReportsDesc": "The status of the reports you submitted",
     "reportAnimal": "Report an animal",
     "unknown": "Unknown",
     "newTitle": "New report",

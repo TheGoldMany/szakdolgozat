@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
+import { ExportButton } from "@/components/dashboard/export-button";
 import { prisma } from "@/lib/prisma";
 import { ShelterVolunteers } from "@/components/volunteers/shelter-volunteers";
 import type { VolunteerEntry, TaskEntry } from "@/components/volunteers/shelter-volunteers";
@@ -95,6 +96,9 @@ export default async function DashboardVolunteersPage() {
           <p className="text-sm text-gray-500">
             {volunteers.filter(v => v.status === "ACTIVE").length} aktív önkéntes &bull; {Math.round(totalHours)} óra teljesítve összesen
           </p>
+        </div>
+        <div className="ml-auto">
+          <ExportButton type="volunteers" />
         </div>
       </div>
 

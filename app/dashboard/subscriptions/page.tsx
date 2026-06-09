@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
+import { ExportButton } from "@/components/dashboard/export-button";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionCancelButton } from "@/components/dashboard/subscription-cancel-button";
 import { cn } from "@/lib/utils";
@@ -63,6 +64,10 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
       <div className="flex items-center gap-2">
         <h1 className="text-2xl font-bold text-gray-900">Előfizetők</h1>
         <PageInfo page="subscriptions" />
+        <div className="ml-auto flex gap-2">
+          <ExportButton type="subscribers" label="Előfizetők CSV" />
+          <ExportButton type="donations"   label="Adományok CSV" />
+        </div>
       </div>
 
       {/* Filter row */}

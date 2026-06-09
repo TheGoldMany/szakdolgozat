@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 
-type ExportType = "animals" | "applications" | "volunteers" | "sponsorships" | "events" | "subscribers";
+type ExportType = "animals" | "applications" | "volunteers" | "sponsorships" | "events" | "subscribers" | "donations";
 
 interface Props {
   type:   ExportType;

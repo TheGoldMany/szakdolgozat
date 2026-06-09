@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-type ExportType = "animals" | "applications" | "volunteers" | "sponsorships" | "events" | "subscribers";
+type ExportType = "animals" | "applications" | "volunteers" | "sponsorships" | "events" | "subscribers" | "donations";
 
 function toCsv(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   }
 
   const type = (req.nextUrl.searchParams.get("type") ?? "animals") as ExportType;
-  const VALID: ExportType[] = ["animals", "applications", "volunteers", "sponsorships", "events", "subscribers"];
+  const VALID: ExportType[] = ["animals", "applications", "volunteers", "sponsorships", "events", "subscribers", "donations"];
   if (!VALID.includes(type)) {
     return NextResponse.json({ error: "Érvénytelen típus" }, { status: 400 });
   }
@@ -182,6 +182,31 @@ export async function GET(req: NextRequest) {
       lemondva:  fmtDate(s.cancelledAt),
     }));
     filename = `export-elofizetok-${fmtDate(new Date())}.csv`;
+  }
+
+  if (type === "donations") {
+    const donations = await prisma.donation.findMany({
+      where: shelterId
+        ? { paidAt: { not: null }, campaign: { shelterId } }
+        : { paidAt: { not: null } },
+      include: {
+        user:     { select: { name: true, email: true } },
+        campaign: { select: { title: true, shelter: { select: { name: true } } } },
+      },
+      orderBy: { paidAt: "desc" },
+    });
+    rows = donations.map(d => ({
+      id:         d.id,
+      adomanyozo: d.isAnonymous ? "Névtelen" : (d.user?.name ?? ""),
+      email:      d.isAnonymous ? "" : (d.user?.email ?? ""),
+      osszeg_ft:  d.amount,
+      kampany:    d.campaign?.title ?? "",
+      menhely:    d.campaign?.shelter?.name ?? "",
+      uzenet:     (d.message ?? "").replace(/\r?\n/g, " "),
+      nevtelen:   d.isAnonymous ? "igen" : "nem",
+      fizetve:    fmtDate(d.paidAt),
+    }));
+    filename = `export-adomanyok-${fmtDate(new Date())}.csv`;
   }
 
   const csv = toCsv(rows);

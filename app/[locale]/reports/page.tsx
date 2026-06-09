@@ -1,6 +1,8 @@
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
-import { Search } from "lucide-react";
+import { Search, ClipboardList } from "lucide-react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ReportCard } from "@/components/reports/report-card";
 import { ReportType, ReportStatus } from "@prisma/client";
@@ -17,21 +19,32 @@ interface PageProps {
 }
 
 export default async function ReportsPage({ searchParams }: PageProps) {
-  const t      = await getTranslations("reports");
-  const locale = await getLocale();
+  const [t, locale, session] = await Promise.all([
+    getTranslations("reports"),
+    getLocale(),
+    getServerSession(authOptions),
+  ]);
   const basePath = locale === routing.defaultLocale ? "/reports" : `/${locale}/reports`;
 
   const typeFilter   = searchParams.type   as ReportType   | undefined;
   const statusFilter = searchParams.status as ReportStatus | undefined;
 
-  const reports = await prisma.animalReport.findMany({
-    where: {
-      ...(typeFilter   && { type:   typeFilter }),
-      ...(statusFilter ? { status: statusFilter } : { status: "ACTIVE" }),
-    },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  const [reports, myReports] = await Promise.all([
+    prisma.animalReport.findMany({
+      where: {
+        ...(typeFilter   && { type:   typeFilter }),
+        ...(statusFilter ? { status: statusFilter } : { status: "ACTIVE" }),
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
+    session?.user?.id
+      ? prisma.animalReport.findMany({
+          where:   { userId: session.user.id },
+          orderBy: { createdAt: "desc" },
+        })
+      : Promise.resolve([]),
+  ]);
 
   const typeButtons = [
     { value: "",      label: t("all") },
@@ -75,6 +88,23 @@ export default async function ReportsPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+
+        {/* My reports */}
+        {myReports.length > 0 && (
+          <section className="mb-8">
+            <div className="mb-4 flex items-center gap-2">
+              <ClipboardList className="h-5 w-5 text-brand-500" />
+              <h2 className="text-lg font-bold text-gray-900">{t("myReports")}</h2>
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                {myReports.length}
+              </span>
+            </div>
+            <p className="mb-4 text-sm text-gray-500">{t("myReportsDesc")}</p>
+            <div className="space-y-4">
+              {myReports.map((r) => <ReportCard key={r.id} report={r} />)}
+            </div>
+          </section>
+        )}
 
         {/* Filters */}
         <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">

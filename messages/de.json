@@ -287,6 +287,8 @@
     "closed": "Geschlossen",
     "noReports": "Keine Meldungen",
     "noReportsDesc": "Sei der Erste, der eine Meldung einreicht!",
+    "myReports": "Meine Meldungen",
+    "myReportsDesc": "Der Status deiner eingereichten Meldungen",
     "reportAnimal": "Tier melden",
     "unknown": "Unbekannt",
     "newTitle": "Neue Meldung",
