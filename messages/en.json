@@ -16,7 +16,10 @@
     "roleSuperAdmin": "Super admin",
     "language": "Language",
     "map": "Map",
-    "events": "Events"
+    "events": "Events",
+    "testBanner": "TEST MODE – This is a development/test environment. Data is not real; features are available for testing purposes only.",
+    "favorites": "My favorites",
+    "notifications": "Notifications"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
@@ -491,6 +494,16 @@
     "title": "My favorites",
     "emptyTitle": "No favorites yet",
     "emptyDesc": "Browse the animals and tap the heart icon to save your favorites.",
-    "browseAnimals": "Browse animals"
+    "browseAnimals": "Browse animals",
+    "filterAllTypes": "All species",
+    "filterAllStatuses": "All statuses",
+    "filterDog": "Dog",
+    "filterCat": "Cat",
+    "filterRabbit": "Rabbit",
+    "filterBird": "Bird",
+    "filterOther": "Other",
+    "filterAvailable": "Adoptable",
+    "filterPending": "In progress",
+    "filterAdopted": "Adopted"
   }
 }

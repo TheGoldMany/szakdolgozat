@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-react";
 import { Uc01AdoptionsTrend } from "./stats/uc01-adoptions-trend";
 import { Uc02CapacityPanel } from "./stats/uc02-capacity-panel";
 import { Uc03ReportsPanel } from "./stats/uc03-reports-panel";
@@ -68,10 +68,12 @@ export function AnalyticsSection({ role, shelters }: Props) {
   const isSuperAdmin = role === "SUPER_ADMIN";
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(shelters.map((s) => s.id)));
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [filterOpen,  setFilterOpen]  = useState(false);
+  const [data,        setData]        = useState<AnalyticsData | null>(null);
+  const [loading,     setLoading]     = useState(false);
+  const [error,       setError]       = useState<string | null>(null);
+  const [etlRunning,  setEtlRunning]  = useState(false);
+  const [etlMsg,      setEtlMsg]      = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -103,6 +105,25 @@ export function AnalyticsSection({ role, shelters }: Props) {
   const selectAll  = () => setSelectedIds(new Set(shelters.map((s) => s.id)));
   const selectNone = () => setSelectedIds(new Set());
 
+  const runEtl = async () => {
+    setEtlRunning(true);
+    setEtlMsg(null);
+    try {
+      const res = await fetch("/api/etl", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setEtlMsg(`ETL kész – ${data.adoptionCount ?? 0} örökbefogadás, ${data.inventoryCount ?? 0} leltársor szinkronizálva.`);
+        fetchData();
+      } else {
+        setEtlMsg(`Hiba: ${data.error ?? "ismeretlen hiba"}`);
+      }
+    } catch {
+      setEtlMsg("Hálózati hiba az ETL futtatásakor.");
+    } finally {
+      setEtlRunning(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Section header */}
@@ -129,8 +150,26 @@ export function AnalyticsSection({ role, shelters }: Props) {
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             Frissít
           </button>
+          {isSuperAdmin && (
+            <button
+              onClick={runEtl}
+              disabled={etlRunning}
+              className="flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 shadow-sm hover:bg-brand-100 disabled:opacity-50 transition-colors"
+            >
+              {etlRunning
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <DatabaseZap className="h-3.5 w-3.5" />}
+              ETL futtatása
+            </button>
+          )}
         </div>
       </div>
+
+      {etlMsg && (
+        <div className={`rounded-xl border px-4 py-2.5 text-xs font-medium ${etlMsg.startsWith("Hiba") || etlMsg.startsWith("Hálózati") ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
+          {etlMsg}
+        </div>
+      )}
 
       {/* Shelter filter panel — super admin only */}
       {isSuperAdmin && filterOpen && (

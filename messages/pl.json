@@ -16,7 +16,10 @@
     "roleSuperAdmin": "Super admin",
     "language": "Język",
     "map": "Mapa",
-    "events": "Wydarzenia"
+    "events": "Wydarzenia",
+    "testBanner": "TRYB TESTOWY – To jest środowisko deweloperskie/testowe. Dane nie są prawdziwe; funkcje są dostępne wyłącznie w celach testowych.",
+    "favorites": "Moje ulubione",
+    "notifications": "Powiadomienia"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
@@ -491,6 +494,16 @@
     "title": "Moje ulubione",
     "emptyTitle": "Brak ulubionych",
     "emptyDesc": "Przeglądaj zwierzęta i kliknij ikonę serca, aby zapisać ulubione.",
-    "browseAnimals": "Przeglądaj zwierzęta"
+    "browseAnimals": "Przeglądaj zwierzęta",
+    "filterAllTypes": "Wszystkie gatunki",
+    "filterAllStatuses": "Wszystkie statusy",
+    "filterDog": "Pies",
+    "filterCat": "Kot",
+    "filterRabbit": "Królik",
+    "filterBird": "Ptak",
+    "filterOther": "Inne",
+    "filterAvailable": "Do adopcji",
+    "filterPending": "W toku",
+    "filterAdopted": "Adoptowany"
   }
 }

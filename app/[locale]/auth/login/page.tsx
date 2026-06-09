@@ -206,7 +206,10 @@ function LoginForm() {
 
         <p className="text-center text-sm text-gray-500">
           {t("noAccountText")}{" "}
-          <Link href="/auth/register" className="font-semibold text-brand-600 hover:underline">
+          <Link
+            href={callbackUrl !== "/" ? `/auth/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/register"}
+            className="font-semibold text-brand-600 hover:underline"
+          >
             {t("registerFreeLink")}
           </Link>
         </p>

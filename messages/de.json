@@ -16,7 +16,10 @@
     "roleSuperAdmin": "Super-Admin",
     "language": "Sprache",
     "map": "Karte",
-    "events": "Events"
+    "events": "Events",
+    "testBanner": "TESTBETRIEB – Dies ist eine Entwicklungs-/Testumgebung. Die Daten sind nicht real; Funktionen stehen nur zum Testen zur Verfügung.",
+    "favorites": "Meine Favoriten",
+    "notifications": "Benachrichtigungen"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
@@ -491,6 +494,16 @@
     "title": "Meine Favoriten",
     "emptyTitle": "Noch keine Favoriten",
     "emptyDesc": "Durchsuche die Tiere und tippe auf das Herzsymbol, um deine Favoriten zu speichern.",
-    "browseAnimals": "Tiere durchsuchen"
+    "browseAnimals": "Tiere durchsuchen",
+    "filterAllTypes": "Alle Arten",
+    "filterAllStatuses": "Alle Status",
+    "filterDog": "Hund",
+    "filterCat": "Katze",
+    "filterRabbit": "Kaninchen",
+    "filterBird": "Vogel",
+    "filterOther": "Andere",
+    "filterAvailable": "Adoptierbar",
+    "filterPending": "In Bearbeitung",
+    "filterAdopted": "Adoptiert"
   }
 }

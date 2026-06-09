@@ -53,8 +53,9 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Platform",
     items: [
-      { href: "/dashboard/shelters",  icon: Building2,      label: "Menhelyek",    roles: ["SUPER_ADMIN"] },
-      { href: "/dashboard/campaigns", icon: ClipboardCheck, label: "Jóváhagyások", roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/shelters",  icon: Building2,      label: "Menhelyek",      roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/users",     icon: Users,          label: "Felhasználók",   roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/campaigns", icon: ClipboardCheck, label: "Jóváhagyások",   roles: ["SUPER_ADMIN"] },
     ],
   },
   {

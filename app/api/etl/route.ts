@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ApplicationStatus } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { dwh } from "@/lib/dwh";
 import {
@@ -10,12 +12,17 @@ import {
 // Vercel Pro: 60s; Hobby: 10s (optimalizált batch-ekkel elegendő)
 export const maxDuration = 60;
 
-// POST /api/etl  – védett: Authorization: Bearer <ETL_SECRET>
+// POST /api/etl  – védett: Bearer <ETL_SECRET> VAGY bejelentkezett SUPER_ADMIN
 export async function POST(req: NextRequest) {
   const auth  = req.headers.get("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-  if (!token || token !== process.env.ETL_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const validBearer = token && token === process.env.ETL_SECRET;
+
+  if (!validBearer) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
   const log: string[] = [];

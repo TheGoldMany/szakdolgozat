@@ -151,6 +151,16 @@ export default async function ConversationPage({ params }: { params: { id: strin
                 Már létezik aktív kérvény ehhez a felhasználóhoz és állathoz.
               </div>
             )}
+            {isConversationUser && (
+              <div className="rounded-2xl border border-brand-100 bg-brand-50 p-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">
+                  Hogyan működik?
+                </p>
+                <p className="text-sm text-brand-800 leading-relaxed">
+                  Küldd el az üzenetedet, és a menhely hamarosan visszajeleznek. Ha a menhely alkalmasnak talál, meghívót küld az örökbefogadási kérvény kitöltéséhez.
+                </p>
+              </div>
+            )}
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link

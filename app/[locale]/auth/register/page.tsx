@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { PawPrint, Heart, Shield, Bell, MailCheck } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
-  const t = useTranslations("auth");
+  const t           = useTranslations("auth");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const [serverError, setServerError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
@@ -134,7 +137,10 @@ export default function RegisterPage() {
                   </button>
                 )}
                 <div>
-                  <Link href="/auth/login" className="text-sm text-gray-400 hover:text-brand-600 transition-colors">
+                  <Link
+                    href={callbackUrl !== "/" ? `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/login"}
+                    className="text-sm text-gray-400 hover:text-brand-600 transition-colors"
+                  >
                     {t("signInLink")}
                   </Link>
                 </div>
@@ -222,7 +228,10 @@ export default function RegisterPage() {
 
               <p className="text-center text-sm text-gray-500">
                 {t("hasAccountText")}{" "}
-                <Link href="/auth/login" className="font-semibold text-brand-500 hover:underline">
+                <Link
+                  href={callbackUrl !== "/" ? `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/auth/login"}
+                  className="font-semibold text-brand-500 hover:underline"
+                >
                   {t("signInLink")}
                 </Link>
               </p>

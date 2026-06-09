@@ -86,9 +86,7 @@ export function Header() {
       <div className="bg-amber-400 text-amber-950">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
           <span className="text-base">⚠️</span>
-          <span>
-            <strong>TESZTÜZEM</strong> &ndash; Ez egy fejlesztoi/tesztkörnyezet. Az adatok nem valósak, a funkciók kipróbálás céljából érhetők el.
-          </span>
+          <span>{t("testBanner")}</span>
           <span className="text-base">⚠️</span>
         </div>
       </div>
@@ -195,13 +193,10 @@ export function Header() {
                       {t("profile")}
                     </Link>
                     <Link href="/favorites" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Kedvenceim
+                      {t("favorites")}
                     </Link>
                     <Link href="/messages" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("myMessages")}
-                    </Link>
-                    <Link href="/notifications" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Értesítések
                     </Link>
                     <Link href="/appointments" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Időpontjaim
@@ -312,12 +307,12 @@ export function Header() {
                 <Link href="/favorites" onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   <Heart className="h-4 w-4" />
-                  Kedvenceim
+                  {t("favorites")}
                 </Link>
                 <Link href="/notifications" onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                   <Bell className="h-4 w-4" />
-                  Értesítések
+                  {t("notifications")}
                 </Link>
                 <Link href="/appointments" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">

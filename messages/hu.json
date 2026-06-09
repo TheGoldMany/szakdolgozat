@@ -16,7 +16,10 @@
     "roleSuperAdmin": "Főadmin",
     "language": "Nyelv",
     "map": "Térkép",
-    "events": "Események"
+    "events": "Események",
+    "testBanner": "TESZTÜZEM – Ez egy fejlesztői/tesztkörnyezet. Az adatok nem valósak, a funkciók kipróbálás céljából érhetők el.",
+    "favorites": "Kedvenceim",
+    "notifications": "Értesítések"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
@@ -491,6 +494,16 @@
     "title": "Kedvenceim",
     "emptyTitle": "Még nincsenek kedvenceid",
     "emptyDesc": "Böngészd az állatokat, és a szív ikonra kattintva mentsd el a kedvenceidet.",
-    "browseAnimals": "Állatok böngészése"
+    "browseAnimals": "Állatok böngészése",
+    "filterAllTypes": "Minden faj",
+    "filterAllStatuses": "Minden státusz",
+    "filterDog": "Kutya",
+    "filterCat": "Macska",
+    "filterRabbit": "Nyúl",
+    "filterBird": "Madár",
+    "filterOther": "Egyéb",
+    "filterAvailable": "Örökbefogadható",
+    "filterPending": "Folyamatban",
+    "filterAdopted": "Örökbefogadott"
   }
 }
