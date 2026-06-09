@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { Link } from "@/i18n/navigation";
-import { PawPrint, Heart, Shield, Bell } from "lucide-react";
+import { PawPrint, Heart, Shield, Bell, MailCheck } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
 
 export default function RegisterPage() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const [serverError, setServerError] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
 
   const {
     register,
@@ -36,13 +35,18 @@ export default function RegisterPage() {
       return;
     }
 
-    await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
+    // Megerősítő emailt küldtünk – nincs automatikus bejelentkezés
+    setRegisteredEmail(data.email);
+  }
+
+  async function resend() {
+    if (!registeredEmail) return;
+    await fetch("/api/auth/resend-verification", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email: registeredEmail }),
     });
-    router.push("/");
-    router.refresh();
+    setResent(true);
   }
 
   return (
@@ -110,6 +114,33 @@ export default function RegisterPage() {
             </p>
           </div>
 
+          {registeredEmail ? (
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+              <MailCheck className="mx-auto mb-4 h-12 w-12 text-brand-500" />
+              <h2 className="text-xl font-bold text-gray-900">{t("verifyEmailSentTitle")}</h2>
+              <p className="mt-2 text-sm text-gray-500">
+                {t("verifyEmailSentDesc", { email: registeredEmail })}
+              </p>
+              <div className="mt-6 space-y-3">
+                {resent ? (
+                  <p className="text-sm font-medium text-green-600">{t("verifyResent")}</p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={resend}
+                    className="text-sm font-semibold text-brand-600 hover:underline"
+                  >
+                    {t("verifyResend")}
+                  </button>
+                )}
+                <div>
+                  <Link href="/auth/login" className="text-sm text-gray-400 hover:text-brand-600 transition-colors">
+                    {t("signInLink")}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
           <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
@@ -197,6 +228,7 @@ export default function RegisterPage() {
               </p>
             </form>
           </div>
+          )}
 
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-brand-500 transition-colors">

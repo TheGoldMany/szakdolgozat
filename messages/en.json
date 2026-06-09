@@ -258,7 +258,18 @@
     "oauthErrorAccountLinked": "This email is already linked to another sign-in method. Please use that.",
     "oauthErrorCallback": "Error connecting to Google/Facebook. Please try again.",
     "oauthErrorSignin": "Could not connect to Google/Facebook. Please try again.",
-    "oauthErrorDefault": "Sign-in error. Please try again."
+    "oauthErrorDefault": "Sign-in error. Please try again.",
+    "verifyEmailSentTitle": "Confirm your email address",
+    "verifyEmailSentDesc": "We sent a confirmation link to {email}. Click it to activate your account.",
+    "verifyResend": "Resend confirmation email",
+    "verifyResent": "Email sent – check your inbox (and the spam folder).",
+    "loginErrorUnverified": "Please confirm your email address first. Check your inbox.",
+    "verifyingTitle": "Confirming your email...",
+    "verifySuccessTitle": "Successfully confirmed!",
+    "verifySuccessDesc": "Your account is active. You can now sign in.",
+    "verifyFailTitle": "The link is invalid or expired",
+    "verifyFailDesc": "Request a new confirmation email on the sign-in page.",
+    "verifyGoLogin": "Sign in"
   },
   "reports": {
     "title": "Lost and found animals",

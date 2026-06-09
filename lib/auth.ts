@@ -63,6 +63,11 @@ export const authOptions: NextAuthOptions = {
         const isValid = await compare(credentials.password, user.password);
         if (!isValid) return null;
 
+        // Jelszavas fiók esetén kötelező a megerősített email-cím
+        if (!user.emailVerified) {
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
+
         return {
           id:         user.id,
           email:      user.email,

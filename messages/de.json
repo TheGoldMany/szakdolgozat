@@ -258,7 +258,18 @@
     "oauthErrorAccountLinked": "Diese E-Mail ist bereits mit einer anderen Anmeldemethode verknüpft. Bitte verwende diese.",
     "oauthErrorCallback": "Fehler beim Verbinden mit Google/Facebook. Bitte versuche es erneut.",
     "oauthErrorSignin": "Konnte keine Verbindung zu Google/Facebook herstellen. Bitte versuche es erneut.",
-    "oauthErrorDefault": "Anmeldefehler. Bitte versuche es erneut."
+    "oauthErrorDefault": "Anmeldefehler. Bitte versuche es erneut.",
+    "verifyEmailSentTitle": "Bestätige deine E-Mail-Adresse",
+    "verifyEmailSentDesc": "Wir haben einen Bestätigungslink an {email} gesendet. Klicke darauf, um dein Konto zu aktivieren.",
+    "verifyResend": "Bestätigungs-E-Mail erneut senden",
+    "verifyResent": "E-Mail gesendet – prüfe dein Postfach (auch den Spam-Ordner).",
+    "loginErrorUnverified": "Bitte bestätige zuerst deine E-Mail-Adresse. Prüfe dein Postfach.",
+    "verifyingTitle": "E-Mail wird bestätigt...",
+    "verifySuccessTitle": "Erfolgreich bestätigt!",
+    "verifySuccessDesc": "Dein Konto ist aktiv. Du kannst dich jetzt anmelden.",
+    "verifyFailTitle": "Der Link ist ungültig oder abgelaufen",
+    "verifyFailDesc": "Fordere auf der Anmeldeseite eine neue Bestätigungs-E-Mail an.",
+    "verifyGoLogin": "Anmelden"
   },
   "reports": {
     "title": "Verlorene und gefundene Tiere",

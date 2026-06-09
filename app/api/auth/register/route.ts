@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { issueVerificationToken } from "@/lib/verification";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -37,7 +38,12 @@ export async function POST(req: NextRequest) {
       select: { id: true, name: true, email: true, role: true },
     });
 
-    return NextResponse.json({ user }, { status: 201 });
+    // Email-megerősítő token kiállítása és email küldése (nem blokkoló)
+    await issueVerificationToken(email, name).catch((err) => {
+      console.error("Verification email error:", err);
+    });
+
+    return NextResponse.json({ user, verificationRequired: true }, { status: 201 });
   } catch (error) {
     console.error("Register error:", error);
     return NextResponse.json({ error: "Szerver hiba." }, { status: 500 });

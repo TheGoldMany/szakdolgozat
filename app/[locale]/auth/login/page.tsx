@@ -65,6 +65,8 @@ function LoginForm() {
   const [serverError, setServerError] = useState(
     urlError ? (OAUTH_ERRORS[urlError] ?? OAUTH_ERRORS.Default) : ""
   );
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
 
   const {
     register,
@@ -74,6 +76,8 @@ function LoginForm() {
 
   async function onSubmit(data: LoginInput) {
     setServerError("");
+    setUnverifiedEmail(null);
+    setResent(false);
     const res = await signIn("credentials", {
       email:      data.email,
       password:   data.password,
@@ -81,11 +85,26 @@ function LoginForm() {
       redirect:   false,
     });
     if (res?.error) {
-      setServerError(t("loginErrorCredentials"));
+      if (res.error.includes("EMAIL_NOT_VERIFIED")) {
+        setUnverifiedEmail(data.email);
+        setServerError(t("loginErrorUnverified"));
+      } else {
+        setServerError(t("loginErrorCredentials"));
+      }
       return;
     }
     router.push(callbackUrl);
     router.refresh();
+  }
+
+  async function resendVerification() {
+    if (!unverifiedEmail) return;
+    await fetch("/api/auth/resend-verification", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email: unverifiedEmail }),
+    });
+    setResent(true);
   }
 
   return (
@@ -93,6 +112,21 @@ function LoginForm() {
       {serverError && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
+          {unverifiedEmail && (
+            <div className="mt-2">
+              {resent ? (
+                <span className="font-medium text-green-700">{t("verifyResent")}</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={resendVerification}
+                  className="font-semibold text-brand-600 hover:underline"
+                >
+                  {t("verifyResend")}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 

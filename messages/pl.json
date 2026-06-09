@@ -258,7 +258,18 @@
     "oauthErrorAccountLinked": "Ten e-mail jest już powiązany z inną metodą logowania. Użyj jej.",
     "oauthErrorCallback": "Błąd połączenia z Google/Facebook. Spróbuj ponownie.",
     "oauthErrorSignin": "Nie można połączyć się z Google/Facebook. Spróbuj ponownie.",
-    "oauthErrorDefault": "Błąd logowania. Spróbuj ponownie."
+    "oauthErrorDefault": "Błąd logowania. Spróbuj ponownie.",
+    "verifyEmailSentTitle": "Potwierdź swój adres e-mail",
+    "verifyEmailSentDesc": "Wysłaliśmy link potwierdzający na adres {email}. Kliknij go, aby aktywować konto.",
+    "verifyResend": "Wyślij ponownie e-mail potwierdzający",
+    "verifyResent": "E-mail wysłany – sprawdź skrzynkę (także folder spam).",
+    "loginErrorUnverified": "Najpierw potwierdź swój adres e-mail. Sprawdź skrzynkę.",
+    "verifyingTitle": "Potwierdzanie adresu e-mail...",
+    "verifySuccessTitle": "Pomyślnie potwierdzono!",
+    "verifySuccessDesc": "Twoje konto jest aktywne. Możesz się teraz zalogować.",
+    "verifyFailTitle": "Link jest nieprawidłowy lub wygasł",
+    "verifyFailDesc": "Poproś o nowy e-mail potwierdzający na stronie logowania.",
+    "verifyGoLogin": "Zaloguj się"
   },
   "reports": {
     "title": "Zagubione i znalezione zwierzęta",

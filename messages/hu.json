@@ -258,7 +258,18 @@
     "oauthErrorAccountLinked": "Ez az email cím már más bejelentkezési módhoz van kötve. Kérjük, használd azt.",
     "oauthErrorCallback": "Hiba a Google/Facebook kapcsolódásnál. Próbáld újra.",
     "oauthErrorSignin": "Nem sikerült csatlakozni a Google/Facebook-hoz. Próbáld újra.",
-    "oauthErrorDefault": "Bejelentkezési hiba. Kérjük, próbáld újra."
+    "oauthErrorDefault": "Bejelentkezési hiba. Kérjük, próbáld újra.",
+    "verifyEmailSentTitle": "Erősítsd meg az email-címed",
+    "verifyEmailSentDesc": "Elküldtünk egy megerősítő linket a(z) {email} címre. Kattints rá a fiókod aktiválásához.",
+    "verifyResend": "Megerősítő email újraküldése",
+    "verifyResent": "Elküldtük az emailt – nézd meg a postafiókod (a spam mappát is).",
+    "loginErrorUnverified": "Előbb erősítsd meg az email-címed. Nézd meg a postafiókod.",
+    "verifyingTitle": "Email-cím megerősítése...",
+    "verifySuccessTitle": "Sikeres megerősítés!",
+    "verifySuccessDesc": "A fiókod aktív. Most már bejelentkezhetsz.",
+    "verifyFailTitle": "A link érvénytelen vagy lejárt",
+    "verifyFailDesc": "Kérj új megerősítő emailt a bejelentkezési oldalon.",
+    "verifyGoLogin": "Bejelentkezés"
   },
   "reports": {
     "title": "Elveszett és megtalált állatok",

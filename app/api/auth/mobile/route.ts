@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where:  { email: String(email).toLowerCase() },
-    select: { id: true, name: true, email: true, password: true, role: true },
+    select: { id: true, name: true, email: true, password: true, role: true, emailVerified: true },
   });
 
   if (!user?.password) {
@@ -26,6 +26,10 @@ export async function POST(req: NextRequest) {
   const valid = await compare(String(password), user.password);
   if (!valid) {
     return NextResponse.json({ error: "Hibás e-mail vagy jelszó" }, { status: 401 });
+  }
+
+  if (!user.emailVerified) {
+    return NextResponse.json({ error: "EMAIL_NOT_VERIFIED" }, { status: 403 });
   }
 
   const token = await new SignJWT({ sub: user.id, role: user.role })
