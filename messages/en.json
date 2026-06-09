@@ -22,7 +22,11 @@
     "notifications": "Notifications",
     "markAllRead": "Mark all as read",
     "noNotifications": "No notifications",
-    "viewAllNotifications": "View all notifications"
+    "viewAllNotifications": "View all notifications",
+    "myAppointments": "My appointments",
+    "myFollowups": "Follow-ups",
+    "myVolunteers": "My volunteering",
+    "myFoster": "My foster animals"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",

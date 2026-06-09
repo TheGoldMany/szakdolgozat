@@ -22,7 +22,11 @@
     "notifications": "Értesítések",
     "markAllRead": "Összes olvasottnak jelöl",
     "noNotifications": "Nincs értesítés",
-    "viewAllNotifications": "Összes értesítés megtekintése"
+    "viewAllNotifications": "Összes értesítés megtekintése",
+    "myAppointments": "Időpontjaim",
+    "myFollowups": "Utánkövetések",
+    "myVolunteers": "Önkéntességem",
+    "myFoster": "Ideiglenes befogadásaim"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",

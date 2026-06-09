@@ -22,7 +22,11 @@
     "notifications": "Benachrichtigungen",
     "markAllRead": "Alle als gelesen markieren",
     "noNotifications": "Keine Benachrichtigungen",
-    "viewAllNotifications": "Alle Benachrichtigungen anzeigen"
+    "viewAllNotifications": "Alle Benachrichtigungen anzeigen",
+    "myAppointments": "Meine Termine",
+    "myFollowups": "Nachverfolgungen",
+    "myVolunteers": "Mein Ehrenamt",
+    "myFoster": "Meine Pflegetiere"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",

@@ -207,16 +207,16 @@ export function Header() {
                       {t("myMessages")}
                     </Link>
                     <Link href="/appointments" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Időpontjaim
+                      {t("myAppointments")}
                     </Link>
                     <Link href="/followups" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Utánkövetések
+                      {t("myFollowups")}
                     </Link>
                     <Link href="/volunteers" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Önkéntességem
+                      {t("myVolunteers")}
                     </Link>
                     <Link href="/foster" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      Ideiglenes befogadásaim
+                      {t("myFoster")}
                     </Link>
                     {isAdmin && (
                       <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -324,19 +324,19 @@ export function Header() {
                 </Link>
                 <Link href="/appointments" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  Időpontjaim
+                  {t("myAppointments")}
                 </Link>
                 <Link href="/followups" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  Utánkövetések
+                  {t("myFollowups")}
                 </Link>
                 <Link href="/volunteers" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  Önkéntességem
+                  {t("myVolunteers")}
                 </Link>
                 <Link href="/foster" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  Ideiglenes befogadásaim
+                  {t("myFoster")}
                 </Link>
                 {isAdmin && (
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)}

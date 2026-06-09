@@ -22,7 +22,11 @@
     "notifications": "Powiadomienia",
     "markAllRead": "Oznacz wszystkie jako przeczytane",
     "noNotifications": "Brak powiadomień",
-    "viewAllNotifications": "Zobacz wszystkie powiadomienia"
+    "viewAllNotifications": "Zobacz wszystkie powiadomienia",
+    "myAppointments": "Moje terminy",
+    "myFollowups": "Obserwacje",
+    "myVolunteers": "Moje wolontariaty",
+    "myFoster": "Moje zwierzęta w opiece"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
