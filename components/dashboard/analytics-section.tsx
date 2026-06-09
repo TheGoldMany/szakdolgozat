@@ -1,13 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-react";
-import { Uc01AdoptionsTrend } from "./stats/uc01-adoptions-trend";
-import { Uc02CapacityPanel } from "./stats/uc02-capacity-panel";
-import { Uc03ReportsPanel } from "./stats/uc03-reports-panel";
-import { Uc04ReturnRate } from "./stats/uc04-return-rate";
-import { Uc05AgeProfile } from "./stats/uc05-age-profile";
-import { Uc06Seasonality } from "./stats/uc06-seasonality";
+
+// A recharts-alapú panelek lazy-load-dal (a ~100KB chart bundle csak igény szerint töltődik)
+const chartFallback = (
+  <div className="h-72 animate-pulse rounded-2xl border border-gray-100 bg-white shadow-sm" />
+);
+const Uc01AdoptionsTrend = dynamic(() => import("./stats/uc01-adoptions-trend").then((m) => m.Uc01AdoptionsTrend), { loading: () => chartFallback });
+const Uc02CapacityPanel  = dynamic(() => import("./stats/uc02-capacity-panel").then((m) => m.Uc02CapacityPanel),   { loading: () => chartFallback });
+const Uc03ReportsPanel   = dynamic(() => import("./stats/uc03-reports-panel").then((m) => m.Uc03ReportsPanel),     { loading: () => chartFallback });
+const Uc04ReturnRate     = dynamic(() => import("./stats/uc04-return-rate").then((m) => m.Uc04ReturnRate),         { loading: () => chartFallback });
+const Uc05AgeProfile     = dynamic(() => import("./stats/uc05-age-profile").then((m) => m.Uc05AgeProfile),         { loading: () => chartFallback });
+const Uc06Seasonality    = dynamic(() => import("./stats/uc06-seasonality").then((m) => m.Uc06Seasonality),        { loading: () => chartFallback });
 
 interface Shelter { id: string; name: string }
 

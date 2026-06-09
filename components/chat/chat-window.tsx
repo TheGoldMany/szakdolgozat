@@ -154,8 +154,17 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
   }, [conversationId]);
 
   useEffect(() => {
-    const interval = setInterval(poll, 5000);
-    return () => clearInterval(interval);
+    // 10s polling, de csak ha a fül látható (nem pazarol kérést háttérben)
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") poll();
+    }, 10000);
+    // Azonnali frissítés, amikor a fül újra aktívvá válik
+    const onVisible = () => { if (document.visibilityState === "visible") poll(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [poll]);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {

@@ -60,17 +60,17 @@ enum FollowUpStatus {
 }
 
 enum InventoryCategory {
-  FOOD       // Takarmány
-  MEDICINE   // Gyógyszer
-  SUPPLIES   // Kellékek
-  CLEANING   // Tisztítószer
-  EQUIPMENT  // Eszköz / felszerelés
-  OTHER      // Egyéb
+  FOOD // Takarmány
+  MEDICINE // Gyógyszer
+  SUPPLIES // Kellékek
+  CLEANING // Tisztítószer
+  EQUIPMENT // Eszköz / felszerelés
+  OTHER // Egyéb
 }
 
 enum InventoryTxType {
-  IN     // Bevételezés
-  OUT    // Felhasználás
+  IN // Bevételezés
+  OUT // Felhasználás
   ADJUST // Leltári korrekció (tényleges értékre állít)
 }
 
@@ -93,37 +93,37 @@ enum FormStatus {
 // -------------------------------------------------------
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          Role      @default(USER)
-  phone         String?
-  address       String?
-  city          String?
-  country       String    @default("HU")
+  id                       String    @id @default(cuid())
+  name                     String?
+  email                    String    @unique
+  emailVerified            DateTime?
+  image                    String?
+  password                 String?
+  role                     Role      @default(USER)
+  phone                    String?
+  address                  String?
+  city                     String?
+  country                  String    @default("HU")
   stripeAccountId          String?
-  stripeOnboardingComplete Boolean @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  stripeOnboardingComplete Boolean   @default(false)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  applications  AdoptionApplication[]
-  shelterAdmins ShelterAdmin[]
-  favorites     Favorite[]
-  reports       AnimalReport[]
-  conversations       Conversation[]        @relation("ConversationUser")
-  sentMessages        Message[]             @relation("MessageSender")
+  accounts            Account[]
+  sessions            Session[]
+  applications        AdoptionApplication[]
+  shelterAdmins       ShelterAdmin[]
+  favorites           Favorite[]
+  reports             AnimalReport[]
+  conversations       Conversation[]         @relation("ConversationUser")
+  sentMessages        Message[]              @relation("MessageSender")
   passwordResetTokens PasswordResetToken[]
   subscriptions       Subscription[]
-  donations           Donation[]            @relation("DonationUser")
-  campaigns           Campaign[]            @relation("CampaignCreator")
-  reviewsWritten      Review[]              @relation("ReviewAuthor")
-  reviewsReceived     Review[]              @relation("ReviewTarget")
-  healthRecordsAdded  HealthRecord[]        @relation("HealthRecordCreator")
+  donations           Donation[]             @relation("DonationUser")
+  campaigns           Campaign[]             @relation("CampaignCreator")
+  reviewsWritten      Review[]               @relation("ReviewAuthor")
+  reviewsReceived     Review[]               @relation("ReviewTarget")
+  healthRecordsAdded  HealthRecord[]         @relation("HealthRecordCreator")
   appointments        Appointment[]
   volunteering        Volunteer[]
   notifications       Notification[]
@@ -133,8 +133,8 @@ model User {
   fosterSupplyLogs    FosterSupplyLog[]      @relation("FosterSupplyCreator")
   sponsorships        Sponsorship[]
   eventRegistrations  EventRegistration[]
-  transferRequests    AnimalTransfer[]    @relation("TransferRequester")
-  transferResolutions AnimalTransfer[]    @relation("TransferResolver")
+  transferRequests    AnimalTransfer[]       @relation("TransferRequester")
+  transferResolutions AnimalTransfer[]       @relation("TransferResolver")
 }
 
 // -------------------------------------------------------
@@ -196,39 +196,39 @@ model VerificationToken {
 // -------------------------------------------------------
 
 model Shelter {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?  @db.Text
-  address     String
-  city        String
-  zipCode     String?
-  country     String   @default("HU")
-  phone       String?
-  email       String?
-  website     String?
-  logoUrl          String?
-  coverUrl         String?
-  isVerified       Boolean  @default(false)
-  isActive         Boolean  @default(true)
-  lat              Float?
-  lng              Float?
+  id                       String   @id @default(cuid())
+  name                     String
+  slug                     String   @unique
+  description              String?  @db.Text
+  address                  String
+  city                     String
+  zipCode                  String?
+  country                  String   @default("HU")
+  phone                    String?
+  email                    String?
+  website                  String?
+  logoUrl                  String?
+  coverUrl                 String?
+  isVerified               Boolean  @default(false)
+  isActive                 Boolean  @default(true)
+  lat                      Float?
+  lng                      Float?
   // Fizetési / cégadatok
-  companyName      String?
-  taxNumber        String?
-  bankAccountName  String?
-  bankAccountNumber String?
+  companyName              String?
+  taxNumber                String?
+  bankAccountName          String?
+  bankAccountNumber        String?
   stripeAccountId          String?
-  stripeOnboardingComplete Boolean @default(false)
-  capacity    Int?     // férőhelyek száma (UC-02 kapacitáskihasználtság)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  stripeOnboardingComplete Boolean  @default(false)
+  capacity                 Int? // férőhelyek száma (UC-02 kapacitáskihasználtság)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   animals              Animal[]
   admins               ShelterAdmin[]
   conversations        Conversation[]
   documents            ShelterDocument[]
-  adoptionRequirements String?            @db.Text
+  adoptionRequirements String?           @db.Text
   tiers                DonationTier[]
   campaigns            Campaign[]
   applicationForms     ApplicationForm[]
@@ -240,8 +240,8 @@ model Shelter {
   kennels              Kennel[]
   fosterProfiles       FosterProfile[]
   events               Event[]
-  transfersFrom        AnimalTransfer[]   @relation("TransferFrom")
-  transfersTo          AnimalTransfer[]   @relation("TransferTo")
+  transfersFrom        AnimalTransfer[]  @relation("TransferFrom")
+  transfersTo          AnimalTransfer[]  @relation("TransferTo")
 }
 
 model ShelterDocument {
@@ -278,11 +278,11 @@ model Animal {
   slug           String       @unique
   type           AnimalType
   breed          String?
-  age            Int?          // hónapokban
+  age            Int? // hónapokban
   size           AnimalSize?
-  gender         String?       // "MALE" | "FEMALE" | "UNKNOWN"
+  gender         String? // "MALE" | "FEMALE" | "UNKNOWN"
   color          String?
-  weight         Float?        // kg
+  weight         Float? // kg
   description    String?      @db.Text
   isVaccinated   Boolean      @default(false)
   isNeutered     Boolean      @default(false)
@@ -291,10 +291,10 @@ model Animal {
   isGoodWithDogs Boolean?
   isGoodWithCats Boolean?
   status         AnimalStatus @default(AVAILABLE)
-  flags          AnimalFlag[] @default([])  // belső, csak adminoknak látható kockázati címkék
-  progressLevel  Int?                       // szubjektív rehabilitációs fejlődési szint (0-100)
-  kennelId       String?                    // fizikai férőhely a menhelyen belül
-  fosterId       String?                    // ideiglenes befogadó, akinél az állat fizikailag van
+  flags          AnimalFlag[] @default([]) // belső, csak adminoknak látható kockázati címkék
+  progressLevel  Int? // szubjektív rehabilitációs fejlődési szint (0-100)
+  kennelId       String? // fizikai férőhely a menhelyen belül
+  fosterId       String? // ideiglenes befogadó, akinél az állat fizikailag van
   arrivedAt      DateTime?
   adoptedAt      DateTime?
   createdAt      DateTime     @default(now())
@@ -316,6 +316,9 @@ model Animal {
 
   @@index([kennelId])
   @@index([fosterId])
+  @@index([status])
+  @@index([shelterId, status])
+  @@index([type, status])
 }
 
 // -------------------------------------------------------
@@ -328,9 +331,9 @@ model Sponsorship {
   animal      Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade)
   userId      String
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount      Int                // havi támogatás (HUF)
-  isPublic    Boolean            @default(true)   // megjelenjen-e „Virtuális gazdi”-ként
-  displayName String?            // opcionális publikus név (ha null és isPublic → user neve)
+  amount      Int // havi támogatás (HUF)
+  isPublic    Boolean            @default(true) // megjelenjen-e „Virtuális gazdi”-ként
+  displayName String? // opcionális publikus név (ha null és isPublic → user neve)
   status      SubscriptionStatus @default(ACTIVE)
   stripeSubId String?            @unique
   createdAt   DateTime           @default(now())
@@ -345,12 +348,12 @@ model Sponsorship {
 // -------------------------------------------------------
 
 enum KennelType {
-  KENNEL      // Kennel (kutya)
-  CAT_ROOM    // Macskaszoba
-  QUARANTINE  // Karantén
-  AVIARY      // Madárház / röpde
-  OUTDOOR     // Kültéri kifutó
-  OTHER       // Egyéb
+  KENNEL // Kennel (kutya)
+  CAT_ROOM // Macskaszoba
+  QUARANTINE // Karantén
+  AVIARY // Madárház / röpde
+  OUTDOOR // Kültéri kifutó
+  OTHER // Egyéb
 }
 
 model Kennel {
@@ -359,12 +362,12 @@ model Kennel {
   shelter   Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
   name      String
   type      KennelType @default(KENNEL)
-  capacity  Int        @default(1)  // maximális férőhely
+  capacity  Int        @default(1) // maximális férőhely
   note      String?    @db.Text
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  animals   Animal[]
+  animals Animal[]
 
   @@index([shelterId])
 }
@@ -374,16 +377,16 @@ model Kennel {
 // -------------------------------------------------------
 
 enum AnimalFlag {
-  ESCAPE_ARTIST            // Szökőművész
-  FOOD_AGGRESSIVE          // Élelemirigy
-  NOT_GOOD_WITH_CHILDREN   // Gyerekekkel nem barátságos
-  NOT_GOOD_WITH_DOGS       // Kutyákkal nem barátságos
-  NOT_GOOD_WITH_CATS       // Macskákkal nem barátságos
-  NEEDS_EXPERIENCED_OWNER  // Tapasztalt gazdát igényel
-  REACTIVE                 // Reaktív / ingerlékeny
-  ANXIOUS                  // Szorongó
-  MEDICAL_NEEDS            // Speciális orvosi ellátást igényel
-  NO_APARTMENT             // Lakásba nem ajánlott (kert szükséges)
+  ESCAPE_ARTIST // Szökőművész
+  FOOD_AGGRESSIVE // Élelemirigy
+  NOT_GOOD_WITH_CHILDREN // Gyerekekkel nem barátságos
+  NOT_GOOD_WITH_DOGS // Kutyákkal nem barátságos
+  NOT_GOOD_WITH_CATS // Macskákkal nem barátságos
+  NEEDS_EXPERIENCED_OWNER // Tapasztalt gazdát igényel
+  REACTIVE // Reaktív / ingerlékeny
+  ANXIOUS // Szorongó
+  MEDICAL_NEEDS // Speciális orvosi ellátást igényel
+  NO_APARTMENT // Lakásba nem ajánlott (kert szükséges)
 }
 
 model BehaviorLog {
@@ -391,7 +394,7 @@ model BehaviorLog {
   animalId      String
   animal        Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
   note          String   @db.Text
-  progressLevel Int?     // ehhez a bejegyzéshez tartozó fejlődési pillanatkép (0-100)
+  progressLevel Int? // ehhez a bejegyzéshez tartozó fejlődési pillanatkép (0-100)
   authorId      String?
   author        User?    @relation("BehaviorLogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   createdAt     DateTime @default(now())
@@ -430,31 +433,34 @@ model AnimalImage {
 // -------------------------------------------------------
 
 model AdoptionApplication {
-  id           String            @id @default(cuid())
-  userId       String
-  animalId     String
-  formId       String?
-  inviteToken  String?           @unique
-  status       ApplicationStatus @default(PENDING)
-  message      String?           @db.Text
-  homeType     String?           // "HOUSE" | "APARTMENT" | "OTHER"
-  hasGarden    Boolean?
-  hasChildren  Boolean?
-  hasPets      Boolean?
-  experience   String?           @db.Text
-  reviewNotes  String?           @db.Text
-  reviewedAt   DateTime?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  userId      String
+  animalId    String
+  formId      String?
+  inviteToken String?           @unique
+  status      ApplicationStatus @default(PENDING)
+  message     String?           @db.Text
+  homeType    String? // "HOUSE" | "APARTMENT" | "OTHER"
+  hasGarden   Boolean?
+  hasChildren Boolean?
+  hasPets     Boolean?
+  experience  String?           @db.Text
+  reviewNotes String?           @db.Text
+  reviewedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  animal    Animal           @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  form      ApplicationForm? @relation(fields: [formId], references: [id], onDelete: SetNull)
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animal    Animal              @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  form      ApplicationForm?    @relation(fields: [formId], references: [id], onDelete: SetNull)
   responses FormFieldResponse[]
   followUps AdoptionFollowUp[]
 
   @@unique([userId, animalId])
   @@index([inviteToken])
+  @@index([animalId])
+  @@index([userId, status])
+  @@index([status, createdAt])
 }
 
 model AdoptionFollowUp {
@@ -462,7 +468,7 @@ model AdoptionFollowUp {
   applicationId String
   scheduledAt   DateTime
   completedAt   DateTime?
-  wellbeing     Int?           // 1-5 csillag
+  wellbeing     Int? // 1-5 csillag
   notes         String?        @db.Text
   photoUrl      String?
   status        FollowUpStatus @default(PENDING)
@@ -496,15 +502,15 @@ model Favorite {
 // -------------------------------------------------------
 
 enum ReportType {
-  LOST   // Elveszett
-  FOUND  // Megtalált
-  STRAY  // Kóbor
+  LOST // Elveszett
+  FOUND // Megtalált
+  STRAY // Kóbor
 }
 
 enum ReportStatus {
-  ACTIVE   // Aktív
+  ACTIVE // Aktív
   RESOLVED // Megoldva
-  CLOSED   // Lezárt
+  CLOSED // Lezárt
 }
 
 model AnimalReport {
@@ -573,6 +579,9 @@ model Message {
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, readAt])
+  @@index([conversationId, createdAt])
 }
 
 // -------------------------------------------------------
@@ -597,7 +606,7 @@ model DonationTier {
   shelterId   String
   name        String
   description String?  @db.Text
-  amount      Int      // HUF / month
+  amount      Int // HUF / month
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -673,28 +682,28 @@ model Donation {
 // -------------------------------------------------------
 
 model ApplicationForm {
-  id          String     @id @default(cuid())
-  shelterId   String
-  shelter     Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
-  title       String
-  description String?    @db.Text
-  status      FormStatus @default(DRAFT)
-  fields      FormField[]
+  id           String                @id @default(cuid())
+  shelterId    String
+  shelter      Shelter               @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?               @db.Text
+  status       FormStatus            @default(DRAFT)
+  fields       FormField[]
   applications AdoptionApplication[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
 
   @@index([shelterId])
 }
 
 model FormField {
-  id        String          @id @default(cuid())
+  id        String              @id @default(cuid())
   formId    String
-  form      ApplicationForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  form      ApplicationForm     @relation(fields: [formId], references: [id], onDelete: Cascade)
   label     String
   type      FieldType
-  required  Boolean         @default(false)
-  order     Int             @default(0)
+  required  Boolean             @default(false)
+  order     Int                 @default(0)
   responses FormFieldResponse[]
 
   @@index([formId])
@@ -718,14 +727,14 @@ model FormFieldResponse {
 
 model Review {
   id        String   @id @default(cuid())
-  rating    Int      // 1-5
+  rating    Int // 1-5
   comment   String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Szerző (bejelentkezett user vagy shelter admin)
-  authorId  String
-  author    User    @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User   @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 
   // Értékelt menhely (user → shelter irány)
   shelterId String?
@@ -735,8 +744,8 @@ model Review {
   targetUserId String?
   targetUser   User?   @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
 
-  @@unique([authorId, shelterId])        // user csak egyszer értékelheti a menhelyet
-  @@unique([authorId, targetUserId])     // shelter csak egyszer értékelheti az örökbefogadót
+  @@unique([authorId, shelterId]) // user csak egyszer értékelheti a menhelyet
+  @@unique([authorId, targetUserId]) // shelter csak egyszer értékelheti az örökbefogadót
   @@index([shelterId])
   @@index([targetUserId])
 }
@@ -746,10 +755,10 @@ model Review {
 // -------------------------------------------------------
 
 enum AppointmentStatus {
-  PENDING    // User requested, waiting for admin
-  CONFIRMED  // Admin confirmed (with possible time adjustment)
-  CANCELLED  // Cancelled by user or admin
-  COMPLETED  // Meeting took place
+  PENDING // User requested, waiting for admin
+  CONFIRMED // Admin confirmed (with possible time adjustment)
+  CANCELLED // Cancelled by user or admin
+  COMPLETED // Meeting took place
 }
 
 enum HealthRecordType {
@@ -785,25 +794,25 @@ model HealthRecord {
 // -------------------------------------------------------
 
 model Appointment {
-  id          String            @id @default(cuid())
-  shelterId   String
-  shelter     Shelter           @relation(fields: [shelterId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  animalId    String?
-  animal      Animal?           @relation(fields: [animalId], references: [id], onDelete: SetNull)
+  id        String  @id @default(cuid())
+  shelterId String
+  shelter   Shelter @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animalId  String?
+  animal    Animal? @relation(fields: [animalId], references: [id], onDelete: SetNull)
 
   status      AppointmentStatus @default(PENDING)
-  proposedAt  DateTime          // User's preferred date/time
-  confirmedAt DateTime?         // Admin-set confirmed time (may differ from proposedAt)
+  proposedAt  DateTime // User's preferred date/time
+  confirmedAt DateTime? // Admin-set confirmed time (may differ from proposedAt)
 
-  note        String?           @db.Text  // User's message to shelter
-  adminNote   String?           @db.Text  // Admin's reply
+  note      String? @db.Text // User's message to shelter
+  adminNote String? @db.Text // Admin's reply
 
-  cancelledBy String?           // "USER" | "ADMIN"
+  cancelledBy String? // "USER" | "ADMIN"
 
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([shelterId])
   @@index([userId])
@@ -816,15 +825,15 @@ model Appointment {
 // -------------------------------------------------------
 
 enum VolunteerStatus {
-  PENDING   // Jelentkezett, jóváhagyásra vár
-  ACTIVE    // Visszaigazolt aktív önkéntes
-  INACTIVE  // Inaktív
-  REJECTED  // Elutasított
+  PENDING // Jelentkezett, jóváhagyásra vár
+  ACTIVE // Visszaigazolt aktív önkéntes
+  INACTIVE // Inaktív
+  REJECTED // Elutasított
 }
 
 enum VolunteerTaskStatus {
-  OPEN      // Nyitott feladat
-  ASSIGNED  // Hozzárendelve
+  OPEN // Nyitott feladat
+  ASSIGNED // Hozzárendelve
   COMPLETED // Elvégezve
   CANCELLED // Lemondva
 }
@@ -843,8 +852,8 @@ model Volunteer {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
-  attendances  VolunteerAttendance[]
-  assignments  VolunteerTaskAssignment[]
+  attendances VolunteerAttendance[]
+  assignments VolunteerTaskAssignment[]
 
   @@unique([userId, shelterId])
   @@index([shelterId])
@@ -863,7 +872,7 @@ model VolunteerTask {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  assignments   VolunteerTaskAssignment[]
+  assignments VolunteerTaskAssignment[]
 
   @@index([shelterId])
   @@index([status])
@@ -899,57 +908,57 @@ model VolunteerAttendance {
 
 enum NotificationType {
   // Appointment
-  APPOINTMENT_NEW          // Admin: new booking request
-  APPOINTMENT_CONFIRMED    // User: admin confirmed
-  APPOINTMENT_CANCELLED    // User/admin: cancelled
+  APPOINTMENT_NEW // Admin: new booking request
+  APPOINTMENT_CONFIRMED // User: admin confirmed
+  APPOINTMENT_CANCELLED // User/admin: cancelled
   // Adoption application
-  APPLICATION_SUBMITTED    // Admin: new application submitted
-  APPLICATION_REVIEWING    // User: application under review
-  APPLICATION_APPROVED     // User: application approved
-  APPLICATION_REJECTED     // User: application rejected
+  APPLICATION_SUBMITTED // Admin: new application submitted
+  APPLICATION_REVIEWING // User: application under review
+  APPLICATION_APPROVED // User: application approved
+  APPLICATION_REJECTED // User: application rejected
   // Volunteer
-  VOLUNTEER_NEW            // Admin: new volunteer application
-  VOLUNTEER_APPROVED       // User: volunteer application approved
-  VOLUNTEER_REJECTED       // User: volunteer application rejected
-  TASK_SIGNUP              // Admin: volunteer signed up for a task
+  VOLUNTEER_NEW // Admin: new volunteer application
+  VOLUNTEER_APPROVED // User: volunteer application approved
+  VOLUNTEER_REJECTED // User: volunteer application rejected
+  TASK_SIGNUP // Admin: volunteer signed up for a task
   // Foster (ideiglenes befogadó)
-  FOSTER_NEW               // Admin: new foster application
-  FOSTER_APPROVED          // User: foster application approved
-  FOSTER_REJECTED          // User: foster application rejected
-  FOSTER_PLACEMENT         // User: an animal was placed in their care
+  FOSTER_NEW // Admin: new foster application
+  FOSTER_APPROVED // User: foster application approved
+  FOSTER_REJECTED // User: foster application rejected
+  FOSTER_PLACEMENT // User: an animal was placed in their care
   // Campaigns
-  CAMPAIGN_PENDING         // Super admin: campaign awaiting approval
-  CAMPAIGN_APPROVED        // Owner: campaign approved
-  CAMPAIGN_REJECTED        // Owner: campaign rejected
+  CAMPAIGN_PENDING // Super admin: campaign awaiting approval
+  CAMPAIGN_APPROVED // Owner: campaign approved
+  CAMPAIGN_REJECTED // Owner: campaign rejected
   // Application forms
-  FORM_PENDING_APPROVAL    // Super admin: form awaiting approval
-  FORM_APPROVED            // Shelter admin: form approved
-  FORM_REJECTED            // Shelter admin: form rejected
+  FORM_PENDING_APPROVAL // Super admin: form awaiting approval
+  FORM_APPROVED // Shelter admin: form approved
+  FORM_REJECTED // Shelter admin: form rejected
   // Reports
-  REPORT_RESOLVED          // User: report status updated
+  REPORT_RESOLVED // User: report status updated
   // Donations & subscriptions
-  DONATION_RECEIVED        // Admin: new donation received
-  SUBSCRIPTION_STARTED     // User: subscription confirmed
-  SUBSCRIPTION_CANCELLED   // User: subscription cancelled
+  DONATION_RECEIVED // Admin: new donation received
+  SUBSCRIPTION_STARTED // User: subscription confirmed
+  SUBSCRIPTION_CANCELLED // User: subscription cancelled
   // Virtual adoption / sponsorship
-  SPONSORSHIP_STARTED      // User: virtual adoption confirmed
-  SPONSOR_UPDATE           // Virtual owner: sponsored animal updated (health/photo/adopted)
+  SPONSORSHIP_STARTED // User: virtual adoption confirmed
+  SPONSOR_UPDATE // Virtual owner: sponsored animal updated (health/photo/adopted)
   // Events (örökbefogadási nap / esemény)
-  EVENT_REGISTRATION       // Admin: new event registration
-  EVENT_UPDATED            // Registrant: event details changed
-  EVENT_CANCELLED          // Registrant: event was cancelled
+  EVENT_REGISTRATION // Admin: new event registration
+  EVENT_UPDATED // Registrant: event details changed
+  EVENT_CANCELLED // Registrant: event was cancelled
   // Messages
-  NEW_MESSAGE              // User/admin: new unread message
+  NEW_MESSAGE // User/admin: new unread message
   // Follow-up
-  FOLLOW_UP_DUE            // User: follow-up questionnaire due
-  FOLLOW_UP_RECEIVED       // Admin: user submitted a follow-up
+  FOLLOW_UP_DUE // User: follow-up questionnaire due
+  FOLLOW_UP_RECEIVED // Admin: user submitted a follow-up
   // Inventory
-  INVENTORY_LOW_STOCK      // Admin: item quantity fell below minimum
-  INVENTORY_EXPIRING_SOON  // Admin: item expiring within 7 days
+  INVENTORY_LOW_STOCK // Admin: item quantity fell below minimum
+  INVENTORY_EXPIRING_SOON // Admin: item expiring within 7 days
   // Animal transfers (menhelyek közötti áthelyezés)
-  TRANSFER_REQUESTED       // Target shelter admin: new transfer request
-  TRANSFER_APPROVED        // Requester: transfer was approved
-  TRANSFER_REJECTED        // Requester: transfer was rejected
+  TRANSFER_REQUESTED // Target shelter admin: new transfer request
+  TRANSFER_APPROVED // Requester: transfer was approved
+  TRANSFER_REJECTED // Requester: transfer was rejected
 }
 
 model Notification {
@@ -959,7 +968,7 @@ model Notification {
   type      NotificationType
   title     String
   body      String?
-  href      String?          // Deep-link to the relevant page
+  href      String? // Deep-link to the relevant page
   readAt    DateTime?
   createdAt DateTime         @default(now())
 
@@ -977,15 +986,15 @@ model InventoryItem {
   shelter     Shelter           @relation(fields: [shelterId], references: [id], onDelete: Cascade)
   name        String
   category    InventoryCategory @default(OTHER)
-  unit        String            @default("db")  // "kg", "liter", "db", stb.
-  quantity    Float             @default(0)      // aktuális készlet
-  minQuantity Float?                             // riasztási küszöb
-  expiresAt   DateTime?                          // szavatossági dátum
+  unit        String            @default("db") // "kg", "liter", "db", stb.
+  quantity    Float             @default(0) // aktuális készlet
+  minQuantity Float? // riasztási küszöb
+  expiresAt   DateTime? // szavatossági dátum
   note        String?           @db.Text
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  transactions InventoryTransaction[]
+  transactions     InventoryTransaction[]
   fosterSupplyLogs FosterSupplyLog[]
 
   @@index([shelterId])
@@ -1013,10 +1022,10 @@ model InventoryTransaction {
 // -------------------------------------------------------
 
 enum FosterStatus {
-  PENDING   // Jelentkezett, jóváhagyásra vár
-  ACTIVE    // Aktív, visszaigazolt ideiglenes befogadó
-  INACTIVE  // Inaktív
-  REJECTED  // Elutasított
+  PENDING // Jelentkezett, jóváhagyásra vár
+  ACTIVE // Aktív, visszaigazolt ideiglenes befogadó
+  INACTIVE // Inaktív
+  REJECTED // Elutasított
 }
 
 model FosterProfile {
@@ -1026,8 +1035,8 @@ model FosterProfile {
   shelterId      String
   shelter        Shelter      @relation(fields: [shelterId], references: [id], onDelete: Cascade)
   status         FosterStatus @default(PENDING)
-  preferredTypes AnimalType[] @default([])  // milyen állatot fogadna (üres = bármi)
-  maxWeightKg    Float?                      // maximális súly, amit vállal
+  preferredTypes AnimalType[] @default([]) // milyen állatot fogadna (üres = bármi)
+  maxWeightKg    Float? // maximális súly, amit vállal
   canQuarantine  Boolean      @default(false) // tud-e karantént / izolációt biztosítani
   motivation     String?      @db.Text
   adminNote      String?      @db.Text
@@ -1048,7 +1057,7 @@ model FosterSupplyLog {
   foster      FosterProfile @relation(fields: [fosterId], references: [id], onDelete: Cascade)
   itemId      String
   item        InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  quantity    Float         // kiadott mennyiség (a központi készletből levonva)
+  quantity    Float // kiadott mennyiség (a központi készletből levonva)
   note        String?
   createdById String?
   createdBy   User?         @relation("FosterSupplyCreator", fields: [createdById], references: [id], onDelete: SetNull)
@@ -1063,25 +1072,25 @@ model FosterSupplyLog {
 // -------------------------------------------------------
 
 enum EventType {
-  ADOPTION_DAY   // Örökbefogadási nap
-  FUNDRAISER     // Adománygyűjtő esemény
-  VOLUNTEER_DAY  // Önkéntes nap
-  OPEN_DAY       // Nyílt nap
-  EDUCATION      // Oktatás / előadás
-  OTHER          // Egyéb
+  ADOPTION_DAY // Örökbefogadási nap
+  FUNDRAISER // Adománygyűjtő esemény
+  VOLUNTEER_DAY // Önkéntes nap
+  OPEN_DAY // Nyílt nap
+  EDUCATION // Oktatás / előadás
+  OTHER // Egyéb
 }
 
 enum EventStatus {
-  DRAFT       // Vázlat, csak az admin látja
-  PUBLISHED   // Közzétéve, publikus
-  CANCELLED   // Lemondva
-  COMPLETED   // Lezárult
+  DRAFT // Vázlat, csak az admin látja
+  PUBLISHED // Közzétéve, publikus
+  CANCELLED // Lemondva
+  COMPLETED // Lezárult
 }
 
 enum EventRegistrationStatus {
-  REGISTERED  // Jelentkezett
-  CANCELLED   // Lemondta
-  ATTENDED    // Megjelent (utólag jelölhető)
+  REGISTERED // Jelentkezett
+  CANCELLED // Lemondta
+  ATTENDED // Megjelent (utólag jelölhető)
 }
 
 model Event {
@@ -1095,7 +1104,7 @@ model Event {
   location    String
   startsAt    DateTime
   endsAt      DateTime?
-  capacity    Int?        // null = korlátlan
+  capacity    Int? // null = korlátlan
   imageUrl    String?
   status      EventStatus @default(DRAFT)
   createdAt   DateTime    @default(now())
@@ -1129,10 +1138,10 @@ model EventRegistration {
 // -------------------------------------------------------
 
 enum TransferStatus {
-  PENDING    // Jóváhagyásra vár
-  APPROVED   // Jóváhagyva, áthelyezés megtörtént
-  REJECTED   // Elutasítva
-  CANCELLED  // Visszavonva a kérelmező által
+  PENDING // Jóváhagyásra vár
+  APPROVED // Jóváhagyva, áthelyezés megtörtént
+  REJECTED // Elutasítva
+  CANCELLED // Visszavonva a kérelmező által
 }
 
 model AnimalTransfer {

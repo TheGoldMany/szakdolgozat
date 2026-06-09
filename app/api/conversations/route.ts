@@ -96,19 +96,22 @@ export async function GET() {
     });
   }
 
-  // Add unread counts
-  const enriched = await Promise.all(
-    conversations.map(async (conv) => {
-      const unread = await prisma.message.count({
-        where: {
-          conversationId: conv.id,
-          senderId: { not: session.user!.id },
-          readAt: null,
-        },
-      });
-      return { ...conv, unreadCount: unread };
-    })
-  );
+  // Add unread counts – egyetlen aggregált lekérdezés (N+1 elkerülése)
+  const unreadGroups = await prisma.message.groupBy({
+    by: ["conversationId"],
+    where: {
+      conversationId: { in: conversations.map((c) => c.id) },
+      senderId: { not: session.user.id },
+      readAt: null,
+    },
+    _count: { _all: true },
+  });
+  const unreadMap = new Map(unreadGroups.map((g) => [g.conversationId, g._count._all]));
+
+  const enriched = conversations.map((conv) => ({
+    ...conv,
+    unreadCount: unreadMap.get(conv.id) ?? 0,
+  }));
 
   return NextResponse.json(enriched);
 }

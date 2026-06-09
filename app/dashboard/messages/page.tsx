@@ -38,19 +38,18 @@ export default async function DashboardMessagesPage() {
     orderBy: { updatedAt: "desc" },
   });
 
-  // Unread per conversation (messages sent by the user side, not read yet)
+  // Unread per conversation – egyetlen aggregált lekérdezés (N+1 elkerülése)
+  const unreadGroups = await prisma.message.groupBy({
+    by: ["conversationId"],
+    where: {
+      conversationId: { in: conversations.map((c) => c.id) },
+      senderId: { not: session.user.id },
+      readAt: null,
+    },
+    _count: { _all: true },
+  });
   const unreadMap: Record<string, number> = {};
-  await Promise.all(
-    conversations.map(async (conv) => {
-      unreadMap[conv.id] = await prisma.message.count({
-        where: {
-          conversationId: conv.id,
-          senderId: { not: session.user!.id },
-          readAt: null,
-        },
-      });
-    })
-  );
+  for (const g of unreadGroups) unreadMap[g.conversationId] = g._count._all;
 
   const totalUnread = Object.values(unreadMap).reduce((a, b) => a + b, 0);
 
