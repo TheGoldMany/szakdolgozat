@@ -81,6 +81,18 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
+
+      {/* Test-mode banner */}
+      <div className="bg-amber-400 text-amber-950">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
+          <span className="text-base">⚠️</span>
+          <span>
+            <strong>TESZTÜZEM</strong> &ndash; Ez egy fejlesztoi/tesztkörnyezet. Az adatok nem valósak, a funkciók kipróbálás céljából érhetők el.
+          </span>
+          <span className="text-base">⚠️</span>
+        </div>
+      </div>
+
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
