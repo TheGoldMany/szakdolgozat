@@ -149,15 +149,15 @@ const PAGE_INFO: Record<string, InfoContent> = {
     ],
   },
   transfers: {
-    title: "Athelyezesek",
-    intro: "Menhelyek kozotti allat-athelyezesi kerelmek kezelese.",
+    title: "Áthelyezések",
+    intro: "Menhelyek közötti állat-áthelyezési kérelmek kezelése.",
     points: [
-      { label: "Kerelem kuldese", desc: "Az Allatok oldalon, az allat melletti gombbal kuldhetsz kerelmet egy masik menhelynek." },
-      { label: "Bejovo kerelmek", desc: "Ha a te menhelyedre akarnak atkuldeni egy allatot, itt jelenik meg – jovahagyhatod vagy elutasithatod." },
-      { label: "Jovahagyas", desc: "Jovahagyaskor az allat automatikusan atkerul a celmenhely allomanyaba, es mindket fel ertesitест kap." },
-      { label: "Visszavonas", desc: "A kerelmező a dontes elott visszavonhatja a kerelmet." },
+      { label: "Kérelem küldése", desc: "Az Állatok oldalon, az állat melletti gombbal küldhetsz kérelmet egy másik menhelynek." },
+      { label: "Bejövő kérelmek", desc: "Ha a te menhelyedre akarnak átküldeni egy állatot, itt jelenik meg – jóváhagyhatod vagy elutasíthatod." },
+      { label: "Jóváhagyás", desc: "Jóváhagyáskor az állat automatikusan átkerül a célmenhely állományába, és mindkét fél értesítést kap." },
+      { label: "Visszavonás", desc: "A kérelmező a döntés előtt visszavonhatja a kérelmet." },
     ],
-    tip: "Egyszerre csak egy aktiv (varakozó) kerelem lehet egy allathoz.",
+    tip: "Egyszerre csak egy aktív (várakozó) kérelem lehet egy állathoz.",
   },
   shelters: {
     title: "Menhelyek (Platform)",

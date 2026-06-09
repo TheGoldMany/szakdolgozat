@@ -34,8 +34,8 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-gray-700">UC-05 &middot; Adoptalt allatok korfaja es versenyhelyzet</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Korosztaly-megoszlas es palyazatok szama (DWH-alapu)</p>
+          <h2 className="text-sm font-semibold text-gray-700">UC-05 &middot; Adoptált állatok korfája és versenyhelyzet</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Korosztály-megoszlás és pályázatok száma (DWH-alapú)</p>
         </div>
         <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
           dwhAvailable
@@ -43,18 +43,18 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
             : "bg-gray-100 text-gray-500 border border-gray-200"
         }`}>
           <Database className="h-3 w-3" />
-          {dwhAvailable ? "DWH elerheto" : "DWH nem elerheto"}
+          {dwhAvailable ? "DWH elérhető" : "DWH nem elérhető"}
         </span>
       </div>
 
       {!dwhAvailable && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-          A DWH adatbazis jelenleg nem elerheto (felfuggesztett Neon peldany). Az ETL futatasa utan frissul az adat.
+          A DWH adatbázis jelenleg nem elérhető (felfüggesztett Neon példány). Az ETL futtatása után frissül az adat.
         </div>
       )}
 
       {dwhAvailable && total === 0 && (
-        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendo DWH-adat. Futtasd le az ETL-t!</p>
+        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendő DWH-adat. Futtasd le az ETL-t!</p>
       )}
 
       {dwhAvailable && total > 0 && (
@@ -62,7 +62,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
 
           {/* Kor megoszlas – pie */}
           <div>
-            <p className="mb-2 text-xs font-medium text-gray-500">Korosztaly megoszlas ({total} adoptalt allat)</p>
+            <p className="mb-2 text-xs font-medium text-gray-500">Korosztály megoszlás ({total} adoptált állat)</p>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
@@ -92,7 +92,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
 
           {/* Palyazatszam eloszlas */}
           <div>
-            <p className="mb-2 text-xs font-medium text-gray-500">Mennyi palyazat erkezett az allathoz?</p>
+            <p className="mb-2 text-xs font-medium text-gray-500">Mennyi pályázat érkezett az állathoz?</p>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={appCountDist} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -100,7 +100,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
                 <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 11 }}
-                  formatter={(v) => [v, "allat"]}
+                  formatter={(v) => [v, "állat"]}
                 />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                   {appCountDist.map((_, i) => (
@@ -116,7 +116,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
       {/* Faj × korosztaly kereszttabla */}
       {dwhAvailable && speciesAgeCross.length > 0 && (
         <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">Faj × korosztaly (adoptalt allatok)</p>
+          <p className="mb-2 text-xs font-medium text-gray-500">Faj × korosztály (adoptált állatok)</p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
@@ -124,7 +124,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
                   <th className="py-1.5 pr-3 text-left font-semibold text-gray-500">Faj</th>
                   {["PUPPY","YOUNG","ADULT","SENIOR","UNKNOWN"].map((cat) => (
                     <th key={cat} className="px-2 py-1.5 text-center font-semibold" style={{ color: AGE_COLORS[cat] }}>
-                      {cat === "PUPPY" ? "Kolyok" : cat === "YOUNG" ? "Fiatal" : cat === "ADULT" ? "Felnott" : cat === "SENIOR" ? "Idos" : "Ismeretlen"}
+                      {cat === "PUPPY" ? "Kölyök" : cat === "YOUNG" ? "Fiatal" : cat === "ADULT" ? "Felnőtt" : cat === "SENIOR" ? "Idős" : "Ismeretlen"}
                     </th>
                   ))}
                 </tr>

@@ -38,8 +38,8 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
     <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-gray-700">UC-06 &middot; Szezonalitas es adatfrissesseg</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Adoptaciok idobeli mintazata (DWH DimDate + ETL napló)</p>
+          <h2 className="text-sm font-semibold text-gray-700">UC-06 &middot; Szezonalitás és adatfrissesség</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Adoptációk időbeli mintázata (DWH DimDate + ETL napló)</p>
         </div>
         <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
           dwhAvailable
@@ -47,13 +47,13 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
             : "bg-gray-100 text-gray-500 border border-gray-200"
         }`}>
           <Database className="h-3 w-3" />
-          {dwhAvailable ? "DWH elerheto" : "DWH nem elerheto"}
+          {dwhAvailable ? "DWH elérhető" : "DWH nem elérhető"}
         </span>
       </div>
 
       {!dwhAvailable && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-          A DWH adatbazis jelenleg nem elerheto. Az ETL futatasa utan frissul az adat.
+          A DWH adatbázis jelenleg nem elérhető. Az ETL futtatása után frissül az adat.
         </div>
       )}
 
@@ -63,9 +63,9 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-brand-500" />
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-gray-400">Utolso ETL futas</p>
+              <p className="text-[10px] uppercase tracking-wide text-gray-400">Utolsó ETL futás</p>
               <p className="text-xs font-semibold text-gray-700">
-                {lastEtl ? formatDate(lastEtl.finishedAt) : "Meg nem futott"}
+                {lastEtl ? formatDate(lastEtl.finishedAt) : "Még nem futott"}
               </p>
             </div>
           </div>
@@ -73,12 +73,12 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
             <>
               <div className="h-8 w-px bg-gray-200" />
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400">Feldolgozott adoptaciok</p>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400">Feldolgozott adoptációk</p>
                 <p className="text-xs font-semibold text-gray-700">{lastEtl.adoptionCount} db</p>
               </div>
               <div className="h-8 w-px bg-gray-200" />
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400">Futasi ido</p>
+                <p className="text-[10px] uppercase tracking-wide text-gray-400">Futási idő</p>
                 <p className="text-xs font-semibold text-gray-700">{(lastEtl.elapsedMs / 1000).toFixed(1)} mp</p>
               </div>
             </>
@@ -87,7 +87,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
       )}
 
       {dwhAvailable && total === 0 && (
-        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendo DWH-adat. Futtasd le az ETL-t!</p>
+        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendő DWH-adat. Futtasd le az ETL-t!</p>
       )}
 
       {dwhAvailable && total > 0 && (
@@ -95,7 +95,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Negyedeves megoszlas */}
             <div>
-              <p className="mb-2 text-xs font-medium text-gray-500">Adoptaciok negyedevenkent</p>
+              <p className="mb-2 text-xs font-medium text-gray-500">Adoptációk negyedévenként</p>
               <ResponsiveContainer width="100%" height={190}>
                 <BarChart data={byQuarter} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -103,7 +103,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
                   <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 11 }}
-                    formatter={(v) => [v, "adoptacio"]}
+                    formatter={(v) => [v, "adoptáció"]}
                   />
                   <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                     {byQuarter.map((_, i) => (
@@ -116,7 +116,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
 
             {/* Het napja szerint */}
             <div>
-              <p className="mb-2 text-xs font-medium text-gray-500">Adoptaciok a het napja szerint</p>
+              <p className="mb-2 text-xs font-medium text-gray-500">Adoptációk a hét napja szerint</p>
               <ResponsiveContainer width="100%" height={190}>
                 <BarChart data={byWeekday} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -124,7 +124,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
                   <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 11 }}
-                    formatter={(v) => [v, "adoptacio"]}
+                    formatter={(v) => [v, "adoptáció"]}
                   />
                   <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                     {byWeekday.map((r) => (
@@ -142,14 +142,14 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
               <CalendarDays className="h-5 w-5 text-amber-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{weekendPct != null ? `${weekendPct}%` : "–"}</p>
-                <p className="text-[10px] text-gray-400">hetvegen tortent adoptacio</p>
+                <p className="text-[10px] text-gray-400">hétvégén történt adoptáció</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
               <PartyPopper className="h-5 w-5 text-purple-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{holidayCount}</p>
-                <p className="text-[10px] text-gray-400">unnepnapon tortent adoptacio</p>
+                <p className="text-[10px] text-gray-400">ünnepnapon történt adoptáció</p>
               </div>
             </div>
           </div>

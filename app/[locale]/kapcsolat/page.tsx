@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Kapcsolat",
-  description: "Vedd fel velünk a kapcsolatot – ÁllatiMenhelyek.hu",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("contact");
+  return {
+    title: t("title"),
+    description: t("desc"),
+  };
+}
 
-export default function KapcsolatPage() {
+export default async function KapcsolatPage() {
+  const t = await getTranslations("contact");
+
   return (
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
         <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 text-center">
-          <h1 className="text-4xl font-bold text-gray-900">Kapcsolat</h1>
+          <h1 className="text-4xl font-bold text-gray-900">{t("title")}</h1>
           <p className="mt-3 text-lg text-gray-500">
-            Kérdésed van? Szívesen segítünk.
+            {t("desc")}
           </p>
         </div>
       </div>
@@ -29,9 +35,9 @@ export default function KapcsolatPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <Mail className="h-5 w-5 text-brand-600" />
             </div>
-            <h2 className="mt-4 text-base font-semibold text-gray-800">E-mail</h2>
+            <h2 className="mt-4 text-base font-semibold text-gray-800">{t("email")}</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Általános megkeresések, technikai problémák, menhely regisztráció.
+              {t("emailDesc")}
             </p>
             <a
               href="mailto:info@allatimenhelyek.hu"
@@ -41,16 +47,16 @@ export default function KapcsolatPage() {
             </a>
           </div>
 
-          {/* Nyitvatartás */}
+          {/* Válaszidő */}
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <Clock className="h-5 w-5 text-brand-600" />
             </div>
-            <h2 className="mt-4 text-base font-semibold text-gray-800">Válaszidő</h2>
+            <h2 className="mt-4 text-base font-semibold text-gray-800">{t("responseTime")}</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Minden megkeresésre igyekszünk 1–2 munkanapon belül válaszolni.
+              {t("responseTimeDesc")}
             </p>
-            <p className="mt-3 text-sm font-medium text-gray-700">H–P: 9:00 – 17:00</p>
+            <p className="mt-3 text-sm font-medium text-gray-700">{t("workingHours")}</p>
           </div>
 
           {/* Székhely */}
@@ -58,9 +64,9 @@ export default function KapcsolatPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <MapPin className="h-5 w-5 text-brand-600" />
             </div>
-            <h2 className="mt-4 text-base font-semibold text-gray-800">Székhely</h2>
+            <h2 className="mt-4 text-base font-semibold text-gray-800">{t("location")}</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Magyarország
+              {t("locationValue")}
             </p>
           </div>
 
@@ -69,15 +75,15 @@ export default function KapcsolatPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <PawPrint className="h-5 w-5 text-brand-600" />
             </div>
-            <h2 className="mt-4 text-base font-semibold text-gray-800">Útmutató</h2>
+            <h2 className="mt-4 text-base font-semibold text-gray-800">{t("guide")}</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Mielőtt írsz, nézd meg az útmutatót – lehet, hogy már megvan a válasz!
+              {t("guideDesc")}
             </p>
             <Link
               href="/sugo"
               className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline"
             >
-              Útmutató megnyitása <ExternalLink className="h-3.5 w-3.5" />
+              {t("openGuide")} <ExternalLink className="h-3.5 w-3.5" />
             </Link>
           </div>
 
@@ -85,17 +91,15 @@ export default function KapcsolatPage() {
 
         {/* Menhely regisztráció */}
         <div className="mt-8 rounded-2xl bg-brand-600 p-8 text-white">
-          <h2 className="text-xl font-bold">Menhelyek figyelmébe</h2>
+          <h2 className="text-xl font-bold">{t("shelterTitle")}</h2>
           <p className="mt-2 text-sm text-brand-100 leading-relaxed">
-            Ha regisztrálni szeretnéd a menhelyed a platformon, küldj e-mailt a fenti
-            elérhetőségre a menhely nevével és elérhetőségeiddel. Csapatunk felveszi
-            veled a kapcsolatot és végigkísér a beállítás folyamatán.
+            {t("shelterDesc")}
           </p>
           <a
             href="mailto:info@allatimenhelyek.hu?subject=Menhely regisztráció"
             className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
           >
-            Menhely regisztrációs igény küldése
+            {t("shelterCta")}
           </a>
         </div>
 
