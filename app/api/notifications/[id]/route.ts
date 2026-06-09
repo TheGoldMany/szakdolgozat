@@ -27,3 +27,23 @@ export async function PATCH(
 
   return NextResponse.json({ success: true });
 }
+
+// DELETE /api/notifications/[id] – remove a single notification
+export async function DELETE(
+  _req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
+  }
+
+  const n = await prisma.notification.findUnique({ where: { id: params.id } });
+  if (!n || n.userId !== session.user.id) {
+    return NextResponse.json({ error: "Nem található" }, { status: 404 });
+  }
+
+  await prisma.notification.delete({ where: { id: params.id } });
+
+  return NextResponse.json({ success: true });
+}

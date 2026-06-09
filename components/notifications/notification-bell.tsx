@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 interface Notification {
@@ -138,6 +139,15 @@ export function NotificationBell() {
               ))
             )}
           </div>
+
+          {/* Footer */}
+          <Link
+            href="/notifications"
+            onClick={() => setOpen(false)}
+            className="block border-t border-gray-100 px-4 py-2.5 text-center text-xs font-medium text-brand-500 hover:bg-gray-50 transition-colors"
+          >
+            Összes értesítés megtekintése
+          </Link>
         </div>
       )}
     </div>

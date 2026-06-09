@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
+import { Menu, X, PawPrint, MessageCircle, Globe, Bell } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -197,6 +197,9 @@ export function Header() {
                     <Link href="/messages" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("myMessages")}
                     </Link>
+                    <Link href="/notifications" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      Értesítések
+                    </Link>
                     <Link href="/appointments" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       Időpontjaim
                     </Link>
@@ -302,6 +305,11 @@ export function Header() {
                       {unread}
                     </span>
                   )}
+                </Link>
+                <Link href="/notifications" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  <Bell className="h-4 w-4" />
+                  Értesítések
                 </Link>
                 <Link href="/appointments" onClick={() => setMobileOpen(false)}
                   className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
