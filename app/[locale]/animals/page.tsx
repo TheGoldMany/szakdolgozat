@@ -50,7 +50,8 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
     ...(type   && { type }),
     ...(size   && { size }),
     ...(gender && { gender }),
-    ...(city   && { shelter: { is: { city } } }),
+    // Csak aktív (nem felfüggesztett) menhelyek állatai jelenjenek meg
+    shelter: { is: { isActive: true, ...(city ? { city } : {}) } },
     ...(searchParams.vaccinated   === "1" && { isVaccinated:   true }),
     ...(searchParams.neutered     === "1" && { isNeutered:     true }),
     ...(searchParams.goodWithKids === "1" && { isGoodWithKids: true }),

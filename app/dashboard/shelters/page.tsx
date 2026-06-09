@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck } from "lucide-react";
+import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck, Power, Loader2 } from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -30,6 +30,7 @@ export default function DashboardSheltersPage() {
   const [shelters, setShelters]     = useState<Shelter[]>([]);
   const [loading, setLoading]       = useState(true);
   const [showForm, setShowForm]     = useState(false);
+  const [busy, setBusy]             = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -39,6 +40,22 @@ export default function DashboardSheltersPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const toggle = useCallback(async (id: string, field: "isActive" | "isVerified", value: boolean) => {
+    setBusy(`${id}:${field}`);
+    try {
+      const res = await fetch(`/api/admin/shelters/${id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ [field]: value }),
+      });
+      if (res.ok) {
+        setShelters((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+      }
+    } finally {
+      setBusy(null);
+    }
+  }, []);
 
   function handleClose() {
     setShowForm(false);
@@ -144,17 +161,41 @@ export default function DashboardSheltersPage() {
 
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1.5">
-                      <span className={cn(
-                        "rounded-full px-2 py-0.5 text-xs font-medium",
-                        shelter.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                      )}>
+                      {/* Aktív / Inaktív kapcsoló */}
+                      <button
+                        onClick={() => toggle(shelter.id, "isActive", !shelter.isActive)}
+                        disabled={busy === `${shelter.id}:isActive`}
+                        title={shelter.isActive ? "Felfüggesztés" : "Aktiválás"}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
+                          shelter.isActive
+                            ? "bg-green-100 text-green-700 hover:bg-green-200"
+                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                        )}
+                      >
+                        {busy === `${shelter.id}:isActive`
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : <Power className="h-3 w-3" />}
                         {shelter.isActive ? "Aktív" : "Inaktív"}
-                      </span>
-                      {shelter.isVerified && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-                          <BadgeCheck className="h-3 w-3" /> Ellenőrzött
-                        </span>
-                      )}
+                      </button>
+
+                      {/* Ellenőrzött kapcsoló */}
+                      <button
+                        onClick={() => toggle(shelter.id, "isVerified", !shelter.isVerified)}
+                        disabled={busy === `${shelter.id}:isVerified`}
+                        title={shelter.isVerified ? "Hitelesítés visszavonása" : "Hitelesítés"}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
+                          shelter.isVerified
+                            ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                            : "border border-dashed border-gray-300 bg-white text-gray-400 hover:bg-gray-50"
+                        )}
+                      >
+                        {busy === `${shelter.id}:isVerified`
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : <BadgeCheck className="h-3 w-3" />}
+                        {shelter.isVerified ? "Ellenőrzött" : "Nem ellenőrzött"}
+                      </button>
                     </div>
                   </td>
 
