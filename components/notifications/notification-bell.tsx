@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface Notification {
   id:        string;
@@ -19,6 +20,7 @@ interface Notification {
 
 export function NotificationBell() {
   const router = useRouter();
+  const t = useTranslations("nav");
   const { data: session } = useSession();
   const [open,          setOpen]          = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -37,7 +39,6 @@ export function NotificationBell() {
   useEffect(() => {
     if (!session?.user?.id) return;
     fetchNotifications();
-    // Csak akkor pollozunk, ha a böngészőfül aktív (nem terheli a hátteret)
     const id = setInterval(() => {
       if (document.visibilityState === "visible") fetchNotifications();
     }, 30_000);
@@ -49,7 +50,6 @@ export function NotificationBell() {
     };
   }, [session?.user?.id]);
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -78,11 +78,11 @@ export function NotificationBell() {
     const d = new Date(iso);
     const now = new Date();
     const diffMin = Math.floor((now.getTime() - d.getTime()) / 60_000);
-    if (diffMin < 1)  return "most";
-    if (diffMin < 60) return `${diffMin} perce`;
+    if (diffMin < 1)  return "< 1 min";
+    if (diffMin < 60) return `${diffMin} min`;
     const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24)   return `${diffH} órája`;
-    return d.toLocaleDateString("hu-HU", { month: "short", day: "numeric" });
+    if (diffH < 24)   return `${diffH}h`;
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
 
   return (
@@ -90,7 +90,7 @@ export function NotificationBell() {
       <button
         onClick={() => setOpen((v) => !v)}
         className="relative flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-brand-500 transition-colors"
-        aria-label="Értesítések"
+        aria-label={t("notifications")}
       >
         <span className="relative">
           <Bell className="h-4 w-4" />
@@ -103,16 +103,16 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-1.5rem)] rounded-xl border border-gray-100 bg-white shadow-lg z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
-            <span className="text-sm font-semibold text-gray-800">Értesítések</span>
+            <span className="text-sm font-semibold text-gray-800">{t("notifications")}</span>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
                 className="text-xs text-brand-500 hover:text-brand-600 font-medium"
               >
-                Összes olvasottnak jelöl
+                {t("markAllRead")}
               </button>
             )}
           </div>
@@ -120,7 +120,7 @@ export function NotificationBell() {
           {/* List */}
           <div className="max-h-96 overflow-y-auto divide-y divide-gray-50">
             {notifications.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-gray-400">Nincs értesítés</p>
+              <p className="px-4 py-8 text-center text-sm text-gray-400">{t("noNotifications")}</p>
             ) : (
               notifications.map((n) => (
                 <button
@@ -154,7 +154,7 @@ export function NotificationBell() {
             onClick={() => setOpen(false)}
             className="block border-t border-gray-100 px-4 py-2.5 text-center text-xs font-medium text-brand-500 hover:bg-gray-50 transition-colors"
           >
-            Összes értesítés megtekintése
+            {t("viewAllNotifications")}
           </Link>
         </div>
       )}

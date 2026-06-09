@@ -1,6 +1,9 @@
+"use client";
+
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { CalendarDays, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface CampaignCardProps {
   campaign: {
@@ -21,6 +24,7 @@ function formatHUF(amount: number) {
 }
 
 export function CampaignCard({ campaign }: CampaignCardProps) {
+  const t = useTranslations("donate");
   const pct = Math.min(
     Math.round((campaign.raisedAmount / campaign.targetAmount) * 100),
     100
@@ -28,7 +32,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
 
   const endsAt = campaign.endsAt ? new Date(campaign.endsAt) : null;
   const endsAtFormatted = endsAt
-    ? endsAt.toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" })
+    ? endsAt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
     : null;
 
   return (
@@ -48,7 +52,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         )}
         {/* Percent badge */}
         <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-brand-600 shadow-sm">
-          {pct}% összegyűlt
+          {t("percentCollected", { pct })}
         </span>
       </div>
 
@@ -75,7 +79,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         <div className="mt-auto space-y-1 text-xs text-gray-400">
           <div className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5 shrink-0" />
-            <span>{campaign._count.donations} adományozó</span>
+            <span>{t("donors", { count: campaign._count.donations })}</span>
             {campaign.shelter && (
               <>
                 <span className="text-gray-300">·</span>
@@ -84,12 +88,12 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             )}
           </div>
           <div className="flex items-center gap-1.5 text-gray-400">
-            <span>Indította: {campaign.user.name ?? "Névtelen"}</span>
+            <span>{t("startedBy", { name: campaign.user.name ?? "–" })}</span>
           </div>
           {endsAtFormatted && (
             <div className="flex items-center gap-1.5">
               <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-              <span>Lejár: {endsAtFormatted}</span>
+              <span>{t("expiresOn", { date: endsAtFormatted })}</span>
             </div>
           )}
         </div>

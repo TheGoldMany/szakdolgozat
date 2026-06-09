@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Bell, Check, Trash2, CheckCheck, Loader2,
   Calendar, FileText, HandHeart, Home, Megaphone, ClipboardList,
@@ -56,6 +57,7 @@ function formatTime(iso: string) {
 
 export function NotificationsCenter() {
   const router = useRouter();
+  const t = useTranslations("notifications");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount,   setUnreadCount]   = useState(0);
   const [filter,        setFilter]        = useState<"all" | "unread">("all");
@@ -123,7 +125,7 @@ export function NotificationsCenter() {
               filter === "all" ? "bg-brand-500 text-white" : "text-gray-600 hover:bg-gray-50"
             )}
           >
-            Összes
+            {t("all")}
           </button>
           <button
             onClick={() => setFilter("unread")}
@@ -132,7 +134,7 @@ export function NotificationsCenter() {
               filter === "unread" ? "bg-brand-500 text-white" : "text-gray-600 hover:bg-gray-50"
             )}
           >
-            Olvasatlan
+            {t("unread")}
             {unreadCount > 0 && (
               <span className={cn(
                 "rounded-full px-1.5 text-[10px] font-bold",
@@ -150,7 +152,7 @@ export function NotificationsCenter() {
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <CheckCheck className="h-4 w-4" />
-            Összes olvasottnak jelöl
+            {t("markAllRead")}
           </button>
         )}
       </div>
@@ -164,9 +166,9 @@ export function NotificationsCenter() {
         <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
           <Bell className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">
-            {filter === "unread" ? "Nincs olvasatlan értesítés" : "Nincs értesítés"}
+            {filter === "unread" ? t("noUnread") : t("empty")}
           </p>
-          <p className="mt-1 text-sm text-gray-400">Itt jelennek meg a rendszer értesítései.</p>
+          <p className="mt-1 text-sm text-gray-400">{t("emptyDesc")}</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -198,11 +200,11 @@ export function NotificationsCenter() {
                   <p className="mt-1 text-xs text-gray-400">{formatTime(n.createdAt)}</p>
                 </button>
 
-                <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex shrink-0 items-center gap-1 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                   {!n.readAt && (
                     <button
                       onClick={() => markRead(n, false)}
-                      title="Olvasottnak jelöl"
+                      title={t("markRead")}
                       className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-500 transition-colors"
                     >
                       <Check className="h-4 w-4" />
@@ -211,7 +213,7 @@ export function NotificationsCenter() {
                   <button
                     onClick={() => remove(n.id)}
                     disabled={busyId === n.id}
-                    title="Törlés"
+                    title={t("delete")}
                     className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50"
                   >
                     {busyId === n.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}

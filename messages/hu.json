@@ -19,7 +19,10 @@
     "events": "Események",
     "testBanner": "TESZTÜZEM – Ez egy fejlesztői/tesztkörnyezet. Az adatok nem valósak, a funkciók kipróbálás céljából érhetők el.",
     "favorites": "Kedvenceim",
-    "notifications": "Értesítések"
+    "notifications": "Értesítések",
+    "markAllRead": "Összes olvasottnak jelöl",
+    "noNotifications": "Nincs értesítés",
+    "viewAllNotifications": "Összes értesítés megtekintése"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
@@ -185,7 +188,11 @@
     "about": "Rólunk",
     "contact": "Elérhetőségek",
     "monthlySubscriptions": "Havi előfizetések",
-    "animalsWaitingCount": "{count} állat vár gazdira"
+    "animalsWaitingCount": "{count} állat vár gazdira",
+    "volunteer": "Önkénteskedj nálunk",
+    "volunteerDesc": "Segíts a menhelyen önkéntesként – sétáltatás, állatgondozás és rendezvényszervezés várja a segítőket.",
+    "foster": "Légy ideiglenes befogadó",
+    "fosterDesc": "Segíts egy állaton anélkül, hogy véglegesen örökbe fogadnád – adj otthont ideiglenesen."
   },
   "donate": {
     "title": "Támogatás",
@@ -204,7 +211,12 @@
     "backToDonate": "Vissza az adományozáshoz",
     "mySubscriptions": "Előfizetéseim",
     "startCampaign": "Saját gyűjtés indítása",
-    "shelterPage": "Menhely oldala"
+    "shelterPage": "Menhely oldala",
+    "percentCollected": "{pct}% összegyűlt",
+    "donors": "{count} adományozó",
+    "startedBy": "Indította: {name}",
+    "expiresOn": "Lejár: {date}",
+    "subscribers": "{count} előfizető"
   },
   "auth": {
     "loginTitle": "Bejelentkezés",
@@ -509,6 +521,37 @@
     "filterOther": "Egyéb",
     "filterAvailable": "Örökbefogadható",
     "filterPending": "Folyamatban",
-    "filterAdopted": "Örökbefogadott"
+    "filterAdopted": "Örökbefogadott",
+    "clearFilters": "Szűrők törlése",
+    "noFavoritesForFilter": "Nincs a szűrőnek megfelelő kedvenc."
+  },
+  "notifications": {
+    "all": "Összes",
+    "unread": "Olvasatlan",
+    "markAllRead": "Összes olvasottnak jelöl",
+    "noUnread": "Nincs olvasatlan értesítés",
+    "empty": "Nincs értesítés",
+    "emptyDesc": "Itt jelennek meg a rendszer értesítései.",
+    "markRead": "Olvasottnak jelöl",
+    "delete": "Törlés"
+  },
+  "map": {
+    "filters": "Térkép szűrők",
+    "status": "Státusz",
+    "statusActive": "Aktív",
+    "statusResolved": "Megoldott",
+    "statusAll": "Mind",
+    "reportType": "Bejelentés típusa",
+    "allTypes": "Mind",
+    "layers": "Megjelenítés",
+    "reportsLayer": "Bejelentések",
+    "sheltersLayer": "Menhelyek",
+    "legend": "Jelmagyarázat",
+    "loading": "Adatok betöltése…",
+    "lost": "Elveszett",
+    "found": "Megtalált",
+    "stray": "Kóbor",
+    "shelter": "Menhely",
+    "newReport": "Új bejelentés"
   }
 }

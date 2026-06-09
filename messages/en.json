@@ -19,7 +19,10 @@
     "events": "Events",
     "testBanner": "TEST MODE – This is a development/test environment. Data is not real; features are available for testing purposes only.",
     "favorites": "My favorites",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "viewAllNotifications": "View all notifications"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
@@ -185,7 +188,11 @@
     "about": "About us",
     "contact": "Contact",
     "monthlySubscriptions": "Monthly subscriptions",
-    "animalsWaitingCount": "{count} animals waiting for a home"
+    "animalsWaitingCount": "{count} animals waiting for a home",
+    "volunteer": "Volunteer with us",
+    "volunteerDesc": "Help the shelter as a volunteer – dog walking, animal care and event support.",
+    "foster": "Become a foster carer",
+    "fosterDesc": "Help an animal without permanently adopting them – provide a temporary home."
   },
   "donate": {
     "title": "Support",
@@ -204,7 +211,12 @@
     "backToDonate": "Back to support",
     "mySubscriptions": "My subscriptions",
     "startCampaign": "Start a campaign",
-    "shelterPage": "Shelter page"
+    "shelterPage": "Shelter page",
+    "percentCollected": "{pct}% collected",
+    "donors": "{count} donors",
+    "startedBy": "Started by: {name}",
+    "expiresOn": "Expires: {date}",
+    "subscribers": "{count} subscribers"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -509,6 +521,37 @@
     "filterOther": "Other",
     "filterAvailable": "Adoptable",
     "filterPending": "In progress",
-    "filterAdopted": "Adopted"
+    "filterAdopted": "Adopted",
+    "clearFilters": "Clear filters",
+    "noFavoritesForFilter": "No favorites match the selected filters."
+  },
+  "notifications": {
+    "all": "All",
+    "unread": "Unread",
+    "markAllRead": "Mark all as read",
+    "noUnread": "No unread notifications",
+    "empty": "No notifications",
+    "emptyDesc": "System notifications will appear here.",
+    "markRead": "Mark as read",
+    "delete": "Delete"
+  },
+  "map": {
+    "filters": "Map filters",
+    "status": "Status",
+    "statusActive": "Active",
+    "statusResolved": "Resolved",
+    "statusAll": "All",
+    "reportType": "Report type",
+    "allTypes": "All",
+    "layers": "Layers",
+    "reportsLayer": "Reports",
+    "sheltersLayer": "Shelters",
+    "legend": "Legend",
+    "loading": "Loading data…",
+    "lost": "Lost",
+    "found": "Found",
+    "stray": "Stray",
+    "shelter": "Shelter",
+    "newReport": "New report"
   }
 }

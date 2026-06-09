@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
+import { SlidersHorizontal, X } from "lucide-react";
 import type { MapReport, MapShelter } from "@/components/ui/animal-map";
 
 const AnimalMap = dynamic(() => import("@/components/ui/animal-map"), { ssr: false });
 
-const TYPE_OPTIONS = [
-  { value: "",      label: "Mind",       color: "#6B7280" },
-  { value: "LOST",  label: "Elveszett",  color: "#EF4444" },
-  { value: "FOUND", label: "Megtalált",  color: "#22C55E" },
-  { value: "STRAY", label: "Kóbor",      color: "#F97316" },
-];
-
 export default function MapView() {
+  const t = useTranslations("map");
+
+  const TYPE_OPTIONS = [
+    { value: "",      label: t("allTypes"),  color: "#6B7280" },
+    { value: "LOST",  label: t("lost"),      color: "#EF4444" },
+    { value: "FOUND", label: t("found"),     color: "#22C55E" },
+    { value: "STRAY", label: t("stray"),     color: "#F97316" },
+  ];
+
   const [reports,  setReports]  = useState<MapReport[]>([]);
   const [shelters, setShelters] = useState<MapShelter[]>([]);
   const [loading,  setLoading]  = useState(true);
@@ -21,7 +25,8 @@ export default function MapView() {
   const [showReports,  setShowReports]  = useState(true);
   const [showShelters, setShowShelters] = useState(true);
   const [typeFilter,   setTypeFilter]   = useState("");
-  const [status, setStatus] = useState("ACTIVE");
+  const [status,       setStatus]       = useState("ACTIVE");
+  const [panelOpen,    setPanelOpen]    = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -39,7 +44,7 @@ export default function MapView() {
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      {/* Térkép */}
+      {/* Map */}
       <div className="absolute inset-0">
         {!loading && (
           <AnimalMap
@@ -54,32 +59,44 @@ export default function MapView() {
           <div className="flex h-full items-center justify-center bg-gray-100">
             <div className="text-center">
               <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-4 border-brand-500 border-t-transparent" />
-              <p className="text-sm text-gray-500">Adatok betöltése…</p>
+              <p className="text-sm text-gray-500">{t("loading")}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Vezérlőpanel – bal felső */}
-      <div className="absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-100 bg-white shadow-lg">
-        {/* Fejléc */}
+      {/* Mobile toggle button */}
+      <button
+        onClick={() => setPanelOpen(v => !v)}
+        className="absolute left-3 top-3 z-[1001] flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-md md:hidden"
+        aria-label={t("filters")}
+      >
+        {panelOpen ? <X className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
+        {t("filters")}
+      </button>
+
+      {/* Control panel – top left */}
+      <div className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-100 bg-white shadow-lg transition-transform md:translate-y-0 ${
+        panelOpen ? "translate-y-12" : "hidden md:block"
+      }`}>
+        {/* Header */}
         <div className="border-b border-gray-100 px-4 py-3">
-          <h2 className="text-sm font-bold text-gray-900">Térkép szűrők</h2>
+          <h2 className="text-sm font-bold text-gray-900">{t("filters")}</h2>
         </div>
 
         <div className="space-y-3 p-4">
-          {/* Státusz */}
+          {/* Status */}
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Státusz</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{t("status")}</p>
             <div className="flex gap-1.5">
               {[
-                { v: "ACTIVE",   l: "Aktív"   },
-                { v: "RESOLVED", l: "Megoldott" },
-                { v: "ALL",      l: "Mind"    },
+                { v: "ACTIVE",   l: t("statusActive")   },
+                { v: "RESOLVED", l: t("statusResolved") },
+                { v: "ALL",      l: t("statusAll")      },
               ].map(o => (
                 <button key={o.v}
                   onClick={() => setStatus(o.v)}
-                  className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors ${
+                  className={`flex-1 rounded-lg px-2 py-2 text-xs font-semibold transition-colors ${
                     status === o.v
                       ? "bg-gray-900 text-white"
                       : "border border-gray-200 text-gray-600 hover:bg-gray-50"
@@ -89,9 +106,9 @@ export default function MapView() {
             </div>
           </div>
 
-          {/* Típus szűrő */}
+          {/* Type filter */}
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Bejelentés típusa</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{t("reportType")}</p>
             <div className="flex flex-col gap-1">
               {TYPE_OPTIONS.map(o => (
                 <button key={o.value}
@@ -114,36 +131,36 @@ export default function MapView() {
             </div>
           </div>
 
-          {/* Rétegek */}
+          {/* Layers */}
           <div>
-            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Megjelenítés</p>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{t("layers")}</p>
             <label className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-50">
               <input type="checkbox" checked={showReports}
                 onChange={e => setShowReports(e.target.checked)}
                 className="h-4 w-4 rounded accent-brand-500" />
-              <span className="text-sm text-gray-700">Bejelentések</span>
+              <span className="text-sm text-gray-700">{t("reportsLayer")}</span>
               <span className="ml-auto text-xs text-gray-400">{visibleReports.length}</span>
             </label>
             <label className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-50">
               <input type="checkbox" checked={showShelters}
                 onChange={e => setShowShelters(e.target.checked)}
                 className="h-4 w-4 rounded accent-brand-500" />
-              <span className="text-sm text-gray-700">Menhelyek 🏠</span>
+              <span className="text-sm text-gray-700">{t("sheltersLayer")}</span>
               <span className="ml-auto text-xs text-gray-400">{shelters.length}</span>
             </label>
           </div>
         </div>
       </div>
 
-      {/* Jelmagyarázat – jobb alsó */}
+      {/* Legend – bottom right */}
       <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-100 bg-white px-3 py-2.5 shadow-lg">
-        <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-gray-500">Jelmagyarázat</p>
+        <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-gray-500">{t("legend")}</p>
         <div className="space-y-1">
           {[
-            { color: "#EF4444", label: "Elveszett" },
-            { color: "#22C55E", label: "Megtalált" },
-            { color: "#F97316", label: "Kóbor"     },
-            { color: "#2563EB", label: "Menhely 🏠" },
+            { color: "#EF4444", label: t("lost")    },
+            { color: "#22C55E", label: t("found")   },
+            { color: "#F97316", label: t("stray")   },
+            { color: "#2563EB", label: t("shelter") },
           ].map(item => (
             <div key={item.label} className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm flex-shrink-0"
@@ -154,12 +171,12 @@ export default function MapView() {
         </div>
       </div>
 
-      {/* Új bejelentés gomb */}
+      {/* New report button */}
       <a
         href="/reports/new"
         className="absolute bottom-8 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-brand-600"
       >
-        + Új bejelentés
+        + {t("newReport")}
       </a>
     </div>
   );

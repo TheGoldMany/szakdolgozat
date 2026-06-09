@@ -91,7 +91,7 @@ export default async function FavoritesPage({
           </div>
         ) : animals.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-12 text-center">
-            <p className="text-gray-400">Nincs a szűrőnek megfelelő kedvenc.</p>
+            <p className="text-gray-400">{t("noFavoritesForFilter")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

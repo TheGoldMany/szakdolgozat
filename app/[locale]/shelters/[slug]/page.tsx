@@ -213,14 +213,12 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         {session && (
           <div className="mx-auto max-w-5xl px-4 pb-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-base font-semibold text-gray-800">Önkénteskedj nálunk</h2>
+              <h2 className="mb-3 text-base font-semibold text-gray-800">{t("volunteer")}</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
             </div>
             <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h2 className="mb-1 text-base font-semibold text-gray-800">Légy ideiglenes befogadó</h2>
-              <p className="mb-3 text-sm text-gray-500">
-                Segíts egy állaton anélkül, hogy véglegesen örökbe fogadnád – adj otthont ideiglenesen.
-              </p>
+              <h2 className="mb-1 text-base font-semibold text-gray-800">{t("foster")}</h2>
+              <p className="mb-3 text-sm text-gray-500">{t("fosterDesc")}</p>
               <FosterApplyButton shelterId={shelter.id} existingStatus={existingFosterStatus} />
             </div>
           </div>

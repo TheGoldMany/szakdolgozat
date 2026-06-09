@@ -19,7 +19,10 @@
     "events": "Events",
     "testBanner": "TESTBETRIEB – Dies ist eine Entwicklungs-/Testumgebung. Die Daten sind nicht real; Funktionen stehen nur zum Testen zur Verfügung.",
     "favorites": "Meine Favoriten",
-    "notifications": "Benachrichtigungen"
+    "notifications": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noNotifications": "Keine Benachrichtigungen",
+    "viewAllNotifications": "Alle Benachrichtigungen anzeigen"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
@@ -185,7 +188,11 @@
     "about": "Über uns",
     "contact": "Kontakt",
     "monthlySubscriptions": "Monatliche Abonnements",
-    "animalsWaitingCount": "{count} Tiere suchen ein Zuhause"
+    "animalsWaitingCount": "{count} Tiere suchen ein Zuhause",
+    "volunteer": "Ehrenamtlich helfen",
+    "volunteerDesc": "Hilf dem Tierheim als Ehrenamtlicher – Gassiführen, Tierpflege und Veranstaltungssupport.",
+    "foster": "Pflegeperson werden",
+    "fosterDesc": "Hilf einem Tier, ohne es dauerhaft zu adoptieren – gib ihm vorübergehend ein Zuhause."
   },
   "donate": {
     "title": "Unterstützung",
@@ -204,7 +211,12 @@
     "backToDonate": "Zurück zur Unterstützung",
     "mySubscriptions": "Meine Abonnements",
     "startCampaign": "Kampagne starten",
-    "shelterPage": "Tierheim-Seite"
+    "shelterPage": "Tierheim-Seite",
+    "percentCollected": "{pct}% gesammelt",
+    "donors": "{count} Spender",
+    "startedBy": "Gestartet von: {name}",
+    "expiresOn": "Läuft ab: {date}",
+    "subscribers": "{count} Abonnenten"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -509,6 +521,37 @@
     "filterOther": "Andere",
     "filterAvailable": "Adoptierbar",
     "filterPending": "In Bearbeitung",
-    "filterAdopted": "Adoptiert"
+    "filterAdopted": "Adoptiert",
+    "clearFilters": "Filter löschen",
+    "noFavoritesForFilter": "Keine Favoriten entsprechen den Filtern."
+  },
+  "notifications": {
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noUnread": "Keine ungelesenen Benachrichtigungen",
+    "empty": "Keine Benachrichtigungen",
+    "emptyDesc": "Hier erscheinen Systembenachrichtigungen.",
+    "markRead": "Als gelesen markieren",
+    "delete": "Löschen"
+  },
+  "map": {
+    "filters": "Kartenfilter",
+    "status": "Status",
+    "statusActive": "Aktiv",
+    "statusResolved": "Gelöst",
+    "statusAll": "Alle",
+    "reportType": "Meldetyp",
+    "allTypes": "Alle",
+    "layers": "Anzeige",
+    "reportsLayer": "Meldungen",
+    "sheltersLayer": "Tierheime",
+    "legend": "Legende",
+    "loading": "Daten werden geladen…",
+    "lost": "Verloren",
+    "found": "Gefunden",
+    "stray": "Streunend",
+    "shelter": "Tierheim",
+    "newReport": "Neue Meldung"
   }
 }

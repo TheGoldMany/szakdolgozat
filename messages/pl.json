@@ -19,7 +19,10 @@
     "events": "Wydarzenia",
     "testBanner": "TRYB TESTOWY – To jest środowisko deweloperskie/testowe. Dane nie są prawdziwe; funkcje są dostępne wyłącznie w celach testowych.",
     "favorites": "Moje ulubione",
-    "notifications": "Powiadomienia"
+    "notifications": "Powiadomienia",
+    "markAllRead": "Oznacz wszystkie jako przeczytane",
+    "noNotifications": "Brak powiadomień",
+    "viewAllNotifications": "Zobacz wszystkie powiadomienia"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
@@ -185,7 +188,11 @@
     "about": "O nas",
     "contact": "Kontakt",
     "monthlySubscriptions": "Miesięczne subskrypcje",
-    "animalsWaitingCount": "{count} zwierząt czeka na dom"
+    "animalsWaitingCount": "{count} zwierząt czeka na dom",
+    "volunteer": "Zostań wolontariuszem",
+    "volunteerDesc": "Pomóż schronisku jako wolontariusz – spacery, opieka nad zwierzętami i wsparcie wydarzeń.",
+    "foster": "Zostań opiekunem tymczasowym",
+    "fosterDesc": "Pomóż zwierzęciu bez jego stałej adopcji – daj mu tymczasowy dom."
   },
   "donate": {
     "title": "Wsparcie",
@@ -204,7 +211,12 @@
     "backToDonate": "Wróć do wsparcia",
     "mySubscriptions": "Moje subskrypcje",
     "startCampaign": "Rozpocznij kampanię",
-    "shelterPage": "Strona schroniska"
+    "shelterPage": "Strona schroniska",
+    "percentCollected": "{pct}% zebrano",
+    "donors": "{count} darczyńców",
+    "startedBy": "Założona przez: {name}",
+    "expiresOn": "Wygasa: {date}",
+    "subscribers": "{count} subskrybentów"
   },
   "auth": {
     "loginTitle": "Zaloguj się",
@@ -509,6 +521,37 @@
     "filterOther": "Inne",
     "filterAvailable": "Do adopcji",
     "filterPending": "W toku",
-    "filterAdopted": "Adoptowany"
+    "filterAdopted": "Adoptowany",
+    "clearFilters": "Wyczyść filtry",
+    "noFavoritesForFilter": "Żadne ulubione nie pasują do filtrów."
+  },
+  "notifications": {
+    "all": "Wszystkie",
+    "unread": "Nieprzeczytane",
+    "markAllRead": "Oznacz wszystkie jako przeczytane",
+    "noUnread": "Brak nieprzeczytanych powiadomień",
+    "empty": "Brak powiadomień",
+    "emptyDesc": "Tutaj pojawią się powiadomienia systemowe.",
+    "markRead": "Oznacz jako przeczytane",
+    "delete": "Usuń"
+  },
+  "map": {
+    "filters": "Filtry mapy",
+    "status": "Status",
+    "statusActive": "Aktywne",
+    "statusResolved": "Rozwiązane",
+    "statusAll": "Wszystkie",
+    "reportType": "Typ zgłoszenia",
+    "allTypes": "Wszystkie",
+    "layers": "Wyświetlanie",
+    "reportsLayer": "Zgłoszenia",
+    "sheltersLayer": "Schroniska",
+    "legend": "Legenda",
+    "loading": "Ładowanie danych…",
+    "lost": "Zagubiony",
+    "found": "Znaleziony",
+    "stray": "Bezdomny",
+    "shelter": "Schronisko",
+    "newReport": "Nowe zgłoszenie"
   }
 }
