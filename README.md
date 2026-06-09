@@ -110,10 +110,11 @@ Teljes körű webalkalmazás, amely összeköti az állami és civil menhelyeket
 │   ├── stripe.ts              # Stripe Client singleton
 │   └── utils.ts               # Segédfüggvények
 ├── prisma/
-│   ├── schema.prisma          # Fő adatbázis (29 modell)
+│   ├── schema.prisma          # Fő adatbázis (42 modell)
 │   ├── dwh.prisma             # Data Warehouse séma
 │   ├── seed.ts                # Alap seed adatok
 │   └── seed-demo.ts           # Demo / bemutató seed
+├── docs/                      # Fejlesztői és tesztdokumentáció
 ├── e2e/                       # Playwright E2E tesztek
 ├── tests/                     # Vitest unit tesztek
 └── types/                     # Globális TypeScript típusok
@@ -222,7 +223,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ### Fő adatbázis – `prisma/schema.prisma`
 
-29 Prisma modell, főbb csoportok:
+42 Prisma modell, főbb csoportok:
 
 | Csoport | Modellek |
 |---|---|
@@ -310,6 +311,16 @@ A projekt Vercel-re optimalizált.
 
 Stripe webhook URL a Vercel deployment után:  
 `https://<your-domain>/api/webhooks/stripe`
+
+---
+
+## Dokumentáció
+
+| Dokumentum | Tartalom |
+|---|---|
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Rendszer-architektúra: routing, adatmodell, auth, API, Stripe, i18n, DWH |
+| [docs/README.md](./docs/README.md) | Tesztdokumentáció index + fejlesztői onboarding (seed fiókok, URL-ek) |
+| `docs/01-17` | Funkciónkénti User Story-alapú tesztesetek (~111 teszteset) |
 
 ---
 

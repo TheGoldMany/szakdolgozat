@@ -3,7 +3,7 @@
 > Fejlesztői onboarding-dokumentum az **ÁllatiMenhelyek.hu** állatmenhely-örökbefogadási
 > platformhoz. Célja, hogy egy új fejlesztő gyorsan átlássa a kódbázis felépítését,
 > a fő modulokat és a köztük lévő kapcsolatokat. A funkcionális tesztesetek a
-> [docs/README.md](./README.md) alatti `01-12` dokumentumokban találhatók.
+> [docs/README.md](./README.md) alatti `01-17` dokumentumokban találhatók.
 
 ---
 
@@ -102,7 +102,7 @@ szakdolgozat/
 ├── middleware.ts              # next-intl + NextAuth middleware
 ├── tests/                     # Vitest unit tesztek
 ├── e2e/                       # Playwright end-to-end tesztek
-├── docs/                      # Teszteset-dokumentáció (01-12) + ez a fájl
+├── docs/                      # Teszteset-dokumentáció (01-17) + ez a fájl
 ├── mobile/                    # Külön React Native (Expo) mobilkliens
 └── types/next-auth.d.ts       # Session/JWT típusbővítés (id, role)
 ```
@@ -459,8 +459,8 @@ sémára futtat `prisma generate` + `db push`-t).
 
 ### 10.3 Kapcsolat a docs/ tesztesetekkel
 
-A `docs/01-auth.md` … `docs/12-superadmin.md` fájlok **manuális, user story-alapú
-teszteseteket** írnak le (TC-XX-YY azonosítókkal, összesen ~76 db) — területenként
+A `docs/01-auth.md` … `docs/17-settings-tiers.md` fájlok **manuális, user story-alapú
+teszteseteket** írnak le (TC-XX-YY azonosítókkal, összesen ~111 db) — területenként
 lefedve az auth-tól a super admin funkciókig (lásd `docs/README.md`). Az e2e tesztek
 ezek egy részét automatizálják (auth, állat-böngészés, dashboard smoke-tesztek); új
 funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell.

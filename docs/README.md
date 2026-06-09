@@ -21,8 +21,15 @@
 | [10-notifications.md](./10-notifications.md) | Értesítési rendszer | TC-10-01 – TC-10-05 |
 | [11-dashboard.md](./11-dashboard.md) | Admin dashboard: állatok, kérelmek, készlet | TC-11-01 – TC-11-12 |
 | [12-superadmin.md](./12-superadmin.md) | Super Admin: felhasználók, menhelyek | TC-12-01 – TC-12-06 |
+| [13-profile.md](./13-profile.md) | Profil, avatar, jelszóváltás, nyelvváltás | TC-13-01 – TC-13-06 |
+| [14-followups.md](./14-followups.md) | Örökbefogadás utáni utánkövetés | TC-14-01 – TC-14-06 |
+| [15-events.md](./15-events.md) | Események (publikus + admin) | TC-15-01 – TC-15-07 |
+| [16-forms-kennels-transfers.md](./16-forms-kennels-transfers.md) | Kérvénysablonok, kennelek, áthelyezések | TC-16-01 – TC-16-09 |
+| [17-settings-tiers.md](./17-settings-tiers.md) | Menhely beállítások, Stripe Connect, támogatói szintek | TC-17-01 – TC-17-07 |
 
-**Összesen: ~76 teszteset**
+**Összesen: ~111 teszteset**
+
+> Rendszer-architektúra áttekintés új fejlesztőknek: [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ---
 
