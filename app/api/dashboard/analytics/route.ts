@@ -362,11 +362,94 @@ export async function GET(req: NextRequest) {
     uc05 = { ageCategoryDist: [], appCountDist: [], speciesAgeCross: [], dwhAvailable: false };
   }
 
+  // ────────────────────────────────────────────────────────
+  // UC-06: Szezonalitas es adatfrissesseg (DWH DimDate + EtlRun)
+  // ────────────────────────────────────────────────────────
+
+  type Uc06Data = {
+    byQuarter:   Array<{ quarter: number; label: string; count: number }>;
+    byWeekday:   Array<{ day: number; label: string; count: number }>;
+    weekendPct:  number | null;
+    holidayCount: number;
+    lastEtl:     { finishedAt: string; elapsedMs: number; adoptionCount: number; inventoryCount: number } | null;
+    dwhAvailable: boolean;
+  };
+
+  let uc06: Uc06Data = {
+    byQuarter:    [],
+    byWeekday:    [],
+    weekendPct:   null,
+    holidayCount: 0,
+    lastEtl:      null,
+    dwhAvailable: false,
+  };
+
+  try {
+    const dwhShelters = await dwh.dimShelter.findMany({
+      where:  { shelterId: { in: shelterIds } },
+      select: { id: true },
+    });
+    const dwhShelterIds = dwhShelters.map((s) => s.id);
+
+    const [adoptionDates, lastEtlRun] = await Promise.all([
+      dwh.factAdoption.findMany({
+        where:  { shelterId: { in: dwhShelterIds } },
+        select: { date: { select: { quarter: true, dayOfWeek: true, isWeekend: true, isHoliday: true } } },
+      }),
+      dwh.etlRun.findFirst({ orderBy: { finishedAt: "desc" } }),
+    ]);
+
+    const QUARTER_LABELS = ["I. negyedev", "II. negyedev", "III. negyedev", "IV. negyedev"];
+    const WEEKDAY_LABELS = ["Vasarnap", "Hetfo", "Kedd", "Szerda", "Csutortok", "Pentek", "Szombat"];
+
+    const qBucket: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    const wBucket: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    let weekendCount = 0;
+    let holidayCount = 0;
+
+    for (const a of adoptionDates) {
+      const q = a.date?.quarter;
+      const w = a.date?.dayOfWeek;
+      if (q != null && qBucket[q] != null) qBucket[q]++;
+      if (w != null && wBucket[w] != null) wBucket[w]++;
+      if (a.date?.isWeekend) weekendCount++;
+      if (a.date?.isHoliday) holidayCount++;
+    }
+
+    const totalDated = adoptionDates.length;
+    const byQuarter = [1, 2, 3, 4].map((q) => ({
+      quarter: q, label: QUARTER_LABELS[q - 1], count: qBucket[q] ?? 0,
+    }));
+    const byWeekday = [1, 2, 3, 4, 5, 6, 0].map((d) => ({
+      day: d, label: WEEKDAY_LABELS[d], count: wBucket[d] ?? 0,
+    }));
+    const weekendPct = totalDated > 0 ? Math.round((weekendCount / totalDated) * 1000) / 10 : null;
+
+    uc06 = {
+      byQuarter,
+      byWeekday,
+      weekendPct,
+      holidayCount,
+      lastEtl: lastEtlRun
+        ? {
+            finishedAt:     lastEtlRun.finishedAt.toISOString(),
+            elapsedMs:      lastEtlRun.elapsedMs,
+            adoptionCount:  lastEtlRun.adoptionCount,
+            inventoryCount: lastEtlRun.inventoryCount,
+          }
+        : null,
+      dwhAvailable: true,
+    };
+  } catch {
+    uc06 = { byQuarter: [], byWeekday: [], weekendPct: null, holidayCount: 0, lastEtl: null, dwhAvailable: false };
+  }
+
   return NextResponse.json({
     uc01: { totalAdoptions, yoyGrowth, thisYearApps, lastYearApps, monthlyTrend, bySpecies },
     uc02: { avgStayBySpecies, stayCategories, shelterUtil, avgUtilization },
     uc03: { lostCount, foundCount, strayCount, matchRate, lostMinusFound, byReportType, reportsByCity },
     uc04: { returnRate, yoyReturnRateChange, returnAnimals, uniqueAnimals, adoptionsByHomeType, adoptionsByProfile },
     uc05,
+    uc06,
   });
 }

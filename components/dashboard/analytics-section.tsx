@@ -7,6 +7,7 @@ import { Uc02CapacityPanel } from "./stats/uc02-capacity-panel";
 import { Uc03ReportsPanel } from "./stats/uc03-reports-panel";
 import { Uc04ReturnRate } from "./stats/uc04-return-rate";
 import { Uc05AgeProfile } from "./stats/uc05-age-profile";
+import { Uc06Seasonality } from "./stats/uc06-seasonality";
 
 interface Shelter { id: string; name: string }
 
@@ -47,6 +48,14 @@ interface AnalyticsData {
     appCountDist:    Array<{ label: string; count: number }>;
     speciesAgeCross: Array<{ type: string; label: string; PUPPY: number; YOUNG: number; ADULT: number; SENIOR: number; UNKNOWN: number }>;
     dwhAvailable:    boolean;
+  };
+  uc06: {
+    byQuarter:    Array<{ quarter: number; label: string; count: number }>;
+    byWeekday:    Array<{ day: number; label: string; count: number }>;
+    weekendPct:   number | null;
+    holidayCount: number;
+    lastEtl:      { finishedAt: string; elapsedMs: number; adoptionCount: number; inventoryCount: number } | null;
+    dwhAvailable: boolean;
   };
 }
 
@@ -188,6 +197,9 @@ export function AnalyticsSection({ role, shelters }: Props) {
           </div>
           <div className={loading ? "opacity-60 pointer-events-none" : ""}>
             <Uc05AgeProfile {...data.uc05} />
+          </div>
+          <div className={loading ? "opacity-60 pointer-events-none" : ""}>
+            <Uc06Seasonality {...data.uc06} />
           </div>
         </div>
       )}
