@@ -7,6 +7,7 @@ import {
   MessageCircle, ChevronRight, Users, CalendarDays, HandHeart, Package,
   ListChecks, BarChart2, Settings, ShieldCheck, AlertTriangle, CheckCircle2,
   Clock, ArrowDownCircle, ArrowUpCircle, RotateCcw, Info,
+  Home, Map, ArrowLeftRight, Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,8 +31,12 @@ const TOC_USER: TocItem[] = [
   { id: "u-onkentesseg",   label: "Önkéntesség",              icon: HandHeart      },
   { id: "u-utankovetes",   label: "Utánkövetés",              icon: ListChecks     },
   { id: "u-adomanyozas",   label: "Adományozás",              icon: Heart          },
-  { id: "u-bejelentes",    label: "Kóbor állat bejelentése",  icon: Bell           },
-  { id: "u-uzenetek",      label: "Üzenetváltás",             icon: MessageCircle  },
+  { id: "u-kedvencek",     label: "Kedvenc állatok",           icon: Heart          },
+  { id: "u-befogadas",     label: "Ideiglenes befogadás",      icon: Home           },
+  { id: "u-esemenyek",     label: "Események",                 icon: CalendarDays   },
+  { id: "u-terkep",        label: "Térkép",                    icon: Map            },
+  { id: "u-bejelentes",    label: "Kóbor állat bejelentése",   icon: Bell           },
+  { id: "u-uzenetek",      label: "Üzenetváltás",              icon: MessageCircle  },
 ];
 
 const TOC_ADMIN: TocItem[] = [
@@ -45,7 +50,11 @@ const TOC_ADMIN: TocItem[] = [
   { id: "a-utankovetes",  label: "Utánkövetések",            icon: ListChecks   },
   { id: "a-adomanyok",    label: "Adományok és kampányok",   icon: Heart        },
   { id: "a-elemzesek",    label: "Elemzések (Analytics)",   icon: BarChart2    },
-  { id: "a-beallitasok",  label: "Menhely beállításai",      icon: Settings     },
+  { id: "a-beallitasok",  label: "Menhely beállításai",       icon: Settings     },
+  { id: "a-befogadok",    label: "Ideiglenes befogadók",      icon: Home         },
+  { id: "a-kenneleks",    label: "Kennelek kezelése",          icon: Building2    },
+  { id: "a-atelyezesek",  label: "Állat áthelyezések",         icon: ArrowLeftRight },
+  { id: "a-esemenyek",    label: "Események kezelése",         icon: CalendarDays },
 ];
 
 const TOC_SUPER: TocItem[] = [
@@ -306,6 +315,112 @@ function UserContent() {
           </Step>
         </div>
         <Note type="info">Minden fizetés biztonságos Stripe-on keresztül zajlik. Kártyaadataidat soha nem tároljuk.</Note>
+      </Section>
+
+      {/* Kedvencek */}
+      <Section id="u-kedvencek" icon={Heart} title="Kedvenc állatok" color="bg-rose-50 text-rose-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A szív ikon segítségével bármely állat elmenthető a kedvencek közé, hogy könnyen megtaláld később.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Állat kedvencnek jelölése">
+            Az állat kártyáján vagy részletoldalán kattints a szív ikonra. Az ikon betelik, jelezve hogy
+            a kedvencek közé kerül. Bejelentkezés szükséges ehhez a funkcióhoz.
+          </Step>
+          <Step n={2} title="Kedvencek megtekintése">
+            A <strong>Kedvenceim</strong> oldalon (fejléc → szív ikon, vagy menü) megtalálod az összes
+            elmentett állatot. Szűrheted faj és státusz szerint.
+          </Step>
+          <Step n={3} title="Eltávolítás a kedvencek közül">
+            A szív ikonra kattintva újra eltávolíthatod az állatot a kedvenceid közül. A kedvenceim oldalon
+            is megjelenik ez a lehetőség.
+          </Step>
+        </div>
+        <Note type="info">Ha egy kedvenc állat státusza megváltozik (pl. örökbe fogadták), az továbbra is látható a listában — így mindig nyomon követheted a korábban megjelölt állatokat.</Note>
+        <QuickLink icon={Heart} label="Kedvenceim" href="/favorites" />
+      </Section>
+
+      {/* Ideiglenes befogadás */}
+      <Section id="u-befogadas" icon={Home} title="Ideiglenes befogadás" color="bg-violet-50 text-violet-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Az ideiglenes befogadók (foster carers) átmenetileg otthont adnak egy állatnak, amíg az végleges
+          örökbefogadóra vár. Ez különösen kismacskáknak, beteg állatoknak, vagy sérülteknek nyújt segítséget.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Befogadói profil létrehozása">
+            Egy menhely profiloldalán kattints az <strong>„Ideiglenes befogadónak jelentkezem"</strong> gombra.
+            Add meg a lakhatási körülményeidet, tapasztalataidat és elérhetőségedet.
+          </Step>
+          <Step n={2} title="Jóváhagyás">
+            A menhely megvizsgálja a profilt és jóváhagyja vagy elutasítja. Döntésről értesítést kapsz.
+            Jóváhagyott státusszal a menhely felajánlhat neked állatokat ideiglenesen.
+          </Step>
+          <Step n={3} title="Aktív befogadás">
+            Ha egy állat nálad van ideiglenesen, az <strong>Ideiglenes befogadásaim</strong> oldalon
+            követheted az ellátmány-naplót és a befogadás részleteit.
+          </Step>
+          <Step n={4} title="Ellátmány-napló">
+            A befogadás során rögzítheted a felhasznált ellátmányokat (takarmány, gyógyszer stb.),
+            amit a menhely nyilvántart a visszatérítéshez.
+          </Step>
+        </div>
+        <Note type="tip">Egy fiókkal több menhelyen is lehetsz ideiglenes befogadó — minden menhelynél külön profil és státusz jön létre.</Note>
+        <QuickLink icon={Home} label="Ideiglenes befogadásaim" href="/foster" />
+      </Section>
+
+      {/* Események */}
+      <Section id="u-esemenyek" icon={CalendarDays} title="Események" color="bg-teal-50 text-teal-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A menhelyek nyílt napokat, örökbefogadási napokat, önkéntes napokat és gyűjtéseket szerveznek.
+          Ezekre az <strong>Események</strong> oldalon tudsz regisztrálni.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Esemény böngészése">
+            Az <strong>Események</strong> menüpontban megtalálod az összes közelgő eseményt. Szűrhetsz
+            helyszín, típus és dátum szerint.
+          </Step>
+          <Step n={2} title="Regisztráció eseményre">
+            Az esemény részletes oldalán kattints a <strong>„Részt veszek"</strong> gombra.
+            Visszaigazolást kapsz e-mailben és az <strong>Értesítések</strong> között.
+          </Step>
+          <Step n={3} title="Regisztrációm megtekintése">
+            Az esemény oldalán megtekintheted a regisztrációd állapotát:
+            <Badge label="Regisztrált" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Visszaigazolt" color="bg-blue-100 text-blue-700 mx-1" />,
+            <Badge label="Lemondva" color="bg-red-100 text-red-700 mx-1" />.
+          </Step>
+          <Step n={4} title="Lemondás">
+            Ha nem tudsz részt venni, a regisztrációd töröld az esemény oldalán.
+            Kérjük ezt legalább 24 órával az esemény előtt tedd meg.
+          </Step>
+        </div>
+        <QuickLink icon={CalendarDays} label="Események" href="/events" />
+      </Section>
+
+      {/* Térkép */}
+      <Section id="u-terkep" icon={Map} title="Interaktív térkép" color="bg-sky-50 text-sky-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A <strong>Térkép</strong> oldalon vizuálisan böngészheted az elveszett, megtalált és kóbor állatok
+          bejelentéseit, valamint a menhelyek elhelyezkedését.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Rétegek kapcsolása">
+            A bal felső szűrőpanelen be- és kikapcsolhatod a Bejelentések és Menhelyek réteget.
+            Mobilon a szűrő ikon megnyitja a panel.
+          </Step>
+          <Step n={2} title="Szűrés típus és státusz szerint">
+            A panelen szűrhetsz bejelentéstípusra (Elveszett / Megtalált / Kóbor) és státuszra
+            (Aktív / Lezárt / Összes).
+          </Step>
+          <Step n={3} title="Részletek megtekintése">
+            Egy jelzőre (marker) kattintva megjelenik a bejelentés vagy menhely rövid összefoglalója.
+            A részletes oldalra az összefoglalóból navigálhatsz.
+          </Step>
+          <Step n={4} title="Új bejelentés indítása">
+            A térkép alján a <strong>„+ Új bejelentés"</strong> gomb megnyitja az új bejelentés űrlapot.
+          </Step>
+        </div>
+        <QuickLink icon={Map} label="Térkép" href="/map" />
       </Section>
 
       {/* Bejelentés */}
@@ -627,6 +742,110 @@ function AdminContent() {
           </Step>
         </div>
         <QuickLink icon={Settings} label="Menhely beállítások" href="/dashboard/settings" />
+      </Section>
+
+      {/* Ideiglenes befogadók */}
+      <Section id="a-befogadok" icon={Home} title="Ideiglenes befogadók kezelése" color="bg-violet-50 text-violet-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A menhely kereshet és jóváhagyhat ideiglenes befogadókat (foster carers) az állatokhoz, akik
+          átmenetileg otthont biztosítanak amíg az állat végleges örökbefogadóra vár.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Befogadói kérelmek kezelése">
+            Dashboard → Ideiglenes befogadás → Függőben lévők. Tekintsd meg a kérelmező profilját
+            (lakhatás, tapasztalat), és fogadd el vagy utasítsd el.
+          </Step>
+          <Step n={2} title="Befogadás hozzárendelése állathoz">
+            Egy jóváhagyott befogadóhoz hozzárendelheted az adott állatot. Az állat státusza automatikusan
+            <Badge label="Átmeneti gondozás" color="bg-purple-100 text-purple-700 mx-1" />-ra vált.
+          </Step>
+          <Step n={3} title="Ellátmány-napló megtekintése">
+            A befogadó naplózza a felhasznált ellátmányokat. Dashboard → Ideiglenes befogadás → Ellátmány napló.
+            Innen követhető, hogy mennyi takarmányt és gyógyszert igényel az adott állat.
+          </Step>
+          <Step n={4} title="Befogadás lezárása">
+            Amikor az állat visszakerül a menhelyre (örökbefogadás előtt vagy más okból),
+            zárd le a befogadási rekordot. A befogadó értesítést kap.
+          </Step>
+        </div>
+        <QuickLink icon={Home} label="Ideiglenes befogadás" href="/dashboard/foster" />
+      </Section>
+
+      {/* Kennelek */}
+      <Section id="a-kenneleks" icon={Building2} title="Kennelek kezelése" color="bg-amber-50 text-amber-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A kennel-modul segítségével nyilvántarthatod a menhely fizikai elhelyezési egységeit (kenneleket,
+          ketreceket, szobákat) és azt, hogy melyik állat hol tartózkodik.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Kennel felvétele">
+            Dashboard → Kennelek → <strong>„Kennel hozzáadása"</strong>.
+            Add meg a kennel nevét, típusát (beltéri / kültéri / karantén) és kapacitását.
+          </Step>
+          <Step n={2} title="Állat hozzárendelése">
+            Egy kennel részletoldalán rendelhetsz hozzá állatot. Egy kennel egyszerre annyi állatot
+            tarthat, amennyit a kapacitása enged.
+          </Step>
+          <Step n={3} title="Kapacitáskihasználtság">
+            A Dashboard UC-02 panelen látható, hogy az összes kennel milyen arányban foglalt.
+            A piros jelzés a 100%-os kihasználtságot mutatja.
+          </Step>
+        </div>
+        <Note type="info">A kennelek karbantartásba helyezhetők (maintenance state), ami ideiglenesen kizárja őket a kapacitásból.</Note>
+        <QuickLink icon={Building2} label="Kennelek" href="/dashboard/kennels" />
+      </Section>
+
+      {/* Áthelyezések */}
+      <Section id="a-atelyezesek" icon={ArrowLeftRight} title="Állat áthelyezések" color="bg-indigo-50 text-indigo-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Áthelyezések rögzítésével dokumentálhatsz menhely-közi állat-mozgásokat.
+          A Super Admin az összes menhelyt érintő áthelyezést is látja.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Áthelyezés indítása">
+            Dashboard → Áthelyezések → <strong>„Új áthelyezés"</strong>. Válaszd ki az állatot,
+            a cél menhelyt, add meg a tervezett dátumot és az indokot.
+          </Step>
+          <Step n={2} title="Státusz követése">
+            Az áthelyezés státuszai:
+            <Badge label="Tervezett" color="bg-yellow-100 text-yellow-700 mx-1" />,
+            <Badge label="Folyamatban" color="bg-blue-100 text-blue-700 mx-1" />,
+            <Badge label="Teljesítve" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Törölve" color="bg-red-100 text-red-700 mx-1" />.
+            Teljesítés után az állat automatikusan a célmenhelyre kerül.
+          </Step>
+          <Step n={3} title="Dokumentumok">
+            Áthelyezési engedélyek és egészségügyi dokumentumok csatolhatók az áthelyezési rekordhoz.
+          </Step>
+        </div>
+        <QuickLink icon={ArrowLeftRight} label="Áthelyezések" href="/dashboard/transfers" />
+      </Section>
+
+      {/* Események admin */}
+      <Section id="a-esemenyek" icon={CalendarDays} title="Események kezelése" color="bg-teal-50 text-teal-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Szervez nyílt napot, örökbefogadási napot, vagy önkéntes gyűjtést? Az Események modullal
+          meghirdetheted, kezelheted a regisztrációkat és értesítheted a résztvevőket.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Esemény létrehozása">
+            Dashboard → Események → <strong>„Új esemény"</strong>.
+            Add meg a nevet, leírást, típust (OPEN_DAY, ADOPTION_DAY, VOLUNTEER_DAY, FUNDRAISER, OTHER),
+            a helyszínt, dátumot és a maximális létszámot.
+          </Step>
+          <Step n={2} title="Regisztrációk kezelése">
+            Az esemény részletoldalán látható az összes regisztrált személy.
+            Minden regisztrációt manuálisan is visszaigazolhatsz vagy elutasíthatsz.
+          </Step>
+          <Step n={3} title="Értesítések résztvevőknek">
+            Az esemény szerkesztésénél az „Értesítés küldése" gombbal értesítheted az összes
+            regisztrált résztvevőt (pl. helyszínváltozás esetén).
+          </Step>
+          <Step n={4} title="Esemény lezárása">
+            Az esemény után zárhatod le azt — a regisztrációk archiválódnak, a résztvevői lista megmarad.
+          </Step>
+        </div>
+        <QuickLink icon={CalendarDays} label="Események kezelése" href="/dashboard/events" />
       </Section>
 
     </div>
