@@ -8,6 +8,10 @@
     --foreground: 20 14% 10%;
   }
 
+  html {
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-white text-gray-900 antialiased;
     overflow-x: hidden;

@@ -92,7 +92,7 @@ export function Header() {
 
       {/* Test-mode banner */}
       <div className="bg-amber-400 text-amber-950">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
+        <div className="mx-auto flex flex-wrap max-w-7xl items-center justify-center gap-x-2 gap-y-0.5 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
           <span className="text-base">⚠️</span>
           <span>{t("testBanner")}</span>
           <span className="text-base">⚠️</span>
