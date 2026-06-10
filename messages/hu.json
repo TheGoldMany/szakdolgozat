@@ -560,7 +560,12 @@
     "cancelSponsorship": "Lemondás",
     "adoptionHistory": "Örökbefogadásaim",
     "noAdoptions": "Még nem fogadtál örökbe állatot.",
-    "adoptedOn": "Örökbefogadva:"
+    "adoptedOn": "Örökbefogadva:",
+    "myReports": "Bejelentéseim",
+    "noReports": "Még nincs elveszett/talált bejelentésed.",
+    "findSimilar": "Keress hasonlókat",
+    "findingSimilar": "Keresés...",
+    "matchCount": "{count} egyezés"
   },
   "messages": {
     "title": "Üzenetek",

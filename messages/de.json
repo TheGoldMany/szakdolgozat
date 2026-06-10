@@ -560,7 +560,12 @@
     "cancelSponsorship": "Kündigen",
     "adoptionHistory": "Meine Adoptionen",
     "noAdoptions": "Du hast noch kein Tier adoptiert.",
-    "adoptedOn": "Adoptiert am:"
+    "adoptedOn": "Adoptiert am:",
+    "myReports": "Meine Meldungen",
+    "noReports": "Du hast noch keine Verloren/Gefunden-Meldung.",
+    "findSimilar": "Ähnliche suchen",
+    "findingSimilar": "Suche...",
+    "matchCount": "{count} Treffer"
   },
   "messages": {
     "title": "Nachrichten",

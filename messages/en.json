@@ -560,7 +560,12 @@
     "cancelSponsorship": "Cancel",
     "adoptionHistory": "My adoptions",
     "noAdoptions": "You haven't adopted an animal yet.",
-    "adoptedOn": "Adopted on:"
+    "adoptedOn": "Adopted on:",
+    "myReports": "My reports",
+    "noReports": "You have no lost/found reports yet.",
+    "findSimilar": "Find similar",
+    "findingSimilar": "Searching...",
+    "matchCount": "{count} match(es)"
   },
   "messages": {
     "title": "Messages",

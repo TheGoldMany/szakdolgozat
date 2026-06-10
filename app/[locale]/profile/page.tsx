@@ -9,6 +9,7 @@ import { ChangePasswordForm } from "@/components/profile/change-password-form";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { SubscriptionsList } from "@/components/profile/subscriptions-list";
 import { SponsorshipsList } from "@/components/profile/sponsorships-list";
+import { ProfileReports } from "@/components/profile/profile-reports";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -25,7 +26,7 @@ export default async function ProfilePage() {
     redirect("/auth/login?callbackUrl=/profile");
   }
 
-  const [user, adoptedApps] = await Promise.all([
+  const [user, adoptedApps, userReports] = await Promise.all([
     prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -81,6 +82,26 @@ export default async function ProfilePage() {
             name: true, slug: true, type: true, adoptedAt: true,
             images:  { where: { isPrimary: true }, take: 1, select: { url: true } },
             shelter: { select: { name: true } },
+          },
+        },
+      },
+    }),
+    prisma.animalReport.findMany({
+      where:   { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id:       true,
+        type:     true,
+        status:   true,
+        name:     true,
+        breed:    true,
+        imageUrl: true,
+        city:     true,
+        createdAt: true,
+        _count: {
+          select: {
+            matchesA: { where: { dismissed: false } },
+            matchesB: { where: { dismissed: false } },
           },
         },
       },
@@ -218,6 +239,24 @@ export default async function ProfilePage() {
                 })}
               </ul>
             )}
+          </div>
+
+          {/* My reports */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("myReports")}</h2>
+            <ProfileReports
+              reports={userReports.map((r) => ({
+                id:         r.id,
+                type:       r.type,
+                status:     r.status,
+                name:       r.name,
+                breed:      r.breed,
+                imageUrl:   r.imageUrl,
+                city:       r.city,
+                createdAt:  r.createdAt.toISOString(),
+                matchCount: r._count.matchesA + r._count.matchesB,
+              }))}
+            />
           </div>
 
         </div>
