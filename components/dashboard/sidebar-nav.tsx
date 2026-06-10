@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
-  ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft,
+  ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -32,8 +32,9 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/volunteers",   icon: HandHeart,     labelKey: "navVolunteers",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/foster",       icon: Home,          labelKey: "navFoster",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/followups",    icon: ListChecks,    labelKey: "navFollowups",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/inventory",    icon: Package,       labelKey: "navInventory",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/kennels",      icon: DoorOpen,      labelKey: "navKennels",        roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/inventory",    icon: Package,          labelKey: "navInventory",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/feeding",      icon: UtensilsCrossed,  labelKey: "navFeeding",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/kennels",      icon: DoorOpen,         labelKey: "navKennels",        roles: ["SHELTER_ADMIN"] },
       { href: "/dashboard/transfers",    icon: ArrowRightLeft, labelKey: "navTransfers",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/forms",        icon: FileText,      labelKey: "navForms",          roles: ["SHELTER_ADMIN"] },
     ],
