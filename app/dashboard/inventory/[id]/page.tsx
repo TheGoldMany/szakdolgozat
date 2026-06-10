@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Package } from "lucide-react";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { InventoryItemDetail } from "@/components/inventory/inventory-item-detail";
@@ -13,6 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function InventoryItemPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+
+  const t = await getTranslations("dashboard");
 
   const item = await prisma.inventoryItem.findUnique({
     where: { id: params.id },
@@ -49,13 +52,13 @@ export default async function InventoryItemPage({ params }: { params: { id: stri
     note:        item.note,
     createdAt:   item.createdAt.toISOString(),
     updatedAt:   item.updatedAt.toISOString(),
-    transactions: item.transactions.map((t) => ({
-      id:          t.id,
-      type:        t.type,
-      quantity:    Number(t.quantity),
-      note:        t.note,
-      createdBy:   t.createdBy,
-      createdAt:   t.createdAt.toISOString(),
+    transactions: item.transactions.map((t2) => ({
+      id:          t2.id,
+      type:        t2.type,
+      quantity:    Number(t2.quantity),
+      note:        t2.note,
+      createdBy:   t2.createdBy,
+      createdAt:   t2.createdAt.toISOString(),
     })),
   };
 
@@ -66,7 +69,7 @@ export default async function InventoryItemPage({ params }: { params: { id: stri
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Vissza a készlethez
+        {t("inventoryDetailBack")}
       </Link>
 
       <div className="flex items-center gap-3">

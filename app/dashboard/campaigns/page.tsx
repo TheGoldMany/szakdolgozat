@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
@@ -14,6 +15,8 @@ export default async function CampaignApprovalsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/campaigns");
   if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
+
+  const t = await getTranslations("dashboard");
 
   const [pending, pendingForms] = await Promise.all([
     prisma.campaign.findMany({
@@ -37,12 +40,12 @@ export default async function CampaignApprovalsPage() {
   return (
     <div className="space-y-10">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Jóváhagyások</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("campaignsTitle")}</h1>
         <PageInfo page="campaigns" />
       </div>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-700">Gyűjtések</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">{t("campaignsSection")}</h2>
         <CampaignApprovals
           campaigns={pending.map((c) => ({
             id:           c.id,
@@ -57,10 +60,10 @@ export default async function CampaignApprovalsPage() {
       </div>
 
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-700">Kérvény sablonok</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-700">{t("campaignFormsSection")}</h2>
         {pendingForms.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-sm text-gray-500">Nincs jóváhagyásra váró kérvény sablon.</p>
+            <p className="text-sm text-gray-500">{t("campaignsNoPendingForms")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -73,13 +76,13 @@ export default async function CampaignApprovalsPage() {
                   <div>
                     <p className="font-semibold text-gray-900">{form.title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {form.shelter.name} · {form._count.fields} mező
+                      {form.shelter.name} · {t("campaignsFormFields", { count: form._count.fields })}
                     </p>
                     {form.description && (
                       <p className="mt-1 text-sm text-gray-600 line-clamp-2">{form.description}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-400">
-                      Beküldve: {new Date(form.createdAt).toLocaleDateString("hu-HU")}
+                      {t("campaignsSubmittedAt")} {new Date(form.createdAt).toLocaleDateString("hu-HU")}
                     </p>
                   </div>
                 </div>

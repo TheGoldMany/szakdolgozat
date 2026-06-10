@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Check, X, PauseCircle, Package, AlertTriangle, PawPrint } from "lucide-react";
 import {
   ANIMAL_TYPE_LABELS, FOSTER_STATUS_LABELS, FOSTER_STATUS_COLORS,
@@ -36,6 +37,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
   inventory:      InventoryLite[];
 }) {
   const router = useRouter();
+  const t = useTranslations("foster");
   const [fosters, setFosters] = useState<FosterRow[]>(initialFosters);
   const [error, setError]     = useState<string | null>(null);
   const [supplyOpen, setSupplyOpen] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
 
       {fosters.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
-          Még nincs ideiglenes befogadói jelentkezés.
+          {t("adminNoFosters")}
         </p>
       ) : fosters.map(f => (
         <div key={f.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
@@ -79,13 +81,13 @@ export function FosterAdmin({ initialFosters, inventory }: {
 
               <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
                 <span>
-                  <span className="font-medium">Preferált:</span>{" "}
+                  <span className="font-medium">{t("adminPreferred")}</span>{" "}
                   {f.preferredTypes.length > 0
-                    ? f.preferredTypes.map(t => ANIMAL_TYPE_LABELS[t]).join(", ")
-                    : "bármi"}
+                    ? f.preferredTypes.map(type => ANIMAL_TYPE_LABELS[type]).join(", ")
+                    : t("adminAnything")}
                 </span>
-                {f.maxWeightKg != null && <span><span className="font-medium">Max súly:</span> {f.maxWeightKg} kg</span>}
-                <span><span className="font-medium">Karantén:</span> {f.canQuarantine ? "igen" : "nem"}</span>
+                {f.maxWeightKg != null && <span><span className="font-medium">{t("adminMaxWeight")}</span> {f.maxWeightKg} kg</span>}
+                <span><span className="font-medium">{t("adminQuarantine")}</span> {f.canQuarantine ? t("adminQuarantineYes") : t("adminQuarantineNo")}</span>
               </div>
               {f.motivation && <p className="mt-1.5 text-xs italic text-gray-500">„{f.motivation}”</p>}
             </div>
@@ -95,19 +97,19 @@ export function FosterAdmin({ initialFosters, inventory }: {
               {f.status !== "ACTIVE" && (
                 <button onClick={() => setStatus(f.id, "ACTIVE")}
                   className="flex items-center gap-1 rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition-colors">
-                  <Check className="h-3.5 w-3.5" /> Jóváhagyás
+                  <Check className="h-3.5 w-3.5" /> {t("adminApprove")}
                 </button>
               )}
               {f.status !== "REJECTED" && (
                 <button onClick={() => setStatus(f.id, "REJECTED")}
                   className="flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors">
-                  <X className="h-3.5 w-3.5" /> Elutasítás
+                  <X className="h-3.5 w-3.5" /> {t("adminReject")}
                 </button>
               )}
               {f.status === "ACTIVE" && (
                 <button onClick={() => setStatus(f.id, "INACTIVE")}
                   className="flex items-center gap-1 rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
-                  <PauseCircle className="h-3.5 w-3.5" /> Inaktiválás
+                  <PauseCircle className="h-3.5 w-3.5" /> {t("adminDeactivate")}
                 </button>
               )}
             </div>
@@ -117,7 +119,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
           {f.fosteredAnimals.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-50 pt-3">
               <PawPrint className="h-3.5 w-3.5 text-gray-400" />
-              <span className="text-xs font-medium text-gray-500">Nála lévő állatok:</span>
+              <span className="text-xs font-medium text-gray-500">{t("adminAnimalsInCare")}</span>
               {f.fosteredAnimals.map(a => (
                 <Link key={a.id} href={`/animals/${a.slug}`}
                   className="rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 hover:bg-purple-100">
@@ -133,7 +135,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
               <button onClick={() => setSupplyOpen(supplyOpen === f.id ? null : f.id)}
                 className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline">
                 <Package className="h-3.5 w-3.5" />
-                {supplyOpen === f.id ? "Bezárás" : "Készlet kiadása"}
+                {supplyOpen === f.id ? t("adminSupplyClose") : t("adminSupplyIssue")}
               </button>
 
               {supplyOpen === f.id && (
@@ -173,6 +175,7 @@ function SupplyForm({ fosterId, inventory, onLogged, onError }: {
   onLogged:  (log: SupplyLog) => void;
   onError:   (msg: string | null) => void;
 }) {
+  const t = useTranslations("foster");
   const [itemId, setItemId]     = useState(inventory[0]?.id ?? "");
   const [quantity, setQuantity] = useState("");
   const [note, setNote]         = useState("");
@@ -196,7 +199,7 @@ function SupplyForm({ fosterId, inventory, onLogged, onError }: {
   }
 
   if (inventory.length === 0) {
-    return <p className="mt-2 text-xs text-gray-400">Nincs készlettétel a menhelyen.</p>;
+    return <p className="mt-2 text-xs text-gray-400">{t("adminNoInventory")}</p>;
   }
 
   return (
@@ -209,13 +212,13 @@ function SupplyForm({ fosterId, inventory, onLogged, onError }: {
       </select>
       <input required type="number" min={0} step={0.1} value={quantity}
         onChange={e => setQuantity(e.target.value)}
-        placeholder={`Mennyiség${selected ? ` (${selected.unit})` : ""}`}
+        placeholder={`${t("adminQuantityPlaceholder")}${selected ? ` (${selected.unit})` : ""}`}
         className="rounded-lg border border-gray-200 px-2 py-1.5 text-xs outline-none" />
       <button type="submit" disabled={loading}
         className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 disabled:opacity-60">
-        {loading ? "…" : "Kiadás"}
+        {loading ? "…" : t("adminIssueBtn")}
       </button>
-      <input value={note} onChange={e => setNote(e.target.value)} placeholder="Megjegyzés (opcionális)"
+      <input value={note} onChange={e => setNote(e.target.value)} placeholder={t("adminNoteOptional")}
         className="rounded-lg border border-gray-200 px-2 py-1.5 text-xs outline-none sm:col-span-4" />
     </form>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
+import { useTranslations } from "next-intl";
 import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info } from "lucide-react";
 
 interface ShelterDoc {
@@ -32,6 +33,8 @@ interface Props {
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
 export function ShelterSettingsForm({ shelter }: Props) {
+  const t = useTranslations("dashboard");
+
   // --- Logo ---
   const [logoPreview,   setLogoPreview]   = useState<string | null>(shelter.logoUrl);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -72,10 +75,10 @@ export function ShelterSettingsForm({ shelter }: Props) {
         body:    JSON.stringify({ type: "shelter", shelterId: shelter.id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Hiba történt");
+      if (!res.ok) throw new Error(data.error ?? t("analyticsError"));
       window.location.href = data.url;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Ismeretlen hiba";
+      const message = err instanceof Error ? err.message : t("tiersUnknownError");
       setStripeError(message);
       setStripeLoading(false);
     }
@@ -107,7 +110,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       });
       if (!res.ok) throw new Error();
     } catch {
-      setLogoError("Feltöltés sikertelen.");
+      setLogoError(t("settingsLogoUploadFailed"));
       setLogoPreview(shelter.logoUrl);
     } finally {
       setLogoUploading(false);
@@ -129,7 +132,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       setPaySaved(true);
       setTimeout(() => setPaySaved(false), 3000);
     } catch {
-      setPayError("Mentés sikertelen.");
+      setPayError(t("settingsSaveFailed"));
     } finally {
       setPaySaving(false);
     }
@@ -141,7 +144,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
     setCapError("");
     const parsed = capacity.trim() === "" ? null : parseInt(capacity, 10);
     if (capacity.trim() !== "" && (isNaN(parsed as number) || (parsed as number) < 1)) {
-      setCapError("Adj meg egy pozitiv egesz szamot.");
+      setCapError(t("settingsCapacityInvalidNumber"));
       setCapSaving(false);
       return;
     }
@@ -155,7 +158,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       setCapSaved(true);
       setTimeout(() => setCapSaved(false), 3000);
     } catch {
-      setCapError("Mentes sikertelen.");
+      setCapError(t("settingsCapacitySaveFailed"));
     } finally {
       setCapSaving(false);
     }
@@ -180,7 +183,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
   async function handleDocUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !docName.trim()) {
-      setUploadError("Add meg a dokumentum nevét először.");
+      setUploadError(t("settingsDocNameRequired"));
       return;
     }
     setUploadError("");
@@ -204,7 +207,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
         if (fileRef.current) fileRef.current.value = "";
       }
     } catch {
-      setUploadError("Feltöltés sikertelen.");
+      setUploadError(t("settingsDocUploadFailed"));
     } finally {
       setUploading(false);
     }
@@ -222,14 +225,14 @@ export function ShelterSettingsForm({ shelter }: Props) {
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
-          Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (4% platform díj levonásával).
+          {t("settingsStripeDesc")}
         </p>
 
         {shelter.stripeOnboardingComplete ? (
           <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
             <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
             <p className="text-sm font-medium text-green-800">
-              Stripe fiók aktív – az adományok automatikusan érkeznek a számládra.
+              {t("settingsStripeActive")}
             </p>
           </div>
         ) : shelter.stripeAccountId ? (
@@ -237,7 +240,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
             <div className="flex items-center gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
               <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
               <p className="text-sm font-medium text-yellow-800">
-                Az onboarding nem teljes. Kattints a gombra a folytatáshoz.
+                {t("settingsStripeIncomplete")}
               </p>
             </div>
             <button
@@ -247,7 +250,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
               className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
             >
               {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Info className="h-4 w-4" />}
-              {stripeLoading ? "Átirányítás..." : "Stripe fiók csatlakoztatása"}
+              {stripeLoading ? t("settingsStripeConnecting") : t("settingsStripeConnect")}
             </button>
           </div>
         ) : (
@@ -255,7 +258,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
             <div className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
               <Info className="h-5 w-5 shrink-0 text-blue-600 mt-0.5" />
               <p className="text-sm text-blue-800">
-                Csatlakoztasd Stripe fiókodat, hogy az adományok és előfizetési díjak automatikusan a számládra érkezzenek (4% platform díj levonásával).
+                {t("settingsStripeDesc")}
               </p>
             </div>
             <button
@@ -265,7 +268,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
               className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
             >
               {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {stripeLoading ? "Átirányítás..." : "Stripe fiók csatlakoztatása"}
+              {stripeLoading ? t("settingsStripeConnecting") : t("settingsStripeConnect")}
             </button>
           </div>
         )}
@@ -275,9 +278,9 @@ export function ShelterSettingsForm({ shelter }: Props) {
 
       {/* Menhely logó */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-sm font-semibold text-gray-700">Menhely profilkép</h2>
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsShelterProfile")}</h2>
         <p className="mb-5 text-xs text-gray-400">
-          Ez az ikon jelenik meg a menhelyek listáján és az állatok oldalán.
+          {t("settingsShelterProfileDesc")}
         </p>
         <div className="flex items-center gap-5">
           <label className="group relative cursor-pointer shrink-0">
@@ -303,7 +306,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
           <div>
             <p className="text-sm font-medium text-gray-700">{shelter.name}</p>
             <p className="mt-0.5 text-xs text-gray-400">
-              {logoUploading ? "Feltöltés..." : "Kattints a képre a módosításhoz"}
+              {logoUploading ? t("settingsLogoUploading") : t("settingsLogoClickToChange")}
             </p>
             {logoError && <p className="mt-1 text-xs text-red-500">{logoError}</p>}
           </div>
@@ -314,30 +317,30 @@ export function ShelterSettingsForm({ shelter }: Props) {
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center gap-2">
           <Building2 className="h-4 w-4 text-gray-500" />
-          <h2 className="text-sm font-semibold text-gray-700">Fizetési adatok</h2>
+          <h2 className="text-sm font-semibold text-gray-700">{t("settingsPaymentInfo")}</h2>
         </div>
         <p className="mb-4 text-xs text-gray-400">
-          Ezek az adatok jelennek meg az adományozóknál, amikor előfizetnek a csomagjaidra.
+          {t("settingsPaymentInfoDesc")}
         </p>
 
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">Cégnév / Szervezet neve</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">{t("settingsCompanyName")}</label>
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)}
               placeholder="pl. Kis Gömböc Menhely Alapítvány" className={cls} />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">Adószám</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">{t("settingsTaxNumber")}</label>
             <input value={taxNumber} onChange={(e) => setTaxNumber(e.target.value)}
               placeholder="pl. 12345678-1-01" className={cls} />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">Bankszámla tulajdonosa</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">{t("settingsBankAccountName")}</label>
             <input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)}
               placeholder="pl. Kis Gömböc Menhely Alapítvány" className={cls} />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-600">Bankszámlaszám</label>
+            <label className="mb-1 block text-xs font-medium text-gray-600">{t("settingsBankAccountNumber")}</label>
             <input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)}
               placeholder="pl. 12345678-12345678-12345678" className={cls} />
           </div>
@@ -347,18 +350,18 @@ export function ShelterSettingsForm({ shelter }: Props) {
           <button type="button" onClick={savePaymentInfo} disabled={paySaving}
             className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
             <Save className="h-4 w-4" />
-            {paySaving ? "Mentés..." : "Mentés"}
+            {paySaving ? t("settingsSaving") : t("settingsSave")}
           </button>
-          {paySaved && <span className="text-sm text-brand-600">Elmentve!</span>}
+          {paySaved && <span className="text-sm text-brand-600">{t("settingsSaved")}</span>}
           {payError && <span className="text-sm text-red-500">{payError}</span>}
         </div>
       </div>
 
       {/* Kapacitás */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-sm font-semibold text-gray-700">Menhelyi kapacitas</h2>
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsCapacity")}</h2>
         <p className="mb-4 text-xs text-gray-400">
-          Hany allat befogadasara alkalmas a menhely? Ez az ertek jelenik meg a kihasznaltsagi mutatoban.
+          {t("settingsCapacityDesc")}
         </p>
         <div className="flex items-center gap-3">
           <input
@@ -370,43 +373,43 @@ export function ShelterSettingsForm({ shelter }: Props) {
             onChange={(e) => setCapacity(e.target.value)}
             className={`w-40 ${cls}`}
           />
-          <span className="text-sm text-gray-400">ferojhely</span>
+          <span className="text-sm text-gray-400">{t("settingsCapacityPlaces")}</span>
         </div>
         <div className="mt-3 flex items-center gap-3">
           <button type="button" onClick={saveCapacity} disabled={capSaving}
             className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
             <Save className="h-4 w-4" />
-            {capSaving ? "Mentes..." : "Mentes"}
+            {capSaving ? t("settingsSaving") : t("settingsSave")}
           </button>
-          {capSaved && <span className="text-sm text-brand-600">Elmentve!</span>}
+          {capSaved && <span className="text-sm text-brand-600">{t("settingsSaved")}</span>}
           {capError && <span className="text-sm text-red-500">{capError}</span>}
         </div>
       </div>
 
       {/* Örökbefogadási feltételek */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-sm font-semibold text-gray-700">Örökbefogadási feltételek</h2>
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsAdoptionRequirements")}</h2>
         <p className="mb-4 text-xs text-gray-400">
-          Ez a szöveg megjelenik minden általad feltöltött állat oldalán.
+          {t("settingsAdoptionRequirementsDesc")}
         </p>
         <textarea value={requirements} onChange={(e) => setRequirements(e.target.value)}
-          rows={8} placeholder="Pl. Az örökbefogadó legyen 18 éves..."
+          rows={8} placeholder={t("settingsAdoptionRequirementsPlaceholder")}
           className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y" />
         <div className="mt-3 flex items-center gap-3">
           <button type="button" onClick={saveRequirements} disabled={reqSaving}
             className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
             <Save className="h-4 w-4" />
-            {reqSaving ? "Mentés..." : "Mentés"}
+            {reqSaving ? t("settingsSaving") : t("settingsSave")}
           </button>
-          {reqSaved && <span className="text-sm text-brand-600">Elmentve!</span>}
+          {reqSaved && <span className="text-sm text-brand-600">{t("settingsSaved")}</span>}
         </div>
       </div>
 
       {/* Dokumentumok */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-sm font-semibold text-gray-700">Letölthető dokumentumok</h2>
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsDocuments")}</h2>
         <p className="mb-4 text-xs text-gray-400">
-          Örökbefogadási nyilatkozat, igénylőlap – minden állatod oldalán megjelennek.
+          {t("settingsDocumentsDesc")}
         </p>
 
         {docs.length > 0 && (
@@ -430,14 +433,14 @@ export function ShelterSettingsForm({ shelter }: Props) {
         )}
 
         <div className="space-y-3 rounded-xl border border-dashed border-gray-300 p-4">
-          <p className="text-xs font-medium text-gray-500">Új dokumentum feltöltése</p>
-          <input type="text" placeholder="Dokumentum neve (pl. Örökbefogadási nyilatkozat)"
+          <p className="text-xs font-medium text-gray-500">{t("settingsDocUploadNew")}</p>
+          <input type="text" placeholder={t("settingsDocNamePlaceholder")}
             value={docName} onChange={(e) => setDocName(e.target.value)}
             className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
           <div className="flex items-center gap-3">
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
               <Upload className="h-4 w-4" />
-              {uploading ? "Feltöltés..." : "Fájl kiválasztása"}
+              {uploading ? t("settingsDocUploading") : t("settingsDocSelectFile")}
               <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" className="sr-only"
                 disabled={uploading} onChange={handleDocUpload} />
             </label>

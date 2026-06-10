@@ -3,22 +3,34 @@
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  AVAILABLE:    { label: "Örökbefogadható", color: "#22c55e" },
-  PENDING:      { label: "Függőben",        color: "#eab308" },
-  ADOPTED:      { label: "Örökbefogadott",  color: "#3b82f6" },
-  FOSTER:       { label: "Ideiglenes",      color: "#a855f7" },
-  MEDICAL_HOLD: { label: "Orvosi kezelés",  color: "#ef4444" },
-};
+import { useTranslations } from "next-intl";
 
 interface Props {
   data: { status: string; count: number }[];
 }
 
 export function AnimalsDonut({ data }: Props) {
+  const t = useTranslations("dashboard");
+
+  const STATUS_CONFIG: Record<string, { labelKey: string; color: string }> = {
+    AVAILABLE:    { labelKey: "animals.available",  color: "#22c55e" },
+    PENDING:      { labelKey: "animals.pending",    color: "#eab308" },
+    ADOPTED:      { labelKey: "animals.adopted",    color: "#3b82f6" },
+    FOSTER:       { labelKey: "animals.foster",     color: "#a855f7" },
+    MEDICAL_HOLD: { labelKey: "animals.medicalHold", color: "#ef4444" },
+  };
+
+  // Fallback Hungarian labels if translation keys aren't in the animals namespace
+  const STATUS_LABELS: Record<string, string> = {
+    AVAILABLE:    "Örökbefogadható",
+    PENDING:      "Függőben",
+    ADOPTED:      "Örökbefogadott",
+    FOSTER:       "Ideiglenes",
+    MEDICAL_HOLD: "Orvosi kezelés",
+  };
+
   const chartData = data.map(d => ({
-    name:  STATUS_CONFIG[d.status]?.label ?? d.status,
+    name:  STATUS_LABELS[d.status] ?? d.status,
     value: d.count,
     color: STATUS_CONFIG[d.status]?.color ?? "#94a3b8",
   }));
@@ -53,7 +65,7 @@ export function AnimalsDonut({ data }: Props) {
       {/* Center label */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-6">
         <span className="text-2xl font-bold text-gray-800">{total}</span>
-        <span className="text-xs text-gray-400">állat</span>
+        <span className="text-xs text-gray-400">{t("donutAnimalCount")}</span>
       </div>
     </div>
   );

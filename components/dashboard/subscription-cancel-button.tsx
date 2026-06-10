@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Props {
   subscriptionId: string;
 }
 
 export function SubscriptionCancelButton({ subscriptionId }: Props) {
+  const t = useTranslations("dashboard");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   async function handleCancel() {
-    const confirmed = window.confirm(
-      "Biztosan le szeretnéd mondani ezt az előfizetést?"
-    );
+    const confirmed = window.confirm(t("subscriptionsCancelConfirm"));
     if (!confirmed) return;
 
     setLoading(true);
@@ -26,7 +26,7 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error ?? "Hiba történt a lemondás során.");
+        alert(data.error ?? t("subscriptionsCancelError"));
       }
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
           />
         </svg>
       )}
-      Lemondás
+      {t("subscriptionsCancelButton")}
     </button>
   );
 }

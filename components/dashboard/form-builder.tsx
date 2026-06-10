@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 
@@ -23,13 +24,6 @@ interface FormBuilderProps {
   initialStatus?: string;
 }
 
-const FIELD_TYPE_LABELS: Record<FieldType, string> = {
-  TEXT:     "Szöveg",
-  TEXTAREA: "Bekezdés",
-  IMAGE:    "Kép feltöltés",
-  FILE:     "Fájl feltöltés",
-};
-
 export function FormBuilder({
   formId,
   initialTitle = "",
@@ -38,6 +32,15 @@ export function FormBuilder({
   initialStatus = "DRAFT",
 }: FormBuilderProps) {
   const router = useRouter();
+  const t = useTranslations("dashboard");
+
+  const FIELD_TYPE_LABELS: Record<FieldType, string> = {
+    TEXT:     t("formBuilderText"),
+    TEXTAREA: t("formBuilderTextarea"),
+    IMAGE:    t("formBuilderImage"),
+    FILE:     t("formBuilderFile"),
+  };
+
   const [title, setTitle]             = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [fields, setFields]           = useState<FormFieldData[]>(initialFields);
@@ -80,7 +83,7 @@ export function FormBuilder({
 
   async function saveForm(): Promise<string | null> {
     if (!title.trim()) {
-      setError("A sablon neve kötelező.");
+      setError(t("formBuilderTitleRequired"));
       return null;
     }
 
@@ -103,7 +106,7 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Mentés sikertelen");
+        throw new Error(data.error ?? t("formBuilderSaveFailed"));
       }
       return formId;
     } else {
@@ -114,7 +117,7 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Létrehozás sikertelen");
+        throw new Error(data.error ?? t("formBuilderCreateFailed"));
       }
       const data = await res.json();
       return data.id as string;
@@ -128,7 +131,7 @@ export function FormBuilder({
     try {
       const id = await saveForm();
       if (!id) return;
-      setSuccess("Piszkozat mentve.");
+      setSuccess(t("formBuilderDraftSaved"));
       if (!formId) {
         router.push(`/dashboard/forms/${id}`);
       } else {
@@ -154,9 +157,9 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Beküldés sikertelen");
+        throw new Error(data.error ?? t("formBuilderSubmitFailed"));
       }
-      setSuccess("Sablon beküldve jóváhagyásra.");
+      setSuccess(t("formBuilderSubmitted"));
       router.push("/dashboard/forms");
     } catch (e) {
       setError((e as Error).message);
@@ -169,26 +172,26 @@ export function FormBuilder({
     <div className="space-y-6">
       {/* Title & Description */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-semibold text-gray-900">Sablon adatai</h2>
+        <h2 className="text-base font-semibold text-gray-900">{t("formBuilderSectionTitle")}</h2>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            Sablon neve <span className="text-red-500">*</span>
+            {t("formBuilderNameLabel")} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="pl. Örökbefogadási kérvény 2024"
+            placeholder={t("formBuilderNamePlaceholder")}
             className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             disabled={!isDraft}
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Leírás</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">{t("formBuilderDescLabel")}</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Opcionális leírás a kérvénysablonhoz..."
+            placeholder={t("formBuilderDescPlaceholder")}
             rows={3}
             className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             disabled={!isDraft}
@@ -199,7 +202,7 @@ export function FormBuilder({
       {/* Fields */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-900">Mezők</h2>
+          <h2 className="text-base font-semibold text-gray-900">{t("formBuilderFieldsTitle")}</h2>
           {isDraft && (
             <button
               type="button"
@@ -207,20 +210,20 @@ export function FormBuilder({
               className="inline-flex items-center gap-1.5 rounded-xl bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-100 transition-colors"
             >
               <Plus className="h-4 w-4" />
-              Mező hozzáadása
+              {t("formBuilderAddField")}
             </button>
           )}
         </div>
 
         {fields.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-6">
-            Még nincs mező. Adj hozzá egyet!
+            {t("formBuilderNoFields")}
           </p>
         )}
 
         {fields.length > 0 && isDraft && (
           <p className="text-xs text-gray-400">
-            Átírhatod a feliratokat, törölhetsz vagy átrendezhetsz mezőket, és újakat is hozzáadhatsz.
+            {t("formBuilderFieldsHint")}
           </p>
         )}
 
@@ -251,18 +254,18 @@ export function FormBuilder({
 
               <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="sm:col-span-1">
-                  <label className="mb-1 block text-xs font-medium text-gray-600">Felirat</label>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{t("formBuilderFieldLabel")}</label>
                   <input
                     type="text"
                     value={field.label}
                     onChange={(e) => updateField(i, { label: e.target.value })}
-                    placeholder="Mező felirata"
+                    placeholder={t("formBuilderFieldLabelPlaceholder")}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     disabled={!isDraft}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-600">Típus</label>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{t("formBuilderFieldType")}</label>
                   <select
                     value={field.type}
                     onChange={(e) => updateField(i, { type: e.target.value as FieldType })}
@@ -283,7 +286,7 @@ export function FormBuilder({
                       className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
                       disabled={!isDraft}
                     />
-                    Kötelező
+                    {t("formBuilderFieldRequired")}
                   </label>
                 </div>
               </div>
@@ -326,7 +329,7 @@ export function FormBuilder({
               (saving || submitting) && "opacity-50 cursor-not-allowed"
             )}
           >
-            {saving ? "Mentés..." : "Mentés piszkozatként"}
+            {saving ? t("formBuilderSaving") : t("formBuilderSaveDraft")}
           </button>
           <button
             type="button"
@@ -337,14 +340,14 @@ export function FormBuilder({
               (saving || submitting) && "opacity-50 cursor-not-allowed"
             )}
           >
-            {submitting ? "Beküldés..." : "Beküldés jóváhagyásra"}
+            {submitting ? t("formBuilderSubmitting") : t("formBuilderSubmitApproval")}
           </button>
         </div>
       )}
 
       {!isDraft && (
         <div className="rounded-xl border border-yellow-100 bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
-          Ez a sablon már nem piszkozat állapotban van, ezért nem szerkeszthető.
+          {t("formBuilderNotDraftNotice")}
         </div>
       )}
     </div>

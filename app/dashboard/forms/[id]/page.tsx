@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FormBuilder } from "@/components/dashboard/form-builder";
@@ -12,6 +13,8 @@ export default async function EditFormPage({ params }: { params: { id: string } 
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/forms");
   if (session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");
+
+  const t = await getTranslations("dashboard");
 
   const shelterAdmin = await prisma.shelterAdmin.findFirst({
     where: { userId: session.user.id },

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { ChevronLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -32,6 +33,8 @@ export default async function AnimalDocumentsPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+
+  const t = await getTranslations("dashboard");
 
   const [animal, healthRecords, behaviorLogs] = await Promise.all([
     prisma.animal.findUnique({
@@ -65,7 +68,7 @@ export default async function AnimalDocumentsPage({
     if (!admin) redirect("/dashboard/animals");
   }
 
-  // Aktív ideiglenes befogadók a kihelyezéshez
+  // Active foster carers for placement
   const activeFosters = await prisma.fosterProfile.findMany({
     where:   { shelterId: animal.shelterId, status: "ACTIVE" },
     include: { user: { select: { name: true, email: true } } },
@@ -76,7 +79,7 @@ export default async function AnimalDocumentsPage({
     label: f.user.name ?? f.user.email,
   }));
 
-  // Virtuális gazdik (szponzorok) statisztika
+  // Virtual sponsors statistics
   const sponsorAgg = await prisma.sponsorship.aggregate({
     where:  { animalId: animal.id, status: "ACTIVE" },
     _count: { id: true },
@@ -100,7 +103,7 @@ export default async function AnimalDocumentsPage({
         className="mb-6 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
       >
         <ChevronLeft className="h-4 w-4" />
-        Vissza az állatokhoz
+        {t("animalsDetailBack")}
       </Link>
 
       {/* Animal header */}
@@ -116,9 +119,9 @@ export default async function AnimalDocumentsPage({
 
       {/* Documents section */}
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-1 text-base font-semibold text-gray-800">Iratok és dokumentumok</h2>
+        <h2 className="mb-1 text-base font-semibold text-gray-800">{t("animalsDetailDocSection")}</h2>
         <p className="mb-5 text-sm text-gray-500">
-          Oltási könyv, egészségügyi igazolás, mikrochip dokumentum stb.
+          {t("animalsDetailDocDesc")}
         </p>
         <AnimalDocuments animalId={animal.id} initialDocs={docs} />
       </div>
@@ -138,15 +141,15 @@ export default async function AnimalDocumentsPage({
       {/* Virtual adoption stats */}
       <div className="mt-6 rounded-2xl border border-pink-100 bg-pink-50 p-6">
         <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-pink-800">
-          Virtuális gazdik
+          {t("animalsDetailVirtualTitle")}
         </h2>
         <div className="flex flex-wrap gap-8">
           <div>
-            <p className="text-xs font-medium text-pink-600">Aktív virtuális gazdi</p>
+            <p className="text-xs font-medium text-pink-600">{t("animalsDetailVirtualCount")}</p>
             <p className="mt-1 text-2xl font-bold text-pink-700">{sponsorCount}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-pink-600">Havi bevétel</p>
+            <p className="text-xs font-medium text-pink-600">{t("animalsDetailVirtualRevenue")}</p>
             <p className="mt-1 text-2xl font-bold text-pink-700">
               {sponsorRevenue.toLocaleString("hu-HU")}
               <span className="ml-1 text-sm font-medium text-pink-400">HUF</span>

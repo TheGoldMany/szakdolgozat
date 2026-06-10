@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface MonthPoint {
   month:    string; // "jan", "feb", …
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export function ApplicationsBar({ data }: Props) {
+  const t = useTranslations("dashboard");
+
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} barSize={14} barGap={3}>
@@ -28,9 +31,9 @@ export function ApplicationsBar({ data }: Props) {
           cursor={{ fill: "#f8fafc" }}
         />
         <Legend iconType="circle" iconSize={8} formatter={(v) => <span style={{ fontSize: 11, color: "#555" }}>{v}</span>} />
-        <Bar dataKey="total"    name="Összes"      fill="#6366f1" radius={[4,4,0,0]} />
-        <Bar dataKey="approved" name="Elfogadott"  fill="#22c55e" radius={[4,4,0,0]} />
-        <Bar dataKey="rejected" name="Elutasított" fill="#f87171" radius={[4,4,0,0]} />
+        <Bar dataKey="total"    name={t("barTotal")}    fill="#6366f1" radius={[4,4,0,0]} />
+        <Bar dataKey="approved" name={t("barApproved")} fill="#22c55e" radius={[4,4,0,0]} />
+        <Bar dataKey="rejected" name={t("barRejected")} fill="#f87171" radius={[4,4,0,0]} />
       </BarChart>
     </ResponsiveContainer>
   );

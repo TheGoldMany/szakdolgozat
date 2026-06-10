@@ -4,6 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Area, AreaChart,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface MonthPoint {
   month:     string;
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export function AdoptionsLine({ data }: Props) {
+  const t = useTranslations("dashboard");
+
   return (
     <ResponsiveContainer width="100%" height={160}>
       <AreaChart data={data}>
@@ -29,10 +32,10 @@ export function AdoptionsLine({ data }: Props) {
         <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} width={24} allowDecimals={false} />
         <Tooltip
           contentStyle={{ borderRadius: 12, border: "1px solid #f0f0f0", fontSize: 12 }}
-          formatter={(v) => [`${v} örökbefogadás`]}
+          formatter={(v) => [`${v} ${t("adoptionsLineTooltip")}`]}
         />
         <Area
-          type="monotone" dataKey="adoptions" name="Örökbefogadás"
+          type="monotone" dataKey="adoptions" name={t("adoptionsLineName")}
           stroke="#3b82f6" strokeWidth={2}
           fill="url(#adoptGradient)"
           dot={{ r: 3, fill: "#3b82f6", strokeWidth: 0 }}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function FosterDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
+  const t = await getTranslations("dashboard");
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -26,7 +28,7 @@ export default async function FosterDashboardPage() {
   if (!isSuperAdmin && !shelterId) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-        A fiókod nincs menhelyhez rendelve.
+        {t("notAssignedToShelter")}
       </div>
     );
   }
@@ -65,7 +67,7 @@ export default async function FosterDashboardPage() {
   return (
     <div>
       <div className="mb-6 flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Ideiglenes befogadók</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("fosterPageTitle")}</h1>
         <PageInfo page="foster" />
       </div>
       <FosterAdmin initialFosters={serialized} inventory={inventory} />

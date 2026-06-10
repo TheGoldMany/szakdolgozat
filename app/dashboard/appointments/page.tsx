@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import type { Metadata } from "next";
 import { authOptions } from "@/lib/auth";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardAppointmentsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+  const t = await getTranslations("appointments");
 
   let shelterIds: string[];
 
@@ -54,11 +56,11 @@ export default async function DashboardAppointmentsPage() {
         <CalendarDays className="h-6 w-6 text-brand-500" />
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Időpontok</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("pageTitle")}</h1>
             <PageInfo page="appointments" />
           </div>
           {pending > 0 && (
-            <p className="text-sm text-amber-600 font-medium">{pending} új foglalás vár visszaigazolásra</p>
+            <p className="text-sm text-amber-600 font-medium">{t("pendingNotice", { count: pending })}</p>
           )}
         </div>
       </div>

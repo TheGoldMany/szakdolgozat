@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus, X, Check } from "lucide-react";
 
@@ -31,6 +32,7 @@ interface TierForm {
 const emptyForm: TierForm = { name: "", description: "", amount: "" };
 
 export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerProps) {
+  const t = useTranslations("dashboard");
   const [tiers, setTiers] = useState<Tier[]>(initialTiers);
   const [showNew, setShowNew] = useState(false);
   const [newForm, setNewForm] = useState<TierForm>(emptyForm);
@@ -43,7 +45,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
     e.preventDefault();
     const amt = parseInt(newForm.amount, 10);
     if (!newForm.name.trim() || isNaN(amt) || amt < 1) {
-      setError("Név és érvényes összeg megadása kötelező.");
+      setError(t("tiersValidationError"));
       return;
     }
     setSaving(true);
@@ -58,13 +60,13 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
           amount: amt,
         }),
       });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Hiba");
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("tiersUnknownError"));
       const created: Tier = await res.json();
       setTiers((prev) => [...prev, { ...created, _count: { subscriptions: 0 } }]);
       setNewForm(emptyForm);
       setShowNew(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba");
+      setError(err instanceof Error ? err.message : t("tiersUnknownError"));
     } finally {
       setSaving(false);
     }
@@ -80,7 +82,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
     e.preventDefault();
     const amt = parseInt(editForm.amount, 10);
     if (!editForm.name.trim() || isNaN(amt) || amt < 1) {
-      setError("Név és érvényes összeg megadása kötelező.");
+      setError(t("tiersValidationError"));
       return;
     }
     setSaving(true);
@@ -95,27 +97,27 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
           amount: amt,
         }),
       });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Hiba");
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("tiersUnknownError"));
       const updated: Tier = await res.json();
       setTiers((prev) =>
         prev.map((t) => (t.id === tierId ? { ...t, ...updated } : t))
       );
       setEditingId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba");
+      setError(err instanceof Error ? err.message : t("tiersUnknownError"));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDelete(tierId: string) {
-    if (!confirm("Biztosan törlöd ezt a csomagot?")) return;
+    if (!confirm(t("tiersDelete") + "?")) return;
     try {
       const res = await fetch(`/api/shelters/${shelterId}/tiers/${tierId}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       setTiers((prev) => prev.filter((t) => t.id !== tierId));
     } catch {
-      setError("Törlés sikertelen.");
+      setError(t("tiersDeleteFailed"));
     }
   }
 
@@ -130,7 +132,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
       const updated: Tier = await res.json();
       setTiers((prev) => prev.map((t) => (t.id === tier.id ? { ...t, ...updated } : t)));
     } catch {
-      setError("Állapot módosítása sikertelen.");
+      setError(t("tiersToggleFailed"));
     }
   }
 
@@ -142,7 +144,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
 
       {/* Tier list */}
       {tiers.length === 0 && !showNew && (
-        <p className="text-sm text-gray-500">Még nincs előfizetési csomag.</p>
+        <p className="text-sm text-gray-500">{t("tiersNoTiers")}</p>
       )}
 
       <div className="space-y-3">
@@ -153,14 +155,14 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
               onSubmit={(e) => handleEdit(e, tier.id)}
               className="rounded-2xl border border-brand-200 bg-brand-50 p-4 space-y-3"
             >
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide">Szerkesztés</p>
-              <TierFormFields form={editForm} onChange={setEditForm} />
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide">{t("tiersEdit")}</p>
+              <TierFormFields form={editForm} onChange={setEditForm} t={t} />
               <div className="flex gap-2">
                 <Button type="submit" loading={saving} size="sm">
-                  <Check className="h-3.5 w-3.5" /> Mentés
+                  <Check className="h-3.5 w-3.5" /> {t("tiersSave")}
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={() => setEditingId(null)}>
-                  <X className="h-3.5 w-3.5" /> Mégse
+                  <X className="h-3.5 w-3.5" /> {t("tiersCancel")}
                 </Button>
               </div>
             </form>
@@ -172,24 +174,24 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-semibold text-gray-900">{tier.name}</p>
-                  <span className="text-sm font-bold text-brand-600">{formatHUF(tier.amount)} / hó</span>
+                  <span className="text-sm font-bold text-brand-600">{formatHUF(tier.amount)} {t("tiersPerMonth")}</span>
                   {!tier.isActive && (
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
-                      Inaktív
+                      {t("tiersInactive")}
                     </span>
                   )}
                 </div>
                 {tier.description && (
                   <p className="mt-0.5 text-sm text-gray-500 line-clamp-1">{tier.description}</p>
                 )}
-                <p className="mt-0.5 text-xs text-gray-400">{tier._count.subscriptions} előfizető</p>
+                <p className="mt-0.5 text-xs text-gray-400">{t("tiersSubscribersCount", { count: tier._count.subscriptions })}</p>
               </div>
 
               <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
                   onClick={() => handleToggleActive(tier)}
-                  title={tier.isActive ? "Deaktiválás" : "Aktiválás"}
+                  title={tier.isActive ? t("tiersDeactivate") : t("tiersActivate")}
                   className={[
                     "rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
                     tier.isActive
@@ -197,7 +199,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
                       : "bg-gray-100 text-gray-500 hover:bg-gray-200",
                   ].join(" ")}
                 >
-                  {tier.isActive ? "Aktív" : "Inaktív"}
+                  {tier.isActive ? t("tiersActive") : t("tiersInactive")}
                 </button>
                 <button
                   type="button"
@@ -225,11 +227,11 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
           onSubmit={handleCreate}
           className="rounded-2xl border border-brand-200 bg-brand-50 p-4 space-y-3"
         >
-          <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide">Új csomag</p>
-          <TierFormFields form={newForm} onChange={setNewForm} />
+          <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide">{t("tiersNew")}</p>
+          <TierFormFields form={newForm} onChange={setNewForm} t={t} />
           <div className="flex gap-2">
             <Button type="submit" loading={saving} size="sm">
-              <Check className="h-3.5 w-3.5" /> Létrehozás
+              <Check className="h-3.5 w-3.5" /> {t("tiersCreate")}
             </Button>
             <Button
               type="button"
@@ -237,7 +239,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
               size="sm"
               onClick={() => { setShowNew(false); setNewForm(emptyForm); setError(null); }}
             >
-              <X className="h-3.5 w-3.5" /> Mégse
+              <X className="h-3.5 w-3.5" /> {t("tiersCancel")}
             </Button>
           </div>
         </form>
@@ -248,7 +250,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
           size="sm"
           onClick={() => { setShowNew(true); setError(null); }}
         >
-          <Plus className="h-4 w-4" /> Új csomag
+          <Plus className="h-4 w-4" /> {t("tiersNew")}
         </Button>
       )}
     </div>
@@ -258,14 +260,16 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
 function TierFormFields({
   form,
   onChange,
+  t,
 }: {
   form: TierForm;
   onChange: (f: TierForm) => void;
+  t: ReturnType<typeof useTranslations<"dashboard">>;
 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-3">
       <div className="sm:col-span-1">
-        <label className="mb-1 block text-xs font-medium text-gray-600">Név</label>
+        <label className="mb-1 block text-xs font-medium text-gray-600">{t("tiersNameLabel")}</label>
         <input
           type="text"
           required
@@ -276,7 +280,7 @@ function TierFormFields({
         />
       </div>
       <div className="sm:col-span-1">
-        <label className="mb-1 block text-xs font-medium text-gray-600">Összeg (Ft/hó)</label>
+        <label className="mb-1 block text-xs font-medium text-gray-600">{t("tiersAmountLabel")}</label>
         <input
           type="number"
           required
@@ -288,10 +292,10 @@ function TierFormFields({
         />
       </div>
       <div className="sm:col-span-1">
-        <label className="mb-1 block text-xs font-medium text-gray-600">Leírás (opcionális)</label>
+        <label className="mb-1 block text-xs font-medium text-gray-600">{t("tiersDescriptionLabel")}</label>
         <input
           type="text"
-          placeholder="Rövid leírás"
+          placeholder={t("tiersDescriptionPlaceholder")}
           value={form.description}
           onChange={(e) => onChange({ ...form, description: e.target.value })}
           className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"

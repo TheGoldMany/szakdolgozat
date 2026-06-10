@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
@@ -10,13 +11,6 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Kérvény sablonok" };
-
-const STATUS_LABELS: Record<string, string> = {
-  DRAFT:            "Piszkozat",
-  PENDING_APPROVAL: "Jóváhagyásra vár",
-  APPROVED:         "Jóváhagyott",
-  REJECTED:         "Elutasított",
-};
 
 const STATUS_CLASSES: Record<string, string> = {
   DRAFT:            "bg-gray-100 text-gray-600",
@@ -29,6 +23,15 @@ export default async function FormsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/forms");
   if (session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");
+
+  const t = await getTranslations("dashboard");
+
+  const STATUS_LABELS: Record<string, string> = {
+    DRAFT:            t("formsStatusDraft"),
+    PENDING_APPROVAL: t("formsStatusPendingApproval"),
+    APPROVED:         t("formsStatusApproved"),
+    REJECTED:         t("formsStatusRejected"),
+  };
 
   const shelterAdmin = await prisma.shelterAdmin.findFirst({
     where: { userId: session.user.id },
@@ -46,7 +49,7 @@ export default async function FormsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900">Kérvény sablonok</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("formsPageTitle")}</h1>
           <PageInfo page="forms" />
         </div>
         <Link
@@ -54,19 +57,19 @@ export default async function FormsPage() {
           className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Új sablon
+          {t("formsNewBtn")}
         </Link>
       </div>
 
       {forms.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
-          <p className="text-sm text-gray-500">Még nem hoztál létre kérvény sablont.</p>
+          <p className="text-sm text-gray-500">{t("formsEmpty")}</p>
           <Link
             href="/dashboard/forms/new"
             className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
           >
             <Plus className="h-4 w-4" />
-            Első sablon létrehozása
+            {t("formsCreateFirst")}
           </Link>
         </div>
       ) : (
@@ -91,14 +94,14 @@ export default async function FormsPage() {
                 {form.description && (
                   <p className="mt-1 text-sm text-gray-500 line-clamp-1">{form.description}</p>
                 )}
-                <p className="mt-1 text-xs text-gray-400">{form._count.fields} mező</p>
+                <p className="mt-1 text-xs text-gray-400">{t("formsFieldCount", { count: form._count.fields })}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Link
                   href={`/dashboard/forms/${form.id}`}
                   className="rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                 >
-                  Szerkesztés
+                  {t("formsEdit")}
                 </Link>
               </div>
             </div>

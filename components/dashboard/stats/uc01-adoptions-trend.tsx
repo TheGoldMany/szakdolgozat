@@ -4,6 +4,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 const SPECIES_COLORS: Record<string, string> = {
   DOG:    "#3b82f6",
@@ -41,6 +42,8 @@ interface Props {
 export function Uc01AdoptionsTrend({
   totalAdoptions, yoyGrowth, thisYearApps, lastYearApps, monthlyTrend, bySpecies,
 }: Props) {
+  const t = useTranslations("dashboard");
+
   const SPECIES_LABELS: Record<string, string> = {
     DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb",
   };
@@ -116,7 +119,7 @@ export function Uc01AdoptionsTrend({
         {/* Species donut */}
         <div className="flex flex-col items-center justify-center">
           {bySpecies.length === 0 ? (
-            <p className="text-xs text-gray-400">Nincs adat</p>
+            <p className="text-xs text-gray-400">{t("chartNoData")}</p>
           ) : (
             <div className="relative w-full">
               <ResponsiveContainer width="100%" height={180}>

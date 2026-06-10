@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
@@ -14,10 +15,6 @@ import { ExportButton } from "@/components/dashboard/export-button";
 import { TransferRequestButton } from "@/components/transfers/transfer-request-button";
 
 export const metadata: Metadata = { title: "Állatok" };
-
-const TYPE_LABELS: Record<AnimalType, string> = {
-  DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb",
-};
 
 const STATUS_COLOR: Record<AnimalStatus, string> = {
   AVAILABLE:    "bg-green-100 text-green-700",
@@ -34,6 +31,8 @@ export default async function DashboardAnimalsPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
+
+  const t = await getTranslations("dashboard");
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -67,29 +66,37 @@ export default async function DashboardAnimalsPage({
     },
   });
 
+  const TYPE_LABELS: Record<AnimalType, string> = {
+    DOG:    t("animalsTypeDog"),
+    CAT:    t("animalsTypeCat"),
+    RABBIT: t("animalsTypeRabbit"),
+    BIRD:   t("animalsTypeBird"),
+    OTHER:  t("animalsTypeOther"),
+  };
+
   const statuses = [
-    { value: "",             label: "Összes" },
-    { value: "AVAILABLE",    label: "Örökbefogadható" },
-    { value: "PENDING",      label: "Folyamatban" },
-    { value: "ADOPTED",      label: "Örökbefogadott" },
-    { value: "FOSTER",       label: "Ideiglenes" },
-    { value: "MEDICAL_HOLD", label: "Kezelés alatt" },
+    { value: "",             label: t("animalsFilterAll") },
+    { value: "AVAILABLE",    label: t("animalsStatusAvailable") },
+    { value: "PENDING",      label: t("animalsStatusPending") },
+    { value: "ADOPTED",      label: t("animalsStatusAdopted") },
+    { value: "FOSTER",       label: t("animalsStatusFoster") },
+    { value: "MEDICAL_HOLD", label: t("animalsStatusMedicalHold") },
   ];
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900">Állatok</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("animalsTitle")}</h1>
           <PageInfo page="animals" />
         </div>
         <div className="flex items-center gap-2">
-          <ExportButton type="animals" label="CSV export" />
+          <ExportButton type="animals" />
           <AddAnimalPanel />
         </div>
       </div>
 
-      {/* Státusz szűrő */}
+      {/* Status filter */}
       <div className="mb-5 flex flex-wrap gap-2">
         {statuses.map((s) => (
           <Link
@@ -110,20 +117,20 @@ export default async function DashboardAnimalsPage({
       {animals.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
           <PawPrint className="h-10 w-10 text-gray-300" />
-          <p className="mt-3 text-sm text-gray-500">Nincsenek állatok ebben a kategóriában</p>
+          <p className="mt-3 text-sm text-gray-500">{t("animalsEmpty")}</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <th className="px-4 py-3 text-left">Állat</th>
-                <th className="hidden px-4 py-3 text-left sm:table-cell">Faj</th>
-                <th className="hidden px-4 py-3 text-left md:table-cell">Menhely</th>
-                <th className="px-4 py-3 text-left">Kérelmek</th>
-                <th className="px-4 py-3 text-left">Státusz</th>
-                <th className="hidden px-4 py-3 text-left lg:table-cell">Áthelyezés</th>
-                <th className="px-4 py-3 text-left">Iratok</th>
+                <th className="px-4 py-3 text-left">{t("animalsTableAnimal")}</th>
+                <th className="hidden px-4 py-3 text-left sm:table-cell">{t("animalsTableSpecies")}</th>
+                <th className="hidden px-4 py-3 text-left md:table-cell">{t("animalsTableShelter")}</th>
+                <th className="px-4 py-3 text-left">{t("animalsTableApplications")}</th>
+                <th className="px-4 py-3 text-left">{t("animalsTableStatus")}</th>
+                <th className="hidden px-4 py-3 text-left lg:table-cell">{t("animalsTableTransfer")}</th>
+                <th className="px-4 py-3 text-left">{t("animalsTableDocs")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -177,10 +184,10 @@ export default async function DashboardAnimalsPage({
                       <Link
                         href={`/dashboard/animals/${animal.id}`}
                         className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-brand-600"
-                        title="Iratok kezelése"
+                        title={t("animalsTableDocsTitle")}
                       >
                         <FileText className="h-4 w-4" />
-                        Iratok
+                        {t("animalsTableDocs")}
                       </Link>
                     </td>
                   </tr>

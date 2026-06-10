@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface CityRow { city: string; lost: number; found: number; stray: number; total: number }
 interface TypeRow  { type: string; label: string; count: number }
@@ -27,6 +28,7 @@ const TYPE_COLORS: Record<string, string> = {
 export function Uc03ReportsPanel({
   lostCount, foundCount, strayCount, matchRate, lostMinusFound, byReportType, reportsByCity,
 }: Props) {
+  const t = useTranslations("dashboard");
   const total = lostCount + foundCount + strayCount;
 
   const cityData = reportsByCity.slice(0, 8).map((c) => ({
@@ -66,7 +68,7 @@ export function Uc03ReportsPanel({
         {/* Donut by type */}
         <div className="flex flex-col items-center">
           {byReportType.length === 0 ? (
-            <p className="text-xs text-gray-400 py-8">Nincs bejelentés</p>
+            <p className="text-xs text-gray-400 py-8">{t("chartNoData")}</p>
           ) : (
             <>
               <div className="relative w-full">
@@ -113,7 +115,7 @@ export function Uc03ReportsPanel({
         <div className="lg:col-span-2">
           <p className="mb-2 text-xs font-medium text-gray-500">Top városok</p>
           {cityData.length === 0 ? (
-            <p className="text-xs text-gray-400">Nincs területi adat</p>
+            <p className="text-xs text-gray-400">{t("chartNoData")}</p>
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={cityData} layout="vertical" margin={{ top: 0, right: 8, left: 4, bottom: 0 }}>

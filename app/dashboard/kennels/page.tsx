@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -12,6 +13,8 @@ export default async function KennelsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
+  const t = await getTranslations("dashboard");
+
   const admin = await prisma.shelterAdmin.findFirst({
     where:  { userId: session.user.id },
     select: { shelterId: true },
@@ -21,7 +24,7 @@ export default async function KennelsPage() {
   if (!shelterId) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-        A férőhely-kezelés menhelyhez kötött. A fiókod nincs menhelyhez rendelve.
+        {t("kennelsNoShelter")}
       </div>
     );
   }
@@ -32,7 +35,7 @@ export default async function KennelsPage() {
       include: { _count: { select: { animals: true } } },
       orderBy: { createdAt: "asc" },
     }),
-    // A menhely fizikailag jelen lévő állatai (nem örökbefogadott)
+    // Animals physically present at the shelter (not adopted)
     prisma.animal.findMany({
       where:   { shelterId, status: { not: "ADOPTED" } },
       select:  { id: true, name: true, status: true, kennelId: true },
@@ -43,7 +46,7 @@ export default async function KennelsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Férőhelyek</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("kennelsTitle")}</h1>
         <PageInfo page="kennels" />
       </div>
       <KennelManager initialKennels={kennels} animals={animals} />

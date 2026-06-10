@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { HandHeart } from "lucide-react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { ExportButton } from "@/components/dashboard/export-button";
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardVolunteersPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+  const t = await getTranslations("dashboard");
 
   let shelterIds: string[];
 
@@ -90,11 +92,11 @@ export default async function DashboardVolunteersPage() {
         <HandHeart className="h-6 w-6 text-brand-500" />
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Önkéntesek</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("volunteersPageTitle")}</h1>
             <PageInfo page="volunteers" />
           </div>
           <p className="text-sm text-gray-500">
-            {volunteers.filter(v => v.status === "ACTIVE").length} aktív önkéntes &bull; {Math.round(totalHours)} óra teljesítve összesen
+            {t("activeVolunteers", { count: volunteers.filter(v => v.status === "ACTIVE").length })} &bull; {t("hoursCompleted", { hours: Math.round(totalHours) })}
           </p>
         </div>
         <div className="ml-auto">

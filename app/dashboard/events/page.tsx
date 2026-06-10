@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { CalendarHeart } from "lucide-react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardEventsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+  const t = await getTranslations("dashboard");
 
   let shelterIds: string[];
   if (session.user.role === "SUPER_ADMIN") {
@@ -72,11 +74,11 @@ export default async function DashboardEventsPage() {
           <CalendarHeart className="h-6 w-6 text-brand-500" />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900">Események</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t("eventsPageTitle")}</h1>
               <PageInfo page="events" />
             </div>
             <p className="text-sm text-gray-500">
-              {events.length} esemény &bull; {upcoming} közelgő, meghirdetett
+              {t("eventsSummary", { total: events.length })} &bull; {t("eventsUpcoming", { count: upcoming })}
             </p>
           </div>
         </div>

@@ -2,15 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AnimalStatus } from "@prisma/client";
-
-const OPTIONS: { value: AnimalStatus; label: string }[] = [
-  { value: "AVAILABLE",    label: "Örökbefogadható" },
-  { value: "PENDING",      label: "Folyamatban" },
-  { value: "ADOPTED",      label: "Örökbefogadott" },
-  { value: "FOSTER",       label: "Ideiglenes" },
-  { value: "MEDICAL_HOLD", label: "Kezelés alatt" },
-];
 
 export function AnimalStatusSelect({
   animalId,
@@ -19,8 +12,17 @@ export function AnimalStatusSelect({
   animalId: string;
   currentStatus: AnimalStatus;
 }) {
+  const t = useTranslations("dashboard");
   const router  = useRouter();
   const [saving, setSaving] = useState(false);
+
+  const OPTIONS: { value: AnimalStatus; labelKey: string }[] = [
+    { value: "AVAILABLE",    labelKey: "animalsStatusAvailable" },
+    { value: "PENDING",      labelKey: "animalsStatusPending" },
+    { value: "ADOPTED",      labelKey: "animalsStatusAdopted" },
+    { value: "FOSTER",       labelKey: "animalsStatusFoster" },
+    { value: "MEDICAL_HOLD", labelKey: "animalsStatusMedicalHold" },
+  ];
 
   async function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setSaving(true);
@@ -41,7 +43,7 @@ export function AnimalStatusSelect({
       className="rounded-lg border border-gray-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
     >
       {OPTIONS.map((o) => (
-        <option key={o.value} value={o.value}>{o.label}</option>
+        <option key={o.value} value={o.value}>{t(o.labelKey)}</option>
       ))}
     </select>
   );

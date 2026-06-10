@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface FormApprovalActionsProps {
@@ -10,6 +11,7 @@ interface FormApprovalActionsProps {
 
 export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
   const router                          = useRouter();
+  const t                               = useTranslations("dashboard");
   const [loading, setLoading]           = useState<"approve" | "reject" | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [showReject, setShowReject]     = useState(false);
@@ -22,7 +24,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
       const res = await fetch(`/api/application-forms/${formId}/approve`, { method: "POST" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Jóváhagyás sikertelen");
+        throw new Error(data.error ?? t("formApprovalApproveFailed"));
       }
       router.refresh();
     } catch (e) {
@@ -43,7 +45,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Elutasítás sikertelen");
+        throw new Error(data.error ?? t("formApprovalRejectFailed"));
       }
       router.refresh();
     } catch (e) {
@@ -68,7 +70,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
             loading !== null && "opacity-50 cursor-not-allowed"
           )}
         >
-          {loading === "approve" ? "..." : "Jóváhagyás"}
+          {loading === "approve" ? "..." : t("formApprovalApprove")}
         </button>
         <button
           type="button"
@@ -79,7 +81,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
             loading !== null && "opacity-50 cursor-not-allowed"
           )}
         >
-          Elutasítás
+          {t("formApprovalReject")}
         </button>
       </div>
       {showReject && (
@@ -88,7 +90,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
             type="text"
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Elutasítás oka (opcionális)"
+            placeholder={t("formApprovalRejectReasonPlaceholder")}
             className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-400"
           />
           <button
@@ -100,7 +102,7 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
               loading !== null && "opacity-50 cursor-not-allowed"
             )}
           >
-            {loading === "reject" ? "..." : "Elutasítás megerősítése"}
+            {loading === "reject" ? "..." : t("formApprovalConfirmReject")}
           </button>
         </div>
       )}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { ExportButton } from "@/components/dashboard/export-button";
@@ -17,6 +18,8 @@ interface PageProps {
 export default async function SubscriptionsPage({ searchParams }: PageProps) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
+
+  const t = await getTranslations("dashboard");
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -54,18 +57,18 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
   const currentStatus = searchParams.status ?? "";
 
   const filterOptions = [
-    { label: "Összes", value: "" },
-    { label: "Aktív", value: "ACTIVE" },
-    { label: "Lemondott", value: "CANCELLED" },
+    { label: t("subscriptionsAll"),       value: "" },
+    { label: t("subscriptionsActive"),    value: "ACTIVE" },
+    { label: t("subscriptionsCancelled"), value: "CANCELLED" },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Előfizetők</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("subscriptionsTitle")}</h1>
         <PageInfo page="subscriptions" />
         <div className="ml-auto flex gap-2">
-          <ExportButton type="subscribers" label="Előfizetők CSV" />
+          <ExportButton type="subscribers" label={`${t("subscriptionsTitle")} CSV`} />
           <ExportButton type="donations"   label="Adományok CSV" />
         </div>
       </div>

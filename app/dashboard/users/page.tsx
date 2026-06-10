@@ -4,12 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Users, Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageInfo } from "@/components/dashboard/page-info";
-
-const ROLE_META: Record<string, { label: string; color: string }> = {
-  USER:          { label: "Felhasználó",  color: "bg-gray-100 text-gray-600"    },
-  SHELTER_ADMIN: { label: "Menhely admin", color: "bg-brand-100 text-brand-700" },
-  SUPER_ADMIN:   { label: "Főadmin",      color: "bg-red-100 text-red-700"      },
-};
+import { useTranslations } from "next-intl";
 
 interface User {
   id:            string;
@@ -22,6 +17,14 @@ interface User {
 }
 
 export default function DashboardUsersPage() {
+  const t = useTranslations("dashboard");
+
+  const ROLE_META: Record<string, { label: string; color: string }> = {
+    USER:          { label: t("usersRoleUser"),       color: "bg-gray-100 text-gray-600"    },
+    SHELTER_ADMIN: { label: t("usersRoleAdmin"),      color: "bg-brand-100 text-brand-700" },
+    SUPER_ADMIN:   { label: t("usersRoleSuperAdmin"), color: "bg-red-100 text-red-700"      },
+  };
+
   const [users,      setUsers]      = useState<User[]>([]);
   const [total,      setTotal]      = useState(0);
   const [page,       setPage]       = useState(1);
@@ -70,7 +73,7 @@ export default function DashboardUsersPage() {
       <div className="flex items-center gap-3">
         <Users className="h-5 w-5 text-brand-500" />
         <h1 className="text-xl font-bold text-gray-900">
-          Felhasználók
+          {t("usersPageTitle")}
           <span className="ml-2 text-sm font-normal text-gray-400">({total})</span>
         </h1>
         <PageInfo page="users" />
@@ -83,7 +86,7 @@ export default function DashboardUsersPage() {
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Keresés névben, e-mailben..."
+            placeholder={t("usersSearchPlaceholder")}
             className="w-full rounded-xl border border-gray-200 pl-9 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
@@ -92,10 +95,10 @@ export default function DashboardUsersPage() {
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
           className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
-          <option value="">Minden szerepkör</option>
-          <option value="USER">Felhasználó</option>
-          <option value="SHELTER_ADMIN">Menhely admin</option>
-          <option value="SUPER_ADMIN">Főadmin</option>
+          <option value="">{t("usersAllRoles")}</option>
+          <option value="USER">{t("usersRoleUser")}</option>
+          <option value="SHELTER_ADMIN">{t("usersRoleAdmin")}</option>
+          <option value="SUPER_ADMIN">{t("usersRoleSuperAdmin")}</option>
         </select>
       </div>
 
@@ -107,17 +110,17 @@ export default function DashboardUsersPage() {
         ) : users.length === 0 ? (
           <div className="py-16 text-center text-gray-400">
             <Users className="mx-auto mb-3 h-8 w-8 text-gray-200" />
-            <p>Nincs találat</p>
+            <p>{t("usersNoResults")}</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
               <tr>
-                <th className="px-4 py-3 text-left">Felhasználó</th>
-                <th className="hidden px-4 py-3 text-left md:table-cell">E-mail</th>
-                <th className="hidden px-4 py-3 text-center sm:table-cell">Kérelmek</th>
-                <th className="px-4 py-3 text-left">Szerepkör</th>
-                <th className="hidden px-4 py-3 text-left lg:table-cell">Regisztrált</th>
+                <th className="px-4 py-3 text-left">{t("usersColUser")}</th>
+                <th className="hidden px-4 py-3 text-left md:table-cell">{t("usersColEmail")}</th>
+                <th className="hidden px-4 py-3 text-center sm:table-cell">{t("usersColApplications")}</th>
+                <th className="px-4 py-3 text-left">{t("usersColRole")}</th>
+                <th className="hidden px-4 py-3 text-left lg:table-cell">{t("usersColRegistered")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -134,7 +137,7 @@ export default function DashboardUsersPage() {
                           <p className="font-medium text-gray-900">{user.name ?? <span className="text-gray-400">–</span>}</p>
                           <p className="text-xs text-gray-400 md:hidden">{user.email}</p>
                           {!user.emailVerified && (
-                            <p className="text-[10px] font-medium text-amber-500">Email nincs megerősítve</p>
+                            <p className="text-[10px] font-medium text-amber-500">{t("usersEmailNotVerified")}</p>
                           )}
                         </div>
                       </div>
@@ -155,9 +158,9 @@ export default function DashboardUsersPage() {
                             meta.color
                           )}
                         >
-                          <option value="USER">Felhasználó</option>
-                          <option value="SHELTER_ADMIN">Menhely admin</option>
-                          <option value="SUPER_ADMIN">Főadmin</option>
+                          <option value="USER">{t("usersRoleUser")}</option>
+                          <option value="SHELTER_ADMIN">{t("usersRoleAdmin")}</option>
+                          <option value="SUPER_ADMIN">{t("usersRoleSuperAdmin")}</option>
                         </select>
                       )}
                     </td>
@@ -174,7 +177,7 @@ export default function DashboardUsersPage() {
 
       {pages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">{total} felhasználó összesen</p>
+          <p className="text-sm text-gray-500">{t("usersTotalLabel", { count: total })}</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}

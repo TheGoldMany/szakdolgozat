@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationReview } from "@/components/dashboard/application-review";
@@ -18,15 +19,6 @@ function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  INVITED:   { label: "Meghívva",        color: "bg-purple-100 text-purple-700" },
-  PENDING:   { label: "Várakozó",        color: "bg-yellow-100 text-yellow-700" },
-  REVIEWING: { label: "Elbírálás alatt", color: "bg-blue-100 text-blue-700" },
-  APPROVED:  { label: "Elfogadva",       color: "bg-green-100 text-green-700" },
-  REJECTED:  { label: "Elutasítva",      color: "bg-red-100 text-red-700" },
-  WITHDRAWN: { label: "Visszavont",      color: "bg-gray-100 text-gray-500" },
-};
-
 export default async function ApplicationDetailPage({
   params,
 }: {
@@ -35,7 +27,18 @@ export default async function ApplicationDetailPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
+  const t = await getTranslations("dashboard");
+
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    INVITED:   { label: t("appsStatusLabelInvited"),   color: "bg-purple-100 text-purple-700" },
+    PENDING:   { label: t("appsStatusLabelPending"),   color: "bg-yellow-100 text-yellow-700" },
+    REVIEWING: { label: t("appsStatusLabelReviewing"), color: "bg-blue-100 text-blue-700" },
+    APPROVED:  { label: t("appsStatusLabelApproved"),  color: "bg-green-100 text-green-700" },
+    REJECTED:  { label: t("appsStatusLabelRejected"),  color: "bg-red-100 text-red-700" },
+    WITHDRAWN: { label: t("appsStatusLabelWithdrawn"), color: "bg-gray-100 text-gray-500" },
+  };
 
   let shelterId: string | undefined;
   if (!isSuperAdmin) {
@@ -90,7 +93,7 @@ export default async function ApplicationDetailPage({
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Vissza a kérelmekhez
+        {t("appDetailBack")}
       </Link>
 
       {/* Viselkedési ütközés figyelmeztetés */}
@@ -100,11 +103,10 @@ export default async function ApplicationDetailPage({
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
             <div>
               <h2 className="text-sm font-bold text-red-800">
-                Figyelem – lehetséges összeférhetetlenség
+                {t("appDetailConflictTitle")}
               </h2>
               <p className="mt-0.5 text-xs text-red-600">
-                A jelentkező válaszai ütköznek az állat belső viselkedési címkéivel.
-                Kérjük, körültekintően bírálja el a kérelmet.
+                {t("appDetailConflictDesc")}
               </p>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-red-700">
                 {conflicts.map((c, i) => <li key={i}>{c}</li>)}
@@ -143,31 +145,31 @@ export default async function ApplicationDetailPage({
             <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600 space-y-0.5">
               <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>
-                  <span className="font-medium">Kérelmező:</span>{" "}
+                  <span className="font-medium">{t("appDetailApplicant")}</span>{" "}
                   <Link href={`/users/${app.userId}`} className="text-brand-600 hover:underline">
                     {app.user.name ?? "–"}
                   </Link>
                 </span>
                 <RatingBadge targetUserId={app.userId} />
               </p>
-              <p><span className="font-medium">Email:</span> {app.user.email}</p>
-              {app.user.phone && <p><span className="font-medium">Telefon:</span> {app.user.phone}</p>}
+              <p><span className="font-medium">{t("appDetailEmail")}</span> {app.user.email}</p>
+              {app.user.phone && <p><span className="font-medium">{t("appDetailPhone")}</span> {app.user.phone}</p>}
               {app.homeType && (
                 <p>
-                  <span className="font-medium">Lakástípus:</span>{" "}
-                  {app.homeType === "HOUSE" ? "Ház" : app.homeType === "APARTMENT" ? "Lakás" : "Egyéb"}
-                  {app.hasGarden ? " (kerttel)" : ""}
+                  <span className="font-medium">{t("appDetailHomeType")}</span>{" "}
+                  {app.homeType === "HOUSE" ? t("appDetailHomeHouse") : app.homeType === "APARTMENT" ? t("appDetailHomeApartment") : t("appDetailHomeOther")}
+                  {app.hasGarden ? t("appDetailHomeWithGarden") : ""}
                 </p>
               )}
               <p className="flex gap-3">
                 {app.hasChildren && (
                   <span className="flex items-center gap-1">
-                    <Users className="h-3.5 w-3.5" />Gyerek a háztartásban
+                    <Users className="h-3.5 w-3.5" />{t("appDetailHasChildren")}
                   </span>
                 )}
                 {app.hasPets && (
                   <span className="flex items-center gap-1">
-                    <PawPrint className="h-3.5 w-3.5" />Van más állat
+                    <PawPrint className="h-3.5 w-3.5" />{t("appDetailHasPets")}
                   </span>
                 )}
               </p>
@@ -179,7 +181,7 @@ export default async function ApplicationDetailPage({
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
               <span className="text-xs text-gray-400">
-                Beküldve: {new Date(app.createdAt).toLocaleDateString("hu-HU", {
+                {t("appDetailSubmittedAt")} {new Date(app.createdAt).toLocaleDateString("hu-HU", {
                   year: "numeric", month: "long", day: "numeric",
                 })}
               </span>
@@ -203,7 +205,7 @@ export default async function ApplicationDetailPage({
       {app.responses.length > 0 && (
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-900">
-            Kitöltött kérvény
+            {t("appDetailFilledForm")}
             {app.form && (
               <span className="ml-2 text-sm font-normal text-gray-400">({app.form.title})</span>
             )}
@@ -237,13 +239,13 @@ export default async function ApplicationDetailPage({
                       className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-brand-600 hover:bg-brand-50 transition-colors"
                     >
                       <FileText className="h-4 w-4 shrink-0" />
-                      Fájl megtekintése
+                      {t("appDetailViewFile")}
                     </a>
                   )
                 ) : resp.value ? (
                   <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                 ) : (
-                  <p className="text-sm text-gray-400 italic">Nem lett kitöltve</p>
+                  <p className="text-sm text-gray-400 italic">{t("appDetailNotFilled")}</p>
                 )}
               </div>
             ))}
@@ -253,13 +255,13 @@ export default async function ApplicationDetailPage({
 
       {app.responses.length === 0 && app.formId && (
         <div className="rounded-2xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
-          <p className="text-sm text-yellow-700">A felhasználó még nem töltötte ki a kérvényt.</p>
+          <p className="text-sm text-yellow-700">{t("appDetailFormNotSubmitted")}</p>
         </div>
       )}
 
       {app.reviewNotes && (
         <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-          <h2 className="mb-2 font-semibold text-gray-900">Admin megjegyzés</h2>
+          <h2 className="mb-2 font-semibold text-gray-900">{t("appDetailAdminNote")}</h2>
           <p className="text-sm text-gray-600">{app.reviewNotes}</p>
         </div>
       )}

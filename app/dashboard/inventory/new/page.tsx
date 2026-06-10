@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { InventoryItemForm } from "@/components/inventory/inventory-item-form";
@@ -16,6 +17,8 @@ export default async function NewInventoryItemPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+
+  const t = await getTranslations("dashboard");
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -39,15 +42,15 @@ export default async function NewInventoryItemPage({
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Vissza a készlethez
+        {t("inventoryDetailBack")}
       </Link>
 
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <h1 className="mb-5 text-lg font-bold text-gray-900">Új készlettétel</h1>
+        <h1 className="mb-5 text-lg font-bold text-gray-900">{t("inventoryNewTitle")}</h1>
 
         {isSuperAdmin && !shelterId && shelters.length > 0 ? (
           <div className="space-y-4">
-            <p className="text-sm text-gray-500">Válassz menhelyet:</p>
+            <p className="text-sm text-gray-500">{t("inventoryNewSelectShelter")}</p>
             <ul className="space-y-2">
               {shelters.map((s) => (
                 <li key={s.id}>
@@ -64,7 +67,7 @@ export default async function NewInventoryItemPage({
         ) : shelterId ? (
           <InventoryItemForm shelterId={shelterId} />
         ) : (
-          <p className="text-sm text-gray-400">Nincs menhelyhez rendelve a fiókod.</p>
+          <p className="text-sm text-gray-400">{t("inventoryNewNoShelter")}</p>
         )}
       </div>
     </div>

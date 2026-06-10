@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-react";
 
 // A recharts-alapú panelek lazy-load-dal (a ~100KB chart bundle csak igény szerint töltődik)
@@ -71,6 +72,7 @@ interface Props {
 }
 
 export function AnalyticsSection({ role, shelters }: Props) {
+  const t = useTranslations("dashboard");
   const isSuperAdmin = role === "SUPER_ADMIN";
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(shelters.map((s) => s.id)));
@@ -92,11 +94,11 @@ export function AnalyticsSection({ role, shelters }: Props) {
       if (!res.ok) throw new Error(await res.text());
       setData(await res.json());
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Hiba történt");
+      setError(e instanceof Error ? e.message : t("analyticsError"));
     } finally {
       setLoading(false);
     }
-  }, [isSuperAdmin, selectedIds]);
+  }, [isSuperAdmin, selectedIds, t]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -118,13 +120,13 @@ export function AnalyticsSection({ role, shelters }: Props) {
       const res = await fetch("/api/etl", { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setEtlMsg(`ETL kész – ${data.adoptionCount ?? 0} örökbefogadás, ${data.inventoryCount ?? 0} leltársor szinkronizálva.`);
+        setEtlMsg(t("analyticsEtlSuccess", { adoptionCount: data.adoptionCount ?? 0, inventoryCount: data.inventoryCount ?? 0 }));
         fetchData();
       } else {
-        setEtlMsg(`Hiba: ${data.error ?? "ismeretlen hiba"}`);
+        setEtlMsg(t("analyticsEtlError", { error: data.error ?? t("tiersUnknownError") }));
       }
     } catch {
-      setEtlMsg("Hálózati hiba az ETL futtatásakor.");
+      setEtlMsg(t("analyticsNetworkError"));
     } finally {
       setEtlRunning(false);
     }
@@ -135,8 +137,8 @@ export function AnalyticsSection({ role, shelters }: Props) {
       {/* Section header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Analitika</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Power BI-alapú üzleti mutatók</p>
+          <h2 className="text-lg font-bold text-gray-900">{t("analyticsTitle")}</h2>
+          <p className="text-xs text-gray-400 mt-0.5">{t("analyticsSubtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           {isSuperAdmin && (
@@ -144,7 +146,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
               onClick={() => setFilterOpen((o) => !o)}
               className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors"
             >
-              Menhelyek ({selectedIds.size}/{shelters.length})
+              {t("analyticsSheltersFilter", { selected: selectedIds.size, total: shelters.length })}
               {filterOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             </button>
           )}
@@ -154,7 +156,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
             className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-            Frissít
+            {t("analyticsRefresh")}
           </button>
           {isSuperAdmin && (
             <button
@@ -165,14 +167,14 @@ export function AnalyticsSection({ role, shelters }: Props) {
               {etlRunning
                 ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 : <DatabaseZap className="h-3.5 w-3.5" />}
-              ETL futtatása
+              {t("analyticsRunEtl")}
             </button>
           )}
         </div>
       </div>
 
       {etlMsg && (
-        <div className={`rounded-xl border px-4 py-2.5 text-xs font-medium ${etlMsg.startsWith("Hiba") || etlMsg.startsWith("Hálózati") ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
+        <div className={`rounded-xl border px-4 py-2.5 text-xs font-medium ${etlMsg.startsWith(t("analyticsEtlError", { error: "" }).slice(0, 4)) || etlMsg === t("analyticsNetworkError") ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
           {etlMsg}
         </div>
       )}
@@ -185,13 +187,13 @@ export function AnalyticsSection({ role, shelters }: Props) {
               onClick={selectAll}
               className="rounded-md bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 hover:bg-brand-100 transition-colors"
             >
-              Összes
+              {t("analyticsSelectAll")}
             </button>
             <button
               onClick={selectNone}
               className="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200 transition-colors"
             >
-              Semmi
+              {t("analyticsSelectNone")}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -251,7 +253,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
 
       {!loading && !data && !error && (
         <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400 text-sm">
-          Nincs megjeleníthető adat
+          {t("analyticsNoData")}
         </div>
       )}
     </div>

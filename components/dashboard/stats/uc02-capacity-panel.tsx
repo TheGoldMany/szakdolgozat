@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface AvgStayRow { type: string; label: string; avgDays: number }
 interface StayCatRow { label: string; days: string; count: number }
@@ -52,6 +53,7 @@ function UtilGauge({ rate }: { rate: number }) {
 }
 
 export function Uc02CapacityPanel({ avgStayBySpecies, stayCategories, shelterUtil, avgUtilization }: Props) {
+  const t = useTranslations("dashboard");
   const stayBarData = stayCategories.map((c) => ({ name: c.label, db: c.count }));
 
   return (
@@ -87,7 +89,7 @@ export function Uc02CapacityPanel({ avgStayBySpecies, stayCategories, shelterUti
         <div>
           <p className="mb-2 text-xs font-medium text-gray-500">Átlagos tartózkodási idő (nap)</p>
           {avgStayBySpecies.length === 0 ? (
-            <p className="text-xs text-gray-400 py-4">Nincs elegendő adat</p>
+            <p className="text-xs text-gray-400 py-4">{t("chartNoData")}</p>
           ) : (
             <ul className="space-y-2 mt-4">
               {avgStayBySpecies.map((s) => (
@@ -123,7 +125,7 @@ export function Uc02CapacityPanel({ avgStayBySpecies, stayCategories, shelterUti
           )}
         </div>
         {shelterUtil.length === 0 ? (
-          <p className="text-xs text-gray-400">Nincs kapacitásadat</p>
+          <p className="text-xs text-gray-400">{t("chartNoData")}</p>
         ) : (
           <div className="flex flex-wrap gap-4">
             {shelterUtil.map((s) => (

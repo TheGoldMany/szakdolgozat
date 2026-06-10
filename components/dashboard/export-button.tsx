@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type ExportType = "animals" | "applications" | "volunteers" | "sponsorships" | "events" | "subscribers" | "donations";
 
@@ -10,7 +11,8 @@ interface Props {
   label?: string;
 }
 
-export function ExportButton({ type, label = "CSV export" }: Props) {
+export function ExportButton({ type, label }: Props) {
+  const t = useTranslations("dashboard");
   const [loading, setLoading] = useState(false);
 
   async function handleExport() {
@@ -28,7 +30,7 @@ export function ExportButton({ type, label = "CSV export" }: Props) {
       a.click();
       URL.revokeObjectURL(url);
     } catch {
-      alert("Az export nem sikerült. Kérjük, próbáld újra.");
+      alert(t("animalsExportFailed"));
     } finally {
       setLoading(false);
     }
@@ -41,7 +43,7 @@ export function ExportButton({ type, label = "CSV export" }: Props) {
       className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 shadow-sm transition hover:bg-gray-50 disabled:opacity-50"
     >
       <Download className="h-4 w-4" />
-      {loading ? "Exportálás…" : label}
+      {loading ? t("animalsExportLoading") : (label ?? t("animalsExportLabel"))}
     </button>
   );
 }

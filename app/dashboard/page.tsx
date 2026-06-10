@@ -5,6 +5,7 @@ import {
   PawPrint, ClipboardList, CalendarDays, Heart,
   TrendingUp, Building2, Users, DollarSign,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
@@ -20,18 +21,20 @@ import { AnalyticsSection } from "@/components/dashboard/analytics-section";
 export const metadata: Metadata = { title: "Áttekintés" };
 export const dynamic = "force-dynamic";
 
-const APP_STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
-  INVITED:   { label: "Meghívva",        color: "bg-purple-100 text-purple-700" },
-  PENDING:   { label: "Várakozó",        color: "bg-yellow-100 text-yellow-700" },
-  REVIEWING: { label: "Elbírálás alatt", color: "bg-blue-100 text-blue-700" },
-  APPROVED:  { label: "Elfogadva",       color: "bg-green-100 text-green-700" },
-  REJECTED:  { label: "Elutasítva",      color: "bg-red-100 text-red-700" },
-  WITHDRAWN: { label: "Visszavont",      color: "bg-gray-100 text-gray-500" },
-};
-
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
+
+  const t = await getTranslations("dashboard");
+
+  const APP_STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
+    INVITED:   { label: t("appStatusInvited"),   color: "bg-purple-100 text-purple-700" },
+    PENDING:   { label: t("appStatusPending"),   color: "bg-yellow-100 text-yellow-700" },
+    REVIEWING: { label: t("appStatusReviewing"), color: "bg-blue-100 text-blue-700" },
+    APPROVED:  { label: t("appStatusApproved"),  color: "bg-green-100 text-green-700" },
+    REJECTED:  { label: t("appStatusRejected"),  color: "bg-red-100 text-red-700" },
+    WITHDRAWN: { label: t("appStatusWithdrawn"), color: "bg-gray-100 text-gray-500" },
+  };
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -45,7 +48,7 @@ export default async function DashboardPage() {
     if (!shelterId) {
       return (
         <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-          Még nincs menhelyhez rendelve a fiókod.
+          {t("noShelterAssigned")}
         </div>
       );
     }
@@ -139,42 +142,42 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900">Áttekintés</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("pageOverviewTitle")}</h1>
           <PageInfo page="overview" />
         </div>
 
         {/* KPI cards */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
-            label="Összes állat"
+            label={t("kpiTotalAnimals")}
             value={totalAnimals}
             icon={PawPrint}
             iconBg="bg-brand-50"
             iconColor="text-brand-500"
           />
           <KpiCard
-            label="Várakozó kérelem"
+            label={t("kpiPendingApps")}
             value={pendingApps}
             icon={ClipboardList}
             iconBg="bg-yellow-50"
             iconColor="text-yellow-500"
-            trend={{ value: pendingApps, label: "jóváhagyásra vár" }}
+            trend={{ value: pendingApps, label: t("kpiPendingAppointmentsLabel") }}
           />
           <KpiCard
-            label="Időpontok"
+            label={t("kpiAppointments")}
             value={pendingAppointments + confirmedAppointments}
             icon={CalendarDays}
             iconBg="bg-purple-50"
             iconColor="text-purple-500"
-            trend={{ value: pendingAppointments, label: "visszaigazolásra vár" }}
+            trend={{ value: pendingAppointments, label: t("kpiPendingApptWait") }}
           />
           <KpiCard
-            label="Örökbefogadás (hónap)"
+            label={t("kpiAdoptionsThisMonth")}
             value={adoptedThisMonth}
             icon={Heart}
             iconBg="bg-blue-50"
             iconColor="text-blue-500"
-            trend={{ value: adoptionTrend, label: "vs. előző hónap" }}
+            trend={{ value: adoptionTrend, label: t("kpiVsPrevMonth") }}
           />
         </div>
 
@@ -182,18 +185,18 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Donut chart */}
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
-            <h2 className="mb-1 text-sm font-semibold text-gray-700">Állatok státusz szerint</h2>
-            <p className="mb-4 text-xs text-gray-400">Jelenlegi megoszlás</p>
+            <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAnimalsByStatusTitle")}</h2>
+            <p className="mb-4 text-xs text-gray-400">{t("chartAnimalsByStatusSubtitle")}</p>
             {animalStatusData.length > 0
               ? <AnimalsDonut data={animalStatusData} />
-              : <p className="py-16 text-center text-sm text-gray-400">Nincs adat</p>
+              : <p className="py-16 text-center text-sm text-gray-400">{t("chartNoData")}</p>
             }
           </div>
 
           {/* Applications bar chart */}
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-3">
-            <h2 className="mb-1 text-sm font-semibold text-gray-700">Kérelmek havi bontásban</h2>
-            <p className="mb-4 text-xs text-gray-400">Elmúlt 6 hónap</p>
+            <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsMonthlyTitle")}</h2>
+            <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <ApplicationsBar data={appsChartData} />
           </div>
         </div>
@@ -202,26 +205,26 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Adoptions line */}
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
-            <h2 className="mb-1 text-sm font-semibold text-gray-700">Örökbefogadások trendje</h2>
-            <p className="mb-4 text-xs text-gray-400">Elmúlt 6 hónap</p>
+            <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAdoptionsTrendTitle")}</h2>
+            <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <AdoptionsLine data={adoptionMonths.map(m => ({ month: m.month, adoptions: m.count }))} />
           </div>
 
           {/* Donations + subs */}
           <div className="space-y-4">
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <p className="text-xs font-medium text-gray-500">Összegyűjtött adományok</p>
+              <p className="text-xs font-medium text-gray-500">{t("donationsCollectedLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-emerald-700">
                 {(donationsAgg._sum.amount ?? 0).toLocaleString("hu-HU")}
                 <span className="ml-1 text-sm font-medium text-gray-400">HUF</span>
               </p>
             </div>
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <p className="text-xs font-medium text-gray-500">Aktív előfizetők</p>
+              <p className="text-xs font-medium text-gray-500">{t("activeSubscribersLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-purple-700">{activeSubsCount}</p>
               <Link href="/dashboard/subscriptions"
                 className="mt-2 block text-xs font-medium text-brand-500 hover:underline">
-                Részletek →
+                {t("detailsLink")}
               </Link>
             </div>
             <Link href="/dashboard/appointments"
@@ -233,7 +236,7 @@ export default async function DashboardPage() {
               )}>
               <div>
                 <p className={`text-xs font-medium ${pendingAppointments > 0 ? "text-amber-600" : "text-gray-500"}`}>
-                  Visszaigazolásra vár
+                  {t("awaitingConfirmationLabel")}
                 </p>
                 <p className={`mt-1 text-2xl font-bold ${pendingAppointments > 0 ? "text-amber-700" : "text-gray-700"}`}>
                   {pendingAppointments}
@@ -247,22 +250,22 @@ export default async function DashboardPage() {
         {/* Recent applications */}
         <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <h2 className="text-sm font-semibold text-gray-700">Legutóbbi kérelmek</h2>
+            <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
             <Link href="/dashboard/applications" className="text-xs font-medium text-brand-500 hover:underline">
-              Összes →
+              {t("allApplicationsLink")}
             </Link>
           </div>
           {recentApps.length === 0 ? (
-            <p className="px-5 py-6 text-sm text-gray-400">Nincs kérelem.</p>
+            <p className="px-5 py-6 text-sm text-gray-400">{t("noApplications")}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
                   <tr>
-                    <th className="px-4 py-3 text-left">Állat</th>
-                    <th className="hidden px-4 py-3 text-left sm:table-cell">Kérelmező</th>
-                    <th className="px-4 py-3 text-left">Státusz</th>
-                    <th className="px-4 py-3 text-left">Dátum</th>
+                    <th className="px-4 py-3 text-left">{t("tableAnimal")}</th>
+                    <th className="hidden px-4 py-3 text-left sm:table-cell">{t("tableApplicant")}</th>
+                    <th className="px-4 py-3 text-left">{t("tableStatus")}</th>
+                    <th className="px-4 py-3 text-left">{t("tableDate")}</th>
                     <th className="px-4 py-3 text-left"></th>
                   </tr>
                 </thead>
@@ -286,7 +289,7 @@ export default async function DashboardPage() {
                         <td className="px-4 py-2.5">
                           <Link href={`/dashboard/applications/${app.id}`}
                             className="text-brand-500 hover:underline">
-                            Részletek
+                            {t("tableDetails")}
                           </Link>
                         </td>
                       </tr>
@@ -389,52 +392,52 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-gray-900">Főadmin áttekintés</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("pageSuperAdminOverviewTitle")}</h1>
         <PageInfo page="overview" />
       </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <KpiCard label="Felhasználók"  value={totalUsers}        icon={Users}        iconBg="bg-gray-100"    iconColor="text-gray-600"
-          trend={{ value: userTrend, label: "vs. előző hónap" }} />
-        <KpiCard label="Menhelyek"     value={totalShelters}     icon={Building2}    iconBg="bg-blue-50"     iconColor="text-blue-500" />
-        <KpiCard label="Állatok"       value={totalAnimals}      icon={PawPrint}     iconBg="bg-brand-50"    iconColor="text-brand-500" />
-        <KpiCard label="Kérelmek"      value={totalApplications} icon={ClipboardList} iconBg="bg-yellow-50" iconColor="text-yellow-500" />
+        <KpiCard label={t("kpiUsers")}        value={totalUsers}        icon={Users}        iconBg="bg-gray-100"    iconColor="text-gray-600"
+          trend={{ value: userTrend, label: t("kpiVsPrevMonth") }} />
+        <KpiCard label={t("kpiShelters")}     value={totalShelters}     icon={Building2}    iconBg="bg-blue-50"     iconColor="text-blue-500" />
+        <KpiCard label={t("kpiAnimals")}      value={totalAnimals}      icon={PawPrint}     iconBg="bg-brand-50"    iconColor="text-brand-500" />
+        <KpiCard label={t("kpiApplications")} value={totalApplications} icon={ClipboardList} iconBg="bg-yellow-50" iconColor="text-yellow-500" />
       </div>
 
       {/* Revenue row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <KpiCard label="Havi előfizetési bevétel" value={monthlyRevenue}       icon={TrendingUp}   iconBg="bg-purple-50" iconColor="text-purple-500" suffix="HUF" />
-        <KpiCard label="Összes adomány"           value={totalDonationsAmount} icon={DollarSign}   iconBg="bg-emerald-50" iconColor="text-emerald-500" suffix="HUF" />
+        <KpiCard label={t("kpiMonthlyRevenue")} value={monthlyRevenue}       icon={TrendingUp}   iconBg="bg-purple-50" iconColor="text-purple-500" suffix="HUF" />
+        <KpiCard label={t("kpiTotalDonations")} value={totalDonationsAmount} icon={DollarSign}   iconBg="bg-emerald-50" iconColor="text-emerald-500" suffix="HUF" />
       </div>
 
       {/* Platform health */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-sm font-bold text-gray-900">Platform állapot</h2>
+        <h2 className="mb-4 text-sm font-bold text-gray-900">{t("platformHealthTitle")}</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl bg-green-50 p-3.5">
             <p className="text-2xl font-bold text-green-600">{activeShelters}</p>
-            <p className="mt-0.5 text-xs font-medium text-green-700">Aktív menhely</p>
+            <p className="mt-0.5 text-xs font-medium text-green-700">{t("platformActiveShelters")}</p>
           </div>
           <div className="rounded-xl bg-gray-50 p-3.5">
             <p className="text-2xl font-bold text-gray-500">{suspendedShelters}</p>
-            <p className="mt-0.5 text-xs font-medium text-gray-600">Felfüggesztett menhely</p>
+            <p className="mt-0.5 text-xs font-medium text-gray-600">{t("platformSuspendedShelters")}</p>
           </div>
           <div className="rounded-xl bg-amber-50 p-3.5">
             <p className="text-2xl font-bold text-amber-600">{unverifiedShelters}</p>
-            <p className="mt-0.5 text-xs font-medium text-amber-700">Hitelesítésre vár</p>
+            <p className="mt-0.5 text-xs font-medium text-amber-700">{t("platformUnverifiedShelters")}</p>
           </div>
           <div className="rounded-xl bg-rose-50 p-3.5">
             <p className="text-2xl font-bold text-rose-600">{unverifiedUsers}</p>
-            <p className="mt-0.5 text-xs font-medium text-rose-700">Nem megerősített e-mail</p>
+            <p className="mt-0.5 text-xs font-medium text-rose-700">{t("platformUnverifiedEmails")}</p>
           </div>
         </div>
         <div className="mt-3 flex gap-3">
           <Link href="/dashboard/shelters" className="text-xs font-medium text-brand-600 hover:underline">
-            Menhelyek kezelése →
+            {t("manageSheltersLink")}
           </Link>
           <Link href="/dashboard/users" className="text-xs font-medium text-brand-600 hover:underline">
-            Felhasználók kezelése →
+            {t("manageUsersLink")}
           </Link>
         </div>
       </div>
@@ -443,42 +446,42 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link href="/dashboard/campaigns"
           className="rounded-2xl border border-orange-100 bg-orange-50 p-5 shadow-sm transition-colors hover:bg-orange-100">
-          <p className="text-xs font-medium text-orange-600">Kampány jóváhagyások</p>
+          <p className="text-xs font-medium text-orange-600">{t("pendingCampaignApprovalsLabel")}</p>
           <p className="mt-2 text-3xl font-bold text-orange-700">{pendingCampaigns}</p>
-          <p className="mt-1 text-sm font-medium text-orange-500">Jóváhagyások →</p>
+          <p className="mt-1 text-sm font-medium text-orange-500">{t("approvalsLink")}</p>
         </Link>
         <Link href="/dashboard/campaigns"
           className="rounded-2xl border border-yellow-100 bg-yellow-50 p-5 shadow-sm transition-colors hover:bg-yellow-100">
-          <p className="text-xs font-medium text-yellow-600">Kérvény sablon jóváhagyások</p>
+          <p className="text-xs font-medium text-yellow-600">{t("pendingFormApprovalsLabel")}</p>
           <p className="mt-2 text-3xl font-bold text-yellow-700">{pendingForms}</p>
-          <p className="mt-1 text-sm font-medium text-yellow-500">Jóváhagyások →</p>
+          <p className="mt-1 text-sm font-medium text-yellow-500">{t("approvalsLink")}</p>
         </Link>
       </div>
 
       {/* Applications chart */}
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <h2 className="mb-1 text-sm font-semibold text-gray-700">Kérelmek platform-szerte</h2>
-        <p className="mb-4 text-xs text-gray-400">Elmúlt 6 hónap</p>
+        <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsPlatformTitle")}</h2>
+        <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
         <ApplicationsBar data={appsChartData} />
       </div>
 
       {/* Recent applications table */}
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-sm font-semibold text-gray-700">Legutóbbi kérelmek</h2>
+          <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
         </div>
         {recentApps.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-gray-400">Nincs kérelem.</p>
+          <p className="px-5 py-6 text-sm text-gray-400">{t("noApplications")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
                 <tr>
-                  <th className="px-4 py-3 text-left">Állat</th>
-                  <th className="hidden px-4 py-3 text-left sm:table-cell">Menhely</th>
-                  <th className="hidden px-4 py-3 text-left md:table-cell">Kérelmező</th>
-                  <th className="px-4 py-3 text-left">Státusz</th>
-                  <th className="px-4 py-3 text-left">Dátum</th>
+                  <th className="px-4 py-3 text-left">{t("tableAnimal")}</th>
+                  <th className="hidden px-4 py-3 text-left sm:table-cell">{t("tableShelter")}</th>
+                  <th className="hidden px-4 py-3 text-left md:table-cell">{t("tableApplicant")}</th>
+                  <th className="px-4 py-3 text-left">{t("tableStatus")}</th>
+                  <th className="px-4 py-3 text-left">{t("tableDate")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -507,15 +510,15 @@ export default async function DashboardPage() {
       {/* Recent donations */}
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-sm font-semibold text-gray-700">Legutóbbi adományok</h2>
+          <h2 className="text-sm font-semibold text-gray-700">{t("recentDonationsTitle")}</h2>
         </div>
         {recentDonations.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-gray-400">Nincs teljesített adomány.</p>
+          <p className="px-5 py-6 text-sm text-gray-400">{t("noDonations")}</p>
         ) : (
           <ul className="divide-y divide-gray-50">
             {recentDonations.map((d) => (
               <li key={d.id} className="flex items-center justify-between px-5 py-3">
-                <span className="text-sm text-gray-700">{d.campaign?.title ?? "Ismeretlen kampány"}</span>
+                <span className="text-sm text-gray-700">{d.campaign?.title ?? t("unknownCampaign")}</span>
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-semibold text-emerald-600">{d.amount.toLocaleString("hu-HU")} HUF</span>
                   <span className="text-xs text-gray-400">

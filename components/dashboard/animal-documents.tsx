@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { FileText, Trash2, Upload, ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type Doc = {
   id:        string;
@@ -33,6 +34,7 @@ export function AnimalDocuments({
   animalId:    string;
   initialDocs: Doc[];
 }) {
+  const t = useTranslations("dashboard");
   const [docs,       setDocs]       = useState<Doc[]>(initialDocs);
   const [uploading,  setUploading]  = useState(false);
   const [deleting,   setDeleting]   = useState<string | null>(null);
@@ -65,13 +67,13 @@ export function AnimalDocuments({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? "Mentési hiba");
+        throw new Error(data.error ?? t("animalsDocSaveError"));
       }
 
       const doc = await res.json() as Doc;
       setDocs((prev) => [doc, ...prev]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Feltöltési hiba");
+      setError(err instanceof Error ? err.message : t("animalsDocUploadError"));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -79,15 +81,15 @@ export function AnimalDocuments({
   }
 
   async function handleDelete(docId: string) {
-    if (!confirm("Biztosan törlöd ezt a dokumentumot?")) return;
+    if (!confirm(t("animalsDocDeleteConfirm"))) return;
     setDeleting(docId);
     setError(null);
     try {
       const res = await fetch(`/api/animals/${animalId}/documents/${docId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Törlési hiba");
+      if (!res.ok) throw new Error(t("animalsDocDeleteError"));
       setDocs((prev) => prev.filter((d) => d.id !== docId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Törlési hiba");
+      setError(err instanceof Error ? err.message : t("animalsDocDeleteError"));
     } finally {
       setDeleting(null);
     }
@@ -111,16 +113,16 @@ export function AnimalDocuments({
           className="flex items-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-50 transition-colors"
         >
           <Upload className="h-4 w-4" />
-          {uploading ? "Feltöltés..." : "Dokumentum feltöltése"}
+          {uploading ? t("animalsDocUploading") : t("animalsDocUploadButton")}
         </button>
-        <p className="mt-1.5 text-xs text-gray-400">PDF, DOC, DOCX – max. 10 MB</p>
+        <p className="mt-1.5 text-xs text-gray-400">{t("animalsDocHint")}</p>
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       {/* Document list */}
       {docs.length === 0 ? (
-        <p className="text-sm text-gray-400">Még nincs feltöltött dokumentum.</p>
+        <p className="text-sm text-gray-400">{t("animalsDocNone")}</p>
       ) : (
         <div className="space-y-2">
           {docs.map((doc) => (
@@ -148,7 +150,7 @@ export function AnimalDocuments({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-lg p-2 text-gray-400 hover:bg-white hover:text-brand-600 transition-colors"
-                  title="Megnyitás"
+                  title={t("animalsDocOpenTitle")}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
@@ -156,7 +158,7 @@ export function AnimalDocuments({
                   onClick={() => handleDelete(doc.id)}
                   disabled={deleting === doc.id}
                   className="rounded-lg p-2 text-gray-400 hover:bg-white hover:text-red-500 disabled:opacity-50 transition-colors"
-                  title="Törlés"
+                  title={t("animalsDocDeleteTitle")}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

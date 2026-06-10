@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
@@ -14,15 +15,6 @@ import { ExportButton } from "@/components/dashboard/export-button";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
-const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
-  INVITED:   { label: "Meghívva",        color: "bg-purple-100 text-purple-700" },
-  PENDING:   { label: "Várakozó",        color: "bg-yellow-100 text-yellow-700" },
-  REVIEWING: { label: "Elbírálás alatt", color: "bg-blue-100 text-blue-700" },
-  APPROVED:  { label: "Elfogadva",       color: "bg-green-100 text-green-700" },
-  REJECTED:  { label: "Elutasítva",      color: "bg-red-100 text-red-700" },
-  WITHDRAWN: { label: "Visszavont",      color: "bg-gray-100 text-gray-500" },
-};
-
 export default async function DashboardApplicationsPage({
   searchParams,
 }: {
@@ -31,7 +23,18 @@ export default async function DashboardApplicationsPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
+  const t = await getTranslations("dashboard");
+
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+
+  const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
+    INVITED:   { label: t("appsStatusLabelInvited"),   color: "bg-purple-100 text-purple-700" },
+    PENDING:   { label: t("appsStatusLabelPending"),   color: "bg-yellow-100 text-yellow-700" },
+    REVIEWING: { label: t("appsStatusLabelReviewing"), color: "bg-blue-100 text-blue-700" },
+    APPROVED:  { label: t("appsStatusLabelApproved"),  color: "bg-green-100 text-green-700" },
+    REJECTED:  { label: t("appsStatusLabelRejected"),  color: "bg-red-100 text-red-700" },
+    WITHDRAWN: { label: t("appsStatusLabelWithdrawn"), color: "bg-gray-100 text-gray-500" },
+  };
 
   let shelterId: string | undefined;
   if (!isSuperAdmin) {
@@ -77,20 +80,20 @@ export default async function DashboardApplicationsPage({
   );
 
   const statuses: Array<{ value: string; label: string }> = [
-    { value: "",          label: "Összes" },
-    { value: "INVITED",   label: "Meghívva" },
-    { value: "PENDING",   label: "Várakozó" },
-    { value: "REVIEWING", label: "Elbírálás alatt" },
-    { value: "APPROVED",  label: "Elfogadott" },
-    { value: "REJECTED",  label: "Elutasított" },
-    { value: "WITHDRAWN", label: "Visszavont" },
+    { value: "",          label: t("appsStatusAll") },
+    { value: "INVITED",   label: t("appsStatusInvited") },
+    { value: "PENDING",   label: t("appsStatusPending") },
+    { value: "REVIEWING", label: t("appsStatusReviewing") },
+    { value: "APPROVED",  label: t("appsStatusApproved") },
+    { value: "REJECTED",  label: t("appsStatusRejected") },
+    { value: "WITHDRAWN", label: t("appsStatusWithdrawn") },
   ];
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900">Kérelmek</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("appsPageTitle")}</h1>
           <PageInfo page="applications" />
         </div>
         <ExportButton type="applications" label="CSV export" />
@@ -117,7 +120,7 @@ export default async function DashboardApplicationsPage({
       {applications.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
           <ClipboardList className="h-10 w-10 text-gray-300" />
-          <p className="mt-3 text-sm text-gray-500">Nincs kérelem ebben a kategóriában</p>
+          <p className="mt-3 text-sm text-gray-500">{t("appsEmpty")}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -157,7 +160,7 @@ export default async function DashboardApplicationsPage({
                     <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600 space-y-0.5">
                       <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span>
-                          <span className="font-medium">Kérelmező:</span>{" "}
+                          <span className="font-medium">{t("appsApplicant")}</span>{" "}
                           <Link href={`/users/${app.userId}`} className="text-brand-600 hover:underline">
                             {app.user.name ?? "–"}
                           </Link>
@@ -168,17 +171,17 @@ export default async function DashboardApplicationsPage({
                           hideWhenEmpty
                         />
                       </p>
-                      <p><span className="font-medium">Email:</span> {app.user.email}</p>
-                      {app.user.phone && <p><span className="font-medium">Telefon:</span> {app.user.phone}</p>}
+                      <p><span className="font-medium">{t("appsEmail")}</span> {app.user.email}</p>
+                      {app.user.phone && <p><span className="font-medium">{t("appsPhone")}</span> {app.user.phone}</p>}
                       {app.homeType && (
-                        <p><span className="font-medium">Lakástípus:</span>{" "}
-                          {app.homeType === "HOUSE" ? "Ház" : app.homeType === "APARTMENT" ? "Lakás" : "Egyéb"}
-                          {app.hasGarden ? " (kerttel)" : ""}
+                        <p><span className="font-medium">{t("appsHomeType")}</span>{" "}
+                          {app.homeType === "HOUSE" ? t("appsHomeHouse") : app.homeType === "APARTMENT" ? t("appsHomeApartment") : t("appsHomeOther")}
+                          {app.hasGarden ? t("appsHomeWithGarden") : ""}
                         </p>
                       )}
                       <p className="flex gap-3">
-                        {app.hasChildren && <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />Gyerek a háztartásban</span>}
-                        {app.hasPets    && <span className="flex items-center gap-1"><PawPrint className="h-3.5 w-3.5" />Van más állat</span>}
+                        {app.hasChildren && <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{t("appsHasChildren")}</span>}
+                        {app.hasPets    && <span className="flex items-center gap-1"><PawPrint className="h-3.5 w-3.5" />{t("appsHasPets")}</span>}
                       </p>
                     </div>
 
@@ -188,7 +191,7 @@ export default async function DashboardApplicationsPage({
 
                     {app.reviewNotes && (
                       <p className="text-xs text-gray-500">
-                        <span className="font-medium">Megjegyzés:</span> {app.reviewNotes}
+                        <span className="font-medium">{t("appsNote")}</span> {app.reviewNotes}
                       </p>
                     )}
 
@@ -203,18 +206,18 @@ export default async function DashboardApplicationsPage({
                         {formFilled ? (
                           <>
                             <FileText className="h-3.5 w-3.5 shrink-0 text-brand-500" />
-                            <span className="flex-1 font-medium text-brand-700">A kérvény be lett küldve</span>
+                            <span className="flex-1 font-medium text-brand-700">{t("appsFormSubmitted")}</span>
                             <Link
                               href={`/dashboard/applications/${app.id}`}
                               className="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-600 transition-colors"
                             >
-                              Megtekintés
+                              {t("appsFormView")}
                             </Link>
                           </>
                         ) : (
                           <>
                             <Clock className="h-3.5 w-3.5 shrink-0 text-yellow-600" />
-                            <span className="text-yellow-700">Még nem küldte be a kérvényt</span>
+                            <span className="text-yellow-700">{t("appsFormNotYet")}</span>
                           </>
                         )}
                       </div>

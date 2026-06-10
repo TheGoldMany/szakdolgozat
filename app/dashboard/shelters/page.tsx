@@ -6,6 +6,7 @@ import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck, Power, 
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
 import { PageInfo } from "@/components/dashboard/page-info";
+import { useTranslations } from "next-intl";
 
 interface ShelterAdmin {
   user: { name: string | null; email: string };
@@ -27,6 +28,7 @@ interface Shelter {
 }
 
 export default function DashboardSheltersPage() {
+  const t = useTranslations("dashboard");
   const [shelters, setShelters]     = useState<Shelter[]>([]);
   const [loading, setLoading]       = useState(true);
   const [showForm, setShowForm]     = useState(false);
@@ -68,17 +70,17 @@ export default function DashboardSheltersPage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Menhelyek</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("sheltersPageTitle")}</h1>
             <PageInfo page="shelters" />
           </div>
-          <p className="mt-1 text-sm text-gray-500">{shelters.length} menhely a rendszerben</p>
+          <p className="mt-1 text-sm text-gray-500">{t("sheltersCountLabel", { count: shelters.length })}</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Menhely hozzáadása
+          {t("sheltersAddButton")}
         </button>
       </div>
 
@@ -86,7 +88,7 @@ export default function DashboardSheltersPage() {
       {showForm && (
         <div className="rounded-2xl border border-brand-200 bg-white p-6 shadow-sm">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Új menhely létrehozása</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t("sheltersNewTitle")}</h2>
           </div>
           <AddShelterForm onClose={handleClose} />
         </div>
@@ -102,12 +104,12 @@ export default function DashboardSheltersPage() {
       ) : shelters.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
           <Building2 className="mx-auto h-10 w-10 text-gray-300" />
-          <p className="mt-3 text-gray-500">Még nincs menhely a rendszerben.</p>
+          <p className="mt-3 text-gray-500">{t("sheltersEmpty")}</p>
           <button
             onClick={() => setShowForm(true)}
             className="mt-4 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
           >
-            Első menhely hozzáadása
+            {t("sheltersAddFirstButton")}
           </button>
         </div>
       ) : (
@@ -115,10 +117,10 @@ export default function DashboardSheltersPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
               <tr>
-                <th className="px-4 py-3 text-left">Menhely</th>
-                <th className="hidden px-4 py-3 text-left sm:table-cell">Admin fiók</th>
-                <th className="hidden px-4 py-3 text-left md:table-cell">Állatok</th>
-                <th className="px-4 py-3 text-left">Státusz</th>
+                <th className="px-4 py-3 text-left">{t("sheltersColName")}</th>
+                <th className="hidden px-4 py-3 text-left sm:table-cell">{t("sheltersColAdmin")}</th>
+                <th className="hidden px-4 py-3 text-left md:table-cell">{t("sheltersColAnimals")}</th>
+                <th className="px-4 py-3 text-left">{t("sheltersColStatus")}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -151,7 +153,7 @@ export default function DashboardSheltersPage() {
                         <p className="text-xs text-gray-400">{shelter.admins[0].user.email}</p>
                       </div>
                     ) : (
-                      <span className="text-gray-300">Nincs admin</span>
+                      <span className="text-gray-300">{t("sheltersNoAdmin")}</span>
                     )}
                   </td>
 
@@ -165,7 +167,7 @@ export default function DashboardSheltersPage() {
                       <button
                         onClick={() => toggle(shelter.id, "isActive", !shelter.isActive)}
                         disabled={busy === `${shelter.id}:isActive`}
-                        title={shelter.isActive ? "Felfüggesztés" : "Aktiválás"}
+                        title={shelter.isActive ? t("sheltersTooltipSuspend") : t("sheltersTooltipActivate")}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
                           shelter.isActive
@@ -176,14 +178,14 @@ export default function DashboardSheltersPage() {
                         {busy === `${shelter.id}:isActive`
                           ? <Loader2 className="h-3 w-3 animate-spin" />
                           : <Power className="h-3 w-3" />}
-                        {shelter.isActive ? "Aktív" : "Inaktív"}
+                        {shelter.isActive ? t("sheltersStatusActive") : t("sheltersStatusInactive")}
                       </button>
 
                       {/* Ellenőrzött kapcsoló */}
                       <button
                         onClick={() => toggle(shelter.id, "isVerified", !shelter.isVerified)}
                         disabled={busy === `${shelter.id}:isVerified`}
-                        title={shelter.isVerified ? "Hitelesítés visszavonása" : "Hitelesítés"}
+                        title={shelter.isVerified ? t("sheltersTooltipUnverify") : t("sheltersTooltipVerify")}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
                           shelter.isVerified
@@ -194,7 +196,7 @@ export default function DashboardSheltersPage() {
                         {busy === `${shelter.id}:isVerified`
                           ? <Loader2 className="h-3 w-3 animate-spin" />
                           : <BadgeCheck className="h-3 w-3" />}
-                        {shelter.isVerified ? "Ellenőrzött" : "Nem ellenőrzött"}
+                        {shelter.isVerified ? t("sheltersStatusVerified") : t("sheltersStatusUnverified")}
                       </button>
                     </div>
                   </td>
@@ -206,7 +208,7 @@ export default function DashboardSheltersPage() {
                       className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      Megtekint
+                      {t("sheltersViewButton")}
                     </Link>
                   </td>
                 </tr>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Package, AlertTriangle, Clock, Tag, Plus } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -12,18 +13,20 @@ import { InventoryList } from "@/components/inventory/inventory-list";
 export const metadata: Metadata = { title: "Készlet" };
 export const dynamic = "force-dynamic";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  FOOD:      "Takarmány",
-  MEDICINE:  "Gyógyszer",
-  SUPPLIES:  "Kellékek",
-  CLEANING:  "Tisztítószer",
-  EQUIPMENT: "Eszköz",
-  OTHER:     "Egyéb",
-};
-
 export default async function InventoryPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+
+  const t = await getTranslations("dashboard");
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    FOOD:      t("inventoryCategoryFood"),
+    MEDICINE:  t("inventoryCategoryMedicine"),
+    SUPPLIES:  t("inventoryCategorySupplies"),
+    CLEANING:  t("inventoryCategoryCleaning"),
+    EQUIPMENT: t("inventoryCategoryEquipment"),
+    OTHER:     t("inventoryCategoryOther"),
+  };
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -40,7 +43,7 @@ export default async function InventoryPage() {
     if (!admin) {
       return (
         <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-          Még nincs menhelyhez rendelve a fiókod.
+          {t("inventoryNoShelter")}
         </div>
       );
     }
@@ -88,7 +91,7 @@ export default async function InventoryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold text-gray-900">Készlet</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("inventoryTitle")}</h1>
           <PageInfo page="inventory" />
         </div>
         <Link
@@ -96,35 +99,35 @@ export default async function InventoryPage() {
           className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Új tétel
+          {t("inventoryNewButton")}
         </Link>
       </div>
 
-      {/* KPI-k */}
+      {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
-          label="Összes tétel"
+          label={t("inventoryKpiTotal")}
           value={totalItems}
           icon={Package}
           iconBg="bg-brand-50"
           iconColor="text-brand-500"
         />
         <KpiCard
-          label="Alacsony készlet"
+          label={t("inventoryKpiLowStock")}
           value={lowStockItems.length}
           icon={AlertTriangle}
           iconBg={lowStockItems.length > 0 ? "bg-red-50" : "bg-gray-50"}
           iconColor={lowStockItems.length > 0 ? "text-red-500" : "text-gray-400"}
         />
         <KpiCard
-          label="Hamarosan lejár (7 nap)"
+          label={t("inventoryKpiExpiring")}
           value={expiringItems.length + expiredItems.length}
           icon={Clock}
           iconBg={(expiringItems.length + expiredItems.length) > 0 ? "bg-amber-50" : "bg-gray-50"}
           iconColor={(expiringItems.length + expiredItems.length) > 0 ? "text-amber-500" : "text-gray-400"}
         />
         <KpiCard
-          label={topCat ? CATEGORY_LABELS[topCat[0]] ?? topCat[0] : "Kategória"}
+          label={topCat ? CATEGORY_LABELS[topCat[0]] ?? topCat[0] : t("inventoryKpiCategory")}
           value={topCat ? topCat[1] : 0}
           icon={Tag}
           iconBg="bg-purple-50"
@@ -132,7 +135,7 @@ export default async function InventoryPage() {
         />
       </div>
 
-      {/* Lista */}
+      {/* List */}
       <InventoryList
         items={serialisedItems}
         shelterId={shelterId}

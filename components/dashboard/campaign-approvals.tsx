@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -23,6 +24,7 @@ function formatHUF(amount: number) {
 }
 
 export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps) {
+  const t = useTranslations("dashboard");
   const [campaigns, setCampaigns] = useState<PendingCampaign[]>(initial);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +40,11 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Hiba történt");
+        throw new Error(data.error ?? t("analyticsError"));
       }
       setCampaigns((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba");
+      setError(err instanceof Error ? err.message : t("campaignsError"));
     } finally {
       setLoadingId(null);
     }
@@ -52,7 +54,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
         <CheckCircle2 className="h-10 w-10 text-gray-300" />
-        <p className="mt-3 text-sm text-gray-500">Nincs jóváhagyásra váró gyűjtés.</p>
+        <p className="mt-3 text-sm text-gray-500">{t("campaignsPending")}</p>
       </div>
     );
   }
@@ -74,9 +76,9 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                 <span>
-                  Beküldő:{" "}
+                  {t("campaignsSubmitter")}{" "}
                   <span className="font-medium text-gray-700">
-                    {c.user.name ?? c.user.email ?? "Névtelen"}
+                    {c.user.name ?? c.user.email ?? t("campaignsAnonymous")}
                   </span>
                 </span>
                 {c.shelter && (
@@ -87,7 +89,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
                 )}
                 <span className="text-gray-300">·</span>
                 <span>
-                  Célösszeg:{" "}
+                  {t("campaignsTargetAmount")}{" "}
                   <span className="font-medium text-gray-700">{formatHUF(c.targetAmount)}</span>
                 </span>
                 <span className="text-gray-300">·</span>
@@ -113,7 +115,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
                 className="gap-1.5"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Jóváhagyás
+                {t("campaignsApprove")}
               </Button>
               <Button
                 size="sm"
@@ -123,7 +125,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
                 className="gap-1.5"
               >
                 <XCircle className="h-3.5 w-3.5" />
-                Elutasítás
+                {t("campaignsReject")}
               </Button>
             </div>
           </div>
