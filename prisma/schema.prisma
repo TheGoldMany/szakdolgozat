@@ -514,6 +514,13 @@ enum ReportStatus {
   CLOSED // Lezárt
 }
 
+// Kép-alapú elveszett-talált párosítás eredménye
+enum MatchVerdict {
+  LIKELY // Valószínű egyezés
+  POSSIBLE // Lehetséges egyezés
+  UNLIKELY // Valószínűtlen
+}
+
 model AnimalReport {
   id           String       @id @default(cuid())
   userId       String?
@@ -536,12 +543,50 @@ model AnimalReport {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // AI kép-elemzés (Claude Vision) – strukturált leíró a párosításhoz
+  aiAnalyzed     Boolean   @default(false)
+  aiAnalyzedAt   DateTime?
+  aiSpecies      String? // felismert faj
+  aiBreed        String? // becsült fajta
+  aiColors       String[] // domináns színek
+  aiPattern      String? // mintázat (pl. cirmos, foltos)
+  aiSize         String? // becsült méret
+  aiFeatures     String[] // megkülönböztető jegyek
+  aiHasCollar    Boolean?
+  aiSummary      String?   @db.Text // rövid kereshető összefoglaló
+
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  matchesA  ReportMatch[] @relation("ReportMatchA")
+  matchesB  ReportMatch[] @relation("ReportMatchB")
 
   @@index([type])
   @@index([status])
   @@index([city])
   @@index([animalType])
+}
+
+// Két bejelentés (jellemzően egy LOST és egy FOUND/STRAY) közötti párosítás.
+// reportA a "lekérdező" (általában az elveszett), reportB a jelölt.
+model ReportMatch {
+  id         String       @id @default(cuid())
+  reportAId  String
+  reportA    AnimalReport @relation("ReportMatchA", fields: [reportAId], references: [id], onDelete: Cascade)
+  reportBId  String
+  reportB    AnimalReport @relation("ReportMatchB", fields: [reportBId], references: [id], onDelete: Cascade)
+  score      Float // 0..1 összesített pontszám
+  verdict    MatchVerdict
+  reasons    String[] // emberi nyelvű indoklás (magyar)
+  distanceKm Float?
+  daysApart  Int?
+  dismissed  Boolean      @default(false) // "ez nem az" visszajelzés
+  notified   Boolean      @default(false) // értesítő email kiment-e
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([reportAId, reportBId])
+  @@index([reportAId])
+  @@index([reportBId])
+  @@index([verdict])
 }
 
 // -------------------------------------------------------

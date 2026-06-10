@@ -55,6 +55,7 @@ export function ReportForm() {
   const t  = useTranslations("reports");
   const tc = useTranslations("common");
   const [serverError, setServerError] = useState<string | null>(null);
+  const [matching, setMatching]       = useState(false);
 
   const schema = buildSchema(t);
 
@@ -97,7 +98,16 @@ export function ReportForm() {
     });
     const json = await res.json();
     if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
-    router.push(`/reports/${json.report.id}`);
+
+    // Kép-alapú párosítás futtatása (legjobb tudás szerint, hibatűrően).
+    const reportId = json.report.id;
+    setMatching(true);
+    try {
+      await fetch(`/api/reports/${reportId}/match`, { method: "POST" });
+    } catch {
+      /* a párosítás hibája ne akadályozza a bejelentés megtekintését */
+    }
+    router.push(`/reports/${reportId}`);
   }
 
   return (
@@ -246,9 +256,9 @@ export function ReportForm() {
         </div>
       </div>
 
-      <button type="submit" disabled={isSubmitting}
+      <button type="submit" disabled={isSubmitting || matching}
         className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
-        {isSubmitting ? t("formSubmitting") : t("formSubmit")}
+        {matching ? t("formMatching") : isSubmitting ? t("formSubmitting") : t("formSubmit")}
       </button>
     </form>
   );

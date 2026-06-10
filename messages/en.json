@@ -411,7 +411,15 @@
     "formSubmitting": "Sending...",
     "validationRequired": "Required field",
     "validationDescMin": "At least 10 characters required",
-    "validationInvalidEmail": "Invalid email address"
+    "validationInvalidEmail": "Invalid email address",
+    "formMatching": "Searching for similar reports…",
+    "matchesTitle": "Possible matches",
+    "matchesIntro": "The system used artificial intelligence to compare the photos and details. The reports below may match – be sure to verify them in person too.",
+    "matchLikely": "Likely match",
+    "matchPossible": "Possible match",
+    "matchUnlikely": "Uncertain",
+    "matchDismiss": "Not a match",
+    "matchContact": "Get in touch"
   },
   "help": {
     "title": "User guide",

@@ -411,7 +411,15 @@
     "formSubmitting": "Wysyłanie...",
     "validationRequired": "Pole wymagane",
     "validationDescMin": "Wymagane co najmniej 10 znaków",
-    "validationInvalidEmail": "Nieprawidłowy adres e-mail"
+    "validationInvalidEmail": "Nieprawidłowy adres e-mail",
+    "formMatching": "Wyszukiwanie podobnych zgłoszeń…",
+    "matchesTitle": "Możliwe dopasowania",
+    "matchesIntro": "System porównał zdjęcia i dane przy użyciu sztucznej inteligencji. Poniższe zgłoszenia mogą pasować – koniecznie zweryfikuj je również osobiście.",
+    "matchLikely": "Prawdopodobne dopasowanie",
+    "matchPossible": "Możliwe dopasowanie",
+    "matchUnlikely": "Niepewne",
+    "matchDismiss": "To nie to",
+    "matchContact": "Skontaktuj się"
   },
   "help": {
     "title": "Podręcznik użytkownika",

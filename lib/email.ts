@@ -512,6 +512,50 @@ export async function sendTransferResolvedEmail(opts: {
   });
 }
 
+export async function sendReportMatchEmail(opts: {
+  to:            string;
+  contactName:   string;
+  matchType:     string;   // a másik bejelentés típusa szövegesen (pl. "megtalált")
+  reasons:       string[]; // magyarázó indoklások
+  reportUrl:     string;   // a SAJÁT bejelentés oldala (ahol a találatok láthatók)
+}) {
+  const reasonList = opts.reasons.length
+    ? `<ul style="margin:12px 0;padding-left:18px;color:#374151;font-size:14px;line-height:1.7">
+         ${opts.reasons.map((r) => `<li>${r}</li>`).join("")}
+       </ul>`
+    : "";
+
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Lehetséges egyezés a bejelentésedre – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+          Találtunk egy lehetséges egyezést! 🐾
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.contactName}!<br/>
+          Egy újabb <strong>${opts.matchType}</strong> bejelentés érkezett, amely a rendszerünk
+          szerint egyezhet az általad beküldött bejelentéssel.
+        </p>
+        ${reasonList}
+        <a href="${opts.reportUrl}"
+           style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                  font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+          Egyezés megtekintése
+        </a>
+        <p style="color:#9ca3af;font-size:12px">
+          A találatot mesterséges intelligencia javasolta, ezért érdemes a fotókat és az adatokat
+          személyesen is összevetni.
+        </p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
+        <p style="color:#9ca3af;font-size:11px">ÁllatiMenhelyek.hu</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendVerificationEmail(email: string, token: string, name?: string | null) {
   const url = `${BASE}/auth/verify-email?token=${token}`;
 

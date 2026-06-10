@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { ResolveButton } from "@/components/reports/resolve-button";
+import { ReportMatches, type MatchView } from "@/components/reports/report-matches";
 import { StaticMap } from "@/components/ui/static-map";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus } from "@prisma/client";
@@ -46,6 +47,52 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
   ]);
 
   if (!report) notFound();
+
+  const isOwnerOrAdminForMatches =
+    (session?.user?.id && report.userId === session.user.id) ||
+    session?.user?.role === "SUPER_ADMIN" ||
+    session?.user?.role === "SHELTER_ADMIN";
+
+  // Kép-alapú párosítási találatok (mindkét irány), a nem elvetettek.
+  const matchRows = await prisma.reportMatch.findMany({
+    where: {
+      dismissed: false,
+      OR: [{ reportAId: report.id }, { reportBId: report.id }],
+    },
+    include: {
+      reportA: true,
+      reportB: true,
+    },
+    orderBy: [{ verdict: "asc" }, { score: "desc" }],
+  });
+
+  const VERDICT_ORDER: Record<string, number> = { LIKELY: 0, POSSIBLE: 1, UNLIKELY: 2 };
+  const matches: MatchView[] = matchRows
+    .map((row) => {
+      const cp = row.reportAId === report.id ? row.reportB : row.reportA;
+      return {
+        id: row.id,
+        verdict: row.verdict,
+        score: row.score,
+        reasons: row.reasons,
+        distanceKm: row.distanceKm,
+        daysApart: row.daysApart,
+        counterpart: {
+          id: cp.id,
+          type: cp.type,
+          name: cp.name,
+          breed: cp.breed,
+          color: cp.color,
+          imageUrl: cp.imageUrl,
+          city: cp.city,
+          createdAt: cp.createdAt.toISOString(),
+          contactName: cp.contactName,
+          contactPhone: cp.contactPhone,
+          contactEmail: cp.contactEmail,
+        },
+      };
+    })
+    .sort((a, b) => VERDICT_ORDER[a.verdict] - VERDICT_ORDER[b.verdict] || b.score - a.score);
 
   const TYPE_LABEL: Record<ReportType, string> = {
     LOST: t("lost"), FOUND: t("found"), STRAY: t("stray"),
@@ -160,6 +207,8 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             {canResolve && <ResolveButton reportId={report.id} />}
           </div>
         </div>
+
+        <ReportMatches matches={matches} canManage={!!isOwnerOrAdminForMatches} />
       </div>
     </div>
   );

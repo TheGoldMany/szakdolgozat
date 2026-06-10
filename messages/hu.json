@@ -411,7 +411,15 @@
     "formSubmitting": "Küldés...",
     "validationRequired": "Kötelező mező",
     "validationDescMin": "Legalább 10 karakter szükséges",
-    "validationInvalidEmail": "Érvénytelen e-mail cím"
+    "validationInvalidEmail": "Érvénytelen e-mail cím",
+    "formMatching": "Hasonló bejelentések keresése…",
+    "matchesTitle": "Lehetséges egyezések",
+    "matchesIntro": "A rendszer mesterséges intelligenciával hasonlította össze a fotókat és az adatokat. Az alábbi bejelentések egyezhetnek – mindenképp vesd össze őket személyesen is.",
+    "matchLikely": "Valószínű egyezés",
+    "matchPossible": "Lehetséges egyezés",
+    "matchUnlikely": "Bizonytalan",
+    "matchDismiss": "Ez nem az",
+    "matchContact": "Kapcsolatfelvétel"
   },
   "help": {
     "title": "Útmutató",

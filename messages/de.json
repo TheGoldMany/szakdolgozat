@@ -411,7 +411,15 @@
     "formSubmitting": "Wird gesendet...",
     "validationRequired": "Pflichtfeld",
     "validationDescMin": "Mindestens 10 Zeichen erforderlich",
-    "validationInvalidEmail": "Ungültige E-Mail-Adresse"
+    "validationInvalidEmail": "Ungültige E-Mail-Adresse",
+    "formMatching": "Suche nach ähnlichen Meldungen…",
+    "matchesTitle": "Mögliche Übereinstimmungen",
+    "matchesIntro": "Das System hat die Fotos und Daten mit künstlicher Intelligenz verglichen. Die folgenden Meldungen könnten übereinstimmen – bitte überprüfe sie auf jeden Fall auch persönlich.",
+    "matchLikely": "Wahrscheinliche Übereinstimmung",
+    "matchPossible": "Mögliche Übereinstimmung",
+    "matchUnlikely": "Unsicher",
+    "matchDismiss": "Das ist es nicht",
+    "matchContact": "Kontakt aufnehmen"
   },
   "help": {
     "title": "Benutzerhandbuch",
