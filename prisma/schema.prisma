@@ -242,6 +242,7 @@ model Shelter {
   events               Event[]
   transfersFrom        AnimalTransfer[]  @relation("TransferFrom")
   transfersTo          AnimalTransfer[]  @relation("TransferTo")
+  feedingSchedules     FeedingSchedule[]
 }
 
 model ShelterDocument {
@@ -996,6 +997,7 @@ model InventoryItem {
 
   transactions     InventoryTransaction[]
   fosterSupplyLogs FosterSupplyLog[]
+  feedingSchedules FeedingSchedule[]
 
   @@index([shelterId])
   @@index([category])
@@ -1165,4 +1167,56 @@ model AnimalTransfer {
   @@index([fromShelterId])
   @@index([toShelterId])
   @@index([status])
+}
+
+// -------------------------------------------------------
+// Feeding Schedule (Automatikus etetési rend)
+// -------------------------------------------------------
+
+enum FeedingFrequency {
+  ONCE_DAILY  // Naponta 1×
+  TWICE_DAILY // Naponta 2×
+  THREE_DAILY // Naponta 3×
+  WEEKLY      // Heti rendszerességgel
+}
+
+model FeedingSchedule {
+  id                 String           @id @default(cuid())
+  shelterId          String
+  shelter            Shelter          @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  name               String
+  inventoryItemId    String
+  inventoryItem      InventoryItem    @relation(fields: [inventoryItemId], references: [id])
+  quantityPerFeeding Float
+  frequency          FeedingFrequency
+  times              String[]         // ["08:00", "18:00"] HH:MM formátum
+  weekDays           Int[]            // [0..6] hétfő=0, csak WEEKLY esetén releváns, üres = minden nap
+  isActive           Boolean          @default(true)
+  nextRunAt          DateTime
+  lastRunAt          DateTime?
+  note               String?          @db.Text
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  logs               FeedingLog[]
+
+  @@index([shelterId])
+  @@index([isActive, nextRunAt])
+}
+
+model FeedingLog {
+  id           String          @id @default(cuid())
+  scheduleId   String
+  schedule     FeedingSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleName String
+  itemName     String
+  unit         String
+  quantity     Float
+  executedAt   DateTime        @default(now())
+  skipped      Boolean         @default(false)
+  skipReason   String?
+  txId         String?
+
+  @@index([scheduleId])
+  @@index([executedAt])
 }
