@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Cell, PieChart, Pie, Legend,
 } from "recharts";
 import { Database } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AgeCatRow  { category: string; label: string; count: number }
 interface AppCntRow  { label: string; count: number }
@@ -28,6 +29,7 @@ const AGE_COLORS: Record<string, string> = {
 const APP_COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444"];
 
 export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross, dwhAvailable }: Props) {
+  const t = useTranslations("dashboard");
   const total = ageCategoryDist.reduce((s, r) => s + r.count, 0);
 
   return (
@@ -54,7 +56,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
       )}
 
       {dwhAvailable && total === 0 && (
-        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendő DWH-adat. Futtasd le az ETL-t!</p>
+        <p className="text-sm text-gray-400 py-4 text-center">{t("chartNoData")}</p>
       )}
 
       {dwhAvailable && total > 0 && (

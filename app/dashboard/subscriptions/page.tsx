@@ -94,18 +94,18 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
       {/* Table */}
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
         {subscriptions.length === 0 ? (
-          <p className="px-5 py-8 text-sm text-gray-400">Nincs előfizető.</p>
+          <p className="px-5 py-8 text-sm text-gray-400">{t("subscriptionsEmpty")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
                 <tr>
-                  <th className="px-4 py-3 text-left">Felhasználó</th>
-                  <th className="px-4 py-3 text-left">Csomag</th>
-                  <th className="px-4 py-3 text-left">Összeg</th>
-                  <th className="px-4 py-3 text-left">Státusz</th>
-                  <th className="px-4 py-3 text-left">Feliratkozott</th>
-                  <th className="px-4 py-3 text-left">Lemondás</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColUser")}</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColPlan")}</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColAmount")}</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColStatus")}</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColSince")}</th>
+                  <th className="px-4 py-3 text-left">{t("subscriptionsColCancel")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -133,7 +133,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                             : "bg-gray-100 text-gray-500"
                         )}
                       >
-                        {sub.status === "ACTIVE" ? "Aktív" : "Lemondott"}
+                        {sub.status === "ACTIVE" ? t("subscriptionsStatusActive") : t("subscriptionsStatusCancelled")}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-gray-400">

@@ -31,7 +31,7 @@ export default async function EditFormPage({ params }: { params: { id: string } 
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Sablon szerkesztése</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">{t("formEditPageTitle")}</h1>
       <FormBuilder
         formId={form.id}
         initialTitle={form.title}

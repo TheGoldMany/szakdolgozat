@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Cell,
 } from "recharts";
 import { Database, Clock, CalendarDays, PartyPopper } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface QuarterRow { quarter: number; label: string; count: number }
 interface WeekdayRow { day: number; label: string; count: number }
@@ -32,6 +33,7 @@ function formatDate(iso: string): string {
 }
 
 export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount, lastEtl, dwhAvailable }: Props) {
+  const t = useTranslations("dashboard");
   const total = byQuarter.reduce((s, r) => s + r.count, 0);
 
   return (
@@ -87,7 +89,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
       )}
 
       {dwhAvailable && total === 0 && (
-        <p className="text-sm text-gray-400 py-4 text-center">Nincs elegendő DWH-adat. Futtasd le az ETL-t!</p>
+        <p className="text-sm text-gray-400 py-4 text-center">{t("chartNoData")}</p>
       )}
 
       {dwhAvailable && total > 0 && (

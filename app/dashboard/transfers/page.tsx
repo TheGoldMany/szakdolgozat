@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ArrowRightLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -14,6 +15,8 @@ export const dynamic = "force-dynamic";
 export default async function DashboardTransfersPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+
+  const t = await getTranslations("dashboard");
 
   let shelterIds: string[];
   if (session.user.role === "SUPER_ADMIN") {
@@ -79,12 +82,12 @@ export default async function DashboardTransfersPage() {
         <ArrowRightLeft className="h-6 w-6 text-brand-500" />
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">Áthelyezések</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("transfersPageTitle")}</h1>
             <PageInfo page="transfers" />
           </div>
           <p className="text-sm text-gray-500">
-            {transfers.length} kérelem összesen
-            {pending > 0 && <span className="ml-1 font-semibold text-yellow-700">&bull; {pending} várakozó</span>}
+            {t("transfersTotal", { count: transfers.length })}
+            {pending > 0 && <span className="ml-1 font-semibold text-yellow-700">&bull; {t("transfersPending", { count: pending })}</span>}
           </p>
         </div>
       </div>

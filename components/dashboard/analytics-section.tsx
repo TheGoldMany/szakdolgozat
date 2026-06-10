@@ -82,6 +82,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
   const [error,       setError]       = useState<string | null>(null);
   const [etlRunning,  setEtlRunning]  = useState(false);
   const [etlMsg,      setEtlMsg]      = useState<string | null>(null);
+  const [etlIsError,  setEtlIsError]  = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -116,17 +117,21 @@ export function AnalyticsSection({ role, shelters }: Props) {
   const runEtl = async () => {
     setEtlRunning(true);
     setEtlMsg(null);
+    setEtlIsError(false);
     try {
       const res = await fetch("/api/etl", { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setEtlMsg(t("analyticsEtlSuccess", { adoptionCount: data.adoptionCount ?? 0, inventoryCount: data.inventoryCount ?? 0 }));
+        setEtlIsError(false);
         fetchData();
       } else {
         setEtlMsg(t("analyticsEtlError", { error: data.error ?? t("tiersUnknownError") }));
+        setEtlIsError(true);
       }
     } catch {
       setEtlMsg(t("analyticsNetworkError"));
+      setEtlIsError(true);
     } finally {
       setEtlRunning(false);
     }
@@ -174,7 +179,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
       </div>
 
       {etlMsg && (
-        <div className={`rounded-xl border px-4 py-2.5 text-xs font-medium ${etlMsg.startsWith(t("analyticsEtlError", { error: "" }).slice(0, 4)) || etlMsg === t("analyticsNetworkError") ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
+        <div className={`rounded-xl border px-4 py-2.5 text-xs font-medium ${etlIsError ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
           {etlMsg}
         </div>
       )}

@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell,
 } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface HomeTypeRow { homeType: string; label: string; count: number }
 interface AdopterProfile { withGarden: number; withChildren: number; withPets: number }
@@ -51,12 +52,13 @@ export function Uc04ReturnRate({
   returnRate, yoyReturnRateChange, returnAnimals, uniqueAnimals,
   adoptionsByHomeType, adoptionsByProfile,
 }: Props) {
+  const t = useTranslations("dashboard");
   const homeBarData = adoptionsByHomeType.map((h) => ({ name: h.label, db: h.count }));
 
   const profileMetrics = [
-    { label: "Kerttel",    value: adoptionsByProfile.withGarden,   color: "#22c55e" },
-    { label: "Gyerekkel",  value: adoptionsByProfile.withChildren, color: "#3b82f6" },
-    { label: "Háziállattal", value: adoptionsByProfile.withPets,   color: "#a855f7" },
+    { label: "Kerttel",      value: adoptionsByProfile.withGarden,   color: "#22c55e" },
+    { label: "Gyerekkel",    value: adoptionsByProfile.withChildren, color: "#3b82f6" },
+    { label: "Háziállattal", value: adoptionsByProfile.withPets,     color: "#a855f7" },
   ];
 
   return (
@@ -99,7 +101,7 @@ export function Uc04ReturnRate({
         <div>
           <p className="mb-2 text-xs font-medium text-gray-500">Lakóhely típusa</p>
           {homeBarData.length === 0 ? (
-            <p className="text-xs text-gray-400 py-4">Nincs adat</p>
+            <p className="text-xs text-gray-400 py-4">{t("chartNoData")}</p>
           ) : (
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={homeBarData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>

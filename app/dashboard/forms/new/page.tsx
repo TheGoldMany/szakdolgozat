@@ -1,30 +1,33 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { FormBuilder } from "@/components/dashboard/form-builder";
 
 export const metadata: Metadata = { title: "Új kérvény sablon" };
-
-const DEFAULT_FIELDS = [
-  { label: "Motiváció / Miért szeretnéd örökbefogadni?", type: "TEXTAREA" as const, required: true,  order: 0 },
-  { label: "Lakástípus (ház / lakás / egyéb)",            type: "TEXT"     as const, required: true,  order: 1 },
-  { label: "Van kert?",                                   type: "TEXT"     as const, required: false, order: 2 },
-  { label: "Van gyermek a háztartásban?",                 type: "TEXT"     as const, required: false, order: 3 },
-  { label: "Van más háziállat otthon?",                   type: "TEXT"     as const, required: false, order: 4 },
-  { label: "Korábbi állattartási tapasztalat",            type: "TEXTAREA" as const, required: false, order: 5 },
-];
 
 export default async function NewFormPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/forms/new");
   if (session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");
 
+  const t = await getTranslations("dashboard");
+
+  const DEFAULT_FIELDS = [
+    { label: t("formNewDefaultMotivation"), type: "TEXTAREA" as const, required: true,  order: 0 },
+    { label: t("formNewDefaultHomeType"),   type: "TEXT"     as const, required: true,  order: 1 },
+    { label: t("formNewDefaultGarden"),     type: "TEXT"     as const, required: false, order: 2 },
+    { label: t("formNewDefaultChildren"),   type: "TEXT"     as const, required: false, order: 3 },
+    { label: t("formNewDefaultPets"),       type: "TEXT"     as const, required: false, order: 4 },
+    { label: t("formNewDefaultExperience"), type: "TEXTAREA" as const, required: false, order: 5 },
+  ];
+
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-bold text-gray-900">Új kérvény sablon</h1>
+      <h1 className="mb-2 text-2xl font-bold text-gray-900">{t("formNewPageTitle")}</h1>
       <p className="mb-6 text-sm text-gray-500">
-        Az alap mezők az örökbefogadási kérvény szokásos kérdéseit tartalmazzák. Átírhatod a feliratokat, törölhetsz mezőket, átrendezheted őket, vagy újakat adhatsz hozzá.
+        {t("formNewPageDesc")}
       </p>
       <FormBuilder initialFields={DEFAULT_FIELDS} />
     </div>

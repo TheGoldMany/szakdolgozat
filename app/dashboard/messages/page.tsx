@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { MessageCircle, PawPrint } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
@@ -13,6 +14,7 @@ export const metadata: Metadata = { title: "Üzenetek" };
 export default async function DashboardMessagesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
+  const t = await getTranslations("dashboard");
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
@@ -59,10 +61,10 @@ export default async function DashboardMessagesPage() {
         <div className="flex items-center gap-3">
           <MessageCircle className="h-5 w-5 text-brand-500" />
           <h1 className="text-xl font-bold text-gray-900">
-            Üzenetek
+            {t("messagesPageTitle")}
             {totalUnread > 0 && (
               <span className="ml-2 rounded-full bg-brand-500 px-2 py-0.5 text-xs font-bold text-white">
-                {totalUnread} új
+                {t("messagesNewCount", { count: totalUnread })}
               </span>
             )}
           </h1>
@@ -73,9 +75,9 @@ export default async function DashboardMessagesPage() {
       {conversations.length === 0 ? (
         <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
           <PawPrint className="mx-auto h-10 w-10 text-gray-300" />
-          <p className="mt-3 text-gray-500">Még nincsenek beérkező üzenetek.</p>
+          <p className="mt-3 text-gray-500">{t("messagesEmpty")}</p>
           <p className="mt-1 text-sm text-gray-400">
-            Az érdeklődők az állat profil oldaláról küldhetnek üzenetet.
+            {t("messagesEmptyDesc")}
           </p>
         </div>
       ) : (
@@ -83,10 +85,10 @@ export default async function DashboardMessagesPage() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
               <tr>
-                <th className="px-4 py-3 text-left">Állat</th>
-                <th className="px-4 py-3 text-left">Felhasználó</th>
-                <th className="hidden px-4 py-3 text-left sm:table-cell">Utolsó üzenet</th>
-                <th className="px-4 py-3 text-left">Dátum</th>
+                <th className="px-4 py-3 text-left">{t("messagesColAnimal")}</th>
+                <th className="px-4 py-3 text-left">{t("messagesColUser")}</th>
+                <th className="hidden px-4 py-3 text-left sm:table-cell">{t("messagesColLastMsg")}</th>
+                <th className="px-4 py-3 text-left">{t("messagesColDate")}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -150,7 +152,7 @@ export default async function DashboardMessagesPage() {
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         )}
                       >
-                        {unread > 0 ? `Válasz (${unread})` : "Megnyit"}
+                        {unread > 0 ? t("messagesReply", { count: unread }) : t("messagesOpen")}
                       </Link>
                     </td>
                   </tr>
