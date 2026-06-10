@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { upload } from "@vercel/blob/client";
 import { Plus, X, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   value:    string[];
@@ -12,10 +13,13 @@ interface Props {
   label?:   string;
 }
 
-export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }: Props) {
+export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
+  const t = useTranslations("common");
   const [uploading, setUploading] = useState<number | null>(null);
   const [error, setError]         = useState("");
   const inputRef                  = useRef<HTMLInputElement>(null);
+
+  const displayLabel = label ?? t("photos");
 
   async function handleFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -25,8 +29,8 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
 
     for (let i = 0; i < toUpload.length; i++) {
       const file = toUpload[i];
-      if (!file.type.startsWith("image/")) { setError("Csak képek tölthetők fel."); continue; }
-      if (file.size > 5 * 1024 * 1024)     { setError("Max 5 MB per kép.");         continue; }
+      if (!file.type.startsWith("image/")) { setError(t("uploadOnlyImages")); continue; }
+      if (file.size > 5 * 1024 * 1024)     { setError(t("uploadMaxSizePerImage")); continue; }
 
       setUploading(value.length + i);
       try {
@@ -38,7 +42,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
         });
         onChange([...value, blob.url]);
       } catch {
-        setError("Feltöltés sikertelen.");
+        setError(t("uploadFailed"));
       } finally {
         setUploading(null);
       }
@@ -58,16 +62,16 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-gray-700">{label}</label>
+      <label className="mb-2 block text-sm font-medium text-gray-700">{displayLabel}</label>
 
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
         {value.map((url, idx) => (
           <div key={url} className="group relative aspect-square overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-            <Image src={url} alt={`Kép ${idx + 1}`} fill className="object-cover" sizes="150px" />
+            <Image src={url} alt={`${t("imageAlt")} ${idx + 1}`} fill className="object-cover" sizes="150px" />
 
             {idx === 0 && (
               <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                <Star className="h-2.5 w-2.5" /> Fő
+                <Star className="h-2.5 w-2.5" /> {t("primaryImage")}
               </span>
             )}
 
@@ -76,7 +80,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
                 <button
                   type="button"
                   onClick={() => makePrimary(idx)}
-                  title="Fő képnek jelöl"
+                  title={t("makePrimary")}
                   className="rounded-full bg-white/90 p-1.5 text-gray-700 hover:bg-white"
                 >
                   <Star className="h-3.5 w-3.5" />
@@ -106,7 +110,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
             ) : (
               <>
                 <Plus className="h-5 w-5" />
-                <span className="text-xs">Kép hozzáadása</span>
+                <span className="text-xs">{t("addImage")}</span>
               </>
             )}
           </button>
@@ -124,7 +128,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label = "Fotók" }:
 
       {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
       <p className="mt-1.5 text-xs text-gray-400">
-        Max {max} kép · Max 5 MB/kép · JPEG, PNG, WebP · Az első kép lesz a főkép (hover → csillag)
+        {t("multiImageHint", { max })}
       </p>
     </div>
   );

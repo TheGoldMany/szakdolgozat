@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   {t("fullName")}
                 </label>
                 <input
-                  placeholder="Kovács János"
+                  placeholder={t("namePlaceholder")}
                   autoComplete="name"
                   className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
                   {...register("name")}

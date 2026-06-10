@@ -4,8 +4,10 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { PawPrint, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function ResetForm() {
+  const t           = useTranslations("auth");
   const router      = useRouter();
   const searchParams = useSearchParams();
   const token       = searchParams.get("token") ?? "";
@@ -20,10 +22,10 @@ function ResetForm() {
   if (!token) {
     return (
       <div className="text-center">
-        <p className="text-sm text-red-600">Érvénytelen link. Kérj új jelszó-visszaállítási emailt.</p>
+        <p className="text-sm text-red-600">{t("resetInvalidLink")}</p>
         <Link href="/auth/forgot-password"
           className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline">
-          Új link kérése
+          {t("resetNewLinkRequest")}
         </Link>
       </div>
     );
@@ -32,11 +34,11 @@ function ResetForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== confirm) {
-      setError("A két jelszó nem egyezik.");
+      setError(t("resetPasswordsMismatch"));
       return;
     }
     if (password.length < 8) {
-      setError("A jelszónak legalább 8 karakter hosszúnak kell lennie.");
+      setError(t("resetPasswordTooShort"));
       return;
     }
 
@@ -51,13 +53,13 @@ function ResetForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? "Hiba történt.");
+        setError(json.error ?? t("resetGenericError"));
         return;
       }
       setSuccess(true);
       setTimeout(() => router.push("/auth/login"), 2500);
     } catch {
-      setError("Hálózati hiba. Próbáld újra.");
+      setError(t("networkError"));
     } finally {
       setLoading(false);
     }
@@ -69,8 +71,8 @@ function ResetForm() {
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-50">
           <CheckCircle2 className="h-7 w-7 text-brand-600" />
         </div>
-        <h2 className="text-lg font-bold text-gray-900">Jelszó sikeresen megváltoztatva!</h2>
-        <p className="mt-2 text-sm text-gray-500">Átirányítás a bejelentkezési oldalra...</p>
+        <h2 className="text-lg font-bold text-gray-900">{t("resetSuccessTitle")}</h2>
+        <p className="mt-2 text-sm text-gray-500">{t("resetSuccessDesc")}</p>
       </div>
     );
   }
@@ -78,8 +80,8 @@ function ResetForm() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Új jelszó beállítása</h1>
-        <p className="mt-1.5 text-sm text-gray-500">Add meg az új jelszavadat.</p>
+        <h1 className="text-xl font-bold text-gray-900">{t("resetTitle")}</h1>
+        <p className="mt-1.5 text-sm text-gray-500">{t("resetDesc")}</p>
       </div>
 
       {error && (
@@ -90,13 +92,13 @@ function ResetForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Új jelszó</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("resetNewPasswordLabel")}</label>
           <div className="relative">
             <input
               type={showPw ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Legalább 8 karakter"
+              placeholder={t("resetPasswordPlaceholder")}
               required
               className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
@@ -108,12 +110,12 @@ function ResetForm() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Jelszó megerősítése</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("confirmPassword")}</label>
           <input
             type={showPw ? "text" : "password"}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Ismételd meg a jelszót"
+            placeholder={t("resetConfirmPlaceholder")}
             required
             className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
@@ -124,7 +126,7 @@ function ResetForm() {
           disabled={loading}
           className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
         >
-          {loading ? "Mentés..." : "Jelszó mentése"}
+          {loading ? t("resetSaving") : t("resetSaveButton")}
         </button>
       </form>
     </>

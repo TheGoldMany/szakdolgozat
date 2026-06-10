@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Clock, Building2, PawPrint, CheckCircle, XCircle, Hourglass, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface AppointmentData {
   id:          string;
@@ -16,13 +17,6 @@ export interface AppointmentData {
   animal:      { name: string; slug: string } | null;
 }
 
-const STATUS_CONFIG = {
-  PENDING:   { label: "Függőben",     icon: Hourglass,    color: "text-amber-600 bg-amber-50"  },
-  CONFIRMED: { label: "Visszaigazolt", icon: CheckCircle,  color: "text-green-600 bg-green-50"  },
-  CANCELLED: { label: "Lemondva",     icon: XCircle,      color: "text-red-600 bg-red-50"      },
-  COMPLETED: { label: "Teljesítve",   icon: Star,         color: "text-blue-600 bg-blue-50"    },
-};
-
 interface Props {
   appt:       AppointmentData;
   showCancel?: boolean;
@@ -30,14 +24,22 @@ interface Props {
 
 export function AppointmentCard({ appt, showCancel = true }: Props) {
   const router = useRouter();
+  const t  = useTranslations("appointments");
   const [loading, setLoading] = useState(false);
+
+  const STATUS_CONFIG = {
+    PENDING:   { label: t("statusPending"),   icon: Hourglass,   color: "text-amber-600 bg-amber-50"  },
+    CONFIRMED: { label: t("statusConfirmed"), icon: CheckCircle, color: "text-green-600 bg-green-50"  },
+    CANCELLED: { label: t("statusCancelled"), icon: XCircle,     color: "text-red-600 bg-red-50"      },
+    COMPLETED: { label: t("statusCompleted"), icon: Star,        color: "text-blue-600 bg-blue-50"    },
+  };
 
   const cfg  = STATUS_CONFIG[appt.status];
   const Icon = cfg.icon;
   const displayTime = appt.confirmedAt ?? appt.proposedAt;
 
   async function handleCancel() {
-    if (!confirm("Biztosan lemondod az időpontot?")) return;
+    if (!confirm(t("cancelConfirm"))) return;
     setLoading(true);
     await fetch(`/api/appointments/${appt.id}`, {
       method:  "PATCH",
@@ -58,7 +60,7 @@ export function AppointmentCard({ appt, showCancel = true }: Props) {
             </span>
             {appt.confirmedAt && (
               <span className="text-xs text-gray-400">
-                (módosított időpont)
+                ({t("modifiedTime")})
               </span>
             )}
           </div>
@@ -86,22 +88,22 @@ export function AppointmentCard({ appt, showCancel = true }: Props) {
 
           {appt.note && (
             <p className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-500">
-              <span className="font-medium text-gray-700">Megjegyzésed:</span> {appt.note}
+              <span className="font-medium text-gray-700">{t("yourNote")}</span> {appt.note}
             </p>
           )}
           {appt.adminNote && (
             <p className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
-              <span className="font-medium">Menhely válasza:</span> {appt.adminNote}
+              <span className="font-medium">{t("shelterReply")}</span> {appt.adminNote}
             </p>
           )}
           {appt.status === "CANCELLED" && appt.cancelledBy && (
             <p className="mt-1.5 text-xs text-gray-400">
-              Lemondta: {appt.cancelledBy === "USER" ? "Te" : "A menhely"}
+              {t("cancelledBy")}: {appt.cancelledBy === "USER" ? t("cancelledByUser") : t("cancelledByShelter")}
             </p>
           )}
           {appt.confirmedAt && appt.proposedAt !== appt.confirmedAt && (
             <p className="mt-1.5 text-xs text-gray-400">
-              Javasolt időpont: {new Date(appt.proposedAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              {t("proposedTime")}: {new Date(appt.proposedAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
             </p>
           )}
         </div>
@@ -109,7 +111,7 @@ export function AppointmentCard({ appt, showCancel = true }: Props) {
         {showCancel && appt.status === "PENDING" && (
           <button onClick={handleCancel} disabled={loading}
             className="shrink-0 rounded-lg border border-red-100 px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50">
-            Lemondás
+            {t("cancelButton")}
           </button>
         )}
       </div>

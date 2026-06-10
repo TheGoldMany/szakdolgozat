@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { CalendarDays, Users, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { DonateForm } from "@/components/donate/donate-form";
+import { getTranslations } from "next-intl/server";
 
 function formatHUF(amount: number) {
   return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
@@ -15,11 +16,12 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
+  const t = await getTranslations("donate");
   const campaign = await prisma.campaign.findUnique({
     where: { id: params.id },
     select: { title: true },
   });
-  if (!campaign) return { title: "Nem található" };
+  if (!campaign) return { title: t("notFound") };
   return { title: campaign.title };
 }
 
@@ -28,6 +30,7 @@ export default async function CampaignDetailPage({
 }: {
   params: { id: string };
 }) {
+  const t = await getTranslations("donate");
   const campaign = await prisma.campaign.findUnique({
     where: { id: params.id },
     include: {
@@ -88,14 +91,14 @@ export default async function CampaignDetailPage({
             {/* Header */}
             <div>
               <nav className="mb-2 flex items-center gap-1 text-xs text-gray-400">
-                <Link href="/donate" className="hover:text-brand-500 transition-colors">Adományozás</Link>
+                <Link href="/donate" className="hover:text-brand-500 transition-colors">{t("donateNow")}</Link>
                 <span>›</span>
                 <span className="text-gray-600 truncate max-w-[200px]">{campaign.title}</span>
               </nav>
               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{campaign.title}</h1>
 
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <span>Indította: <span className="font-medium text-gray-700">{campaign.user.name ?? "Névtelen"}</span></span>
+                <span>{t("startedBy", { name: campaign.user.name ?? t("anonymous") })}</span>
                 {campaign.shelter && (
                   <>
                     <span className="text-gray-300">·</span>
@@ -113,7 +116,7 @@ export default async function CampaignDetailPage({
                     <span className="text-gray-300">·</span>
                     <span className="flex items-center gap-1">
                       <CalendarDays className="h-3.5 w-3.5" />
-                      Lejár: {endsAt}
+                      {t("expiresOn", { date: endsAt })}
                     </span>
                   </>
                 )}
@@ -122,7 +125,7 @@ export default async function CampaignDetailPage({
 
             {/* Description */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-sm font-semibold text-gray-700">A gyűjtésről</h2>
+              <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("aboutCampaign")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
                 {campaign.description}
               </p>
@@ -132,17 +135,17 @@ export default async function CampaignDetailPage({
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="mb-4 text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-400" />
-                Legutóbbi adományok
+                {t("recentDonations")}
               </h2>
               {campaign.donations.length === 0 ? (
-                <p className="text-sm text-gray-400">Még nem érkezett adomány. Legyél az első!</p>
+                <p className="text-sm text-gray-400">{t("noDonationsYet")}</p>
               ) : (
                 <ul className="divide-y divide-gray-50 space-y-0">
                   {campaign.donations.map((d) => (
                     <li key={d.id} className="flex items-start justify-between gap-4 py-3">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-800">
-                          {d.isAnonymous ? "Névtelen adományozó" : (d.user?.name ?? "Névtelen")}
+                          {d.isAnonymous ? t("anonymousDonor") : (d.user?.name ?? t("anonymous"))}
                         </p>
                         {d.message && (
                           <p className="mt-0.5 text-xs italic text-gray-500 line-clamp-2">
@@ -176,15 +179,15 @@ export default async function CampaignDetailPage({
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <p className="text-sm font-semibold text-brand-600">{pct}% összegyűlt</p>
+              <p className="text-sm font-semibold text-brand-600">{t("percentCollected", { pct })}</p>
               {campaign.donations.length > 0 && (
-                <p className="mt-1 text-xs text-gray-400">{campaign.donations.length}+ adományozó</p>
+                <p className="mt-1 text-xs text-gray-400">{t("donorsPlus", { count: campaign.donations.length })}</p>
               )}
             </div>
 
             {/* Donate form */}
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h2 className="mb-4 text-base font-semibold text-gray-900">Adományozás</h2>
+              <h2 className="mb-4 text-base font-semibold text-gray-900">{t("donateNow")}</h2>
               <DonateForm campaignId={campaign.id} />
             </div>
 

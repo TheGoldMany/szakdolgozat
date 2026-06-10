@@ -5,49 +5,72 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { LocationPicker } from "@/components/ui/location-picker";
 
-const schema = z.object({
-  type:         z.enum(["LOST", "FOUND", "STRAY"]),
-  animalType:   z.enum(["DOG", "CAT", "RABBIT", "BIRD", "OTHER"]),
-  name:         z.string().optional(),
-  breed:        z.string().optional(),
-  color:        z.string().optional(),
-  gender:       z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
-  description:  z.string().min(10, "Legalább 10 karakter szükséges"),
-  city:         z.string().min(1, "Kötelező mező"),
-  address:      z.string().optional(),
-  lat:          z.number().optional(),
-  lng:          z.number().optional(),
-  contactName:  z.string().min(2, "Kötelező mező"),
-  contactPhone: z.string().min(1, "Kötelező mező"),
-  contactEmail: z.string().email("Érvénytelen email"),
-  imageUrl:     z.string().optional(),
-});
+function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
+  return z.object({
+    type:         z.enum(["LOST", "FOUND", "STRAY"]),
+    animalType:   z.enum(["DOG", "CAT", "RABBIT", "BIRD", "OTHER"]),
+    name:         z.string().optional(),
+    breed:        z.string().optional(),
+    color:        z.string().optional(),
+    gender:       z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
+    description:  z.string().min(10, t("validationDescMin")),
+    city:         z.string().min(1, t("validationRequired")),
+    address:      z.string().optional(),
+    lat:          z.number().optional(),
+    lng:          z.number().optional(),
+    contactName:  z.string().min(2, t("validationRequired")),
+    contactPhone: z.string().min(1, t("validationRequired")),
+    contactEmail: z.string().email(t("validationInvalidEmail")),
+    imageUrl:     z.string().optional(),
+  });
+}
 
-type FormData = z.infer<typeof schema>;
-
-const TYPE_OPTIONS = [
-  { value: "LOST",  label: "Elveszett",  sub: "Az én állatom tűnt el" },
-  { value: "FOUND", label: "Megtalált",  sub: "Befogott egy gazdátlan állatot" },
-  { value: "STRAY", label: "Kóbor",      sub: "Kóborló állatot láttam" },
-];
-
-const ANIMAL_OPTIONS = [
-  { value: "DOG",    label: "Kutya" },
-  { value: "CAT",    label: "Macska" },
-  { value: "RABBIT", label: "Nyúl" },
-  { value: "BIRD",   label: "Madár" },
-  { value: "OTHER",  label: "Egyéb" },
-];
+type FormData = {
+  type:         "LOST" | "FOUND" | "STRAY";
+  animalType:   "DOG" | "CAT" | "RABBIT" | "BIRD" | "OTHER";
+  name?:        string;
+  breed?:       string;
+  color?:       string;
+  gender?:      "MALE" | "FEMALE" | "UNKNOWN";
+  description:  string;
+  city:         string;
+  address?:     string;
+  lat?:         number;
+  lng?:         number;
+  contactName:  string;
+  contactPhone: string;
+  contactEmail: string;
+  imageUrl?:    string;
+};
 
 const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 const inputWhiteCls = `${inputCls} bg-white`;
 
 export function ReportForm() {
   const router = useRouter();
+  const t  = useTranslations("reports");
+  const tc = useTranslations("common");
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const schema = buildSchema(t);
+
+  const TYPE_OPTIONS = [
+    { value: "LOST",  label: t("lost"),  sub: t("typeLostSub")  },
+    { value: "FOUND", label: t("found"), sub: t("typeFoundSub") },
+    { value: "STRAY", label: t("stray"), sub: t("typestraySub") },
+  ];
+
+  const ANIMAL_OPTIONS = [
+    { value: "DOG",    label: t("animalDog")    },
+    { value: "CAT",    label: t("animalCat")    },
+    { value: "RABBIT", label: t("animalRabbit") },
+    { value: "BIRD",   label: t("animalBird")   },
+    { value: "OTHER",  label: t("animalOther")  },
+  ];
 
   const {
     register,
@@ -73,7 +96,7 @@ export function ReportForm() {
       body: JSON.stringify(data),
     });
     const json = await res.json();
-    if (!res.ok) { setServerError(json.error ?? "Hiba történt"); return; }
+    if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
     router.push(`/reports/${json.report.id}`);
   }
 
@@ -88,7 +111,7 @@ export function ReportForm() {
       {/* Bejelentés típusa */}
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-700">
-          Bejelentés típusa <span className="text-red-500">*</span>
+          {t("formTypeLabel")} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {TYPE_OPTIONS.map((o) => (
@@ -104,7 +127,7 @@ export function ReportForm() {
       {/* Állatfaj */}
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-700">
-          Állatfaj <span className="text-red-500">*</span>
+          {t("formSpeciesLabel")} <span className="text-red-500">*</span>
         </label>
         <div className="flex flex-wrap gap-2">
           {ANIMAL_OPTIONS.map((o) => (
@@ -120,25 +143,25 @@ export function ReportForm() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {selectedType === "LOST" && (
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Állat neve</label>
-            <input {...register("name")} placeholder="pl. Bodri" className={inputCls} />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formAnimalName")}</label>
+            <input {...register("name")} placeholder={t("formAnimalNamePlaceholder")} className={inputCls} />
           </div>
         )}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Fajta</label>
-          <input {...register("breed")} placeholder="pl. Labrador" className={inputCls} />
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formBreed")}</label>
+          <input {...register("breed")} placeholder={t("formBreedPlaceholder")} className={inputCls} />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Szín / jellemzők</label>
-          <input {...register("color")} placeholder="pl. Fekete-fehér foltos" className={inputCls} />
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formColor")}</label>
+          <input {...register("color")} placeholder={t("formColorPlaceholder")} className={inputCls} />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Nem</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formGender")}</label>
           <select {...register("gender")}
             className="h-9 w-full rounded-xl border border-gray-200 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-            <option value="">Ismeretlen</option>
-            <option value="MALE">Hím</option>
-            <option value="FEMALE">Nőstény</option>
+            <option value="">{t("genderUnknown")}</option>
+            <option value="MALE">{t("genderMale")}</option>
+            <option value="FEMALE">{t("genderFemale")}</option>
           </select>
         </div>
       </div>
@@ -146,10 +169,10 @@ export function ReportForm() {
       {/* Leírás */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Részletes leírás <span className="text-red-500">*</span>
+          {t("formDescription")} <span className="text-red-500">*</span>
         </label>
         <textarea {...register("description")} rows={4}
-          placeholder="Mikor és hol tűnt el / találtad? Ismertető jelek, körülmények..."
+          placeholder={t("formDescriptionPlaceholder")}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" />
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
       </div>
@@ -162,7 +185,7 @@ export function ReportForm() {
           <ImageUpload
             value={field.value ?? ""}
             onChange={field.onChange}
-            label="Fotó (opcionális)"
+            label={t("formPhotoLabel")}
           />
         )}
       />
@@ -172,14 +195,14 @@ export function ReportForm() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Város <span className="text-red-500">*</span>
+              {t("formCity")} <span className="text-red-500">*</span>
             </label>
-            <input {...register("city")} placeholder="pl. Budapest" className={inputCls} />
+            <input {...register("city")} placeholder={t("formCityPlaceholder")} className={inputCls} />
             {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Utca, házszám</label>
-            <input {...register("address")} placeholder="pl. Váci utca 10." className={inputCls} />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formAddress")}</label>
+            <input {...register("address")} placeholder={t("formAddressPlaceholder")} className={inputCls} />
           </div>
         </div>
 
@@ -197,27 +220,27 @@ export function ReportForm() {
 
       {/* Kapcsolattartó */}
       <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-4">
-        <p className="text-sm font-semibold text-gray-700">Kapcsolattartói adatok</p>
+        <p className="text-sm font-semibold text-gray-700">{t("formContactSection")}</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Név <span className="text-red-500">*</span>
+              {t("formContactName")} <span className="text-red-500">*</span>
             </label>
-            <input {...register("contactName")} placeholder="Teljes név" className={inputWhiteCls} />
+            <input {...register("contactName")} placeholder={t("formContactNamePlaceholder")} className={inputWhiteCls} />
             {errors.contactName && <p className="mt-1 text-xs text-red-500">{errors.contactName.message}</p>}
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Telefonszám <span className="text-red-500">*</span>
+              {t("formContactPhone")} <span className="text-red-500">*</span>
             </label>
-            <input {...register("contactPhone")} placeholder="+36 30 123 4567" className={inputWhiteCls} />
+            <input {...register("contactPhone")} placeholder={t("formContactPhonePlaceholder")} className={inputWhiteCls} />
             {errors.contactPhone && <p className="mt-1 text-xs text-red-500">{errors.contactPhone.message}</p>}
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Email <span className="text-red-500">*</span>
+              {t("formContactEmail")} <span className="text-red-500">*</span>
             </label>
-            <input {...register("contactEmail")} type="email" placeholder="email@example.com" className={inputWhiteCls} />
+            <input {...register("contactEmail")} type="email" placeholder={t("formContactEmailPlaceholder")} className={inputWhiteCls} />
             {errors.contactEmail && <p className="mt-1 text-xs text-red-500">{errors.contactEmail.message}</p>}
           </div>
         </div>
@@ -225,7 +248,7 @@ export function ReportForm() {
 
       <button type="submit" disabled={isSubmitting}
         className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
-        {isSubmitting ? "Beküldés..." : "Bejelentés elküldése"}
+        {isSubmitting ? t("formSubmitting") : t("formSubmit")}
       </button>
     </form>
   );

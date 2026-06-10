@@ -5,17 +5,16 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 
-const schema = z.object({
-  message:     z.string().min(20, "Legalább 20 karakter szükséges"),
-  homeType:    z.enum(["HOUSE", "APARTMENT", "OTHER"]),
-  hasGarden:   z.boolean(),
-  hasChildren: z.boolean(),
-  hasPets:     z.boolean(),
-  experience:  z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
+type FormData = {
+  message:     string;
+  homeType:    "HOUSE" | "APARTMENT" | "OTHER";
+  hasGarden:   boolean;
+  hasChildren: boolean;
+  hasPets:     boolean;
+  experience?: string;
+};
 
 interface AdoptionFormProps {
   animalId:   string;
@@ -23,9 +22,19 @@ interface AdoptionFormProps {
 }
 
 export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
+  const t = useTranslations("animals.adoptionForm");
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const schema = z.object({
+    message:     z.string().min(20, t("messageMinError")),
+    homeType:    z.enum(["HOUSE", "APARTMENT", "OTHER"]),
+    hasGarden:   z.boolean(),
+    hasChildren: z.boolean(),
+    hasPets:     z.boolean(),
+    experience:  z.string().optional(),
+  });
 
   const {
     register,
@@ -45,7 +54,7 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error ?? "Ismeretlen hiba");
+      setServerError(json.error ?? t("unknownError"));
       return;
     }
     setSubmitted(true);
@@ -56,9 +65,9 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
     return (
       <div className="rounded-2xl bg-green-50 border border-green-200 p-6 text-center">
         <div className="text-4xl mb-3">🎉</div>
-        <p className="font-semibold text-green-800">Kérelmed sikeresen beküldve!</p>
+        <p className="font-semibold text-green-800">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-green-700">
-          A menhely hamarosan felveszi veled a kapcsolatot.
+          {t("successDesc")}
         </p>
       </div>
     );
@@ -75,13 +84,13 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
       {/* Motiváció */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Miért szeretnéd örökbe fogadni {animalName}-t?
+          {t("motivationLabel", { name: animalName })}
           <span className="text-red-500 ml-0.5">*</span>
         </label>
         <textarea
           {...register("message")}
           rows={4}
-          placeholder="Mutatkozz be és meséld el, miért lennél jó gazdi..."
+          placeholder={t("motivationPlaceholder")}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
         />
         {errors.message && (
@@ -92,28 +101,28 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
       {/* Lakástípus */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Hol laksz? <span className="text-red-500">*</span>
+          {t("homeTypeLabel")} <span className="text-red-500">*</span>
         </label>
         <select
           {...register("homeType")}
           className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
-          <option value="">Válassz...</option>
-          <option value="HOUSE">Ház</option>
-          <option value="APARTMENT">Lakás</option>
-          <option value="OTHER">Egyéb</option>
+          <option value="">{t("homeTypeChoose")}</option>
+          <option value="HOUSE">{t("homeTypeHouse")}</option>
+          <option value="APARTMENT">{t("homeTypeApartment")}</option>
+          <option value="OTHER">{t("homeTypeOther")}</option>
         </select>
         {errors.homeType && (
-          <p className="mt-1 text-xs text-red-500">Kötelező mező</p>
+          <p className="mt-1 text-xs text-red-500">{t("homeTypeRequired")}</p>
         )}
       </div>
 
       {/* Checkboxok */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
-          { name: "hasGarden"   as const, label: "Van kertem" },
-          { name: "hasChildren" as const, label: "Él gyerek a háztartásban" },
-          { name: "hasPets"     as const, label: "Van más háziállatom" },
+          { name: "hasGarden"   as const, label: t("hasGardenLabel") },
+          { name: "hasChildren" as const, label: t("hasChildrenLabel") },
+          { name: "hasPets"     as const, label: t("hasPetsLabel") },
         ].map(({ name, label }) => (
           <label key={name} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50">
             <input
@@ -129,13 +138,13 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
       {/* Tapasztalat */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Korábbi tapasztalat állatokkal
-          <span className="ml-1 text-xs font-normal text-gray-400">(opcionális)</span>
+          {t("experienceLabel")}
+          <span className="ml-1 text-xs font-normal text-gray-400">{t("experienceOptional")}</span>
         </label>
         <textarea
           {...register("experience")}
           rows={3}
-          placeholder="Volt-e már háziállatod? Milyen tapasztalataid vannak?"
+          placeholder={t("experiencePlaceholder")}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
         />
       </div>
@@ -145,7 +154,7 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
         disabled={isSubmitting}
         className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
       >
-        {isSubmitting ? "Küldés..." : "Kérelem beküldése"}
+        {isSubmitting ? t("submitting") : t("submitButton")}
       </button>
     </form>
   );

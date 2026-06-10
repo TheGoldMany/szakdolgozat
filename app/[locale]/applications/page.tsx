@@ -54,7 +54,7 @@ export default async function ApplicationsPage() {
   );
 
   const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
-    INVITED:   { label: "Meghívva",            color: "bg-purple-100 text-purple-700" },
+    INVITED:   { label: t("statusInvited"),   color: "bg-purple-100 text-purple-700" },
     PENDING:   { label: t("statusPending"),   color: "bg-yellow-100 text-yellow-700" },
     REVIEWING: { label: t("statusReviewing"), color: "bg-blue-100 text-blue-700"    },
     APPROVED:  { label: t("statusApproved"),  color: "bg-green-100 text-green-700"  },
@@ -164,29 +164,29 @@ export default async function ApplicationsPage() {
                       {showInvite ? (
                         <>
                           <ClipboardList className="h-4 w-4 shrink-0 text-purple-500" />
-                          <span className="flex-1 text-purple-700 font-medium">A menhely kérvény kitöltését kéri</span>
+                          <span className="flex-1 text-purple-700 font-medium">{t("formRequestedBanner")}</span>
                           <Link
                             href={`/apply/${app.inviteToken}`}
                             className="rounded-lg bg-purple-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-600 transition-colors"
                           >
-                            Kérvény kitöltése
+                            {t("fillForm")}
                           </Link>
                         </>
                       ) : formFilled ? (
                         <>
                           <FileText className="h-4 w-4 shrink-0 text-brand-500" />
-                          <span className="flex-1 text-brand-700 font-medium">Kérvény beküldve</span>
+                          <span className="flex-1 text-brand-700 font-medium">{t("formSubmittedBanner")}</span>
                           <Link
                             href={`/applications/${app.id}`}
                             className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition-colors"
                           >
-                            Megtekintés
+                            {t("view")}
                           </Link>
                         </>
                       ) : (
                         <>
                           <Clock className="h-4 w-4 shrink-0 text-yellow-600" />
-                          <span className="text-yellow-700">Kérvény kitöltése folyamatban</span>
+                          <span className="text-yellow-700">{t("formInProgressBanner")}</span>
                         </>
                       )}
                     </div>

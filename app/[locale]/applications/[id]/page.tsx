@@ -8,27 +8,33 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, FileText } from "lucide-react";
 import { ContractDownloadButton } from "@/components/applications/contract-download-button";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = { title: "Kérelmem részletei" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("applications");
+  return { title: t("detailTitle") };
+}
 
 function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
-
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  INVITED:   { label: "Meghívva",        color: "bg-purple-100 text-purple-700" },
-  PENDING:   { label: "Várakozó",        color: "bg-yellow-100 text-yellow-700" },
-  REVIEWING: { label: "Elbírálás alatt", color: "bg-blue-100 text-blue-700" },
-  APPROVED:  { label: "Elfogadva",       color: "bg-green-100 text-green-700" },
-  REJECTED:  { label: "Elutasítva",      color: "bg-red-100 text-red-700" },
-  WITHDRAWN: { label: "Visszavont",      color: "bg-gray-100 text-gray-500" },
-};
 
 export default async function UserApplicationDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const t = await getTranslations("applications");
+
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    INVITED:   { label: t("statusInvited"),   color: "bg-purple-100 text-purple-700" },
+    PENDING:   { label: t("statusPending"),   color: "bg-yellow-100 text-yellow-700" },
+    REVIEWING: { label: t("statusReviewing"), color: "bg-blue-100 text-blue-700" },
+    APPROVED:  { label: t("statusApproved"),  color: "bg-green-100 text-green-700" },
+    REJECTED:  { label: t("statusRejected"),  color: "bg-red-100 text-red-700" },
+    WITHDRAWN: { label: t("statusWithdrawn"), color: "bg-gray-100 text-gray-500" },
+  };
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/applications");
 
@@ -64,7 +70,7 @@ export default async function UserApplicationDetailPage({
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Vissza a kérelmekhez
+          {t("backToApplications")}
         </Link>
 
         {/* Animal + status */}
@@ -91,7 +97,7 @@ export default async function UserApplicationDetailPage({
                 {app.animal.shelter.city} · {app.animal.shelter.name}
               </p>
               <p className="text-xs text-gray-400">
-                Kérelem beküldve: {new Date(app.createdAt).toLocaleDateString("hu-HU", {
+                {t("submittedAt")} {new Date(app.createdAt).toLocaleDateString("hu-HU", {
                   year: "numeric", month: "long", day: "numeric",
                 })}
               </p>
@@ -101,7 +107,7 @@ export default async function UserApplicationDetailPage({
           {app.status === "APPROVED" && (
             <div className="border-t border-green-50 bg-green-50 px-5 py-3">
               <p className="mb-2.5 text-xs font-medium text-green-700">
-                Gratulálunk! A kérelmed elfogadva. Töltsd le az örökbefogadási szerződést:
+                {t("approvedBannerText")}
               </p>
               <ContractDownloadButton applicationId={app.id} animalName={app.animal.name} />
             </div>
@@ -109,7 +115,7 @@ export default async function UserApplicationDetailPage({
           {app.reviewNotes && (
             <div className="border-t border-gray-100 px-5 py-3">
               <p className="text-xs text-gray-500">
-                <span className="font-medium text-gray-700">Menhely megjegyzése: </span>
+                <span className="font-medium text-gray-700">{t("shelterNote")} </span>
                 {app.reviewNotes}
               </p>
             </div>
@@ -120,7 +126,7 @@ export default async function UserApplicationDetailPage({
         {app.responses.length > 0 ? (
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
             <h2 className="font-semibold text-gray-900">
-              Kitöltött kérvény
+              {t("filledForm")}
               {app.form && (
                 <span className="ml-2 text-sm font-normal text-gray-400">({app.form.title})</span>
               )}
@@ -151,13 +157,13 @@ export default async function UserApplicationDetailPage({
                         className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-brand-600 hover:bg-brand-50 transition-colors"
                       >
                         <FileText className="h-4 w-4 shrink-0" />
-                        Fájl megtekintése
+                        {t("viewFile")}
                       </a>
                     )
                   ) : resp.value ? (
                     <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                   ) : (
-                    <p className="text-sm text-gray-400 italic">Nem lett kitöltve</p>
+                    <p className="text-sm text-gray-400 italic">{t("notFilled")}</p>
                   )}
                 </div>
               ))}
@@ -165,13 +171,13 @@ export default async function UserApplicationDetailPage({
           </div>
         ) : app.formId ? (
           <div className="rounded-2xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
-            <p className="text-sm text-yellow-700">A kérvény még nem lett beküldve.</p>
+            <p className="text-sm text-yellow-700">{t("formNotSubmitted")}</p>
             {app.inviteToken && (
               <Link
                 href={`/apply/${app.inviteToken}`}
                 className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-purple-500 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-600 transition-colors"
               >
-                Kérvény kitöltése
+                {t("fillForm")}
               </Link>
             )}
           </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Clock, X, CheckCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   shelterId: string;
@@ -13,6 +14,8 @@ interface Props {
 
 export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Props) {
   const router = useRouter();
+  const t  = useTranslations("appointments");
+  const tc = useTranslations("common");
   const [date,    setDate]    = useState("");
   const [time,    setTime]    = useState("10:00");
   const [note,    setNote]    = useState("");
@@ -26,7 +29,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!date || !time) { setError("Kérlek add meg a dátumot és az időpontot!"); return; }
+    if (!date || !time) { setError(t("validationDatetime")); return; }
 
     setLoading(true); setError(null);
 
@@ -41,7 +44,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) { setError(data.error ?? "Hiba történt"); return; }
+    if (!res.ok) { setError(data.error ?? tc("error")); return; }
 
     setSuccess(true);
     router.refresh();
@@ -51,12 +54,12 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
     return (
       <div className="rounded-2xl border border-green-100 bg-green-50 p-6 text-center">
         <CheckCircle className="mx-auto mb-3 h-10 w-10 text-green-500" />
-        <p className="font-semibold text-green-800">Időpontod elküldve!</p>
-        <p className="mt-1 text-sm text-green-600">A menhely hamarosan visszajelez.</p>
+        <p className="font-semibold text-green-800">{t("successTitle")}</p>
+        <p className="mt-1 text-sm text-green-600">{t("successDesc")}</p>
         {onClose && (
           <button onClick={onClose}
             className="mt-4 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors">
-            Bezárás
+            {tc("close")}
           </button>
         )}
       </div>
@@ -67,7 +70,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
     <form onSubmit={handleSubmit} className="space-y-4">
       {animalName && (
         <p className="text-sm text-gray-600">
-          Időpont kérése: <span className="font-semibold text-gray-900">{animalName}</span> megtekintésére
+          {t("requestFor")} <span className="font-semibold text-gray-900">{animalName}</span>
         </p>
       )}
 
@@ -75,7 +78,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-600">
             <CalendarDays className="mr-1 inline h-3.5 w-3.5" />
-            Dátum *
+            {t("dateLabel")} *
           </label>
           <input
             required type="date" value={date} min={minDateStr}
@@ -86,7 +89,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
         <div>
           <label className="mb-1 block text-xs font-semibold text-gray-600">
             <Clock className="mr-1 inline h-3.5 w-3.5" />
-            Időpont *
+            {t("timeLabel")} *
           </label>
           <input
             required type="time" value={time}
@@ -97,11 +100,11 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-semibold text-gray-600">Üzenet (opcionális)</label>
+        <label className="mb-1 block text-xs font-semibold text-gray-600">{t("noteLabel")}</label>
         <textarea
           value={note} onChange={e => setNote(e.target.value)}
           rows={3} maxLength={1000}
-          placeholder="Pl. délután inkább alkalmas, mert reggel dolgozom…"
+          placeholder={t("notePlaceholder")}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none"
         />
       </div>
@@ -111,7 +114,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
       <div className="flex gap-2">
         <button type="submit" disabled={loading}
           className="flex-1 rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
-          {loading ? "Küldés…" : "Időpont kérése"}
+          {loading ? t("submitting") : t("submitButton")}
         </button>
         {onClose && (
           <button type="button" onClick={onClose}

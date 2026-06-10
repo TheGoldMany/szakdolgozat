@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { ImageIcon, X, Loader2, Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ImageUploadProps {
   value: string;
@@ -10,18 +11,21 @@ interface ImageUploadProps {
   label?: string;
 }
 
-export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
+  const t = useTranslations("common");
   const [uploading, setUploading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const displayLabel = label ?? t("photo");
+
   async function handleFile(file: File) {
     if (!file.type.startsWith("image/")) {
-      setError("Csak képfájl tölthető fel (JPG, PNG, WebP, GIF).");
+      setError(t("uploadOnlyImages"));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setError("A kép mérete maximum 5 MB lehet.");
+      setError(t("uploadMaxSize"));
       return;
     }
 
@@ -36,7 +40,7 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
       });
       onChange(blob.url);
     } catch {
-      setError("Feltöltés sikertelen. Próbáld újra.");
+      setError(t("uploadFailed"));
     } finally {
       setUploading(false);
     }
@@ -60,7 +64,7 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-700">{label}</label>
+      <label className="mb-1.5 block text-sm font-medium text-gray-700">{displayLabel}</label>
 
       {value ? (
         /* Előnézet */
@@ -68,7 +72,7 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
-            alt="Előnézet"
+            alt={t("imagePreview")}
             className="h-48 w-full object-cover"
           />
           <button
@@ -90,7 +94,7 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
           {uploading ? (
             <>
               <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
-              <p className="text-sm text-gray-500">Feltöltés folyamatban...</p>
+              <p className="text-sm text-gray-500">{t("uploading")}</p>
             </>
           ) : (
             <>
@@ -99,14 +103,14 @@ export function ImageUpload({ value, onChange, label = "Fotó" }: ImageUploadPro
               </div>
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-700">
-                  <span className="text-brand-500">Kattints a feltöltéshez</span>
-                  {" "}vagy húzd ide a képet
+                  <span className="text-brand-500">{t("uploadClickToUpload")}</span>
+                  {" "}{t("uploadOrDrag")}
                 </p>
-                <p className="mt-1 text-xs text-gray-400">JPG, PNG, WebP – max. 5 MB</p>
+                <p className="mt-1 text-xs text-gray-400">{t("uploadFormats")}</p>
               </div>
               <div className="flex items-center gap-2 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-medium text-brand-600">
                 <Upload className="h-3.5 w-3.5" />
-                Kép kiválasztása
+                {t("uploadSelectImage")}
               </div>
             </>
           )}
