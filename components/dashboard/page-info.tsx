@@ -20,8 +20,8 @@ const PAGE_INFO: Record<string, InfoContent> = {
     title: "Események",
     intro: "Itt hirdetsz meg örökbefogadási napokat, adománygyűjtéseket és nyílt napokat, valamint követed a jelentkezőket.",
     points: [
-      { label: "Új esemény", desc: "Az „Új esemény” gombbal add meg a címet, típust, helyszínt, kezdő- és záró időpontot, opcionális létszámkorlátot és borítóképet." },
-      { label: "Vázlat vs. közzététel", desc: "Vázlatként mentve csak te látod; a „Közzététel” gombbal válik publikussá és jelentkezhetővé az Események oldalon." },
+      { label: "Új esemény", desc: "Az „Új esemény" gombbal add meg a címet, típust, helyszínt, kezdő- és záró időpontot, opcionális létszámkorlátot és borítóképet." },
+      { label: "Vázlat vs. közzététel", desc: "Vázlatként mentve csak te látod; a „Közzététel" gombbal válik publikussá és jelentkezhetővé az Események oldalon." },
       { label: "Jelentkezők", desc: "Minden eseménynél kibontható a jelentkezők listája a kísérők számával és megjegyzéseikkel együtt." },
       { label: "Lemondás / lezárás", desc: "Lemondáskor minden jelentkező automatikus értesítést kap; a lezárás archiválja a megtörtént eseményt." },
     ],
@@ -34,7 +34,7 @@ const PAGE_INFO: Record<string, InfoContent> = {
       { label: "Jóváhagyás / elutasítás", desc: "A jelentkezőknél a Jóváhagyás gombbal teszed aktívvá a befogadót; csak aktív befogadóhoz lehet állatot kihelyezni." },
       { label: "Preferenciák", desc: "Minden jelentkezőnél látod, milyen állatfajtát és mekkora súlyhatárig vállal, illetve tud-e karantént biztosítani." },
       { label: "Állat kihelyezése", desc: "Az állat részletoldalán (Állatok → adott állat) választhatod ki, melyik aktív befogadóhoz kerül fizikailag." },
-      { label: "Készlet kiadása", desc: "Aktív befogadónál a „Készlet kiadása” gombbal rögzíthetsz tápot/gyógyszert – a mennyiség automatikusan levonódik a központi raktárkészletből." },
+      { label: "Készlet kiadása", desc: "Aktív befogadónál a „Készlet kiadása" gombbal rögzíthetsz tápot/gyógyszert – a mennyiség automatikusan levonódik a központi raktárkészletből." },
     ],
     tip: "A kiadott készlet OUT tranzakcióként jelenik meg a készletmodulban is, így a leltár pontos marad.",
   },
@@ -42,7 +42,7 @@ const PAGE_INFO: Record<string, InfoContent> = {
     title: "Férőhelyek kezelése",
     intro: "Itt képezed le a menhely fizikai férőhelyeit – kenneleket, karanténokat, macskaszobákat – és követed, hol van fizikailag az adott állat.",
     points: [
-      { label: "Új férőhely", desc: "Az „Új férőhely” gombbal hozz létre egy egységet: megnevezés, típus (kennel, karantén, macskaszoba stb.) és maximális kapacitás." },
+      { label: "Új férőhely", desc: "Az „Új férőhely" gombbal hozz létre egy egységet: megnevezés, típus (kennel, karantén, macskaszoba stb.) és maximális kapacitás." },
       { label: "Foglaltság", desc: "Minden kártyán látod a kihasználtságot (foglalt/kapacitás) és a szabad helyek számát. Megtelt férőhely pirossal jelölve." },
       { label: "Áthelyezés", desc: "Az állat melletti legördülő listával egy mozdulattal áthelyezheted másik férőhelyre. A rendszer megakadályozza, ha a cél már megtelt." },
       { label: "Férőhely nélküliek", desc: "Az alsó szekcióban látod a férőhelyhez még nem rendelt állatokat, és onnan is beoszthatod őket." },
@@ -53,8 +53,8 @@ const PAGE_INFO: Record<string, InfoContent> = {
     title: "Készletkezelés",
     intro: "Itt tartod nyilván a menhely takarmány-, gyógyszer-, kellék- és eszközkészletét. A rendszer figyeli a minimum szintet és a lejárati dátumokat.",
     points: [
-      { label: "Tétel hozzáadása", desc: "A „Tétel hozzáadása” gombbal vehetsz fel új tételt: név, kategória, mértékegység, nyitókészlet, opcionális minimum szint és lejárati dátum." },
-      { label: "Mozgás rögzítése", desc: "A „Mozgás” gombbal rögzíthetsz Bevételezést (IN, +), Felhasználást (OUT, –) vagy Leltári korrekciót (ADJUST – a tényleges darabszámra állít). OUT esetén nem mehet a készlet 0 alá." },
+      { label: "Tétel hozzáadása", desc: "A „Tétel hozzáadása" gombbal vehetsz fel új tételt: név, kategória, mértékegység, nyitókészlet, opcionális minimum szint és lejárati dátum." },
+      { label: "Mozgás rögzítése", desc: "A „Mozgás" gombbal rögzíthetsz Bevételezést (IN, +), Felhasználást (OUT, –) vagy Leltári korrekciót (ADJUST – a tényleges darabszámra állít). OUT esetén nem mehet a készlet 0 alá." },
       { label: "Riasztások", desc: "Piros jelölés = alacsony készlet (jelenlegi < minimum), sárga = 7 napon belül lejár. Ezekről automatikus értesítést is kapsz." },
       { label: "Mozgástörténet", desc: "Minden tétel részletoldalán látható, ki, mikor, mennyit rögzített – így ellenőrizhető a nyilvántartás." },
     ],
@@ -75,7 +75,7 @@ const PAGE_INFO: Record<string, InfoContent> = {
     title: "Állatok kezelése",
     intro: "A menhely összes állatának nyilvántartása. Itt adsz hozzá új állatot és frissíted az állapotukat.",
     points: [
-      { label: "Állat hozzáadása", desc: "Az „Állat hozzáadása” gombbal: faj, fajta, kor, súly, leírás, fotók (max. 6) és egészségügyi jelölők (oltott, ivartalanított, mikrochipes)." },
+      { label: "Állat hozzáadása", desc: "Az „Állat hozzáadása" gombbal: faj, fajta, kor, súly, leírás, fotók (max. 6) és egészségügyi jelölők (oltott, ivartalanított, mikrochipes)." },
       { label: "Státusz váltás", desc: "Soronként állítható: Elérhető, Függőben, Örökbefogadva, Átmeneti gondozás, Állatorvosi megfigyelés." },
       { label: "Egészségügyi napló", desc: "Az állat részletoldalán rögzíthető oltás, féregtelenítés, kezelés, állatorvosi vizit – az állatorvos nevével és a következő esedékességgel." },
       { label: "Dokumentumok", desc: "Az Iratok fülön PDF-ek tölthetők fel (oltási könyv, ivartalanítási igazolás)." },
@@ -119,7 +119,7 @@ const PAGE_INFO: Record<string, InfoContent> = {
       { label: "Aktív előfizetők", desc: "Látod az előfizető nevét, a csomag típusát és az előfizetés kezdetét." },
       { label: "Lemondás", desc: "Az előfizetést a felhasználó a saját profilján mondhatja le – adminként nem módosítható." },
     ],
-    tip: "Az előfizetési csomagokat az „Előfizetési csomagok” oldalon hozhatod létre.",
+    tip: "Az előfizetési csomagokat az „Előfizetési csomagok" oldalon hozhatod létre.",
   },
   tiers: {
     title: "Előfizetési csomagok",

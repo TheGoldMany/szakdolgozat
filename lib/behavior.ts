@@ -36,7 +36,7 @@ export function detectConflicts(
 
   if (flags.includes("NOT_GOOD_WITH_CHILDREN") && applicant.hasChildren) {
     conflicts.push(
-      "A jelentkező háztartásában gyermek él, de az állat „Gyerekekkel nem barátságos” címkével rendelkezik.",
+      "A jelentkező háztartásában gyermek él, de az állat „Gyerekekkel nem barátságos" címkével rendelkezik.",
     );
   }
 

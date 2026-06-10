@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     // Kapacitás ellenőrzés – tele van?
     if (kennel._count.animals >= kennel.capacity) {
       return NextResponse.json(
-        { error: `A(z) „${kennel.name}” férőhely megtelt (${kennel._count.animals}/${kennel.capacity}).` },
+        { error: `A(z) „${kennel.name}" férőhely megtelt (${kennel._count.animals}/${kennel.capacity}).` },
         { status: 409 },
       );
     }

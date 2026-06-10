@@ -89,7 +89,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
                 {f.maxWeightKg != null && <span><span className="font-medium">{t("adminMaxWeight")}</span> {f.maxWeightKg} kg</span>}
                 <span><span className="font-medium">{t("adminQuarantine")}</span> {f.canQuarantine ? t("adminQuarantineYes") : t("adminQuarantineNo")}</span>
               </div>
-              {f.motivation && <p className="mt-1.5 text-xs italic text-gray-500">„{f.motivation}”</p>}
+              {f.motivation && <p className="mt-1.5 text-xs italic text-gray-500">„{f.motivation}"</p>}
             </div>
 
             {/* Műveletek */}
