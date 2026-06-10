@@ -29,7 +29,7 @@ export function FosterAssign({ animalId, currentFosterId, fosters }: Props) {
     });
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(data.error ?? t("error")); return; }
     setValue(fosterId);
     router.refresh();
   }
