@@ -50,7 +50,7 @@ export function FosterAdmin({ initialFosters, inventory }: {
       body:    JSON.stringify({ status }),
     });
     const data = await res.json();
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(data.error ?? t("error")); return; }
     setFosters(prev => prev.map(f => f.id === id ? { ...f, status } : f));
     router.refresh();
   }
@@ -193,7 +193,7 @@ function SupplyForm({ fosterId, inventory, onLogged, onError }: {
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { onError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { onError(data.error ?? t("error")); return; }
     onLogged(data as SupplyLog);
     setQuantity(""); setNote("");
   }
