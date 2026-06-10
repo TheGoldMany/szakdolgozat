@@ -16,6 +16,7 @@ const schema = z.object({
   city:         z.string().min(1, "Kötelező mező").max(100),
   address:      z.string().max(200).optional(),
   imageUrl:     z.string().url().optional().or(z.literal("")),
+  imageUrls:    z.array(z.string().url()).max(6).optional(),
   contactName:  z.string().min(2).max(100),
   contactPhone: z.string().min(1, "Kötelező mező").max(20),
   contactEmail: z.string().email("Érvénytelen email"),
@@ -35,13 +36,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const data = parsed.data;
+  const { imageUrls, ...data } = parsed.data;
+  // A galéria képei; az első a primary. Visszafelé kompatibilis a régi
+  // egy-képes imageUrl mezővel is.
+  const gallery = (imageUrls ?? []).filter(Boolean);
+  const primaryUrl = gallery[0] || data.imageUrl || null;
+
   try {
     const report = await prisma.animalReport.create({
       data: {
         ...data,
-        imageUrl: data.imageUrl || null,
+        imageUrl: primaryUrl,
         userId: session?.user?.id ?? null,
+        ...(gallery.length && {
+          images: {
+            create: gallery.map((url, i) => ({
+              url, alt: data.name ?? null, isPrimary: i === 0, order: i,
+            })),
+          },
+        }),
       },
     });
     return NextResponse.json({ report }, { status: 201 });

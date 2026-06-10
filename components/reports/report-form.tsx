@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
-import { ImageUpload } from "@/components/ui/image-upload";
+import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 import { LocationPicker } from "@/components/ui/location-picker";
 
 function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
@@ -25,7 +25,7 @@ function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
     contactName:  z.string().min(2, t("validationRequired")),
     contactPhone: z.string().min(1, t("validationRequired")),
     contactEmail: z.string().email(t("validationInvalidEmail")),
-    imageUrl:     z.string().optional(),
+    imageUrls:    z.array(z.string()).optional(),
   });
 }
 
@@ -44,7 +44,7 @@ type FormData = {
   contactName:  string;
   contactPhone: string;
   contactEmail: string;
-  imageUrl?:    string;
+  imageUrls?:   string[];
 };
 
 const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -82,7 +82,7 @@ export function ReportForm() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { type: "LOST", animalType: "DOG", imageUrl: "" },
+    defaultValues: { type: "LOST", animalType: "DOG", imageUrls: [] },
   });
 
   const selectedType = watch("type");
@@ -187,14 +187,15 @@ export function ReportForm() {
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
       </div>
 
-      {/* Fotó */}
+      {/* Fotók */}
       <Controller
-        name="imageUrl"
+        name="imageUrls"
         control={control}
         render={({ field }) => (
-          <ImageUpload
-            value={field.value ?? ""}
+          <MultiImageUpload
+            value={field.value ?? []}
             onChange={field.onChange}
+            max={6}
             label={t("formPhotoLabel")}
           />
         )}

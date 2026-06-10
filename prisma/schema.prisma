@@ -556,6 +556,7 @@ model AnimalReport {
   aiSummary      String?   @db.Text // rövid kereshető összefoglaló
 
   user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  images    ReportImage[]
   matchesA  ReportMatch[] @relation("ReportMatchA")
   matchesB  ReportMatch[] @relation("ReportMatchB")
 
@@ -563,6 +564,22 @@ model AnimalReport {
   @@index([status])
   @@index([city])
   @@index([animalType])
+}
+
+// Egy bejelentéshez tartozó képek (mint az AnimalImage az állatoknál).
+// A primary kép URL-je denormalizálva az AnimalReport.imageUrl mezőben is.
+model ReportImage {
+  id        String       @id @default(cuid())
+  reportId  String
+  url       String
+  alt       String?
+  isPrimary Boolean      @default(false)
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+
+  report AnimalReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
 }
 
 // Két bejelentés (jellemzően egy LOST és egy FOUND/STRAY) közötti párosítás.

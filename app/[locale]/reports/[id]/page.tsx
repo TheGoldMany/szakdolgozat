@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function ReportDetailPage({ params }: { params: { id: string } }) {
   const [report, session, t] = await Promise.all([
-    prisma.animalReport.findUnique({ where: { id: params.id } }),
+    prisma.animalReport.findUnique({
+      where: { id: params.id },
+      include: { images: { orderBy: [{ isPrimary: "desc" }, { order: "asc" }] } },
+    }),
     getServerSession(authOptions),
     getTranslations("reports"),
   ]);
@@ -107,6 +110,14 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
   const statusLabel = STATUS_LABEL[report.status];
   const statusColor = STATUS_COLOR[report.status];
 
+  // Galéria: a relációs képek, visszaesve a régi egy-képes imageUrl mezőre.
+  const galleryImages =
+    report.images.length > 0
+      ? report.images.map((img) => img.url)
+      : report.imageUrl
+        ? [report.imageUrl]
+        : [];
+
   const isOwner    = session?.user?.id && report.userId === session.user.id;
   const isAdmin    = session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "SHELTER_ADMIN";
   const canResolve = (isOwner || isAdmin) && report.status === "ACTIVE";
@@ -143,14 +154,31 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             </span>
           </div>
 
-          {report.imageUrl && (
-            <div className="relative h-56 w-full sm:h-72 bg-gray-100">
-              <Image
-                src={report.imageUrl}
-                alt={report.name ?? report.breed ?? t("unknownAnimal")}
-                fill className="object-cover"
-                sizes="(max-width: 672px) 100vw, 672px"
-              />
+          {galleryImages.length > 0 && (
+            <div>
+              <div className="relative h-56 w-full sm:h-72 bg-gray-100">
+                <Image
+                  src={galleryImages[0]}
+                  alt={report.name ?? report.breed ?? t("unknownAnimal")}
+                  fill className="object-cover"
+                  sizes="(max-width: 672px) 100vw, 672px"
+                  priority
+                />
+              </div>
+              {galleryImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-2 p-2">
+                  {galleryImages.slice(1, 5).map((url, i) => (
+                    <div key={url} className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+                      <Image
+                        src={url}
+                        alt={`${report.name ?? report.breed ?? t("unknownAnimal")} ${i + 2}`}
+                        fill className="object-cover"
+                        sizes="160px"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
