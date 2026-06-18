@@ -174,6 +174,9 @@
     "propGoodWithCats": "Macskabarát",
     "favoriteAdd": "Kedvencekhez ad",
     "favoriteRemove": "Eltávolítás a kedvencekből",
+    "favoriteAddedToast": "Hozzáadva a kedvencekhez",
+    "favoriteRemovedToast": "Eltávolítva a kedvencekből",
+    "favoriteError": "Nem sikerült, próbáld újra",
     "adoptionForm": {
       "messageMinError": "Legalább 20 karakter szükséges",
       "unknownError": "Ismeretlen hiba",
@@ -421,7 +424,11 @@
     "matchDismiss": "Ez nem az",
     "matchContact": "Kapcsolatfelvétel",
     "matchDismissed": "Egyezés elutasítva",
-    "matchDismissError": "Hiba az elutasítás során, próbáld újra"
+    "matchDismissError": "Hiba az elutasítás során, próbáld újra",
+    "resolveButton": "Megjelölés megoldottként",
+    "resolveSuccess": "A bejelentés megoldottként megjelölve",
+    "resolveError": "Nem sikerült megjelölni, próbáld újra",
+    "formSuccess": "Bejelentés sikeresen elküldve"
   },
   "help": {
     "title": "Útmutató",
@@ -496,6 +503,8 @@
     "statusWithdrawn": "Visszavont",
     "withdraw": "Visszavonás",
     "withdrawConfirm": "Biztosan visszavonod?",
+    "withdrawSuccess": "Kérelem visszavonva",
+    "withdrawError": "Nem sikerült visszavonni, próbáld újra",
     "statusInvited": "Meghívva",
     "formRequestedBanner": "A menhely kérvény kitöltését kéri",
     "fillForm": "Kérvény kitöltése",
@@ -1031,6 +1040,7 @@
     "subscriptionsCancelButton": "Lemondás",
     "subscriptionsCancelConfirm": "Biztosan le szeretnéd mondani ezt az előfizetést?",
     "subscriptionsCancelError": "Hiba történt a lemondás során.",
+    "subscriptionsCancelSuccess": "Előfizetés lemondva",
     "analyticsTitle": "Analitika",
     "analyticsSubtitle": "Power BI-alapú üzleti mutatók",
     "analyticsSheltersFilter": "Menhelyek ({selected}/{total})",

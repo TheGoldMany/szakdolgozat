@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { upload } from "@vercel/blob/client";
 import { Send, Paperclip, X, FileText, Image as ImageIcon, ClipboardList } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface Sender {
@@ -215,7 +216,12 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
         // Restore on failure
         setInput(prev);
         setAttachment(prevAttachment);
+        toast.error("Az üzenet küldése sikertelen, próbáld újra.");
       }
+    } catch {
+      setInput(prev);
+      setAttachment(prevAttachment);
+      toast.error("Hálózati hiba, próbáld újra.");
     } finally {
       setSending(false);
       inputRef.current?.focus();

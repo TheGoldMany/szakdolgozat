@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heart, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -51,11 +52,14 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
           return;
         }
         setFavorited(!next);     // revert
+        toast.error(t("favoriteError"));
         return;
       }
+      toast.success(next ? t("favoriteAddedToast") : t("favoriteRemovedToast"));
       if (!next) onRemoved?.();
     } catch {
       setFavorited(!next);       // revert on network error
+      toast.error(t("favoriteError"));
     } finally {
       setLoading(false);
     }

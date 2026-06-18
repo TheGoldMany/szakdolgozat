@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface Props {
   subscriptionId: string;
@@ -23,11 +24,14 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
         method: "POST",
       });
       if (res.ok) {
+        toast.success(t("subscriptionsCancelSuccess"));
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        alert(data.error ?? t("subscriptionsCancelError"));
+        toast.error(data.error ?? t("subscriptionsCancelError"));
       }
+    } catch {
+      toast.error(t("subscriptionsCancelError"));
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { StarRating } from "./star-rating";
 
 interface ReviewCardProps {
@@ -26,8 +27,15 @@ export function ReviewCard({ review, currentUserId }: ReviewCardProps) {
   async function handleDelete() {
     if (!confirm("Biztosan törlöd az értékelésedet?")) return;
     setDeleting(true);
-    await fetch(`/api/reviews/${review.id}`, { method: "DELETE" });
-    router.refresh();
+    try {
+      const res = await fetch(`/api/reviews/${review.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      toast.success("Értékelés törölve");
+      router.refresh();
+    } catch {
+      toast.error("Nem sikerült törölni, próbáld újra");
+      setDeleting(false);
+    }
   }
 
   return (

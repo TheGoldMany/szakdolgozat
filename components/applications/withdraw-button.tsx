@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 export function WithdrawButton({ applicationId }: { applicationId: string }) {
   const t = useTranslations("applications");
@@ -16,8 +17,16 @@ export function WithdrawButton({ applicationId }: { applicationId: string }) {
       return;
     }
     setLoading(true);
-    await fetch(`/api/applications/${applicationId}`, { method: "PATCH" });
-    router.refresh();
+    try {
+      const res = await fetch(`/api/applications/${applicationId}`, { method: "PATCH" });
+      if (!res.ok) throw new Error();
+      toast.success(t("withdrawSuccess"));
+      router.refresh();
+    } catch {
+      toast.error(t("withdrawError"));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

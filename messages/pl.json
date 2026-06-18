@@ -174,6 +174,9 @@
     "propGoodWithCats": "Lubi koty",
     "favoriteAdd": "Dodaj do ulubionych",
     "favoriteRemove": "Usuń z ulubionych",
+    "favoriteAddedToast": "Dodano do ulubionych",
+    "favoriteRemovedToast": "Usunięto z ulubionych",
+    "favoriteError": "Nie udało się, spróbuj ponownie",
     "adoptionForm": {
       "messageMinError": "Wymagane co najmniej 20 znaków",
       "unknownError": "Nieznany błąd",
@@ -421,7 +424,11 @@
     "matchDismiss": "To nie to",
     "matchContact": "Skontaktuj się",
     "matchDismissed": "Dopasowanie odrzucone",
-    "matchDismissError": "Błąd podczas odrzucania, spróbuj ponownie"
+    "matchDismissError": "Błąd podczas odrzucania, spróbuj ponownie",
+    "resolveButton": "Oznacz jako rozwiązane",
+    "resolveSuccess": "Zgłoszenie oznaczone jako rozwiązane",
+    "resolveError": "Nie udało się oznaczyć, spróbuj ponownie",
+    "formSuccess": "Zgłoszenie wysłane pomyślnie"
   },
   "help": {
     "title": "Podręcznik użytkownika",
@@ -496,6 +503,8 @@
     "statusWithdrawn": "Wycofany",
     "withdraw": "Wycofaj",
     "withdrawConfirm": "Na pewno chcesz wycofać?",
+    "withdrawSuccess": "Wniosek wycofany",
+    "withdrawError": "Nie udało się wycofać, spróbuj ponownie",
     "statusInvited": "Zaproszony",
     "formRequestedBanner": "Schronisko prosi o wypełnienie formularza",
     "fillForm": "Wypełnij formularz",
@@ -1031,6 +1040,7 @@
     "subscriptionsCancelButton": "Anuluj",
     "subscriptionsCancelConfirm": "Czy na pewno chcesz anulować tę subskrypcję?",
     "subscriptionsCancelError": "Wystąpił błąd podczas anulowania.",
+    "subscriptionsCancelSuccess": "Subskrypcja anulowana",
     "analyticsTitle": "Analityka",
     "analyticsSubtitle": "Wskaźniki biznesowe oparte na Power BI",
     "analyticsSheltersFilter": "Schroniska ({selected}/{total})",

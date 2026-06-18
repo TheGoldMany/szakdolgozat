@@ -174,6 +174,9 @@
     "propGoodWithCats": "Good with cats",
     "favoriteAdd": "Add to favorites",
     "favoriteRemove": "Remove from favorites",
+    "favoriteAddedToast": "Added to favorites",
+    "favoriteRemovedToast": "Removed from favorites",
+    "favoriteError": "Something went wrong, please try again",
     "adoptionForm": {
       "messageMinError": "At least 20 characters required",
       "unknownError": "Unknown error",
@@ -421,7 +424,11 @@
     "matchDismiss": "Not a match",
     "matchContact": "Get in touch",
     "matchDismissed": "Match dismissed",
-    "matchDismissError": "Could not dismiss match, please try again"
+    "matchDismissError": "Could not dismiss match, please try again",
+    "resolveButton": "Mark as resolved",
+    "resolveSuccess": "Report marked as resolved",
+    "resolveError": "Could not mark as resolved, please try again",
+    "formSuccess": "Report submitted successfully"
   },
   "help": {
     "title": "User guide",
@@ -496,6 +503,8 @@
     "statusWithdrawn": "Withdrawn",
     "withdraw": "Withdraw",
     "withdrawConfirm": "Are you sure?",
+    "withdrawSuccess": "Application withdrawn",
+    "withdrawError": "Could not withdraw, please try again",
     "statusInvited": "Invited",
     "formRequestedBanner": "The shelter requests you fill out a form",
     "fillForm": "Fill out form",
@@ -1031,6 +1040,7 @@
     "subscriptionsCancelButton": "Cancel",
     "subscriptionsCancelConfirm": "Are you sure you want to cancel this subscription?",
     "subscriptionsCancelError": "An error occurred while cancelling.",
+    "subscriptionsCancelSuccess": "Subscription cancelled",
     "analyticsTitle": "Analytics",
     "analyticsSubtitle": "Power BI-based business metrics",
     "analyticsSheltersFilter": "Shelters ({selected}/{total})",

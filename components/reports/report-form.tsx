@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 import { LocationPicker } from "@/components/ui/location-picker";
 
@@ -98,6 +99,8 @@ export function ReportForm() {
     });
     const json = await res.json();
     if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
+
+    toast.success(t("formSuccess"));
 
     // Kép-alapú párosítás futtatása (legjobb tudás szerint, hibatűrően).
     const reportId = json.report.id;
