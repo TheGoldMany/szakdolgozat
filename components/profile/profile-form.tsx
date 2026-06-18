@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 const schema = z.object({
   name:    z.string().min(2),
@@ -26,7 +27,6 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const t = useTranslations("profile");
-  const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -45,7 +45,6 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
   async function onSubmit(data: FormData) {
     setServerError(null);
-    setSuccess(false);
     const res = await fetch("/api/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -56,7 +55,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       setServerError(json.error ?? t("networkError"));
       return;
     }
-    setSuccess(true);
+    toast.success(t("profileSaved"));
   }
 
   return (
@@ -64,11 +63,6 @@ export function ProfileForm({ user }: ProfileFormProps) {
       {serverError && (
         <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {serverError}
-        </div>
-      )}
-      {success && (
-        <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
-          {t("profileSaved")}
         </div>
       )}
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition";
 
@@ -13,12 +14,10 @@ export function ChangePasswordForm() {
   const [confirm, setConfirm]   = useState("");
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
-  const [success, setSuccess]   = useState(false);
   const [error, setError]       = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSuccess(false);
     setError("");
 
     if (next !== confirm) {
@@ -42,7 +41,7 @@ export function ChangePasswordForm() {
         setError(json.error ?? t("networkError"));
         return;
       }
-      setSuccess(true);
+      toast.success(t("passwordChanged"));
       setCurrent(""); setNext(""); setConfirm("");
     } catch {
       setError(t("networkError"));
@@ -56,11 +55,6 @@ export function ChangePasswordForm() {
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
-        </div>
-      )}
-      {success && (
-        <div className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
-          {t("passwordChanged")}
         </div>
       )}
 

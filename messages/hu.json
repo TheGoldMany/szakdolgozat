@@ -419,7 +419,9 @@
     "matchPossible": "Lehetséges egyezés",
     "matchUnlikely": "Bizonytalan",
     "matchDismiss": "Ez nem az",
-    "matchContact": "Kapcsolatfelvétel"
+    "matchContact": "Kapcsolatfelvétel",
+    "matchDismissed": "Egyezés elutasítva",
+    "matchDismissError": "Hiba az elutasítás során, próbáld újra"
   },
   "help": {
     "title": "Útmutató",
@@ -566,6 +568,13 @@
     "findSimilar": "Keress hasonlókat",
     "findingSimilar": "Keresés...",
     "matchCount": "{count} egyezés"
+  },
+  "cookies": {
+    "title": "Sütik és adatvédelem",
+    "description": "Ez az oldal munkamenet-sütiket használ a bejelentkezéshez. Más célú sütit nem tárolunk.",
+    "learnMore": "Adatkezelési tájékoztató",
+    "acceptAll": "Elfogadom",
+    "necessaryOnly": "Csak szükséges"
   },
   "messages": {
     "title": "Üzenetek",

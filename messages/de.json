@@ -419,7 +419,9 @@
     "matchPossible": "Mögliche Übereinstimmung",
     "matchUnlikely": "Unsicher",
     "matchDismiss": "Das ist es nicht",
-    "matchContact": "Kontakt aufnehmen"
+    "matchContact": "Kontakt aufnehmen",
+    "matchDismissed": "Treffer abgelehnt",
+    "matchDismissError": "Fehler beim Ablehnen, bitte erneut versuchen"
   },
   "help": {
     "title": "Benutzerhandbuch",
@@ -566,6 +568,13 @@
     "findSimilar": "Ähnliche suchen",
     "findingSimilar": "Suche...",
     "matchCount": "{count} Treffer"
+  },
+  "cookies": {
+    "title": "Cookies & Datenschutz",
+    "description": "Diese Seite verwendet Session-Cookies für die Anmeldung. Andere Cookies werden nicht gespeichert.",
+    "learnMore": "Datenschutzerklärung",
+    "acceptAll": "Alle akzeptieren",
+    "necessaryOnly": "Nur notwendige"
   },
   "messages": {
     "title": "Nachrichten",

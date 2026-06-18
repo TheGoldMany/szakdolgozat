@@ -419,7 +419,9 @@
     "matchPossible": "Possible match",
     "matchUnlikely": "Uncertain",
     "matchDismiss": "Not a match",
-    "matchContact": "Get in touch"
+    "matchContact": "Get in touch",
+    "matchDismissed": "Match dismissed",
+    "matchDismissError": "Could not dismiss match, please try again"
   },
   "help": {
     "title": "User guide",
@@ -566,6 +568,13 @@
     "findSimilar": "Find similar",
     "findingSimilar": "Searching...",
     "matchCount": "{count} match(es)"
+  },
+  "cookies": {
+    "title": "Cookies & Privacy",
+    "description": "This site uses session cookies for login. No other cookies are stored.",
+    "learnMore": "Privacy policy",
+    "acceptAll": "Accept all",
+    "necessaryOnly": "Necessary only"
   },
   "messages": {
     "title": "Messages",

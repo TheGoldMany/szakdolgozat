@@ -6,6 +6,7 @@ import { getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { CookieBanner } from "@/components/ui/cookie-banner";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import "../globals.css";
@@ -41,6 +42,7 @@ export default async function LocaleLayout({
             <Suspense><Header /></Suspense>
             <main>{children}</main>
             <Footer />
+            <CookieBanner />
           </Providers>
         </NextIntlClientProvider>
       </body>

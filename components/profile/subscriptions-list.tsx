@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 type Tier = {
   name:    string;
@@ -22,19 +23,18 @@ export function SubscriptionsList({ subscriptions }: { subscriptions: Subscripti
   const t      = useTranslations("profile");
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
-  const [error,   setError]   = useState<string | null>(null);
 
   async function handleCancel(id: string) {
     if (!confirm(t("cancelConfirm"))) return;
     setLoading(id);
-    setError(null);
     try {
       const res  = await fetch(`/api/subscriptions/${id}/cancel`, { method: "POST" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t("networkError"));
+      toast.success(t("cancelled"));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("networkError"));
+      toast.error(err instanceof Error ? err.message : t("networkError"));
     } finally {
       setLoading(null);
     }
@@ -46,7 +46,6 @@ export function SubscriptionsList({ subscriptions }: { subscriptions: Subscripti
 
   return (
     <div className="space-y-3">
-      {error && <p className="text-sm text-red-500">{error}</p>}
       {subscriptions.map((sub) => (
         <div key={sub.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
           <div className="text-sm">

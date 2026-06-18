@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import {
   Sparkles,
@@ -83,8 +84,13 @@ export function ReportMatches({ matches, canManage }: Props) {
       });
       if (res.ok) {
         setHidden((prev) => new Set(prev).add(id));
+        toast.info(t("matchDismissed"));
         router.refresh();
+      } else {
+        toast.error(t("matchDismissError"));
       }
+    } catch {
+      toast.error(t("matchDismissError"));
     } finally {
       setDismissing(null);
     }

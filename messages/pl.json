@@ -419,7 +419,9 @@
     "matchPossible": "Możliwe dopasowanie",
     "matchUnlikely": "Niepewne",
     "matchDismiss": "To nie to",
-    "matchContact": "Skontaktuj się"
+    "matchContact": "Skontaktuj się",
+    "matchDismissed": "Dopasowanie odrzucone",
+    "matchDismissError": "Błąd podczas odrzucania, spróbuj ponownie"
   },
   "help": {
     "title": "Podręcznik użytkownika",
@@ -566,6 +568,13 @@
     "findSimilar": "Szukaj podobnych",
     "findingSimilar": "Szukanie...",
     "matchCount": "{count} dopasowanie(ń)"
+  },
+  "cookies": {
+    "title": "Pliki cookie i prywatność",
+    "description": "Ta strona używa plików cookie sesji do logowania. Inne pliki cookie nie są przechowywane.",
+    "learnMore": "Polityka prywatności",
+    "acceptAll": "Akceptuj wszystkie",
+    "necessaryOnly": "Tylko niezbędne"
   },
   "messages": {
     "title": "Wiadomości",
