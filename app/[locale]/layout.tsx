@@ -40,7 +40,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Suspense><Header /></Suspense>
-            <main>{children}</main>
+            <main className="pt-28">{children}</main>
             <Footer />
             <CookieBanner />
           </Providers>

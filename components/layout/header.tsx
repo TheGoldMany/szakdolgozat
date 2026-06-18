@@ -88,7 +88,7 @@ export function Header() {
   const currentLocale = LOCALE_LABELS[locale] ?? LOCALE_LABELS.hu;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
+    <header className="fixed top-0 left-0 right-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
 
       {/* Test-mode banner */}
       <div className="bg-amber-400 text-amber-950">
