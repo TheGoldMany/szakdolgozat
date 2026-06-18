@@ -327,3 +327,4 @@ Stripe webhook URL a Vercel deployment után:
 ## Licenc
 
 Szakdolgozati projekt – © 2026
+# Deploy trigger
