@@ -20,6 +20,7 @@ import {
   isVisionEnabled,
 } from "./vision";
 import { sendReportMatchEmail } from "./email";
+import { createNotification } from "./notifications";
 import type { AnimalReport, ReportType, MatchVerdict } from "@prisma/client";
 
 const RADIUS_KM = 50;
@@ -286,6 +287,18 @@ export async function runMatchingForReport(reportId: string): Promise<void> {
       if (verdict === "LIKELY" && !match.dismissed && !match.notified) {
         const priorReport = candidate; // a már létező bejelentés
         const base = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
+
+        // In-app értesítés a harang-ikonhoz (ha a korábbi bejelentésnek van gazdája)
+        if (priorReport.userId) {
+          await createNotification({
+            userId: priorReport.userId,
+            type:   "REPORT_MATCH_FOUND",
+            title:  "Lehetséges egyezés a bejelentésedre",
+            body:   reasons[0] ?? `Új ${TYPE_LABEL[report.type].toLowerCase()} bejelentés illeszkedhet a tiédhez.`,
+            href:   `/reports/${priorReport.id}`,
+          }).catch((err) => console.error("report match notification error:", err));
+        }
+
         try {
           await sendReportMatchEmail({
             to: priorReport.contactEmail,

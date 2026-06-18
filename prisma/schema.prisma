@@ -999,6 +999,7 @@ enum NotificationType {
   FORM_REJECTED // Shelter admin: form rejected
   // Reports
   REPORT_RESOLVED // User: report status updated
+  REPORT_MATCH_FOUND // User: a likely lost/found match was found for their report
   // Donations & subscriptions
   DONATION_RECEIVED // Admin: new donation received
   SUBSCRIPTION_STARTED // User: subscription confirmed
