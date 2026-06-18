@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { HandHeart, X, CheckCircle } from "lucide-react";
 
 interface Props {
@@ -16,7 +17,6 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
   const [skills,       setSkills]       = useState("");
   const [availability, setAvailability] = useState("");
   const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState<string | null>(null);
   const [success,      setSuccess]      = useState(false);
 
   if (existingStatus) {
@@ -42,22 +42,27 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true); setError(null);
-    const res = await fetch("/api/volunteers", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({
-        shelterId,
-        motivation:   motivation || undefined,
-        skills:       skills || undefined,
-        availability: availability || undefined,
-      }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
-    setSuccess(true);
-    router.refresh();
+    setLoading(true);
+    try {
+      const res  = await fetch("/api/volunteers", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          shelterId,
+          motivation:   motivation || undefined,
+          skills:       skills || undefined,
+          availability: availability || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error ?? "Hiba történt, próbáld újra."); return; }
+      setSuccess(true);
+      router.refresh();
+    } catch {
+      toast.error("Hálózati hiba, próbáld újra.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (success) {
@@ -107,7 +112,6 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
               className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
           <button type="submit" disabled={loading}
             className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
             {loading ? "Küldés..." : "Jelentkezés elküldése"}

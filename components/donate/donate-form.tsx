@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 interface DonateFormProps {
@@ -57,7 +58,9 @@ export function DonateForm({ campaignId }: DonateFormProps) {
       const { url } = await res.json();
       if (url) window.location.href = url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba történt.");
+      const msg = err instanceof Error ? err.message : "Ismeretlen hiba történt.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

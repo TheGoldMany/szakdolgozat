@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { StarRating } from "./star-rating";
 
 interface Props {
@@ -11,44 +12,39 @@ interface Props {
 
 export function ReviewForm({ shelterId, targetUserId }: Props) {
   const router = useRouter();
-  const [rating,   setRating]   = useState(0);
-  const [comment,  setComment]  = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
-  const [success,  setSuccess]  = useState(false);
+  const [rating,  setRating]  = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [ratingError, setRatingError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (rating === 0) { setError("Adj meg csillagos értékelést!"); return; }
+    if (rating === 0) { setRatingError(true); return; }
+    setRatingError(false);
     setLoading(true);
-    setError(null);
 
-    const res = await fetch("/api/reviews", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shelterId, targetUserId, rating, comment: comment || undefined }),
-    });
+    try {
+      const res  = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ shelterId, targetUserId, rating, comment: comment || undefined }),
+      });
+      const data = await res.json();
 
-    const data = await res.json();
-    setLoading(false);
+      if (!res.ok) {
+        toast.error(data.error ?? "Hiba történt");
+        return;
+      }
 
-    if (!res.ok) {
-      setError(data.error ?? "Hiba történt");
-      return;
+      toast.success("Értékelésed sikeresen elküldve!");
+      setRating(0);
+      setComment("");
+      router.refresh();
+    } catch {
+      toast.error("Hálózati hiba, próbáld újra.");
+    } finally {
+      setLoading(false);
     }
-
-    setSuccess(true);
-    setRating(0);
-    setComment("");
-    router.refresh();
-  }
-
-  if (success) {
-    return (
-      <div className="rounded-2xl border border-green-100 bg-green-50 p-4 text-sm text-green-700">
-        ✓ Értékelésed sikeresen elküldve!
-      </div>
-    );
   }
 
   return (
@@ -57,7 +53,8 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
 
       <div className="mb-4">
         <p className="mb-1.5 text-xs font-medium text-gray-500">Csillagok *</p>
-        <StarRating value={rating} onChange={setRating} size="lg" />
+        <StarRating value={rating} onChange={(v) => { setRating(v); setRatingError(false); }} size="lg" />
+        {ratingError && <p className="mt-1 text-xs text-red-500">Adj meg csillagos értékelést!</p>}
       </div>
 
       <div className="mb-4">
@@ -74,8 +71,6 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
         />
         <p className="mt-1 text-right text-xs text-gray-400">{comment.length}/1000</p>
       </div>
-
-      {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
 
       <button
         type="submit"

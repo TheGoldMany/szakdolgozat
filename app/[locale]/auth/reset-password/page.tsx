@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { PawPrint, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 function ResetForm() {
   const t           = useTranslations("auth");
@@ -56,6 +57,7 @@ function ResetForm() {
         setError(json.error ?? t("resetGenericError"));
         return;
       }
+      toast.success(t("resetSuccessTitle"));
       setSuccess(true);
       setTimeout(() => router.push("/auth/login"), 2500);
     } catch {

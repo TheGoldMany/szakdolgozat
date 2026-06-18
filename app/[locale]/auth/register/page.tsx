@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { PawPrint, Heart, Shield, Bell, MailCheck } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const t           = useTranslations("auth");
@@ -44,11 +45,16 @@ export default function RegisterPage() {
 
   async function resend() {
     if (!registeredEmail) return;
-    await fetch("/api/auth/resend-verification", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ email: registeredEmail }),
-    });
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: registeredEmail }),
+      });
+      toast.success(t("verifyResent"));
+    } catch {
+      toast.error(t("networkError"));
+    }
     setResent(true);
   }
 

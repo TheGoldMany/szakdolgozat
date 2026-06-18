@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 type FormData = {
   message:     string;
@@ -57,6 +58,7 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
       setServerError(json.error ?? t("unknownError"));
       return;
     }
+    toast.success(t("successTitle"));
     setSubmitted(true);
     router.refresh();
   }

@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { PawPrint, CheckCircle2 } from "lucide-react";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 // ── Google icon ──────────────────────────────────────────
 function GoogleIcon() {
@@ -99,11 +100,16 @@ function LoginForm() {
 
   async function resendVerification() {
     if (!unverifiedEmail) return;
-    await fetch("/api/auth/resend-verification", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ email: unverifiedEmail }),
-    });
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: unverifiedEmail }),
+      });
+      toast.success(t("verifyResent"));
+    } catch {
+      toast.error(t("networkError"));
+    }
     setResent(true);
   }
 
