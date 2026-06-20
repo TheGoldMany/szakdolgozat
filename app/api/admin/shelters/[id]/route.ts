@@ -24,16 +24,21 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
   }
 
-  const exists = await prisma.shelter.findUnique({ where: { id: params.id }, select: { id: true } });
-  if (!exists) {
-    return NextResponse.json({ error: "A menhely nem található" }, { status: 404 });
+  try {
+    const exists = await prisma.shelter.findUnique({ where: { id: params.id }, select: { id: true } });
+    if (!exists) {
+      return NextResponse.json({ error: "A menhely nem található" }, { status: 404 });
+    }
+
+    const shelter = await prisma.shelter.update({
+      where: { id: params.id },
+      data:  parsed.data,
+      select: { id: true, isActive: true, isVerified: true },
+    });
+
+    return NextResponse.json(shelter);
+  } catch (error) {
+    console.error('[api/admin/shelters/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const shelter = await prisma.shelter.update({
-    where: { id: params.id },
-    data:  parsed.data,
-    select: { id: true, isActive: true, isVerified: true },
-  });
-
-  return NextResponse.json(shelter);
 }

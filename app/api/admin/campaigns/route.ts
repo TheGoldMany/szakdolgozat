@@ -10,13 +10,18 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
   }
 
-  const campaigns = await prisma.campaign.findMany({
-    where:   { status: "PENDING" },
-    orderBy: { createdAt: "asc" },
-    include: {
-      user: { select: { name: true, email: true } },
-    },
-  });
+  try {
+    const campaigns = await prisma.campaign.findMany({
+      where:   { status: "PENDING" },
+      orderBy: { createdAt: "asc" },
+      include: {
+        user: { select: { name: true, email: true } },
+      },
+    });
 
-  return NextResponse.json(campaigns);
+    return NextResponse.json(campaigns);
+  } catch (error) {
+    console.error('[api/admin/campaigns GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

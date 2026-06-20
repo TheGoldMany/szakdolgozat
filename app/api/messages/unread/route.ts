@@ -7,30 +7,35 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ count: 0 });
 
-  const userId = session.user.id;
-  const isShelterAdmin = session.user.role === "SHELTER_ADMIN";
+  try {
+    const userId = session.user.id;
+    const isShelterAdmin = session.user.role === "SHELTER_ADMIN";
 
-  let conversationFilter = {};
+    let conversationFilter = {};
 
-  if (isShelterAdmin) {
-    const adminRecord = await prisma.shelterAdmin.findFirst({
-      where: { userId },
-      select: { shelterId: true },
+    if (isShelterAdmin) {
+      const adminRecord = await prisma.shelterAdmin.findFirst({
+        where: { userId },
+        select: { shelterId: true },
+      });
+      conversationFilter = adminRecord
+        ? { OR: [{ userId }, { shelterId: adminRecord.shelterId }] }
+        : { userId };
+    } else {
+      conversationFilter = { userId };
+    }
+
+    const count = await prisma.message.count({
+      where: {
+        senderId: { not: userId },
+        readAt:   null,
+        conversation: conversationFilter,
+      },
     });
-    conversationFilter = adminRecord
-      ? { OR: [{ userId }, { shelterId: adminRecord.shelterId }] }
-      : { userId };
-  } else {
-    conversationFilter = { userId };
+
+    return NextResponse.json({ count });
+  } catch (error) {
+    console.error('[api/messages/unread GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const count = await prisma.message.count({
-    where: {
-      senderId: { not: userId },
-      readAt:   null,
-      conversation: conversationFilter,
-    },
-  });
-
-  return NextResponse.json({ count });
 }

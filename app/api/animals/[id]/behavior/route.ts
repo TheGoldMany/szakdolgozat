@@ -14,12 +14,17 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const records = await prisma.behaviorLog.findMany({
-    where:   { animalId: params.id },
-    include: { author: { select: { name: true } } },
-    orderBy: { createdAt: "desc" },
-  });
-  return NextResponse.json(records);
+  try {
+    const records = await prisma.behaviorLog.findMany({
+      where:   { animalId: params.id },
+      include: { author: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(records);
+  } catch (error) {
+    console.error('[api/animals/[id]/behavior GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // POST /api/animals/[id]/behavior – csak a menhely adminja / önkéntese
@@ -32,42 +37,47 @@ export async function POST(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const animal = await prisma.animal.findUnique({
-    where:  { id: params.id },
-    select: { shelterId: true },
-  });
-  if (!animal) return NextResponse.json({ error: "Nem található" }, { status: 404 });
-
-  const isAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId: animal.shelterId },
-  });
-  if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-  }
-
-  const body   = await req.json();
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
-  }
-
-  const record = await prisma.behaviorLog.create({
-    data: {
-      animalId:      params.id,
-      authorId:      session.user.id,
-      note:          parsed.data.note,
-      progressLevel: parsed.data.progressLevel,
-    },
-    include: { author: { select: { name: true } } },
-  });
-
-  // Ha a bejegyzés tartalmaz fejlődési szintet, frissítjük az állat aktuális szintjét is
-  if (parsed.data.progressLevel !== undefined) {
-    await prisma.animal.update({
-      where: { id: params.id },
-      data:  { progressLevel: parsed.data.progressLevel },
+  try {
+    const animal = await prisma.animal.findUnique({
+      where:  { id: params.id },
+      select: { shelterId: true },
     });
-  }
+    if (!animal) return NextResponse.json({ error: "Nem található" }, { status: 404 });
 
-  return NextResponse.json(record, { status: 201 });
+    const isAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id, shelterId: animal.shelterId },
+    });
+    if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    const body   = await req.json();
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
+    }
+
+    const record = await prisma.behaviorLog.create({
+      data: {
+        animalId:      params.id,
+        authorId:      session.user.id,
+        note:          parsed.data.note,
+        progressLevel: parsed.data.progressLevel,
+      },
+      include: { author: { select: { name: true } } },
+    });
+
+    // Ha a bejegyzés tartalmaz fejlődési szintet, frissítjük az állat aktuális szintjét is
+    if (parsed.data.progressLevel !== undefined) {
+      await prisma.animal.update({
+        where: { id: params.id },
+        data:  { progressLevel: parsed.data.progressLevel },
+      });
+    }
+
+    return NextResponse.json(record, { status: 201 });
+  } catch (error) {
+    console.error('[api/animals/[id]/behavior POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

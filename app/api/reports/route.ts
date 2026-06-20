@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ report }, { status: 201 });
   } catch (error) {
-    console.error("Report create error:", error);
-    return NextResponse.json({ error: "Nem sikerült elküldeni a bejelentést" }, { status: 500 });
+    console.error('[api/reports POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

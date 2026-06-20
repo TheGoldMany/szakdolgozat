@@ -13,20 +13,25 @@ export async function POST(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const task = await prisma.volunteerTask.findUnique({ where: { id: params.id } });
-  if (!task) return NextResponse.json({ error: "Nem található" }, { status: 404 });
+  try {
+    const task = await prisma.volunteerTask.findUnique({ where: { id: params.id } });
+    if (!task) return NextResponse.json({ error: "Nem található" }, { status: 404 });
 
-  const isAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId: task.shelterId },
-  });
-  if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    const isAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id, shelterId: task.shelterId },
+    });
+    if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    const updated = await prisma.volunteerTask.update({
+      where: { id: params.id },
+      data:  { status: "COMPLETED" },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error("[api/volunteer-tasks/[id]/complete POST]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const updated = await prisma.volunteerTask.update({
-    where: { id: params.id },
-    data:  { status: "COMPLETED" },
-  });
-
-  return NextResponse.json(updated);
 }

@@ -44,58 +44,63 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
 
-  // Ellenőrzés: admin email foglalt-e?
-  const existing = await prisma.user.findUnique({ where: { email: d.adminEmail } });
-  if (existing) {
-    return NextResponse.json({ error: "Ez az admin email cím már foglalt." }, { status: 409 });
+  try {
+    // Ellenőrzés: admin email foglalt-e?
+    const existing = await prisma.user.findUnique({ where: { email: d.adminEmail } });
+    if (existing) {
+      return NextResponse.json({ error: "Ez az admin email cím már foglalt." }, { status: 409 });
+    }
+
+    // Egyedi slug generálás
+    let slug = slugify(d.shelterName);
+    const count = await prisma.shelter.count({ where: { slug: { startsWith: slug } } });
+    if (count > 0) slug = `${slug}-${count + 1}`;
+
+    // Tranzakcióban hozzuk létre a menhelyt és az admin usert
+    const result = await prisma.$transaction(async (tx) => {
+      const hashed = await hash(d.adminPassword, 10);
+
+      const adminUser = await tx.user.create({
+        data: {
+          name:          d.adminName,
+          email:         d.adminEmail,
+          password:      hashed,
+          role:          Role.SHELTER_ADMIN,
+          emailVerified: new Date(),
+        },
+      });
+
+      const shelter = await tx.shelter.create({
+        data: {
+          name:        d.shelterName,
+          slug,
+          city:        d.city,
+          address:     d.address,
+          zipCode:     d.zipCode ?? null,
+          phone:       d.phone || null,
+          email:       d.shelterEmail || null,
+          description: d.description || null,
+          country:     "HU",
+          isActive:    true,
+          isVerified:  true,
+        },
+      });
+
+      await tx.shelterAdmin.create({
+        data: { userId: adminUser.id, shelterId: shelter.id },
+      });
+
+      return { shelter, adminUser };
+    });
+
+    return NextResponse.json({
+      shelter: { id: result.shelter.id, name: result.shelter.name, slug: result.shelter.slug },
+      admin:   { id: result.adminUser.id, email: result.adminUser.email },
+    }, { status: 201 });
+  } catch (error) {
+    console.error('[api/admin/shelters POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  // Egyedi slug generálás
-  let slug = slugify(d.shelterName);
-  const count = await prisma.shelter.count({ where: { slug: { startsWith: slug } } });
-  if (count > 0) slug = `${slug}-${count + 1}`;
-
-  // Tranzakcióban hozzuk létre a menhelyt és az admin usert
-  const result = await prisma.$transaction(async (tx) => {
-    const hashed = await hash(d.adminPassword, 10);
-
-    const adminUser = await tx.user.create({
-      data: {
-        name:          d.adminName,
-        email:         d.adminEmail,
-        password:      hashed,
-        role:          Role.SHELTER_ADMIN,
-        emailVerified: new Date(),
-      },
-    });
-
-    const shelter = await tx.shelter.create({
-      data: {
-        name:        d.shelterName,
-        slug,
-        city:        d.city,
-        address:     d.address,
-        zipCode:     d.zipCode ?? null,
-        phone:       d.phone || null,
-        email:       d.shelterEmail || null,
-        description: d.description || null,
-        country:     "HU",
-        isActive:    true,
-        isVerified:  true,
-      },
-    });
-
-    await tx.shelterAdmin.create({
-      data: { userId: adminUser.id, shelterId: shelter.id },
-    });
-
-    return { shelter, adminUser };
-  });
-
-  return NextResponse.json({
-    shelter: { id: result.shelter.id, name: result.shelter.name, slug: result.shelter.slug },
-    admin:   { id: result.adminUser.id, email: result.adminUser.email },
-  }, { status: 201 });
 }
 
 export async function GET() {
@@ -104,13 +109,18 @@ export async function GET() {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
   }
 
-  const shelters = await prisma.shelter.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      admins: { include: { user: { select: { name: true, email: true } } } },
-      _count:  { select: { animals: true } },
-    },
-  });
+  try {
+    const shelters = await prisma.shelter.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        admins: { include: { user: { select: { name: true, email: true } } } },
+        _count:  { select: { animals: true } },
+      },
+    });
 
-  return NextResponse.json(shelters);
+    return NextResponse.json(shelters);
+  } catch (error) {
+    console.error('[api/admin/shelters GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

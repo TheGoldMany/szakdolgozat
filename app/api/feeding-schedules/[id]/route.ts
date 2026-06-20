@@ -60,71 +60,76 @@ export async function PATCH(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const { ok, schedule } = await authorizeForSchedule(
-    session.user.id,
-    session.user.role,
-    params.id
-  );
-  if (!ok || !schedule) {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-  }
-
-  const body = await req.json();
-  const parsed = patchSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Érvénytelen adatok", details: parsed.error.flatten() },
-      { status: 400 }
+  try {
+    const { ok, schedule } = await authorizeForSchedule(
+      session.user.id,
+      session.user.role,
+      params.id
     );
-  }
+    if (!ok || !schedule) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
 
-  const data = parsed.data;
-
-  // Validate inventoryItemId belongs to same shelter (if being changed)
-  if (data.inventoryItemId !== undefined) {
-    const item = await prisma.inventoryItem.findFirst({
-      where: { id: data.inventoryItemId, shelterId: schedule.shelterId },
-      select: { id: true },
-    });
-    if (!item) {
+    const body = await req.json();
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "A megadott készletelem nem tartozik ehhez a menhelyhez." },
+        { error: "Érvénytelen adatok", details: parsed.error.flatten() },
         { status: 400 }
       );
     }
-  }
 
-  // Recalculate nextRunAt when times/frequency changed, or when reactivating
-  const timesChanged = data.times !== undefined;
-  const frequencyChanged = data.frequency !== undefined;
-  const weekDaysChanged = data.weekDays !== undefined;
-  const reactivating = data.isActive === true;
+    const data = parsed.data;
 
-  let nextRunAt: Date | undefined;
-  if (timesChanged || frequencyChanged || weekDaysChanged || reactivating) {
-    nextRunAt = calculateNextRunAt({
-      times: data.times ?? schedule.times,
-      frequency: data.frequency ?? schedule.frequency,
-      weekDays: data.weekDays ?? schedule.weekDays,
+    // Validate inventoryItemId belongs to same shelter (if being changed)
+    if (data.inventoryItemId !== undefined) {
+      const item = await prisma.inventoryItem.findFirst({
+        where: { id: data.inventoryItemId, shelterId: schedule.shelterId },
+        select: { id: true },
+      });
+      if (!item) {
+        return NextResponse.json(
+          { error: "A megadott készletelem nem tartozik ehhez a menhelyhez." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Recalculate nextRunAt when times/frequency changed, or when reactivating
+    const timesChanged = data.times !== undefined;
+    const frequencyChanged = data.frequency !== undefined;
+    const weekDaysChanged = data.weekDays !== undefined;
+    const reactivating = data.isActive === true;
+
+    let nextRunAt: Date | undefined;
+    if (timesChanged || frequencyChanged || weekDaysChanged || reactivating) {
+      nextRunAt = calculateNextRunAt({
+        times: data.times ?? schedule.times,
+        frequency: data.frequency ?? schedule.frequency,
+        weekDays: data.weekDays ?? schedule.weekDays,
+      });
+    }
+
+    const updated = await prisma.feedingSchedule.update({
+      where: { id: params.id },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.inventoryItemId !== undefined && { inventoryItemId: data.inventoryItemId }),
+        ...(data.quantityPerFeeding !== undefined && { quantityPerFeeding: data.quantityPerFeeding }),
+        ...(data.frequency !== undefined && { frequency: data.frequency }),
+        ...(data.times !== undefined && { times: data.times }),
+        ...(data.weekDays !== undefined && { weekDays: data.weekDays }),
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+        ...(data.note !== undefined && { note: data.note }),
+        ...(nextRunAt !== undefined && { nextRunAt }),
+      },
     });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/feeding-schedules/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const updated = await prisma.feedingSchedule.update({
-    where: { id: params.id },
-    data: {
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.inventoryItemId !== undefined && { inventoryItemId: data.inventoryItemId }),
-      ...(data.quantityPerFeeding !== undefined && { quantityPerFeeding: data.quantityPerFeeding }),
-      ...(data.frequency !== undefined && { frequency: data.frequency }),
-      ...(data.times !== undefined && { times: data.times }),
-      ...(data.weekDays !== undefined && { weekDays: data.weekDays }),
-      ...(data.isActive !== undefined && { isActive: data.isActive }),
-      ...(data.note !== undefined && { note: data.note }),
-      ...(nextRunAt !== undefined && { nextRunAt }),
-    },
-  });
-
-  return NextResponse.json(updated);
 }
 
 // ---------------------------------------------------------------------------
@@ -140,15 +145,20 @@ export async function DELETE(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const { ok } = await authorizeForSchedule(
-    session.user.id,
-    session.user.role,
-    params.id
-  );
-  if (!ok) {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-  }
+  try {
+    const { ok } = await authorizeForSchedule(
+      session.user.id,
+      session.user.role,
+      params.id
+    );
+    if (!ok) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
 
-  await prisma.feedingSchedule.delete({ where: { id: params.id } });
-  return NextResponse.json({ success: true });
+    await prisma.feedingSchedule.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/feeding-schedules/[id] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

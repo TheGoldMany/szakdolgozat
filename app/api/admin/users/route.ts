@@ -25,20 +25,25 @@ export async function GET(req: NextRequest) {
     ...(role && { role: role as "USER" | "SHELTER_ADMIN" | "SUPER_ADMIN" }),
   };
 
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where,
-      select: {
-        id: true, name: true, email: true, role: true,
-        emailVerified: true, createdAt: true,
-        _count: { select: { applications: true, shelterAdmins: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.user.count({ where }),
-  ]);
+  try {
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true, name: true, email: true, role: true,
+          emailVerified: true, createdAt: true,
+          _count: { select: { applications: true, shelterAdmins: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.user.count({ where }),
+    ]);
 
-  return NextResponse.json({ users, total, page, pages: Math.ceil(total / limit) });
+    return NextResponse.json({ users, total, page, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    console.error('[api/admin/users GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

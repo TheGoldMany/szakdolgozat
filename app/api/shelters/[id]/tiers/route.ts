@@ -24,12 +24,17 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const tiers = await prisma.donationTier.findMany({
-    where:   { shelterId: params.id, isActive: true },
-    orderBy: { amount: "asc" },
-    include: { _count: { select: { subscriptions: true } } },
-  });
-  return NextResponse.json(tiers);
+  try {
+    const tiers = await prisma.donationTier.findMany({
+      where:   { shelterId: params.id, isActive: true },
+      orderBy: { amount: "asc" },
+      include: { _count: { select: { subscriptions: true } } },
+    });
+    return NextResponse.json(tiers);
+  } catch (error) {
+    console.error('[api/shelters/[id]/tiers GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // POST /api/shelters/[id]/tiers – shelter admin creates a tier

@@ -25,27 +25,32 @@ export async function POST(req: NextRequest) {
 
   const { shelterId, title, description, scheduledAt, maxVolunteers } = parsed.data;
 
-  const isAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId },
-  });
-  if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  try {
+    const isAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id, shelterId },
+    });
+    if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    const task = await prisma.volunteerTask.create({
+      data: {
+        shelterId,
+        title,
+        description:   description ?? null,
+        scheduledAt:   new Date(scheduledAt),
+        maxVolunteers: maxVolunteers ?? 1,
+      },
+      include: {
+        assignments: { include: { volunteer: { include: { user: { select: { name: true } } } } } },
+      },
+    });
+
+    return NextResponse.json(task, { status: 201 });
+  } catch (error) {
+    console.error('[api/volunteer-tasks POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const task = await prisma.volunteerTask.create({
-    data: {
-      shelterId,
-      title,
-      description:   description ?? null,
-      scheduledAt:   new Date(scheduledAt),
-      maxVolunteers: maxVolunteers ?? 1,
-    },
-    include: {
-      assignments: { include: { volunteer: { include: { user: { select: { name: true } } } } } },
-    },
-  });
-
-  return NextResponse.json(task, { status: 201 });
 }
 
 // GET /api/volunteer-tasks?shelterId=xxx – get tasks for shelter
@@ -57,28 +62,33 @@ export async function GET(req: NextRequest) {
 
   const shelterId = req.nextUrl.searchParams.get("shelterId");
 
-  let shelterIds: string[] = [];
-  if (shelterId) {
-    shelterIds = [shelterId];
-  } else if (session.user.role === "SUPER_ADMIN") {
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    shelterIds = all.map(s => s.id);
-  } else {
-    const admins = await prisma.shelterAdmin.findMany({
-      where: { userId: session.user.id }, select: { shelterId: true },
-    });
-    shelterIds = admins.map(a => a.shelterId);
-  }
+  try {
+    let shelterIds: string[] = [];
+    if (shelterId) {
+      shelterIds = [shelterId];
+    } else if (session.user.role === "SUPER_ADMIN") {
+      const all = await prisma.shelter.findMany({ select: { id: true } });
+      shelterIds = all.map(s => s.id);
+    } else {
+      const admins = await prisma.shelterAdmin.findMany({
+        where: { userId: session.user.id }, select: { shelterId: true },
+      });
+      shelterIds = admins.map(a => a.shelterId);
+    }
 
-  const tasks = await prisma.volunteerTask.findMany({
-    where:   { shelterId: { in: shelterIds } },
-    orderBy: { scheduledAt: "asc" },
-    include: {
-      assignments: {
-        include: { volunteer: { include: { user: { select: { name: true, email: true } } } } },
+    const tasks = await prisma.volunteerTask.findMany({
+      where:   { shelterId: { in: shelterIds } },
+      orderBy: { scheduledAt: "asc" },
+      include: {
+        assignments: {
+          include: { volunteer: { include: { user: { select: { name: true, email: true } } } } },
+        },
       },
-    },
-  });
+    });
 
-  return NextResponse.json(tasks);
+    return NextResponse.json(tasks);
+  } catch (error) {
+    console.error('[api/volunteer-tasks GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

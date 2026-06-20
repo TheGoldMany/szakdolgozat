@@ -25,28 +25,33 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where:  { id: session.user.id },
-    select: { password: true },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where:  { id: session.user.id },
+      select: { password: true },
+    });
 
-  if (!user?.password) {
-    return NextResponse.json(
-      { error: "Ez a fiók social login-nal lett létrehozva, nincs jelszava." },
-      { status: 400 }
-    );
+    if (!user?.password) {
+      return NextResponse.json(
+        { error: "Ez a fiók social login-nal lett létrehozva, nincs jelszava." },
+        { status: 400 }
+      );
+    }
+
+    const valid = await compare(parsed.data.currentPassword, user.password);
+    if (!valid) {
+      return NextResponse.json({ error: "A jelenlegi jelszó helytelen." }, { status: 400 });
+    }
+
+    const hashed = await hash(parsed.data.newPassword, 12);
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data:  { password: hashed },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[api/auth/change-password POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const valid = await compare(parsed.data.currentPassword, user.password);
-  if (!valid) {
-    return NextResponse.json({ error: "A jelenlegi jelszó helytelen." }, { status: 400 });
-  }
-
-  const hashed = await hash(parsed.data.newPassword, 12);
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data:  { password: hashed },
-  });
-
-  return NextResponse.json({ ok: true });
 }

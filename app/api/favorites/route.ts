@@ -11,12 +11,17 @@ export async function GET() {
     return NextResponse.json({ animalIds: [] });
   }
 
-  const favorites = await prisma.favorite.findMany({
-    where:  { userId: session.user.id },
-    select: { animalId: true },
-  });
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where:  { userId: session.user.id },
+      select: { animalId: true },
+    });
 
-  return NextResponse.json({ animalIds: favorites.map((f) => f.animalId) });
+    return NextResponse.json({ animalIds: favorites.map((f) => f.animalId) });
+  } catch (error) {
+    console.error('[api/favorites GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // POST /api/favorites – add an animal to favorites
@@ -34,19 +39,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Hibás adat" }, { status: 400 });
   }
 
-  const animal = await prisma.animal.findUnique({
-    where:  { id: parsed.data.animalId },
-    select: { id: true },
-  });
-  if (!animal) {
-    return NextResponse.json({ error: "Az állat nem található" }, { status: 404 });
+  try {
+    const animal = await prisma.animal.findUnique({
+      where:  { id: parsed.data.animalId },
+      select: { id: true },
+    });
+    if (!animal) {
+      return NextResponse.json({ error: "Az állat nem található" }, { status: 404 });
+    }
+
+    await prisma.favorite.upsert({
+      where:  { userId_animalId: { userId: session.user.id, animalId: parsed.data.animalId } },
+      create: { userId: session.user.id, animalId: parsed.data.animalId },
+      update: {},
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/favorites POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  await prisma.favorite.upsert({
-    where:  { userId_animalId: { userId: session.user.id, animalId: parsed.data.animalId } },
-    create: { userId: session.user.id, animalId: parsed.data.animalId },
-    update: {},
-  });
-
-  return NextResponse.json({ success: true });
 }

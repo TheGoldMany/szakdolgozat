@@ -10,32 +10,37 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  let shelterIds: string[];
+  try {
+    let shelterIds: string[];
 
-  if (session.user.role === "SUPER_ADMIN") {
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    shelterIds = all.map(s => s.id);
-  } else {
-    const adminOf = await prisma.shelterAdmin.findMany({
-      where:  { userId: session.user.id },
-      select: { shelterId: true },
+    if (session.user.role === "SUPER_ADMIN") {
+      const all = await prisma.shelter.findMany({ select: { id: true } });
+      shelterIds = all.map(s => s.id);
+    } else {
+      const adminOf = await prisma.shelterAdmin.findMany({
+        where:  { userId: session.user.id },
+        select: { shelterId: true },
+      });
+      shelterIds = adminOf.map(a => a.shelterId);
+    }
+
+    if (shelterIds.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const appointments = await prisma.appointment.findMany({
+      where:   { shelterId: { in: shelterIds } },
+      orderBy: { proposedAt: "asc" },
+      include: {
+        user:    { select: { name: true, email: true, phone: true } },
+        animal:  { select: { name: true, slug: true } },
+        shelter: { select: { name: true } },
+      },
     });
-    shelterIds = adminOf.map(a => a.shelterId);
+
+    return NextResponse.json(appointments);
+  } catch (error) {
+    console.error('[api/appointments/shelter GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  if (shelterIds.length === 0) {
-    return NextResponse.json([]);
-  }
-
-  const appointments = await prisma.appointment.findMany({
-    where:   { shelterId: { in: shelterIds } },
-    orderBy: { proposedAt: "asc" },
-    include: {
-      user:    { select: { name: true, email: true, phone: true } },
-      animal:  { select: { name: true, slug: true } },
-      shelter: { select: { name: true } },
-    },
-  });
-
-  return NextResponse.json(appointments);
 }

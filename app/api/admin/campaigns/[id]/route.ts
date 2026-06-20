@@ -27,56 +27,61 @@ export async function PATCH(
     );
   }
 
-  const campaign = await prisma.campaign.findUnique({ where: { id: params.id } });
-  if (!campaign) {
-    return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
-  }
-
-  if (campaign.status !== "PENDING") {
-    return NextResponse.json(
-      { error: "Csak PENDING státuszú kampány módosítható" },
-      { status: 409 }
-    );
-  }
-
-  const { action } = parsed.data;
-
-  const updated = await prisma.campaign.update({
-    where: { id: params.id },
-    data:
-      action === "APPROVE"
-        ? { status: "ACTIVE", approvedById: session.user.id, approvedAt: new Date() }
-        : { status: "REJECTED" },
-  });
-
-  // Notify campaign owner(s)
-  void (async () => {
-    try {
-      if (campaign.shelterId) {
-        const admins = await prisma.shelterAdmin.findMany({
-          where:  { shelterId: campaign.shelterId },
-          select: { userId: true },
-        });
-        await createNotifications(admins.map((a) => ({
-          userId: a.userId,
-          type:   (action === "APPROVE" ? "CAMPAIGN_APPROVED" : "CAMPAIGN_REJECTED") as "CAMPAIGN_APPROVED" | "CAMPAIGN_REJECTED",
-          title:  action === "APPROVE" ? "Kampányod jóváhagyva" : "Kampányod elutasítva",
-          body:   campaign.title,
-          href:   action === "APPROVE" ? `/donate/${campaign.id}` : "/dashboard",
-        })));
-      } else if (campaign.userId) {
-        await createNotification({
-          userId: campaign.userId,
-          type:   action === "APPROVE" ? "CAMPAIGN_APPROVED" : "CAMPAIGN_REJECTED",
-          title:  action === "APPROVE" ? "Kampányod jóváhagyva" : "Kampányod elutasítva",
-          body:   campaign.title,
-          href:   action === "APPROVE" ? `/donate/${campaign.id}` : "/",
-        });
-      }
-    } catch (err) {
-      console.error("Campaign notification error:", err);
+  try {
+    const campaign = await prisma.campaign.findUnique({ where: { id: params.id } });
+    if (!campaign) {
+      return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
     }
-  })();
 
-  return NextResponse.json(updated);
+    if (campaign.status !== "PENDING") {
+      return NextResponse.json(
+        { error: "Csak PENDING státuszú kampány módosítható" },
+        { status: 409 }
+      );
+    }
+
+    const { action } = parsed.data;
+
+    const updated = await prisma.campaign.update({
+      where: { id: params.id },
+      data:
+        action === "APPROVE"
+          ? { status: "ACTIVE", approvedById: session.user.id, approvedAt: new Date() }
+          : { status: "REJECTED" },
+    });
+
+    // Notify campaign owner(s)
+    void (async () => {
+      try {
+        if (campaign.shelterId) {
+          const admins = await prisma.shelterAdmin.findMany({
+            where:  { shelterId: campaign.shelterId },
+            select: { userId: true },
+          });
+          await createNotifications(admins.map((a) => ({
+            userId: a.userId,
+            type:   (action === "APPROVE" ? "CAMPAIGN_APPROVED" : "CAMPAIGN_REJECTED") as "CAMPAIGN_APPROVED" | "CAMPAIGN_REJECTED",
+            title:  action === "APPROVE" ? "Kampányod jóváhagyva" : "Kampányod elutasítva",
+            body:   campaign.title,
+            href:   action === "APPROVE" ? `/donate/${campaign.id}` : "/dashboard",
+          })));
+        } else if (campaign.userId) {
+          await createNotification({
+            userId: campaign.userId,
+            type:   action === "APPROVE" ? "CAMPAIGN_APPROVED" : "CAMPAIGN_REJECTED",
+            title:  action === "APPROVE" ? "Kampányod jóváhagyva" : "Kampányod elutasítva",
+            body:   campaign.title,
+            href:   action === "APPROVE" ? `/donate/${campaign.id}` : "/",
+          });
+        }
+      } catch (err) {
+        console.error("Campaign notification error:", err);
+      }
+    })();
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/admin/campaigns/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

@@ -10,10 +10,15 @@ export async function POST() {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  await prisma.notification.updateMany({
-    where: { userId: session.user.id, readAt: null },
-    data:  { readAt: new Date() },
-  });
+  try {
+    await prisma.notification.updateMany({
+      where: { userId: session.user.id, readAt: null },
+      data:  { readAt: new Date() },
+    });
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/notifications/read-all POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

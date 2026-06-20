@@ -17,28 +17,33 @@ export async function POST(
     return NextResponse.json({ error: "Csak főadmin hagyhat jóvá sablont" }, { status: 403 });
   }
 
-  const form = await prisma.applicationForm.findUnique({ where: { id: params.id } });
-  if (!form) {
-    return NextResponse.json({ error: "Sablon nem található" }, { status: 404 });
+  try {
+    const form = await prisma.applicationForm.findUnique({ where: { id: params.id } });
+    if (!form) {
+      return NextResponse.json({ error: "Sablon nem található" }, { status: 404 });
+    }
+
+    const updated = await prisma.applicationForm.update({
+      where: { id: params.id },
+      data: { status: "APPROVED" },
+    });
+
+    // Notify shelter admins
+    const admins = await prisma.shelterAdmin.findMany({
+      where:  { shelterId: form.shelterId },
+      select: { userId: true },
+    });
+    createNotifications(admins.map((a) => ({
+      userId: a.userId,
+      type:   "FORM_APPROVED" as const,
+      title:  "Kérvénysablon jóváhagyva",
+      body:   form.title,
+      href:   "/dashboard/application-forms",
+    }))).catch(() => {});
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/application-forms/[id]/approve POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const updated = await prisma.applicationForm.update({
-    where: { id: params.id },
-    data: { status: "APPROVED" },
-  });
-
-  // Notify shelter admins
-  const admins = await prisma.shelterAdmin.findMany({
-    where:  { shelterId: form.shelterId },
-    select: { userId: true },
-  });
-  createNotifications(admins.map((a) => ({
-    userId: a.userId,
-    type:   "FORM_APPROVED" as const,
-    title:  "Kérvénysablon jóváhagyva",
-    body:   form.title,
-    href:   "/dashboard/application-forms",
-  }))).catch(() => {});
-
-  return NextResponse.json(updated);
 }

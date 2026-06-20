@@ -37,77 +37,82 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
   const d = parsed.data;
 
-  const event = await prisma.event.findUnique({ where: { id: params.id } });
-  if (!event) return NextResponse.json({ error: "Esemény nem található" }, { status: 404 });
+  try {
+    const event = await prisma.event.findUnique({ where: { id: params.id } });
+    if (!event) return NextResponse.json({ error: "Esemény nem található" }, { status: 404 });
 
-  if (!(await canManage(session.user.id, session.user.role, event.shelterId))) {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-  }
+    if (!(await canManage(session.user.id, session.user.role, event.shelterId))) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
 
-  const newStarts = d.startsAt ? new Date(d.startsAt) : event.startsAt;
-  const newEnds   = d.endsAt !== undefined ? (d.endsAt ? new Date(d.endsAt) : null) : event.endsAt;
-  if (newEnds && newEnds < newStarts) {
-    return NextResponse.json({ error: "A befejezés nem lehet a kezdés előtt" }, { status: 400 });
-  }
+    const newStarts = d.startsAt ? new Date(d.startsAt) : event.startsAt;
+    const newEnds   = d.endsAt !== undefined ? (d.endsAt ? new Date(d.endsAt) : null) : event.endsAt;
+    if (newEnds && newEnds < newStarts) {
+      return NextResponse.json({ error: "A befejezés nem lehet a kezdés előtt" }, { status: 400 });
+    }
 
-  const becameCancelled = d.status === "CANCELLED" && event.status !== "CANCELLED";
-  const detailsChanged  =
-    event.status === "PUBLISHED" &&
-    d.status !== "CANCELLED" &&
-    ((d.startsAt && newStarts.getTime() !== event.startsAt.getTime()) ||
-      (d.location && d.location !== event.location));
+    const becameCancelled = d.status === "CANCELLED" && event.status !== "CANCELLED";
+    const detailsChanged  =
+      event.status === "PUBLISHED" &&
+      d.status !== "CANCELLED" &&
+      ((d.startsAt && newStarts.getTime() !== event.startsAt.getTime()) ||
+        (d.location && d.location !== event.location));
 
-  const updated = await prisma.event.update({
-    where: { id: params.id },
-    data: {
-      ...(d.title       !== undefined && { title: d.title }),
-      ...(d.description !== undefined && { description: d.description }),
-      ...(d.type        !== undefined && { type: d.type }),
-      ...(d.location    !== undefined && { location: d.location }),
-      ...(d.startsAt    !== undefined && { startsAt: newStarts }),
-      ...(d.endsAt      !== undefined && { endsAt: newEnds }),
-      ...(d.capacity    !== undefined && { capacity: d.capacity }),
-      ...(d.imageUrl    !== undefined && { imageUrl: d.imageUrl || null }),
-      ...(d.status      !== undefined && { status: d.status }),
-    },
-    include: { _count: { select: { registrations: { where: { status: "REGISTERED" } } } } },
-  });
-
-  // Notify registrants on cancellation or on key detail change
-  if (becameCancelled || detailsChanged) {
-    const regs = await prisma.eventRegistration.findMany({
-      where:   { eventId: params.id, status: "REGISTERED" },
-      include: { user: { select: { id: true, email: true, name: true } } },
+    const updated = await prisma.event.update({
+      where: { id: params.id },
+      data: {
+        ...(d.title       !== undefined && { title: d.title }),
+        ...(d.description !== undefined && { description: d.description }),
+        ...(d.type        !== undefined && { type: d.type }),
+        ...(d.location    !== undefined && { location: d.location }),
+        ...(d.startsAt    !== undefined && { startsAt: newStarts }),
+        ...(d.endsAt      !== undefined && { endsAt: newEnds }),
+        ...(d.capacity    !== undefined && { capacity: d.capacity }),
+        ...(d.imageUrl    !== undefined && { imageUrl: d.imageUrl || null }),
+        ...(d.status      !== undefined && { status: d.status }),
+      },
+      include: { _count: { select: { registrations: { where: { status: "REGISTERED" } } } } },
     });
-    const userIds = [...new Set(regs.map(r => r.userId))];
-    if (userIds.length > 0) {
-      createNotifications(userIds.map(userId => ({
-        userId,
-        type:  becameCancelled ? ("EVENT_CANCELLED" as const) : ("EVENT_UPDATED" as const),
-        title: becameCancelled ? "Esemény lemondva" : "Esemény módosítva",
-        body:  becameCancelled
-          ? `A(z) "${updated.title}" esemény sajnos elmaradt.`
-          : `A(z) "${updated.title}" esemény részletei megváltoztak.`,
-        href:  `/events/${updated.slug}`,
-      }))).catch(() => {});
 
-      if (becameCancelled) {
-        const dateStr = event.startsAt.toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
-        for (const reg of regs) {
-          if (reg.user?.email) {
-            sendEventCancelledEmail({
-              to:         reg.user.email,
-              name:       reg.user.name ?? "Felhasználó",
-              eventTitle: updated.title,
-              eventDate:  dateStr,
-            }).catch(() => {});
+    // Notify registrants on cancellation or on key detail change
+    if (becameCancelled || detailsChanged) {
+      const regs = await prisma.eventRegistration.findMany({
+        where:   { eventId: params.id, status: "REGISTERED" },
+        include: { user: { select: { id: true, email: true, name: true } } },
+      });
+      const userIds = [...new Set(regs.map(r => r.userId))];
+      if (userIds.length > 0) {
+        createNotifications(userIds.map(userId => ({
+          userId,
+          type:  becameCancelled ? ("EVENT_CANCELLED" as const) : ("EVENT_UPDATED" as const),
+          title: becameCancelled ? "Esemény lemondva" : "Esemény módosítva",
+          body:  becameCancelled
+            ? `A(z) "${updated.title}" esemény sajnos elmaradt.`
+            : `A(z) "${updated.title}" esemény részletei megváltoztak.`,
+          href:  `/events/${updated.slug}`,
+        }))).catch(() => {});
+
+        if (becameCancelled) {
+          const dateStr = event.startsAt.toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
+          for (const reg of regs) {
+            if (reg.user?.email) {
+              sendEventCancelledEmail({
+                to:         reg.user.email,
+                name:       reg.user.name ?? "Felhasználó",
+                eventTitle: updated.title,
+                eventDate:  dateStr,
+              }).catch(() => {});
+            }
           }
         }
       }
     }
-  }
 
-  return NextResponse.json(updated);
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/events/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // DELETE /api/events/[id]
@@ -117,13 +122,18 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const event = await prisma.event.findUnique({ where: { id: params.id } });
-  if (!event) return NextResponse.json({ error: "Esemény nem található" }, { status: 404 });
+  try {
+    const event = await prisma.event.findUnique({ where: { id: params.id } });
+    if (!event) return NextResponse.json({ error: "Esemény nem található" }, { status: 404 });
 
-  if (!(await canManage(session.user.id, session.user.role, event.shelterId))) {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    if (!(await canManage(session.user.id, session.user.role, event.shelterId))) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    await prisma.event.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[api/events/[id] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  await prisma.event.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
 }

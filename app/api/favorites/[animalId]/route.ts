@@ -13,9 +13,14 @@ export async function DELETE(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  await prisma.favorite.deleteMany({
-    where: { userId: session.user.id, animalId: params.animalId },
-  });
+  try {
+    await prisma.favorite.deleteMany({
+      where: { userId: session.user.id, animalId: params.animalId },
+    });
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/favorites/[animalId] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

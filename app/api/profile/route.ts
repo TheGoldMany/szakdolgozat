@@ -26,11 +26,16 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
-  const user = await prisma.user.update({
-    where: { id: session.user.id },
-    data: parsed.data,
-    select: { id: true, name: true, email: true, phone: true, address: true, city: true, role: true },
-  });
+  try {
+    const user = await prisma.user.update({
+      where: { id: session.user.id },
+      data: parsed.data,
+      select: { id: true, name: true, email: true, phone: true, address: true, city: true, role: true },
+    });
 
-  return NextResponse.json({ user });
+    return NextResponse.json({ user });
+  } catch (error) {
+    console.error('[api/profile PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

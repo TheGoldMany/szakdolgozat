@@ -25,11 +25,16 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   if (!(await checkAccess(params.id, session.user.id, session.user.role ?? "")))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const docs = await prisma.shelterDocument.findMany({
-    where:   { shelterId: params.id },
-    orderBy: { createdAt: "asc" },
-  });
-  return NextResponse.json(docs);
+  try {
+    const docs = await prisma.shelterDocument.findMany({
+      where:   { shelterId: params.id },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json(docs);
+  } catch (error) {
+    console.error('[api/shelters/[id]/documents GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {

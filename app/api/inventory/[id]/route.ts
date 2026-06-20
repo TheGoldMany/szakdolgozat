@@ -27,24 +27,29 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
 
-  const { ok, item } = await authorize(session.user.id, session.user.role, params.id);
-  if (!ok || !item) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  try {
+    const { ok, item } = await authorize(session.user.id, session.user.role, params.id);
+    if (!ok || !item) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
 
-  const body   = await req.json();
-  const parsed = patchSchema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
+    const body   = await req.json();
+    const parsed = patchSchema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
 
-  const updated = await prisma.inventoryItem.update({
-    where: { id: params.id },
-    data: {
-      ...parsed.data,
-      expiresAt: parsed.data.expiresAt !== undefined
-        ? (parsed.data.expiresAt ? new Date(parsed.data.expiresAt) : null)
-        : undefined,
-    },
-  });
+    const updated = await prisma.inventoryItem.update({
+      where: { id: params.id },
+      data: {
+        ...parsed.data,
+        expiresAt: parsed.data.expiresAt !== undefined
+          ? (parsed.data.expiresAt ? new Date(parsed.data.expiresAt) : null)
+          : undefined,
+      },
+    });
 
-  return NextResponse.json(updated);
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/inventory/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // DELETE /api/inventory/[id]
@@ -52,9 +57,14 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
 
-  const { ok } = await authorize(session.user.id, session.user.role, params.id);
-  if (!ok) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  try {
+    const { ok } = await authorize(session.user.id, session.user.role, params.id);
+    if (!ok) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
 
-  await prisma.inventoryItem.delete({ where: { id: params.id } });
-  return NextResponse.json({ success: true });
+    await prisma.inventoryItem.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/inventory/[id] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

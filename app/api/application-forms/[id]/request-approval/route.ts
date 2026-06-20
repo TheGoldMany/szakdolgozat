@@ -17,39 +17,44 @@ export async function POST(
     return NextResponse.json({ error: "Nincs jogosultság" }, { status: 403 });
   }
 
-  const shelterAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    select: { shelterId: true },
-  });
-  if (!shelterAdmin) {
-    return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
+  try {
+    const shelterAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id },
+      select: { shelterId: true },
+    });
+    if (!shelterAdmin) {
+      return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
+    }
+
+    const form = await prisma.applicationForm.findUnique({ where: { id: params.id } });
+    if (!form || form.shelterId !== shelterAdmin.shelterId) {
+      return NextResponse.json({ error: "Sablon nem található" }, { status: 404 });
+    }
+    if (form.status !== "DRAFT") {
+      return NextResponse.json({ error: "Csak piszkozat küldhető jóváhagyásra" }, { status: 409 });
+    }
+
+    const updated = await prisma.applicationForm.update({
+      where: { id: params.id },
+      data: { status: "PENDING_APPROVAL" },
+    });
+
+    // Notify all super admins
+    const superAdmins = await prisma.user.findMany({
+      where:  { role: "SUPER_ADMIN" },
+      select: { id: true },
+    });
+    createNotifications(superAdmins.map((u) => ({
+      userId: u.id,
+      type:   "FORM_PENDING_APPROVAL" as const,
+      title:  "Kérvénysablon jóváhagyásra vár",
+      body:   form.title,
+      href:   "/dashboard/approvals",
+    }))).catch(() => {});
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/application-forms/[id]/request-approval POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const form = await prisma.applicationForm.findUnique({ where: { id: params.id } });
-  if (!form || form.shelterId !== shelterAdmin.shelterId) {
-    return NextResponse.json({ error: "Sablon nem található" }, { status: 404 });
-  }
-  if (form.status !== "DRAFT") {
-    return NextResponse.json({ error: "Csak piszkozat küldhető jóváhagyásra" }, { status: 409 });
-  }
-
-  const updated = await prisma.applicationForm.update({
-    where: { id: params.id },
-    data: { status: "PENDING_APPROVAL" },
-  });
-
-  // Notify all super admins
-  const superAdmins = await prisma.user.findMany({
-    where:  { role: "SUPER_ADMIN" },
-    select: { id: true },
-  });
-  createNotifications(superAdmins.map((u) => ({
-    userId: u.id,
-    type:   "FORM_PENDING_APPROVAL" as const,
-    title:  "Kérvénysablon jóváhagyásra vár",
-    body:   form.title,
-    href:   "/dashboard/approvals",
-  }))).catch(() => {});
-
-  return NextResponse.json(updated);
 }

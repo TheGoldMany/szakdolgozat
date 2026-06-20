@@ -14,23 +14,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const applications = await prisma.adoptionApplication.findMany({
-    where:   { userId },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id:        true,
-      status:    true,
-      createdAt: true,
-      animal: {
-        select: {
-          id:     true,
-          name:   true,
-          type:   true,
-          images: { where: { isPrimary: true }, take: 1, select: { url: true, isPrimary: true } },
+  try {
+    const applications = await prisma.adoptionApplication.findMany({
+      where:   { userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id:        true,
+        status:    true,
+        createdAt: true,
+        animal: {
+          select: {
+            id:     true,
+            name:   true,
+            type:   true,
+            images: { where: { isPrimary: true }, take: 1, select: { url: true, isPrimary: true } },
+          },
         },
       },
-    },
-  });
+    });
 
-  return NextResponse.json(applications);
+    return NextResponse.json(applications);
+  } catch (error) {
+    console.error('[api/applications/my GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

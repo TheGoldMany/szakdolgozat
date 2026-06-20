@@ -28,21 +28,26 @@ export async function GET() {
     return NextResponse.json({ error: "Csak menhely adminok férhetnek hozzá" }, { status: 403 });
   }
 
-  const shelterAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    select: { shelterId: true },
-  });
-  if (!shelterAdmin) {
-    return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
+  try {
+    const shelterAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id },
+      select: { shelterId: true },
+    });
+    if (!shelterAdmin) {
+      return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
+    }
+
+    const forms = await prisma.applicationForm.findMany({
+      where: { shelterId: shelterAdmin.shelterId },
+      include: { fields: { orderBy: { order: "asc" } } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(forms);
+  } catch (error) {
+    console.error('[api/application-forms GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const forms = await prisma.applicationForm.findMany({
-    where: { shelterId: shelterAdmin.shelterId },
-    include: { fields: { orderBy: { order: "asc" } } },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return NextResponse.json(forms);
 }
 
 // POST /api/application-forms – create a new form
@@ -55,38 +60,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Csak menhely adminok hozhatnak létre sablont" }, { status: 403 });
   }
 
-  const shelterAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    select: { shelterId: true },
-  });
-  if (!shelterAdmin) {
-    return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
-  }
-
   const body = await req.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Érvénytelen adatok", details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { title, description, fields } = parsed.data;
+  try {
+    const shelterAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id },
+      select: { shelterId: true },
+    });
+    if (!shelterAdmin) {
+      return NextResponse.json({ error: "Nem tartozol menhelyhez" }, { status: 403 });
+    }
 
-  const form = await prisma.applicationForm.create({
-    data: {
-      shelterId:   shelterAdmin.shelterId,
-      title,
-      description: description ?? null,
-      fields: {
-        create: fields.map((f) => ({
-          label:    f.label,
-          type:     f.type,
-          required: f.required,
-          order:    f.order,
-        })),
+    const { title, description, fields } = parsed.data;
+
+    const form = await prisma.applicationForm.create({
+      data: {
+        shelterId:   shelterAdmin.shelterId,
+        title,
+        description: description ?? null,
+        fields: {
+          create: fields.map((f) => ({
+            label:    f.label,
+            type:     f.type,
+            required: f.required,
+            order:    f.order,
+          })),
+        },
       },
-    },
-    include: { fields: { orderBy: { order: "asc" } } },
-  });
+      include: { fields: { orderBy: { order: "asc" } } },
+    });
 
-  return NextResponse.json(form, { status: 201 });
+    return NextResponse.json(form, { status: 201 });
+  } catch (error) {
+    console.error('[api/application-forms POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

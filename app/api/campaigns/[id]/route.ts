@@ -11,36 +11,41 @@ export async function GET(
 ) {
   const session = await getServerSession(authOptions);
 
-  const campaign = await prisma.campaign.findUnique({
-    where:   { id: params.id },
-    include: {
-      user:    { select: { name: true } },
-      shelter: { select: { name: true, slug: true } },
-      donations: {
-        select: {
-          userId:     true,
-          amount:     true,
-          message:    true,
-          isAnonymous:true,
-          createdAt:  true,
-          user:       { select: { name: true } },
+  try {
+    const campaign = await prisma.campaign.findUnique({
+      where:   { id: params.id },
+      include: {
+        user:    { select: { name: true } },
+        shelter: { select: { name: true, slug: true } },
+        donations: {
+          select: {
+            userId:     true,
+            amount:     true,
+            message:    true,
+            isAnonymous:true,
+            createdAt:  true,
+            user:       { select: { name: true } },
+          },
+          orderBy: { createdAt: "desc" },
         },
-        orderBy: { createdAt: "desc" },
+        _count: { select: { donations: true } },
       },
-      _count: { select: { donations: true } },
-    },
-  });
+    });
 
-  if (!campaign) {
-    return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
+    if (!campaign) {
+      return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
+    }
+
+    const isOwner    = session?.user?.id === campaign.userId;
+    const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
+    if (campaign.status !== "ACTIVE" && !isOwner && !isSuperAdmin) {
+      return NextResponse.json({ error: "A kampány nem elérhető" }, { status: 403 });
+    }
+
+    return NextResponse.json(campaign);
+  } catch (error) {
+    console.error("[api/campaigns/[id] GET]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const isOwner    = session?.user?.id === campaign.userId;
-  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
-
-  if (campaign.status !== "ACTIVE" && !isOwner && !isSuperAdmin) {
-    return NextResponse.json({ error: "A kampány nem elérhető" }, { status: 403 });
-  }
-
-  return NextResponse.json(campaign);
 }

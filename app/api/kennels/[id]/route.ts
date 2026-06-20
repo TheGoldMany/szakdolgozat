@@ -30,27 +30,32 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
 
-  const auth = await authorize(params.id, session.user.id, session.user.role);
-  if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  try {
+    const auth = await authorize(params.id, session.user.id, session.user.role);
+    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  const body   = await req.json();
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
+    const body   = await req.json();
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
 
-  // Kapacitást nem lehet a jelenlegi foglaltság alá csökkenteni
-  if (parsed.data.capacity !== undefined && parsed.data.capacity < auth.kennel._count.animals) {
-    return NextResponse.json(
-      { error: `A férőhelyen jelenleg ${auth.kennel._count.animals} állat van, a kapacitás nem lehet ennél kisebb.` },
-      { status: 400 },
-    );
+    // Kapacitást nem lehet a jelenlegi foglaltság alá csökkenteni
+    if (parsed.data.capacity !== undefined && parsed.data.capacity < auth.kennel._count.animals) {
+      return NextResponse.json(
+        { error: `A férőhelyen jelenleg ${auth.kennel._count.animals} állat van, a kapacitás nem lehet ennél kisebb.` },
+        { status: 400 },
+      );
+    }
+
+    const updated = await prisma.kennel.update({
+      where: { id: params.id },
+      data:  parsed.data,
+      include: { _count: { select: { animals: true } } },
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('[api/kennels/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const updated = await prisma.kennel.update({
-    where: { id: params.id },
-    data:  parsed.data,
-    include: { _count: { select: { animals: true } } },
-  });
-  return NextResponse.json(updated);
 }
 
 // DELETE /api/kennels/[id]
@@ -58,10 +63,15 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
 
-  const auth = await authorize(params.id, session.user.id, session.user.role);
-  if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  try {
+    const auth = await authorize(params.id, session.user.id, session.user.role);
+    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  // A benne lévő állatok kennelId-je SetNull-ra áll (schema szerint)
-  await prisma.kennel.delete({ where: { id: params.id } });
-  return NextResponse.json({ success: true });
+    // A benne lévő állatok kennelId-je SetNull-ra áll (schema szerint)
+    await prisma.kennel.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/kennels/[id] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

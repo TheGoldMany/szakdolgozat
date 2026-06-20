@@ -13,29 +13,34 @@ export async function PATCH(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const application = await prisma.adoptionApplication.findUnique({
-    where: { id: params.id },
-  });
+  try {
+    const application = await prisma.adoptionApplication.findUnique({
+      where: { id: params.id },
+    });
 
-  if (!application) {
-    return NextResponse.json({ error: "Kérelem nem található" }, { status: 404 });
+    if (!application) {
+      return NextResponse.json({ error: "Kérelem nem található" }, { status: 404 });
+    }
+
+    if (application.userId !== session.user.id) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    if (application.status !== ApplicationStatus.PENDING) {
+      return NextResponse.json(
+        { error: "Csak PENDING státuszú kérelem vonható vissza" },
+        { status: 409 }
+      );
+    }
+
+    const updated = await prisma.adoptionApplication.update({
+      where: { id: params.id },
+      data: { status: ApplicationStatus.WITHDRAWN },
+    });
+
+    return NextResponse.json({ application: updated });
+  } catch (error) {
+    console.error('[api/applications/[id] PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  if (application.userId !== session.user.id) {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-  }
-
-  if (application.status !== ApplicationStatus.PENDING) {
-    return NextResponse.json(
-      { error: "Csak PENDING státuszú kérelem vonható vissza" },
-      { status: 409 }
-    );
-  }
-
-  const updated = await prisma.adoptionApplication.update({
-    where: { id: params.id },
-    data: { status: ApplicationStatus.WITHDRAWN },
-  });
-
-  return NextResponse.json({ application: updated });
 }

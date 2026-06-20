@@ -30,16 +30,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const requested = req.nextUrl.searchParams.get("shelterId");
-  const shelterId = await resolveShelterId(session.user.id, session.user.role, requested);
-  if (!shelterId) return NextResponse.json([]);
+  try {
+    const requested = req.nextUrl.searchParams.get("shelterId");
+    const shelterId = await resolveShelterId(session.user.id, session.user.role, requested);
+    if (!shelterId) return NextResponse.json([]);
 
-  const kennels = await prisma.kennel.findMany({
-    where:   { shelterId },
-    include: { _count: { select: { animals: true } } },
-    orderBy: { createdAt: "asc" },
-  });
-  return NextResponse.json(kennels);
+    const kennels = await prisma.kennel.findMany({
+      where:   { shelterId },
+      include: { _count: { select: { animals: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json(kennels);
+  } catch (error) {
+    console.error('[api/kennels GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // POST /api/kennels – új férőhely létrehozása
@@ -55,19 +60,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
   }
 
-  const requested = (body?.shelterId as string | undefined) ?? null;
-  const shelterId = await resolveShelterId(session.user.id, session.user.role, requested);
-  if (!shelterId) return NextResponse.json({ error: "Nincs menhely" }, { status: 400 });
+  try {
+    const requested = (body?.shelterId as string | undefined) ?? null;
+    const shelterId = await resolveShelterId(session.user.id, session.user.role, requested);
+    if (!shelterId) return NextResponse.json({ error: "Nincs menhely" }, { status: 400 });
 
-  // Jogosultság ellenőrzés (SHELTER_ADMIN csak a sajátját)
-  if (session.user.role !== "SUPER_ADMIN") {
-    const admin = await prisma.shelterAdmin.findFirst({ where: { userId: session.user.id, shelterId } });
-    if (!admin) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    // Jogosultság ellenőrzés (SHELTER_ADMIN csak a sajátját)
+    if (session.user.role !== "SUPER_ADMIN") {
+      const admin = await prisma.shelterAdmin.findFirst({ where: { userId: session.user.id, shelterId } });
+      if (!admin) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    const kennel = await prisma.kennel.create({
+      data: { shelterId, ...parsed.data },
+      include: { _count: { select: { animals: true } } },
+    });
+    return NextResponse.json(kennel, { status: 201 });
+  } catch (error) {
+    console.error('[api/kennels POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const kennel = await prisma.kennel.create({
-    data: { shelterId, ...parsed.data },
-    include: { _count: { select: { animals: true } } },
-  });
-  return NextResponse.json(kennel, { status: 201 });
 }

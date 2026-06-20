@@ -37,29 +37,34 @@ export async function GET(req: NextRequest) {
     }),
   };
 
-  const [animals, total] = await Promise.all([
-    prisma.animal.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      include: {
-        images:  { where: { isPrimary: true }, take: 1 },
-        shelter: { select: { id: true, name: true, city: true } },
-      },
-    }),
-    prisma.animal.count({ where }),
-  ]);
+  try {
+    const [animals, total] = await Promise.all([
+      prisma.animal.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          images:  { where: { isPrimary: true }, take: 1 },
+          shelter: { select: { id: true, name: true, city: true } },
+        },
+      }),
+      prisma.animal.count({ where }),
+    ]);
 
-  return NextResponse.json({
-    animals,
-    pagination: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
-  });
+    return NextResponse.json({
+      animals,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("[api/animals GET]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 // ── POST /api/animals ─────────────────────────────────────────────────────────

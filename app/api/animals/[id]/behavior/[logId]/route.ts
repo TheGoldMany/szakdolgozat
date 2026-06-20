@@ -13,19 +13,24 @@ export async function DELETE(
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
-  const record = await prisma.behaviorLog.findUnique({
-    where:   { id: params.logId },
-    include: { animal: { select: { shelterId: true } } },
-  });
-  if (!record) return NextResponse.json({ error: "Nem található" }, { status: 404 });
+  try {
+    const record = await prisma.behaviorLog.findUnique({
+      where:   { id: params.logId },
+      include: { animal: { select: { shelterId: true } } },
+    });
+    if (!record) return NextResponse.json({ error: "Nem található" }, { status: 404 });
 
-  const isAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId: record.animal.shelterId },
-  });
-  if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    const isAdmin = await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id, shelterId: record.animal.shelterId },
+    });
+    if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    await prisma.behaviorLog.delete({ where: { id: params.logId } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('[api/animals/[id]/behavior/[logId] DELETE]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  await prisma.behaviorLog.delete({ where: { id: params.logId } });
-  return NextResponse.json({ success: true });
 }

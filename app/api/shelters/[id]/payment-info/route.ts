@@ -36,14 +36,19 @@ export async function PATCH(
     return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
   }
 
-  const shelter = await prisma.shelter.update({
-    where: { id: params.id },
-    data:  parsed.data,
-    select: {
-      companyName: true, taxNumber: true,
-      bankAccountName: true, bankAccountNumber: true,
-    },
-  });
+  try {
+    const shelter = await prisma.shelter.update({
+      where: { id: params.id },
+      data:  parsed.data,
+      select: {
+        companyName: true, taxNumber: true,
+        bankAccountName: true, bankAccountNumber: true,
+      },
+    });
 
-  return NextResponse.json(shelter);
+    return NextResponse.json(shelter);
+  } catch (error) {
+    console.error('[api/shelters/[id]/payment-info PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

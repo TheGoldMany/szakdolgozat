@@ -32,16 +32,21 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
 
-  const paramId    = req.nextUrl.searchParams.get("shelterId");
-  const shelterIds = paramId ? [paramId] : await resolveShelterIds(session.user.id, session.user.role);
+  try {
+    const paramId    = req.nextUrl.searchParams.get("shelterId");
+    const shelterIds = paramId ? [paramId] : await resolveShelterIds(session.user.id, session.user.role);
 
-  const items = await prisma.inventoryItem.findMany({
-    where:   { shelterId: { in: shelterIds } },
-    orderBy: [{ category: "asc" }, { name: "asc" }],
-    include: { _count: { select: { transactions: true } } },
-  });
+    const items = await prisma.inventoryItem.findMany({
+      where:   { shelterId: { in: shelterIds } },
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+      include: { _count: { select: { transactions: true } } },
+    });
 
-  return NextResponse.json(items);
+    return NextResponse.json(items);
+  } catch (error) {
+    console.error('[api/inventory GET]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // POST /api/inventory
@@ -53,37 +58,42 @@ export async function POST(req: NextRequest) {
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Érvénytelen adatok", details: parsed.error.flatten() }, { status: 400 });
 
-  const { shelterId, name, category, unit, quantity, minQuantity, expiresAt, note } = parsed.data;
+  try {
+    const { shelterId, name, category, unit, quantity, minQuantity, expiresAt, note } = parsed.data;
 
-  const isAdmin = session.user.role === "SUPER_ADMIN" ||
-    !!(await prisma.shelterAdmin.findFirst({ where: { userId: session.user.id, shelterId } }));
-  if (!isAdmin) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    const isAdmin = session.user.role === "SUPER_ADMIN" ||
+      !!(await prisma.shelterAdmin.findFirst({ where: { userId: session.user.id, shelterId } }));
+    if (!isAdmin) return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
 
-  const item = await prisma.inventoryItem.create({
-    data: {
-      shelterId,
-      name,
-      category:    category    ?? "OTHER",
-      unit:        unit        ?? "db",
-      quantity:    quantity    ?? 0,
-      minQuantity: minQuantity ?? null,
-      expiresAt:   expiresAt   ? new Date(expiresAt) : null,
-      note:        note        ?? null,
-    },
-  });
-
-  // Record opening stock as an IN transaction (if non-zero)
-  if ((quantity ?? 0) > 0) {
-    await prisma.inventoryTransaction.create({
+    const item = await prisma.inventoryItem.create({
       data: {
-        itemId:      item.id,
-        type:        "IN",
-        quantity:    quantity!,
-        note:        "Nyitókészlet",
-        createdById: session.user.id,
+        shelterId,
+        name,
+        category:    category    ?? "OTHER",
+        unit:        unit        ?? "db",
+        quantity:    quantity    ?? 0,
+        minQuantity: minQuantity ?? null,
+        expiresAt:   expiresAt   ? new Date(expiresAt) : null,
+        note:        note        ?? null,
       },
     });
-  }
 
-  return NextResponse.json(item, { status: 201 });
+    // Record opening stock as an IN transaction (if non-zero)
+    if ((quantity ?? 0) > 0) {
+      await prisma.inventoryTransaction.create({
+        data: {
+          itemId:      item.id,
+          type:        "IN",
+          quantity:    quantity!,
+          note:        "Nyitókészlet",
+          createdById: session.user.id,
+        },
+      });
+    }
+
+    return NextResponse.json(item, { status: 201 });
+  } catch (error) {
+    console.error('[api/inventory POST]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

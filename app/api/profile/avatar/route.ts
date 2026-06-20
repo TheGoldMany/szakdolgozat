@@ -20,10 +20,15 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Érvénytelen adat" }, { status: 400 });
   }
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data:  { image: parsed.data.image },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data:  { image: parsed.data.image },
+    });
 
-  return NextResponse.json({ image: parsed.data.image });
+    return NextResponse.json({ image: parsed.data.image });
+  } catch (error) {
+    console.error('[api/profile/avatar PATCH]', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
