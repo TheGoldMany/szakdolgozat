@@ -428,7 +428,9 @@
     "resolveButton": "Oznacz jako rozwiązane",
     "resolveSuccess": "Zgłoszenie oznaczone jako rozwiązane",
     "resolveError": "Nie udało się oznaczyć, spróbuj ponownie",
-    "formSuccess": "Zgłoszenie wysłane pomyślnie"
+    "formSuccess": "Zgłoszenie wysłane pomyślnie",
+    "sendingMessage": "Wysyłanie...",
+    "sendMessage": "Wyślij wiadomość"
   },
   "help": {
     "title": "Podręcznik użytkownika",
@@ -1053,6 +1055,8 @@
     "analyticsEtlError": "Błąd: {error}",
     "analyticsNetworkError": "Błąd sieci podczas uruchamiania ETL.",
     "analyticsError": "Wystąpił błąd",
+    "volunteers": "Wolontariusze",
+    "tasks": "Zadania",
     "dashboard": {
       "fosterPageTitle": "Opiekunowie tymczasowi",
       "notAssignedToShelter": "Twoje konto nie jest przypisane do żadnego schroniska.",
@@ -1280,7 +1284,10 @@
     "notePlaceholder": "Wszystko, co organizatorzy powinni wiedzieć",
     "submitRegister": "Potwierdź rejestrację",
     "submitting": "Wysyłanie…",
-    "error": "Wystąpił błąd"
+    "error": "Wystąpił błąd",
+    "newEvent": "Nowe wydarzenie",
+    "editEvent": "Edytuj wydarzenie",
+    "cancel": "Anuluj"
   },
   "favorites": {
     "title": "Moje ulubione",
@@ -1420,6 +1427,26 @@
     "validTimeFormat": "Nieprawidłowy czas (HH:MM)",
     "validWeekDaysRequired": "Wybierz co najmniej jeden dzień",
     "insufficientStock": "Niewystarczające zapasy",
-    "autoNote": "Automatyczne karmienie"
+    "autoNote": "Automatyczne karmienie",
+    "editSchedule": "Edytuj harmonogram",
+    "newSchedule": "Nowy harmonogram karmienia"
+  },
+  "kennels": {
+    "newKennel": "Nowe legowisko",
+    "cancel": "Anuluj",
+    "editKennel": "Edytuj legowisko"
+  },
+  "reviews": {
+    "submitting": "Wysyłanie…",
+    "submitReview": "Wyślij recenzję"
+  },
+  "health": {
+    "typeVetVisit": "Wizyta weterynaryjna",
+    "typeCheckup": "Ogólne badanie",
+    "typeVaccination": "Szczepienie",
+    "typeDeworm": "Odrobaczanie",
+    "typeSurgery": "Operacja",
+    "typeDental": "Stomatologia",
+    "typeOther": "Inne"
   }
 }

@@ -428,7 +428,9 @@
     "resolveButton": "Mark as resolved",
     "resolveSuccess": "Report marked as resolved",
     "resolveError": "Could not mark as resolved, please try again",
-    "formSuccess": "Report submitted successfully"
+    "formSuccess": "Report submitted successfully",
+    "sendingMessage": "Sending...",
+    "sendMessage": "Send message"
   },
   "help": {
     "title": "User guide",
@@ -1053,6 +1055,11 @@
     "analyticsEtlError": "Error: {error}",
     "analyticsNetworkError": "Network error while running ETL.",
     "analyticsError": "An error occurred",
+    "volunteers": "Volunteers",
+    "tasks": "Tasks",
+    "newTask": "New task",
+    "createNewTask": "Create new task",
+    "createTask": "Create task",
     "dashboard": {
       "fosterPageTitle": "Foster carers",
       "notAssignedToShelter": "Your account is not assigned to a shelter.",
@@ -1280,7 +1287,10 @@
     "notePlaceholder": "Anything the organisers should know",
     "submitRegister": "Confirm registration",
     "submitting": "Sending…",
-    "error": "An error occurred"
+    "error": "An error occurred",
+    "newEvent": "New event",
+    "editEvent": "Edit event",
+    "cancel": "Cancel"
   },
   "favorites": {
     "title": "My favorites",
@@ -1420,6 +1430,26 @@
     "validTimeFormat": "Invalid time (HH:MM)",
     "validWeekDaysRequired": "Select at least one day",
     "insufficientStock": "Insufficient stock",
-    "autoNote": "Automatic feeding"
+    "autoNote": "Automatic feeding",
+    "editSchedule": "Edit feeding schedule",
+    "newSchedule": "New feeding schedule"
+  },
+  "kennels": {
+    "newKennel": "New kennel",
+    "cancel": "Cancel",
+    "editKennel": "Edit kennel"
+  },
+  "reviews": {
+    "submitting": "Submitting…",
+    "submitReview": "Submit review"
+  },
+  "health": {
+    "typeVetVisit": "Vet visit",
+    "typeCheckup": "Checkup",
+    "typeVaccination": "Vaccination",
+    "typeDeworm": "Deworming",
+    "typeSurgery": "Surgery",
+    "typeDental": "Dental treatment",
+    "typeOther": "Other"
   }
 }

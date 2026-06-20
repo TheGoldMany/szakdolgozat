@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function ReviewForm({ shelterId, targetUserId }: Props) {
+  const t = useTranslations('reviews');
   const router = useRouter();
   const [rating,  setRating]  = useState(0);
   const [comment, setComment] = useState("");
@@ -77,7 +79,7 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
         disabled={loading}
         className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
       >
-        {loading ? "Küldés…" : "Értékelés beküldése"}
+        {loading ? t('submitting') : t('submitReview')}
       </button>
     </form>
   );

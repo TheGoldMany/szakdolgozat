@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { X, Clock } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ interface Props {
 }
 
 export function FeedingScheduleForm({ shelterId, inventoryItems, schedule, onClose, onSaved }: Props) {
+  const t = useTranslations('feeding');
   const isEdit = !!schedule;
 
   // Form state
@@ -181,7 +183,7 @@ export function FeedingScheduleForm({ shelterId, inventoryItems, schedule, onClo
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="text-base font-semibold text-gray-900">
-            {isEdit ? "Ütemterv szerkesztése" : "Új etetési ütemterv"}
+            {isEdit ? t('editSchedule') : t('newSchedule')}
           </h2>
           <button
             type="button"

@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Syringe, Stethoscope, Scissors, HeartPulse, Bug, ClipboardCheck, Trash2, Plus, X } from "lucide-react";
 
-const TYPES = [
-  { value: "VACCINATION", label: "Oltás",               icon: Syringe       },
-  { value: "TREATMENT",   label: "Kezelés",             icon: HeartPulse    },
-  { value: "VET_VISIT",   label: "Állatorvos látogatás", icon: Stethoscope   },
-  { value: "SURGERY",     label: "Műtét",               icon: Scissors      },
-  { value: "DEWORMING",   label: "Féreghajtás",         icon: Bug           },
-  { value: "CHECKUP",     label: "Általános vizsgálat", icon: ClipboardCheck },
-];
+const TYPE_ICONS: Record<string, React.ElementType> = {
+  VACCINATION: Syringe,
+  TREATMENT:   HeartPulse,
+  VET_VISIT:   Stethoscope,
+  SURGERY:     Scissors,
+  DEWORMING:   Bug,
+  CHECKUP:     ClipboardCheck,
+};
 
 const TYPE_COLOR: Record<string, string> = {
   VACCINATION: "text-blue-600 bg-blue-50",
@@ -39,7 +40,16 @@ interface Props {
 }
 
 export function HealthManager({ animalId, initial }: Props) {
+  const t = useTranslations('health');
   const router = useRouter();
+  const TYPES = [
+    { value: "VACCINATION", label: t('typeVaccination'), icon: TYPE_ICONS.VACCINATION },
+    { value: "TREATMENT",   label: t('typeCheckup'),     icon: TYPE_ICONS.TREATMENT   },
+    { value: "VET_VISIT",   label: t('typeVetVisit'),    icon: TYPE_ICONS.VET_VISIT   },
+    { value: "SURGERY",     label: t('typeSurgery'),     icon: TYPE_ICONS.SURGERY     },
+    { value: "DEWORMING",   label: t('typeDeworm'),      icon: TYPE_ICONS.DEWORMING   },
+    { value: "CHECKUP",     label: t('typeCheckup'),     icon: TYPE_ICONS.CHECKUP     },
+  ];
   const [records, setRecords] = useState<HealthEntry[]>(initial);
   const [showForm, setShowForm] = useState(false);
   const [loading,  setLoading]  = useState(false);

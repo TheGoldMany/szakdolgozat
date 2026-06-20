@@ -428,7 +428,9 @@
     "resolveButton": "Als gelöst markieren",
     "resolveSuccess": "Meldung als gelöst markiert",
     "resolveError": "Konnte nicht markiert werden, bitte erneut versuchen",
-    "formSuccess": "Meldung erfolgreich gesendet"
+    "formSuccess": "Meldung erfolgreich gesendet",
+    "sendingMessage": "Senden...",
+    "sendMessage": "Nachricht senden"
   },
   "help": {
     "title": "Benutzerhandbuch",
@@ -1053,6 +1055,11 @@
     "analyticsEtlError": "Fehler: {error}",
     "analyticsNetworkError": "Netzwerkfehler beim Ausführen des ETL.",
     "analyticsError": "Ein Fehler ist aufgetreten",
+    "volunteers": "Freiwillige",
+    "tasks": "Aufgaben",
+    "newTask": "Neue Aufgabe",
+    "createNewTask": "Neue Aufgabe erstellen",
+    "createTask": "Aufgabe erstellen",
     "dashboard": {
       "fosterPageTitle": "Pflegepersonen",
       "notAssignedToShelter": "Dein Konto ist keinem Tierheim zugeordnet.",
@@ -1280,7 +1287,10 @@
     "notePlaceholder": "Alles, was die Organisatoren wissen sollten",
     "submitRegister": "Anmeldung bestätigen",
     "submitting": "Senden…",
-    "error": "Ein Fehler ist aufgetreten"
+    "error": "Ein Fehler ist aufgetreten",
+    "newEvent": "Neue Veranstaltung",
+    "editEvent": "Veranstaltung bearbeiten",
+    "cancel": "Abbrechen"
   },
   "favorites": {
     "title": "Meine Favoriten",
@@ -1420,6 +1430,26 @@
     "validTimeFormat": "Ungültige Uhrzeit (HH:MM)",
     "validWeekDaysRequired": "Wähle mindestens einen Tag aus",
     "insufficientStock": "Unzureichender Bestand",
-    "autoNote": "Automatische Fütterung"
+    "autoNote": "Automatische Fütterung",
+    "editSchedule": "Fütterungsplan bearbeiten",
+    "newSchedule": "Neuer Fütterungsplan"
+  },
+  "kennels": {
+    "newKennel": "Neues Gehege",
+    "cancel": "Abbrechen",
+    "editKennel": "Gehege bearbeiten"
+  },
+  "reviews": {
+    "submitting": "Wird gesendet…",
+    "submitReview": "Bewertung absenden"
+  },
+  "health": {
+    "typeVetVisit": "Tierarztbesuch",
+    "typeCheckup": "Untersuchung",
+    "typeVaccination": "Impfung",
+    "typeDeworm": "Entwurmung",
+    "typeSurgery": "Operation",
+    "typeDental": "Zahnbehandlung",
+    "typeOther": "Sonstiges"
   }
 }

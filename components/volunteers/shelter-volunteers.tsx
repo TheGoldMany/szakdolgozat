@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Check, X, UserMinus, Plus, ChevronDown, ChevronUp,
   CalendarDays, Clock, ClipboardList, Users, HandHeart,
@@ -243,6 +244,7 @@ function TaskCard({ task }: { task: TaskEntry }) {
 
 function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: () => void }) {
   const router = useRouter();
+  const t = useTranslations('dashboard');
   const [title,         setTitle]         = useState("");
   const [description,   setDescription]   = useState("");
   const [scheduledAt,   setScheduledAt]   = useState("");
@@ -273,7 +275,7 @@ function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: (
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-brand-100 bg-brand-50 p-5 space-y-3">
-      <p className="text-sm font-semibold text-gray-800">Új feladat létrehozása</p>
+      <p className="text-sm font-semibold text-gray-800">{t('createNewTask')}</p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <input required value={title} onChange={e => setTitle(e.target.value)} maxLength={200}
@@ -298,7 +300,7 @@ function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: (
       {error && <p className="text-sm text-red-500">{error}</p>}
       <button type="submit" disabled={loading}
         className="w-full rounded-xl bg-brand-500 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60">
-        {loading ? "Mentés..." : "Feladat létrehozása"}
+        {loading ? "Mentés..." : t('createTask')}
       </button>
     </form>
   );
@@ -306,7 +308,7 @@ function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: (
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-const TABS = ["Önkéntesek", "Feladatok"] as const;
+const TABS = ["volunteers", "tasks"] as const;
 
 interface Props {
   shelterId:  string;
@@ -315,7 +317,8 @@ interface Props {
 }
 
 export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
-  const [tab,         setTab]         = useState<(typeof TABS)[number]>("Önkéntesek");
+  const tDash = useTranslations('dashboard');
+  const [tab,         setTab]         = useState<(typeof TABS)[number]>("volunteers");
   const [showNewTask, setShowNewTask] = useState(false);
   const [volFilter,   setVolFilter]   = useState<string>("ALL");
 
@@ -327,29 +330,29 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
       {/* Tab strip */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex gap-2">
-          {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)}
+          {TABS.map(tabKey => (
+            <button key={tabKey} onClick={() => setTab(tabKey)}
               className={`flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-sm font-medium transition-colors ${
-                tab === t ? "bg-brand-500 text-white shadow-sm" : "bg-white border border-gray-200 text-gray-600 hover:border-brand-200"
+                tab === tabKey ? "bg-brand-500 text-white shadow-sm" : "bg-white border border-gray-200 text-gray-600 hover:border-brand-200"
               }`}>
-              {t === "Önkéntesek" ? <HandHeart className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
-              {t}
-              {t === "Önkéntesek" && pending > 0 && (
+              {tabKey === "volunteers" ? <HandHeart className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
+              {tDash(tabKey)}
+              {tabKey === "volunteers" && pending > 0 && (
                 <span className="ml-0.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-white">{pending}</span>
               )}
             </button>
           ))}
         </div>
-        {tab === "Feladatok" && (
+        {tab === "tasks" && (
           <button onClick={() => setShowNewTask(v => !v)}
             className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-600">
             <Plus className="h-4 w-4" />
-            Új feladat
+            {tDash('newTask')}
           </button>
         )}
       </div>
 
-      {tab === "Önkéntesek" && (
+      {tab === "volunteers" && (
         <div>
           {/* Filter */}
           <div className="mb-4 flex flex-wrap gap-2">
@@ -376,7 +379,7 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
         </div>
       )}
 
-      {tab === "Feladatok" && (
+      {tab === "tasks" && (
         <div className="space-y-4">
           {showNewTask && (
             <NewTaskForm shelterId={shelterId} onCreated={() => setShowNewTask(false)} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Send } from "lucide-react";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function SendMessageForm({ reportId }: Props) {
+  const t = useTranslations('reports');
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -66,7 +68,7 @@ export function SendMessageForm({ reportId }: Props) {
         className="flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
       >
         <Send className="h-4 w-4" />
-        {loading ? "Küldés..." : "Üzenet küldése"}
+        {loading ? t('sendingMessage') : t('sendMessage')}
       </button>
     </form>
   );

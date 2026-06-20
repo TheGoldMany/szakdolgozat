@@ -428,7 +428,9 @@
     "resolveButton": "Megjelölés megoldottként",
     "resolveSuccess": "A bejelentés megoldottként megjelölve",
     "resolveError": "Nem sikerült megjelölni, próbáld újra",
-    "formSuccess": "Bejelentés sikeresen elküldve"
+    "formSuccess": "Bejelentés sikeresen elküldve",
+    "sendingMessage": "Küldés...",
+    "sendMessage": "Üzenet küldése"
   },
   "help": {
     "title": "Útmutató",
@@ -1053,6 +1055,11 @@
     "analyticsEtlError": "Hiba: {error}",
     "analyticsNetworkError": "Hálózati hiba az ETL futtatásakor.",
     "analyticsError": "Hiba történt",
+    "volunteers": "Önkéntesek",
+    "tasks": "Feladatok",
+    "newTask": "Új feladat",
+    "createNewTask": "Új feladat létrehozása",
+    "createTask": "Feladat létrehozása",
     "dashboard": {
       "fosterPageTitle": "Ideiglenes befogadók",
       "notAssignedToShelter": "A fiókod nincs menhelyhez rendelve.",
@@ -1280,7 +1287,10 @@
     "notePlaceholder": "Bármi, amit a szervezőknek tudniuk kell",
     "submitRegister": "Jelentkezés véglegesítése",
     "submitting": "Küldés…",
-    "error": "Hiba történt"
+    "error": "Hiba történt",
+    "newEvent": "Új esemény",
+    "editEvent": "Esemény szerkesztése",
+    "cancel": "Mégse"
   },
   "favorites": {
     "title": "Kedvenceim",
@@ -1420,6 +1430,26 @@
     "validTimeFormat": "Érvénytelen időpont (HH:MM)",
     "validWeekDaysRequired": "Legalább egy napot válassz",
     "insufficientStock": "Nincs elegendő készlet",
-    "autoNote": "Automatikus etetés"
+    "autoNote": "Automatikus etetés",
+    "editSchedule": "Etetési beosztás szerkesztése",
+    "newSchedule": "Új etetési beosztás"
+  },
+  "kennels": {
+    "newKennel": "Új férőhely",
+    "cancel": "Mégse",
+    "editKennel": "Férőhely szerkesztése"
+  },
+  "reviews": {
+    "submitting": "Küldés…",
+    "submitReview": "Értékelés elküldése"
+  },
+  "health": {
+    "typeVetVisit": "Állatorvosi látogatás",
+    "typeCheckup": "Vizsgálat",
+    "typeVaccination": "Oltás",
+    "typeDeworm": "Féregtelenítés",
+    "typeSurgery": "Műtét",
+    "typeDental": "Fogászati kezelés",
+    "typeOther": "Egyéb"
   }
 }

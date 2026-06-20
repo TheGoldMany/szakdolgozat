@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Plus, X, Trash2, DoorOpen, AlertTriangle } from "lucide-react";
 import { KENNEL_TYPE_LABELS, ALL_KENNEL_TYPES } from "@/lib/kennel";
 import type { KennelType } from "@prisma/client";
@@ -28,6 +29,7 @@ interface Props {
 
 export function KennelManager({ initialKennels, animals: initialAnimals }: Props) {
   const router = useRouter();
+  const t = useTranslations('kennels');
   const [kennels, setKennels] = useState<KennelLite[]>(initialKennels);
   const [animals, setAnimals] = useState<AnimalLite[]>(initialAnimals);
   const [showForm, setShowForm] = useState(false);
@@ -96,7 +98,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
         <button onClick={() => setShowForm(v => !v)}
           className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {showForm ? "Mégse" : "Új férőhely"}
+          {showForm ? t('cancel') : t('newKennel')}
         </button>
 
         {showForm && (

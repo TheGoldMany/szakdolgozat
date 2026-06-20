@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Plus, X, Trash2, CalendarHeart, MapPin, Users, AlertTriangle,
   ChevronDown, ChevronUp, Pencil,
@@ -52,6 +53,7 @@ function fmtDate(iso: string) {
 }
 
 export function EventsManager({ shelterId, events }: Props) {
+  const t = useTranslations('events');
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId]     = useState<string | null>(null);
@@ -134,12 +136,12 @@ export function EventsManager({ shelterId, events }: Props) {
         <button onClick={() => (showForm ? setShowForm(false) : openCreate())}
           className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {showForm ? "Mégse" : "Új esemény"}
+          {showForm ? t('cancel') : t('newEvent')}
         </button>
 
         {showForm && (
           <form onSubmit={e => handleSubmit(e, false)} className="mt-4 rounded-2xl border border-brand-100 bg-brand-50 p-5">
-            <p className="mb-4 font-semibold text-gray-800">{editId ? "Esemény szerkesztése" : "Új esemény"}</p>
+            <p className="mb-4 font-semibold text-gray-800">{editId ? t('editEvent') : t('newEvent')}</p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Cím *</label>
