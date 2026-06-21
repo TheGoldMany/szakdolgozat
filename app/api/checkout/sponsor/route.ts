@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
     checkoutSession = await getStripe().checkout.sessions.create({
       mode:                 "subscription",
       payment_method_types: ["card"],
+      // Pass sponsor's email so Stripe auto-sends monthly invoice emails
+      customer_email: session.user.email ?? undefined,
       line_items: [
         {
           price_data: {

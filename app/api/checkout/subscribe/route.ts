@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     tier.shelter.stripeOnboardingComplete ? tier.shelter.stripeAccountId : null
   );
 
-  // When routing to a connected account, the 4% platform fee is added ON TOP
+  // When routing to a connected account, the 5% platform fee is added ON TOP
   // of the tier price each month: the subscriber pays tier.amount + fee, the
   // shelter receives the full tier.amount, and the platform keeps `fee`.
   // application_fee_percent is the fee's share of the grossed-up total so the
@@ -69,6 +69,9 @@ export async function POST(req: NextRequest) {
     checkoutSession = await getStripe().checkout.sessions.create({
       mode:                 "subscription",
       payment_method_types: ["card"],
+      // Pass subscriber's email so Stripe auto-sends invoice emails
+      // and creates a customer record for billing history
+      customer_email: session.user.email ?? undefined,
       line_items: [
         {
           price_data: {

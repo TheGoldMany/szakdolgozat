@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Az ÁllatiMenhelyek.hu általános szerződési feltételei",
 };
 
-const EFFECTIVE_DATE = "2024. január 1.";
+const EFFECTIVE_DATE = "2026. június 21.";
 const PLATFORM_NAME = "ÁllatiMenhelyek.hu";
 const CONTACT_EMAIL = "info@allatimenhelyek.hu";
 
@@ -248,19 +248,60 @@ export default function ASZFPage() {
 
           <SubHeading title="5.2 Egyszeri adományok" />
           <P>
-            Az egyszeri adományok visszatérítésmentes önkéntes juttatások; kizárólag technikai hiba
-            esetén kérhető visszatérítés a {CONTACT_EMAIL} e-mail-címen 5 munkanapon belül.
+            Az egyszeri adományok visszatérítésmentes önkéntes juttatások. Technikai hiba
+            esetén visszatérítés kérhető a {CONTACT_EMAIL} e-mail-címen, a fizetéstől
+            számított <strong>5 munkanapon belül</strong>. Minden sikeres egyszeri fizetésről
+            Stripe-on keresztül automatikus elektronikus bizonylat kerül kiküldésre a megadott
+            e-mail-címre.
           </P>
 
-          <SubHeading title="5.3 Havi előfizetések" />
+          <SubHeading title="5.3 Elállási jog – havi előfizetések és virtuális örökbefogadás" />
+          <P>
+            A 45/2014. (II. 26.) Korm. rendelet (az EU 2011/83/EU fogyasztói jogok irányelvét
+            átültető jogszabály) alapján a fogyasztó az előfizetés megkezdésétől számított{" "}
+            <strong>14 naptári napon belül indokolás nélkül elállhat</strong>, és teljes visszatérítést
+            kérhet, feltéve hogy a szolgáltatást még nem vette igénybe.
+          </P>
+          <UL items={[
+            <>
+              <strong>14 napon belüli elállás:</strong> az előfizetés azonnali lemondásra kerül,
+              és a befizetett összeg teljes egészében visszatérítésre kerül az eredeti fizetési
+              módra 5–10 munkanapon belül.
+            </>,
+            <>
+              <strong>14 nap elteltével:</strong> a lemondás a következő számlázási ciklus
+              végén lép hatályba; az aktuális hónapra kifizetett összeg nem jár vissza.
+            </>,
+            "Az elállást a Profil → Előfizetéseim oldalon vagy e-mailben jelezd.",
+          ]} />
+
+          <SubHeading title="5.4 Havi előfizetések – általános feltételek" />
           <UL items={[
             "Az előfizetés minden hónapban automatikusan megújul.",
             "Lemondás bármikor lehetséges a Profil → Előfizetéseim menüponton keresztül.",
-            "A lemondás a következő számlázási ciklus elejétől hatályos; az aktuális időszakra már befizetett összeg nem kerül visszatérítésre.",
+            "Minden havi számlázásról automatikus Stripe-számla kerül kiküldésre e-mailben.",
             "Az üzemeltető fenntartja a jogot az előfizetési díjak módosítására, amelyről 30 nappal előre értesíti az érintetteket.",
           ]} />
 
-          <SubHeading title="5.4 Adományozási kampányok" />
+          <SubHeading title="5.5 Visszatérítési folyamat" />
+          <P>
+            Visszatérítési igényt a <strong>{CONTACT_EMAIL}</strong> e-mail-címen lehet benyújtani,
+            feltüntetve a fizetés dátumát és összegét. A visszatérítés az eredeti bankkártyára
+            vagy fizetési módra történik, általában <strong>5–10 munkanap</strong> alatt.
+            A Stripe tranzakciós díja (kb. 1,4% + 50 Ft) visszatérítésre nem kerül, ha a
+            fizetési rendszer azt már elvonta.
+          </P>
+
+          <SubHeading title="5.6 Platform díj" />
+          <P>
+            Minden fizetés után az {PLATFORM_NAME} <strong>5% platformdíjat</strong> von le
+            a menhely részére átutalt összegből. Ez az összeg az adományozó által fizetett
+            végösszegen felül, külön tételként jelenik meg a Stripe fizetési felületen,
+            így az adományozó pontosan látja, mennyi kerül a menhelyhez és mennyi az
+            üzemeltetési díj.
+          </P>
+
+          <SubHeading title="5.7 Adományozási kampányok" />
           <P>
             Felhasználók és menhelyek adományozási kampányokat indíthatnak. A kampányok elérési
             összege cél, nem garancia. Ha egy kampány nem éri el célját, a befolyt összeg a

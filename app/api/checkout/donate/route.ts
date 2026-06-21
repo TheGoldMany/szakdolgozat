@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   const connectedAccountId = await resolveTransferDestination(candidateAccountId);
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit.
-  // When routing to a connected account, the 4% platform fee is added ON TOP
+  // When routing to a connected account, the 5% platform fee is added ON TOP
   // of the donor's intended amount: the donor pays amount + fee, the shelter
   // receives the full `amount`, and the platform keeps `fee`.
   const amountInFiller = amount * 100;
@@ -85,6 +85,11 @@ export async function POST(req: NextRequest) {
     checkoutSession = await getStripe().checkout.sessions.create({
       mode:                 "payment",
       payment_method_types: ["card"],
+      // Pass donor's email so Stripe sends an automatic receipt and links
+      // the payment to a customer record for invoice history
+      customer_email: session?.user?.email ?? undefined,
+      // Generate a downloadable invoice for every one-time payment
+      invoice_creation: { enabled: true },
       line_items: [
         {
           price_data: {
