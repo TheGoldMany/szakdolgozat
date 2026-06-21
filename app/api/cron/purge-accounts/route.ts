@@ -49,10 +49,10 @@ export async function GET(req: NextRequest) {
         prisma.favorite.deleteMany({ where: { userId } }),
         prisma.review.deleteMany({ where: { OR: [{ authorId: userId }, { targetUserId: userId }] } }),
         // Nullify userId on financial records instead of deleting (8-year retention)
-        prisma.donation.updateMany({ where: { userId }, data: { userId: null } }),
-        prisma.subscription.updateMany({ where: { userId }, data: { userId: null } }),
-        prisma.sponsorship.updateMany({ where: { userId }, data: { userId: null } }),
-        prisma.campaign.updateMany({ where: { userId }, data: { userId: null } }),
+        prisma.donation.updateMany({ where: { userId }, data: { userId: { set: null } } }),
+        prisma.subscription.updateMany({ where: { userId }, data: { userId: { set: null } } }),
+        prisma.sponsorship.updateMany({ where: { userId }, data: { userId: { set: null } } }),
+        prisma.campaign.updateMany({ where: { userId }, data: { userId: { set: null } } }),
         // Finally delete the user shell
         prisma.user.delete({ where: { id: userId } }),
       ]);

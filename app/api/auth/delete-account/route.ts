@@ -31,6 +31,7 @@ export async function DELETE() {
 
     // Cancel all active Stripe subscriptions (donation tiers)
     for (const sub of user.subscriptions) {
+      if (!sub.stripeSubId) continue;
       try {
         await stripe.subscriptions.cancel(sub.stripeSubId);
       } catch (err) {
@@ -40,6 +41,7 @@ export async function DELETE() {
 
     // Cancel all active Stripe sponsorships (virtual adoptions)
     for (const spo of user.sponsorships) {
+      if (!spo.stripeSubId) continue;
       try {
         await stripe.subscriptions.cancel(spo.stripeSubId);
       } catch (err) {

@@ -98,7 +98,7 @@ export default async function CampaignDetailPage({
               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{campaign.title}</h1>
 
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <span>{t("startedBy", { name: campaign.user.name ?? t("anonymous") })}</span>
+                <span>{t("startedBy", { name: campaign.user?.name ?? t("anonymous") })}</span>
                 {campaign.shelter && (
                   <>
                     <span className="text-gray-300">·</span>

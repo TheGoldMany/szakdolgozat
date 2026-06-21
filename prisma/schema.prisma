@@ -333,8 +333,8 @@ model Sponsorship {
   id          String             @id @default(cuid())
   animalId    String
   animal      Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
   amount      Int // havi támogatás (HUF)
   isPublic    Boolean            @default(true) // megjelenjen-e „Virtuális gazdi”-ként
   displayName String? // opcionális publikus név (ha null és isPublic → user neve)
@@ -685,14 +685,14 @@ model DonationTier {
 
 model Subscription {
   id          String             @id @default(cuid())
-  userId      String
+  userId      String?
   tierId      String
   status      SubscriptionStatus @default(ACTIVE)
   stripeSubId String?            @unique
   createdAt   DateTime           @default(now())
   cancelledAt DateTime?
 
-  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   tier DonationTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -701,7 +701,7 @@ model Subscription {
 
 model Campaign {
   id           String         @id @default(cuid())
-  userId       String
+  userId       String?
   shelterId    String?
   title        String
   slug         String         @unique
@@ -716,7 +716,7 @@ model Campaign {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  user      User       @relation("CampaignCreator", fields: [userId], references: [id])
+  user      User?      @relation("CampaignCreator", fields: [userId], references: [id], onDelete: SetNull)
   shelter   Shelter?   @relation(fields: [shelterId], references: [id], onDelete: SetNull)
   donations Donation[]
 

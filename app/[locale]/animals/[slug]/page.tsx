@@ -106,7 +106,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
   });
   const publicSponsors = activeSponsors
     .filter((s) => s.isPublic)
-    .map((s) => ({ name: s.displayName ?? s.user.name ?? "Virtuális gazdi" }));
+    .map((s) => ({ name: s.displayName ?? s.user?.name ?? "Virtuális gazdi" }));
 
   const primaryImage = animal.images[0];
   const extraImages  = animal.images.slice(1);

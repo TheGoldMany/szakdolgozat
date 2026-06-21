@@ -11,7 +11,7 @@ interface PendingCampaign {
   description: string;
   targetAmount: number;
   createdAt: string;
-  user: { name: string | null; email: string | null };
+  user: { name: string | null; email: string | null } | null;
   shelter: { name: string } | null;
 }
 
@@ -78,7 +78,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
                 <span>
                   {t("campaignsSubmitter")}{" "}
                   <span className="font-medium text-gray-700">
-                    {c.user.name ?? c.user.email ?? t("campaignsAnonymous")}
+                    {c.user?.name ?? c.user?.email ?? t("campaignsAnonymous")}
                   </span>
                 </span>
                 {c.shelter && (

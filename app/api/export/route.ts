@@ -125,8 +125,8 @@ export async function GET(req: NextRequest) {
     rows = sponsors.map(s => ({
       id:           s.id,
       allat:        s.animal.name,
-      tamogato:     s.user.name ?? "",
-      email:        s.user.email ?? "",
+      tamogato:     s.user?.name ?? "",
+      email:        s.user?.email ?? "",
       osszeg_ft:    s.amount,
       statusz:      s.status,
       publikus:     s.isPublic ? "igen" : "nem",
@@ -172,8 +172,8 @@ export async function GET(req: NextRequest) {
     });
     rows = subs.map(s => ({
       id:        s.id,
-      elofizetett: s.user.name ?? "",
-      email:     s.user.email ?? "",
+      elofizetett: s.user?.name ?? "",
+      email:     s.user?.email ?? "",
       csomag:    s.tier.name,
       menhely:   s.tier.shelter?.name ?? "",
       osszeg_ft: s.tier.amount,

@@ -34,8 +34,8 @@ export async function notifyAnimalSponsors(
   });
   if (sponsors.length === 0) return;
 
-  // Egy user több szponzorációja esetén is csak egy értesítés
-  const uniqueUserIds = [...new Set(sponsors.map((s) => s.userId))];
+  // Egy user több szponzorációja esetén is csak egy értesítés; törölt user (null) kihagyva
+  const uniqueUserIds = [...new Set(sponsors.map((s) => s.userId))].filter((id): id is string => id !== null);
   return createNotifications(uniqueUserIds.map((userId) => ({
     userId,
     type: "SPONSOR_UPDATE" as NotificationType,

@@ -13,7 +13,7 @@ interface CampaignCardProps {
     targetAmount: number;
     raisedAmount: number;
     endsAt: string | null;
-    user: { name: string | null };
+    user: { name: string | null } | null;
     shelter: { name: string; slug: string } | null;
     _count: { donations: number };
   };
@@ -88,7 +88,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             )}
           </div>
           <div className="flex items-center gap-1.5 text-gray-400">
-            <span>{t("startedBy", { name: campaign.user.name ?? "–" })}</span>
+            <span>{t("startedBy", { name: campaign.user?.name ?? "–" })}</span>
           </div>
           {endsAtFormatted && (
             <div className="flex items-center gap-1.5">

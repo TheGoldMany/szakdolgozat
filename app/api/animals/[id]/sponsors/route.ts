@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     // Publikus gazdik nevei (anonim szponzorok kihagyva)
     const publicSponsors = sponsorships
       .filter((s) => s.isPublic)
-      .map((s) => ({ name: s.displayName ?? s.user.name ?? "Virtuális gazdi" }));
+      .map((s) => ({ name: s.displayName ?? s.user?.name ?? "Virtuális gazdi" }));
 
     const count = sponsorships.length;
 

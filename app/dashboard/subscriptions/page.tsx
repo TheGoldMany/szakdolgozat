@@ -112,8 +112,8 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                 {subscriptions.map((sub) => (
                   <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-2.5">
-                      <p className="font-medium text-gray-800">{sub.user.name ?? "–"}</p>
-                      <p className="text-gray-400">{sub.user.email}</p>
+                      <p className="font-medium text-gray-800">{sub.user?.name ?? "–"}</p>
+                      <p className="text-gray-400">{sub.user?.email ?? "–"}</p>
                     </td>
                     <td className="px-4 py-2.5">
                       <p className="font-medium text-gray-800">{sub.tier.name}</p>
