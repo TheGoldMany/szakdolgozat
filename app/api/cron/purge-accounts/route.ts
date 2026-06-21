@@ -13,6 +13,19 @@ export async function GET(req: NextRequest) {
   }
 
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const now    = new Date();
+  // Read notifications older than 90 days can be safely pruned
+  const notifCutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+
+  // Clean up housekeeping records that accumulate over time
+  await prisma.$transaction([
+    prisma.passwordResetToken.deleteMany({ where: { expiresAt: { lt: now } } }),
+    prisma.session.deleteMany({ where: { expires: { lt: now } } }),
+    // Remove read notifications older than 90 days to keep the table lean
+    prisma.notification.deleteMany({
+      where: { readAt: { not: null }, createdAt: { lt: notifCutoff } },
+    }),
+  ]);
 
   const usersToDelete = await prisma.user.findMany({
     where: { deletionScheduledAt: { lte: cutoff } },

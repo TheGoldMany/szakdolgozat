@@ -345,7 +345,13 @@
     "resetSaveButton": "Passwort speichern",
     "resetSuccessTitle": "Passwort erfolgreich geändert!",
     "resetSuccessDesc": "Weiterleitung zur Anmeldeseite...",
-    "namePlaceholder": "Max Mustermann"
+    "namePlaceholder": "Max Mustermann",
+    "unsubscribedTitle": "Erfolgreich abgemeldet",
+    "unsubscribedDesc": "Du erhältst keine Benachrichtigungs-E-Mails mehr an diese Adresse. Du kannst sie jederzeit in deinem Profil wieder aktivieren.",
+    "unsubscribeInvalidTitle": "Ungültiger Link",
+    "unsubscribeInvalidDesc": "Dieser Abmeldelink ist ungültig oder abgelaufen.",
+    "unsubscribeErrorTitle": "Ein Fehler ist aufgetreten",
+    "unsubscribeErrorDesc": "Wir konnten deine Abmeldung nicht verarbeiten. Bitte versuche es erneut oder kontaktiere uns."
   },
   "reports": {
     "title": "Verlorene und gefundene Tiere",

@@ -345,7 +345,13 @@
     "resetSaveButton": "Jelszó mentése",
     "resetSuccessTitle": "Jelszó sikeresen megváltoztatva!",
     "resetSuccessDesc": "Átirányítás a bejelentkezési oldalra...",
-    "namePlaceholder": "Kovács János"
+    "namePlaceholder": "Kovács János",
+    "unsubscribedTitle": "Sikeresen leiratkoztál",
+    "unsubscribedDesc": "Nem küldünk több értesítő emailt erre a címre. Bejelentkezés után a profilodban bármikor visszakapcsolhatod.",
+    "unsubscribeInvalidTitle": "Érvénytelen link",
+    "unsubscribeInvalidDesc": "A leiratkozási link nem érvényes vagy már lejárt.",
+    "unsubscribeErrorTitle": "Hiba történt",
+    "unsubscribeErrorDesc": "Nem sikerült feldolgozni a leiratkozást. Próbáld újra vagy vedd fel velünk a kapcsolatot."
   },
   "reports": {
     "title": "Elveszett és megtalált állatok",

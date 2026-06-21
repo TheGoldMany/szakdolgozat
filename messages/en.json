@@ -345,7 +345,13 @@
     "resetSaveButton": "Save password",
     "resetSuccessTitle": "Password changed successfully!",
     "resetSuccessDesc": "Redirecting to the login page...",
-    "namePlaceholder": "John Smith"
+    "namePlaceholder": "John Smith",
+    "unsubscribedTitle": "Successfully unsubscribed",
+    "unsubscribedDesc": "You will no longer receive notification emails at this address. You can re-enable them anytime from your profile.",
+    "unsubscribeInvalidTitle": "Invalid link",
+    "unsubscribeInvalidDesc": "This unsubscribe link is invalid or has expired.",
+    "unsubscribeErrorTitle": "Something went wrong",
+    "unsubscribeErrorDesc": "We could not process your unsubscribe request. Please try again or contact us."
   },
   "reports": {
     "title": "Lost and found animals",

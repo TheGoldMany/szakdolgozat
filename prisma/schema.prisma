@@ -108,6 +108,7 @@ model User {
   stripeOnboardingComplete Boolean   @default(false)
   birthDate                DateTime?
   deletionScheduledAt      DateTime?
+  emailNotifications       Boolean   @default(true)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 

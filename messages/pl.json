@@ -345,7 +345,13 @@
     "resetSaveButton": "Zapisz hasło",
     "resetSuccessTitle": "Hasło zostało pomyślnie zmienione!",
     "resetSuccessDesc": "Przekierowanie do strony logowania...",
-    "namePlaceholder": "Jan Kowalski"
+    "namePlaceholder": "Jan Kowalski",
+    "unsubscribedTitle": "Pomyślnie wypisano",
+    "unsubscribedDesc": "Nie będziemy już wysyłać powiadomień e-mail na ten adres. Możesz je ponownie włączyć w swoim profilu.",
+    "unsubscribeInvalidTitle": "Nieprawidłowy link",
+    "unsubscribeInvalidDesc": "Ten link do wypisania się jest nieprawidłowy lub wygasł.",
+    "unsubscribeErrorTitle": "Wystąpił błąd",
+    "unsubscribeErrorDesc": "Nie udało się przetworzyć żądania wypisania. Spróbuj ponownie lub skontaktuj się z nami."
   },
   "reports": {
     "title": "Zagubione i znalezione zwierzęta",
