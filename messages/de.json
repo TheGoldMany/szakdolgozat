@@ -71,7 +71,21 @@
     "latestReportsDesc": "Verlorene, gefundene und streunende Tiere",
     "all": "Alle",
     "ctaTitle": "Haustier verloren?",
-    "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!"
+    "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!",
+    "ctaAdopt": "Tiere durchsuchen",
+    "ctaDonate": "Tierheime unterstützen",
+    "whyTitle": "Warum ÁllatiMenhelyek.hu?",
+    "whySubtitle": "Eine Plattform, die Tiere, Halter und Tierheime verbindet.",
+    "why1Title": "Echtzeit-Daten",
+    "why1Desc": "Die Liste der adoptierbaren Tiere wird kontinuierlich aus den Tierheim-Systemen aktualisiert.",
+    "why2Title": "Transparenter Prozess",
+    "why2Desc": "Verfolge den Status deines Adoptionsantrags und kommuniziere mit dem Tierheim an einem Ort.",
+    "why3Title": "Sichere Spenden",
+    "why3Desc": "Kartenzahlungen über Stripe. Das Geld geht direkt an das gewählte Tierheim.",
+    "why4Title": "Community Fundbüro",
+    "why4Desc": "Meldesystem mit KI-gestützter Zuordnung für verlorene und gefundene Tiere.",
+    "sheltersTitle": "Partnertierheime",
+    "sheltersDesc": "Arbeite mit ihnen zusammen — jede Adoption rettet ein Leben."
   },
   "animals": {
     "title": "Tiere",

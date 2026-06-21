@@ -71,7 +71,21 @@
     "latestReportsDesc": "Lost, found and stray animals",
     "all": "All",
     "ctaTitle": "Lost your pet?",
-    "ctaDesc": "Submit a report – the community will help you find them!"
+    "ctaDesc": "Submit a report – the community will help you find them!",
+    "ctaAdopt": "Browse animals",
+    "ctaDonate": "Support shelters",
+    "whyTitle": "Why ÁllatiMenhelyek.hu?",
+    "whySubtitle": "One platform connecting animals, adopters, and shelters.",
+    "why1Title": "Real-time data",
+    "why1Desc": "The list of adoptable animals is continuously updated directly from shelter systems.",
+    "why2Title": "Transparent process",
+    "why2Desc": "Track your adoption application status and communicate with the shelter in one place.",
+    "why3Title": "Secure donations",
+    "why3Desc": "Card payments via Stripe. Money goes directly to the chosen shelter.",
+    "why4Title": "Community lost & found",
+    "why4Desc": "Report and AI-powered matching system for lost and found animals.",
+    "sheltersTitle": "Partner shelters",
+    "sheltersDesc": "Work with them — every adoption saves a life."
   },
   "animals": {
     "title": "Animals",
