@@ -71,21 +71,7 @@
     "latestReportsDesc": "Elveszett, megtalált és kóbor állatok",
     "all": "Összes",
     "ctaTitle": "Elveszett a kedvenced?",
-    "ctaDesc": "Add fel a bejelentést – a közösség segít megtalálni!",
-    "ctaAdopt": "Böngéssz állatok között",
-    "ctaDonate": "Támogasd a menhelyeket",
-    "whyTitle": "Miért az ÁllatiMenhelyek.hu?",
-    "whySubtitle": "Egy platform, ami összeköt állatot, gazdát és menhelyet.",
-    "why1Title": "Valós idejű adatok",
-    "why1Desc": "Az örökbefogadható állatok listája folyamatosan frissül a menhelyek rendszeréből.",
-    "why2Title": "Átlátható folyamat",
-    "why2Desc": "Kövesd az örökbefogadási kérelmeid státuszát és kommunikálj a menhellyel egy helyen.",
-    "why3Title": "Biztonságos adományozás",
-    "why3Desc": "Stripe-on keresztül, kártyás fizetéssel. A pénz közvetlenül az adott menhelynek kerül.",
-    "why4Title": "Közösségi elveszett-talált",
-    "why4Desc": "Bejelentési és AI-alapú párosító rendszer elveszett és megtalált állatoknak.",
-    "sheltersTitle": "Csatlakozott menhelyek",
-    "sheltersDesc": "Dolgozz együtt velük — minden örökbefogadás egy élet megmentése."
+    "ctaDesc": "Add fel a bejelentést – a közösség segít megtalálni!"
   },
   "animals": {
     "title": "Állatok",

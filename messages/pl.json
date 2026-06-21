@@ -71,21 +71,7 @@
     "latestReportsDesc": "Zagubione, znalezione i bezdomne zwierzęta",
     "all": "Wszystkie",
     "ctaTitle": "Zgubiłeś swojego pupila?",
-    "ctaDesc": "Złóż zgłoszenie – społeczność pomoże ci go znaleźć!",
-    "ctaAdopt": "Przeglądaj zwierzęta",
-    "ctaDonate": "Wspieraj schroniska",
-    "whyTitle": "Dlaczego ÁllatiMenhelyek.hu?",
-    "whySubtitle": "Jedna platforma łącząca zwierzęta, adopcje i schroniska.",
-    "why1Title": "Dane w czasie rzeczywistym",
-    "why1Desc": "Lista adopcyjnych zwierząt jest na bieżąco aktualizowana z systemów schronisk.",
-    "why2Title": "Przejrzysty proces",
-    "why2Desc": "Śledź status wniosku adopcyjnego i komunikuj się ze schroniskiem w jednym miejscu.",
-    "why3Title": "Bezpieczne darowizny",
-    "why3Desc": "Płatności kartą przez Stripe. Pieniądze trafiają bezpośrednio do wybranego schroniska.",
-    "why4Title": "Społecznościowe zaginione-znalezione",
-    "why4Desc": "System zgłoszeń z dopasowaniem AI dla zagubionych i znalezionych zwierząt.",
-    "sheltersTitle": "Schroniska partnerskie",
-    "sheltersDesc": "Współpracuj z nimi — każda adopcja ratuje życie."
+    "ctaDesc": "Złóż zgłoszenie – społeczność pomoże ci go znaleźć!"
   },
   "animals": {
     "title": "Zwierzęta",
