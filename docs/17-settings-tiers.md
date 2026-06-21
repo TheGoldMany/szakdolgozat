@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkcióit fedi le. A `/dashboard/settings` oldalon a menhely admin a `ShelterSettingsForm` komponensen keresztül kezeli a menhely logóját, kapacitását, örökbefogadási feltételeit, számlázási adatait (cégnév, adószám, bankszámla) és dokumentumait, valamint innen indítható a **Stripe Connect** onboarding (`POST /api/stripe/connect/onboard`), amellyel az adományok és előfizetési díjak közvetlenül a menhely Stripe Express számlájára érkeznek (4% platformdíjjal). A `/dashboard/tiers` oldalon a `TiersManager` komponenssel havi támogatói szintek (`DonationTier`) hozhatók létre és szerkeszthetők (minimum 175 Ft – Stripe limit); az aktív csomagok a publikus `/hu/donate` és `/hu/shelters/[slug]` oldalakon `TierCard`-ként jelennek meg „Feliratkozás" gombbal, amely Stripe Checkout fizetésre visz (`POST /api/checkout/subscribe`). Az előfizetések (`Subscription`, státuszok: `ACTIVE`, `CANCELLED`, `PAST_DUE`) a `/dashboard/subscriptions` oldalon listázhatók, szűrhetők és admin által lemondhatók (`POST /api/subscriptions/[id]/admin-cancel`).
+Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkcióit fedi le. A `/dashboard/settings` oldalon a menhely admin a `ShelterSettingsForm` komponensen keresztül kezeli a menhely logóját, kapacitását, örökbefogadási feltételeit, számlázási adatait (cégnév, adószám, bankszámla) és dokumentumait, valamint innen indítható a **Stripe Connect** onboarding (`POST /api/stripe/connect/onboard`), amellyel az adományok és előfizetési díjak közvetlenül a menhely Stripe Express számlájára érkeznek (5% platformdíjjal). A `/dashboard/tiers` oldalon a `TiersManager` komponenssel havi támogatói szintek (`DonationTier`) hozhatók létre és szerkeszthetők (minimum 175 Ft – Stripe limit); az aktív csomagok a publikus `/hu/donate` és `/hu/shelters/[slug]` oldalakon `TierCard`-ként jelennek meg „Feliratkozás" gombbal, amely Stripe Checkout fizetésre visz (`POST /api/checkout/subscribe`). Az előfizetések (`Subscription`, státuszok: `ACTIVE`, `CANCELLED`, `PAST_DUE`) a `/dashboard/subscriptions` oldalon listázhatók, szűrhetők és admin által lemondhatók (`POST /api/subscriptions/[id]/admin-cancel`).
 
 ---
 
@@ -108,7 +108,7 @@ A számlázási adatok menthetők és perzisztensek. Dokumentum csak névvel tö
 | **Státusz** | ⬜ Nem tesztelt |
 
 **Elfogadási feltételek:**
-- [ ] A Stripe Connect szekció leírása említi a 4% platformdíjat
+- [ ] A Stripe Connect szekció leírása említi a 5% platformdíjat
 - [ ] Ha a menhelynek nincs Stripe fiókja, a „Stripe fiók csatlakoztatása" gomb látható
 - [ ] A gombra kattintva `POST /api/stripe/connect/onboard` (`{ type: "shelter", shelterId }`) Stripe Express fiókot hoz létre (country: `HU`), és a böngésző a Stripe onboarding URL-re irányít
 - [ ] A menhely `stripeAccountId` mezője kitöltődik, `stripeOnboardingComplete: false` értékkel
@@ -119,7 +119,7 @@ A számlázási adatok menthetők és perzisztensek. Dokumentum csak névvel tö
 
 **Tesztelési lépések:**
 1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal, és navigálj a `/dashboard/settings` oldalra.
-2. Keresd meg a „Stripe Connect" szekciót – ellenőrizd a 4% platformdíjat említő leírást és az aktuális állapotjelzést.
+2. Keresd meg a „Stripe Connect" szekciót – ellenőrizd a 5% platformdíjat említő leírást és az aktuális állapotjelzést.
 3. Kattints a „Stripe fiók csatlakoztatása" gombra – ellenőrizd az „Átirányítás..." állapotot, majd a Stripe onboarding oldal betöltését.
 4. Szakítsd meg a folyamatot (zárd be / navigálj vissza a `/dashboard/settings` oldalra).
 5. Ellenőrizd, hogy a szekció most sárga „Az onboarding nem teljes…" figyelmeztetést mutat folytatás gombbal.
@@ -227,7 +227,7 @@ A csomag adatai szerkeszthetők, az aktív/inaktív állapot a publikus láthat�
 - [ ] A `TierCard`-on a „Feliratkozás" gomb bejelentkezett felhasználóként `POST /api/checkout/subscribe` (`{ tierId }`) hívást indít, és a Stripe Checkout oldalára irányít
 - [ ] Kijelentkezett állapotban az API `401` hibát ad („Bejelentkezés szükséges")
 - [ ] Inaktív csomagra nem indítható checkout (`409` – „A csomag nem aktív")
-- [ ] A Stripe Checkout a csomag árát havi ismétlődő (subscription) tételként mutatja; ha a menhely Stripe Connect fiókja aktív, a 4% platformdíj az összegre rárakódik
+- [ ] A Stripe Checkout a csomag árát havi ismétlődő (subscription) tételként mutatja; ha a menhely Stripe Connect fiókja aktív, a 5% platformdíj az összegre rárakódik
 - [ ] A `4242 4242 4242 4242` teszt kártyával (bármilyen jövőbeli lejárat, bármilyen CVC) a fizetés sikeres
 - [ ] Sikeres fizetés után a felhasználó a `/donate/success` oldalra kerül; a megszakított fizetés a menhely oldalára (`/shelters/[slug]`) irányít vissza
 - [ ] A webhook feldolgozása után `ACTIVE` státuszú `Subscription` rekord jön létre a helyes `userId` és `tierId` értékekkel, `stripeSubId`-val

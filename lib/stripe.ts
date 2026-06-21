@@ -5,7 +5,7 @@ import Stripe from "stripe";
  * The remainder is transferred in full to the connected account (shelter /
  * campaign owner). Change this single value to adjust the platform's cut.
  */
-export const PLATFORM_FEE_PERCENT = 4;
+export const PLATFORM_FEE_PERCENT = 5;
 
 /**
  * Platform fee for a given amount, in the same whole-currency unit (HUF).
