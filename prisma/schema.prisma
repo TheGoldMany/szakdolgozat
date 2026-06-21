@@ -106,6 +106,8 @@ model User {
   country                  String    @default("HU")
   stripeAccountId          String?
   stripeOnboardingComplete Boolean   @default(false)
+  birthDate                DateTime?
+  deletionScheduledAt      DateTime?
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 

@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/feeding",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/purge-accounts",
+      "schedule": "0 3 * * *"
     }
   ]
 }

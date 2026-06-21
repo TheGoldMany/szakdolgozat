@@ -10,6 +10,7 @@ import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { SubscriptionsList } from "@/components/profile/subscriptions-list";
 import { SponsorshipsList } from "@/components/profile/sponsorships-list";
 import { ProfileReports } from "@/components/profile/profile-reports";
+import { DeleteAccountButton } from "@/components/profile/delete-account-button";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -257,6 +258,13 @@ export default async function ProfilePage() {
                 matchCount: r._count.matchesA + r._count.matchesB,
               }))}
             />
+          </div>
+
+          {/* Danger zone – account deletion */}
+          <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-1 text-sm font-semibold text-red-700">{t("dangerZone")}</h2>
+            <p className="mb-4 text-xs text-gray-500">{t("deleteAccountDesc")}</p>
+            <DeleteAccountButton />
           </div>
 
         </div>
