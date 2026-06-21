@@ -45,6 +45,12 @@ export function Header() {
     { href: "/donate",   label: t("donate")   },
   ];
 
+  // Prevent body scroll while mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   useEffect(() => {
     if (!session?.user?.id) return;
     const fetch_ = () =>
@@ -255,115 +261,154 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu – full-screen overlay so content is always reachable */}
       {mobileOpen && (
-        <div className="border-t border-gray-100 bg-white px-4 py-4 md:hidden">
-          <nav className="flex flex-col gap-1">
-            {NAV_LINKS.map((l) => (
-              <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                {l.label}
-              </Link>
-            ))}
+        <div
+          className="fixed inset-0 z-50 md:hidden"
+          style={{ top: 0 }}
+        >
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setMobileOpen(false)}
+          />
 
-            {/* Language switcher mobile */}
-            <hr className="my-2 border-gray-100" />
-            <div className="px-3 py-1">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("language")}</p>
-              <div className="flex flex-wrap gap-2">
-                {routing.locales.map((loc) => (
-                  <button
-                    key={loc}
-                    onClick={() => { switchLocale(loc); setMobileOpen(false); }}
-                    className={cn(
-                      "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                      loc === locale
-                        ? "bg-brand-500 text-white"
-                        : "border border-gray-200 text-gray-700 hover:bg-gray-50"
-                    )}
-                  >
-                    {LOCALE_LABELS[loc].flag} {LOCALE_LABELS[loc].label}
-                  </button>
-                ))}
-              </div>
+          {/* Drawer panel */}
+          <div className="absolute right-0 top-0 flex h-full w-4/5 max-w-sm flex-col bg-white shadow-xl">
+
+            {/* Drawer header */}
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
+              <span className="font-bold text-brand-500 flex items-center gap-2">
+                <PawPrint className="h-5 w-5" />
+                ÁllatiMenhelyek
+              </span>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <hr className="my-2 border-gray-100" />
-            {session ? (
-              <>
-                {roleInfo && (
-                  <div className="px-3 pb-1">
-                    <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
-                      {roleInfo.label}
-                    </span>
-                  </div>
-                )}
-                <Link href="/profile" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("profile")}
-                </Link>
-                <Link href="/messages" onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <MessageCircle className="h-4 w-4" />
-                  {t("myMessages")}
-                  {unread > 0 && (
-                    <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                      {unread}
-                    </span>
-                  )}
-                </Link>
-                <Link href="/favorites" onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <Heart className="h-4 w-4" />
-                  {t("favorites")}
-                </Link>
-                <Link href="/notifications" onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  <Bell className="h-4 w-4" />
-                  {t("notifications")}
-                </Link>
-                <Link href="/appointments" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("myAppointments")}
-                </Link>
-                <Link href="/followups" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("myFollowups")}
-                </Link>
-                <Link href="/volunteers" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("myVolunteers")}
-                </Link>
-                <Link href="/foster" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("myFoster")}
-                </Link>
-                {isAdmin && (
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                    {t("adminPanel")}
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              <nav className="flex flex-col gap-0.5">
+                {NAV_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                    {l.label}
                   </Link>
+                ))}
+
+                {/* Language switcher */}
+                <hr className="my-3 border-gray-100" />
+                <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("language")}</p>
+                <div className="flex flex-wrap gap-2 px-3 pb-1">
+                  {routing.locales.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => { switchLocale(loc); setMobileOpen(false); }}
+                      className={cn(
+                        "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                        loc === locale
+                          ? "bg-brand-500 text-white"
+                          : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                      )}
+                    >
+                      {LOCALE_LABELS[loc].flag} {LOCALE_LABELS[loc].label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Auth section */}
+                <hr className="my-3 border-gray-100" />
+                {session ? (
+                  <>
+                    {/* User info */}
+                    <div className="px-3 pb-3">
+                      <p className="font-semibold text-sm text-gray-800">{session.user?.name}</p>
+                      <p className="text-xs text-gray-400 truncate">{session.user?.email}</p>
+                      {roleInfo && (
+                        <span className={cn("mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
+                          {roleInfo.label}
+                        </span>
+                      )}
+                    </div>
+
+                    <Link href="/profile" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("profile")}
+                    </Link>
+                    <Link href="/messages" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      <MessageCircle className="h-4 w-4 shrink-0" />
+                      {t("myMessages")}
+                      {unread > 0 && (
+                        <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                          {unread}
+                        </span>
+                      )}
+                    </Link>
+                    <Link href="/favorites" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      <Heart className="h-4 w-4 shrink-0" />
+                      {t("favorites")}
+                    </Link>
+                    <Link href="/notifications" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      <Bell className="h-4 w-4 shrink-0" />
+                      {t("notifications")}
+                    </Link>
+                    <Link href="/appointments" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("myAppointments")}
+                    </Link>
+                    <Link href="/followups" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("myFollowups")}
+                    </Link>
+                    <Link href="/volunteers" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("myVolunteers")}
+                    </Link>
+                    <Link href="/foster" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("myFoster")}
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/dashboard" onClick={() => setMobileOpen(false)}
+                        className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                        {t("adminPanel")}
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("login")}
+                    </Link>
+                    <Link href="/auth/register" onClick={() => setMobileOpen(false)}
+                      className="mt-1 rounded-xl bg-brand-500 px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-600 active:bg-brand-700">
+                      {t("register")}
+                    </Link>
+                  </>
                 )}
+              </nav>
+            </div>
+
+            {/* Logout pinned at bottom */}
+            {session && (
+              <div className="border-t border-gray-100 px-4 py-4">
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="rounded-lg px-3 py-2 text-left text-sm text-red-500 hover:bg-red-50"
+                  onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }); }}
+                  className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-100 active:bg-red-200 transition-colors"
                 >
                   {t("logout")}
                 </button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                  {t("login")}
-                </Link>
-                <Link href="/auth/register" onClick={() => setMobileOpen(false)}
-                  className="rounded-xl bg-brand-500 px-3 py-2 text-center text-sm font-medium text-white">
-                  {t("register")}
-                </Link>
-              </>
+              </div>
             )}
-          </nav>
+          </div>
         </div>
       )}
     </header>
