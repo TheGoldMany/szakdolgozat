@@ -11,6 +11,8 @@ import { SubscriptionsList } from "@/components/profile/subscriptions-list";
 import { SponsorshipsList } from "@/components/profile/sponsorships-list";
 import { ProfileReports } from "@/components/profile/profile-reports";
 import { DeleteAccountButton } from "@/components/profile/delete-account-button";
+import { EmailNotificationsToggle } from "@/components/profile/email-notifications-toggle";
+import { DownloadDataButton } from "@/components/profile/download-data-button";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -31,16 +33,17 @@ export default async function ProfilePage() {
     prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
-      id:        true,
-      name:      true,
-      email:     true,
-      image:     true,
-      phone:     true,
-      address:   true,
-      city:      true,
-      role:      true,
-      password:  true,
-      createdAt: true,
+      id:                 true,
+      name:               true,
+      email:              true,
+      image:              true,
+      phone:              true,
+      address:            true,
+      city:               true,
+      role:               true,
+      password:           true,
+      emailNotifications: true,
+      createdAt:          true,
       _count: { select: { applications: true } },
       subscriptions: {
         orderBy: { createdAt: "desc" },
@@ -258,6 +261,19 @@ export default async function ProfilePage() {
                 matchCount: r._count.matchesA + r._count.matchesB,
               }))}
             />
+          </div>
+
+          {/* Notification preferences */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("notificationSettings")}</h2>
+            <EmailNotificationsToggle enabled={user.emailNotifications} />
+          </div>
+
+          {/* GDPR data portability */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("myData")}</h2>
+            <p className="mb-4 text-xs text-gray-500">{t("myDataDesc")}</p>
+            <DownloadDataButton />
           </div>
 
           {/* Danger zone – account deletion */}

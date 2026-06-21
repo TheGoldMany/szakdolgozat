@@ -5,10 +5,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const updateSchema = z.object({
-  name:    z.string().min(2, "Legalább 2 karakter szükséges").max(100),
-  phone:   z.string().max(20).optional().nullable(),
-  address: z.string().max(200).optional().nullable(),
-  city:    z.string().max(100).optional().nullable(),
+  name:               z.string().min(2, "Legalább 2 karakter szükséges").max(100).optional(),
+  phone:              z.string().max(20).optional().nullable(),
+  address:            z.string().max(200).optional().nullable(),
+  city:               z.string().max(100).optional().nullable(),
+  emailNotifications: z.boolean().optional(),
 });
 
 export async function PATCH(req: NextRequest) {
