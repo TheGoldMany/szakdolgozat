@@ -96,15 +96,6 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
 
-      {/* Test-mode banner */}
-      <div className="bg-amber-400 text-amber-950">
-        <div className="mx-auto flex flex-wrap max-w-7xl items-center justify-center gap-x-2 gap-y-0.5 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
-          <span className="text-base">⚠️</span>
-          <span>{t("testBanner")}</span>
-          <span className="text-base">⚠️</span>
-        </div>
-      </div>
-
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
