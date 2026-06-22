@@ -9,7 +9,7 @@ const ADMIN_EMAIL    = "terrarisztika1@gmail.com";
 const ADMIN_NAME     = "Admin";
 const ADMIN_PASSWORD = "HE4N%dXMu6vDH7b&";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (token !== ONE_TIME_TOKEN) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
