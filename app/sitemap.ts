@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+// Always render at request time — requires a live DB connection
+export const dynamic = "force-dynamic";
+
 const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
