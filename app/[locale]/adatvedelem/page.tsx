@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
-import { Shield, Cookie, Lock, Eye, Trash2, Download, Mail, ExternalLink } from "lucide-react";
+import { Shield, Cookie, Lock, Eye, Trash2, Download, Mail, ExternalLink, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Adatvédelmi tájékoztató",
@@ -59,7 +59,354 @@ function TableRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function AdatvedelemPage() {
+type PrivacySummarySection = {
+  number: string;
+  heading: string;
+  items: string[];
+};
+
+type PrivacySummaryContent = {
+  legalLabel: string;
+  title: string;
+  summaryBadge: string;
+  noticeLine1: string;
+  noticeLine2: string;
+  noticeLink: string;
+  lastUpdated: string;
+  footerTos: string;
+  footerContact: string;
+  sections: PrivacySummarySection[];
+};
+
+const SUMMARIES: Record<string, PrivacySummaryContent> = {
+  en: {
+    legalLabel: "Legal document",
+    title: "Privacy Policy",
+    summaryBadge: "Summary",
+    noticeLine1:
+      "This is a translated summary of the most important points. The full, legally binding Privacy Policy is written in Hungarian.",
+    noticeLine2: "View the full Hungarian version",
+    noticeLink: "/hu/adatvedelem",
+    lastUpdated: "Last updated: 1 January 2024",
+    footerTos: "Terms of Service",
+    footerContact: "Contact",
+    sections: [
+      {
+        number: "1",
+        heading: "Data controller",
+        items: [
+          `Data controller: ${CONTROLLER_NAME}`,
+          `Contact: ${CONTROLLER_EMAIL}`,
+          "Registered in Hungary — Hungarian law applies.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Data we collect",
+        items: [
+          "Account data: email address, display name, profile picture (optional), account creation date.",
+          "Google OAuth tokens if you sign in with Google (no password stored in that case).",
+          "Adoption application answers — collected on behalf of the shelter, which acts as data controller for this data.",
+          "Payment transaction IDs, amounts, and statuses — we never store card details (Stripe handles that).",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Payment data & Stripe",
+        items: [
+          "All card data is handled exclusively by Stripe, Inc., which is certified to PCI DSS Level 1.",
+          "We only store the transaction IDs returned by Stripe — never your card number, CVV, or expiry date.",
+          "Stripe's privacy policy: stripe.com/privacy",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Your rights (GDPR)",
+        items: [
+          "Access (Art. 15): request information about what data we hold on you.",
+          "Rectification (Art. 16): ask us to correct inaccurate data.",
+          "Erasure (Art. 17): delete your account directly in Profile → Delete account.",
+          "Data portability (Art. 20): download your data from Profile.",
+          "Object to processing (Art. 21): contact us at " + CONTROLLER_EMAIL,
+          "You can also contact your local data protection authority in your EU member state.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Data retention",
+        items: [
+          "Account data: until deletion + 30 days grace period.",
+          "Financial records: 8 years (Hungarian accounting law requirement).",
+          "Session tokens: up to 30 days of inactivity.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Data processors",
+        items: [
+          "Stripe, Inc. — payment processing (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC — OAuth sign-in (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc. — application hosting (USA, EU–US Data Privacy Framework).",
+          "Shelters — adoption application data (EU, Hungary) — shelters act as independent data controllers.",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Supervisory authority",
+        items: [
+          "Hungarian authority: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "EU residents may also lodge a complaint with the data protection authority in their own member state.",
+        ],
+      },
+      {
+        number: "8",
+        heading: "Contact for privacy questions",
+        items: [CONTROLLER_EMAIL],
+      },
+    ],
+  },
+  de: {
+    legalLabel: "Rechtsdokument",
+    title: "Datenschutzerklärung",
+    summaryBadge: "Zusammenfassung",
+    noticeLine1:
+      "Dies ist eine übersetzte Zusammenfassung der wichtigsten Punkte. Die vollständige, rechtlich bindende Datenschutzerklärung ist auf Ungarisch verfasst.",
+    noticeLine2: "Vollständige ungarische Version anzeigen",
+    noticeLink: "/hu/adatvedelem",
+    lastUpdated: "Zuletzt aktualisiert: 1. Januar 2024",
+    footerTos: "AGB",
+    footerContact: "Kontakt",
+    sections: [
+      {
+        number: "1",
+        heading: "Verantwortlicher",
+        items: [
+          `Verantwortlicher: ${CONTROLLER_NAME}`,
+          `Kontakt: ${CONTROLLER_EMAIL}`,
+          "Registriert in Ungarn – ungarisches Recht ist anwendbar.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Erhobene Daten",
+        items: [
+          "Kontodaten: E-Mail-Adresse, Anzeigename, Profilbild (optional), Erstellungsdatum des Kontos.",
+          "Google-OAuth-Token bei Anmeldung mit Google (kein Passwort wird in diesem Fall gespeichert).",
+          "Antworten auf Adoptionsanträge — im Auftrag des Tierheims erhoben, das als Verantwortlicher für diese Daten gilt.",
+          "Zahlungstransaktions-IDs, Beträge und Status — wir speichern niemals Kartendaten (das übernimmt Stripe).",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Zahlungsdaten & Stripe",
+        items: [
+          "Alle Kartendaten werden ausschließlich von Stripe, Inc. verarbeitet, das nach PCI DSS Level 1 zertifiziert ist.",
+          "Wir speichern nur die von Stripe zurückgegebenen Transaktions-IDs — niemals Ihre Kartennummer, CVV oder das Ablaufdatum.",
+          "Datenschutzrichtlinie von Stripe: stripe.com/privacy",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Ihre Rechte (DSGVO)",
+        items: [
+          "Auskunft (Art. 15): Informationen darüber anfordern, welche Daten wir über Sie haben.",
+          "Berichtigung (Art. 16): uns bitten, unrichtige Daten zu korrigieren.",
+          "Löschung (Art. 17): Konto direkt unter Profil → Konto löschen löschen.",
+          "Datenübertragbarkeit (Art. 20): Daten unter Profil herunterladen.",
+          "Widerspruch (Art. 21): Kontaktieren Sie uns unter " + CONTROLLER_EMAIL,
+          "Sie können sich auch an die Datenschutzbehörde Ihres EU-Mitgliedstaates wenden.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Speicherdauer",
+        items: [
+          "Kontodaten: bis zur Löschung + 30 Tage Kulanzfrist.",
+          "Finanzunterlagen: 8 Jahre (ungarische buchhalterische Pflicht).",
+          "Sitzungstoken: bis zu 30 Tage Inaktivität.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Auftragsverarbeiter",
+        items: [
+          "Stripe, Inc. — Zahlungsabwicklung (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC — OAuth-Anmeldung (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc. — Anwendungshosting (USA, EU–US Data Privacy Framework).",
+          "Tierheime — Adoptionsantragsdaten (EU, Ungarn) — Tierheime handeln als eigenständige Verantwortliche.",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Aufsichtsbehörde",
+        items: [
+          "Ungarische Behörde: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "EU-Einwohner können auch bei der Datenschutzbehörde ihres eigenen Mitgliedstaates Beschwerde einlegen.",
+        ],
+      },
+      {
+        number: "8",
+        heading: "Kontakt bei Datenschutzfragen",
+        items: [CONTROLLER_EMAIL],
+      },
+    ],
+  },
+  pl: {
+    legalLabel: "Dokument prawny",
+    title: "Polityka prywatności",
+    summaryBadge: "Podsumowanie",
+    noticeLine1:
+      "To jest przetłumaczone podsumowanie najważniejszych punktów. Pełna, prawnie wiążąca Polityka prywatności sporządzona jest w języku węgierskim.",
+    noticeLine2: "Zobacz pełną wersję węgierską",
+    noticeLink: "/hu/adatvedelem",
+    lastUpdated: "Ostatnia aktualizacja: 1 stycznia 2024",
+    footerTos: "Regulamin",
+    footerContact: "Kontakt",
+    sections: [
+      {
+        number: "1",
+        heading: "Administrator danych",
+        items: [
+          `Administrator: ${CONTROLLER_NAME}`,
+          `Kontakt: ${CONTROLLER_EMAIL}`,
+          "Zarejestrowany na Węgrzech — stosuje się prawo węgierskie.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Zbierane dane",
+        items: [
+          "Dane konta: adres e-mail, nazwa wyświetlana, zdjęcie profilowe (opcjonalne), data utworzenia konta.",
+          "Tokeny Google OAuth przy logowaniu przez Google (w tym przypadku hasło nie jest przechowywane).",
+          "Odpowiedzi we wnioskach adopcyjnych — zbierane w imieniu schroniska, które jest administratorem tych danych.",
+          "Identyfikatory transakcji płatniczych, kwoty i statusy — nigdy nie przechowujemy danych karty (zajmuje się tym Stripe).",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Dane płatnicze i Stripe",
+        items: [
+          "Wszystkie dane karty są przetwarzane wyłącznie przez Stripe, Inc., certyfikowany na poziomie PCI DSS Level 1.",
+          "Przechowujemy tylko identyfikatory transakcji zwrócone przez Stripe — nigdy numer karty, CVV ani datę ważności.",
+          "Polityka prywatności Stripe: stripe.com/privacy",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Twoje prawa (RODO)",
+        items: [
+          "Dostęp (art. 15): zażądaj informacji o danych, które przechowujemy.",
+          "Sprostowanie (art. 16): poproś nas o poprawienie nieprawidłowych danych.",
+          "Usunięcie (art. 17): usuń konto bezpośrednio w Profil → Usuń konto.",
+          "Przenoszenie danych (art. 20): pobierz swoje dane w Profilu.",
+          "Sprzeciw (art. 21): skontaktuj się z nami pod adresem " + CONTROLLER_EMAIL,
+          "Możesz też złożyć skargę do organu ochrony danych w swoim państwie członkowskim UE.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Okres przechowywania danych",
+        items: [
+          "Dane konta: do usunięcia + 30 dni okresu karencji.",
+          "Dokumentacja finansowa: 8 lat (wymóg węgierskiego prawa rachunkowego).",
+          "Tokeny sesji: do 30 dni nieaktywności.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Podmioty przetwarzające",
+        items: [
+          "Stripe, Inc. — przetwarzanie płatności (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC — logowanie OAuth (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc. — hosting aplikacji (USA, EU–US Data Privacy Framework).",
+          "Schroniska — dane wniosków adopcyjnych (UE, Węgry) — schroniska działają jako niezależni administratorzy.",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Organ nadzorczy",
+        items: [
+          "Organ węgierski: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "Mieszkańcy UE mogą również złożyć skargę do organu ochrony danych we własnym państwie członkowskim.",
+        ],
+      },
+      {
+        number: "8",
+        heading: "Kontakt w sprawach prywatności",
+        items: [CONTROLLER_EMAIL],
+      },
+    ],
+  },
+};
+
+function AdatvedelemSummaryPage({ locale }: { locale: string }) {
+  const content = SUMMARIES[locale];
+  if (!content) return null;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b border-gray-100">
+        <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
+              <Shield className="h-6 w-6 text-brand-600" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
+                {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
+              </p>
+              <h1 className="text-3xl font-bold text-gray-900">{content.title}</h1>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-gray-500">
+            {content.lastUpdated} &nbsp;·&nbsp; Platform: <strong>{CONTROLLER_NAME}</strong>
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <span>
+              {content.noticeLine1}{" "}
+              <Link
+                href={content.noticeLink}
+                className="font-semibold underline underline-offset-2 hover:text-amber-900"
+              >
+                {content.noticeLine2} →
+              </Link>
+            </span>
+          </div>
+
+          {content.sections.map((section) => (
+            <div key={section.number}>
+              <SectionHeading number={section.number} title={section.heading} />
+              <UL items={section.items} />
+            </div>
+          ))}
+
+          <div className="mt-10 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
+            {content.lastUpdated} &nbsp;·&nbsp;{" "}
+            <Link href="/aszf" className="hover:text-brand-500">
+              {content.footerTos}
+            </Link>
+            {" "}&nbsp;·&nbsp;{" "}
+            <Link href="/kapcsolat" className="hover:text-brand-500">
+              {content.footerContact}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AdatvedelemPage({ params: { locale } }: { params: { locale: string } }) {
+  if (locale !== "hu") {
+    return <AdatvedelemSummaryPage locale={locale} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
 

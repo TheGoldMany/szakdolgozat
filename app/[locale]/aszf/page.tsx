@@ -65,7 +65,306 @@ function WarnBox({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function ASZFPage() {
+type SummarySection = {
+  number: string;
+  heading: string;
+  items: string[];
+};
+
+type SummaryContent = {
+  legalLabel: string;
+  title: string;
+  summaryBadge: string;
+  noticeLine1: string;
+  noticeLine2: string;
+  noticeLink: string;
+  lastUpdated: string;
+  footerPrivacy: string;
+  footerContact: string;
+  sections: SummarySection[];
+};
+
+const SUMMARIES: Record<string, SummaryContent> = {
+  en: {
+    legalLabel: "Legal document",
+    title: "Terms of Service",
+    summaryBadge: "Summary",
+    noticeLine1:
+      "This is a translated summary of the most important points. The full, legally binding Terms of Service is written in Hungarian.",
+    noticeLine2: "View the full Hungarian version",
+    noticeLink: "/hu/aszf",
+    lastUpdated: "Last updated: 21 June 2026",
+    footerPrivacy: "Privacy Policy",
+    footerContact: "Contact",
+    sections: [
+      {
+        number: "1",
+        heading: "What is ÁllatiMenhelyek.hu?",
+        items: [
+          "ÁllatiMenhelyek.hu is a digital intermediary platform connecting animal shelters with people looking to adopt a pet.",
+          "The platform does not own any animals — adoption decisions are made solely by the individual shelters.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Who can use the platform?",
+        items: [
+          "You must be at least 18 years old (or have the consent of your legal guardian).",
+          "You confirm that the information you provide is accurate and up to date.",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Payments & Platform fee",
+        items: [
+          "All payments are processed securely via Stripe. We never store your card details.",
+          "A transparent 5% platform fee is added on top of each payment and shown as a separate line item at checkout, so you always see exactly how much goes to the shelter.",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Subscriptions",
+        items: [
+          "Monthly subscriptions renew automatically each month.",
+          "You can cancel at any time from your Profile → Subscriptions page.",
+          "You receive an automatic Stripe invoice by email for every billing cycle.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Right of withdrawal & Refunds",
+        items: [
+          "Subscriptions: you have 14 calendar days from activation to withdraw without giving a reason and receive a full refund, provided you have not used the service.",
+          `One-time donations are voluntary and non-refundable. In case of a technical error, contact ${CONTACT_EMAIL} within 5 business days.`,
+          "Refunds are returned to the original payment method, typically within 5–10 business days.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Governing law & Disputes",
+        items: [
+          "These Terms are governed by Hungarian law.",
+          "Disputes are resolved first through friendly negotiation, then by competent Hungarian courts.",
+          "EU consumers may also use the Online Dispute Resolution platform: ec.europa.eu/consumers/odr",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Contact",
+        items: [CONTACT_EMAIL],
+      },
+    ],
+  },
+  de: {
+    legalLabel: "Rechtsdokument",
+    title: "Allgemeine Geschäftsbedingungen",
+    summaryBadge: "Zusammenfassung",
+    noticeLine1:
+      "Dies ist eine übersetzte Zusammenfassung der wichtigsten Punkte. Die vollständigen, rechtlich bindenden AGB sind auf Ungarisch verfasst.",
+    noticeLine2: "Vollständige ungarische Version anzeigen",
+    noticeLink: "/hu/aszf",
+    lastUpdated: "Zuletzt aktualisiert: 21. Juni 2026",
+    footerPrivacy: "Datenschutzerklärung",
+    footerContact: "Kontakt",
+    sections: [
+      {
+        number: "1",
+        heading: "Was ist ÁllatiMenhelyek.hu?",
+        items: [
+          "ÁllatiMenhelyek.hu ist eine digitale Vermittlungsplattform, die Tierheime mit Adoptionsinteressenten verbindet.",
+          "Die Plattform besitzt keine Tiere – Adoptionsentscheidungen werden ausschließlich von den jeweiligen Tierheimen getroffen.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Wer darf die Plattform nutzen?",
+        items: [
+          "Sie müssen mindestens 18 Jahre alt sein (oder die Einwilligung Ihres gesetzlichen Vertreters haben).",
+          "Sie bestätigen, dass die von Ihnen angegebenen Daten korrekt und aktuell sind.",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Zahlungen & Plattformgebühr",
+        items: [
+          "Alle Zahlungen werden sicher über Stripe abgewickelt. Ihre Kartendaten werden von uns nicht gespeichert.",
+          "Eine transparente Plattformgebühr von 5 % wird auf jeden Zahlungsbetrag aufgeschlagen und beim Checkout als separater Posten ausgewiesen – so sehen Sie genau, wie viel an das Tierheim geht.",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Abonnements",
+        items: [
+          "Monatliche Abonnements verlängern sich automatisch jeden Monat.",
+          "Sie können jederzeit unter Profil → Abonnements kündigen.",
+          "Für jeden Abrechnungszeitraum erhalten Sie automatisch eine Stripe-Rechnung per E-Mail.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Widerrufsrecht & Rückerstattungen",
+        items: [
+          "Abonnements: Sie haben 14 Kalendertage ab Aktivierung, um ohne Angabe von Gründen zu widerrufen und eine vollständige Rückerstattung zu erhalten, sofern Sie den Dienst noch nicht genutzt haben.",
+          `Einmalige Spenden sind freiwillig und nicht erstattungsfähig. Bei technischen Fehlern wenden Sie sich innerhalb von 5 Werktagen an ${CONTACT_EMAIL}.`,
+          "Rückerstattungen erfolgen auf das ursprüngliche Zahlungsmittel, in der Regel innerhalb von 5–10 Werktagen.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Anwendbares Recht & Streitigkeiten",
+        items: [
+          "Diese AGB unterliegen ungarischem Recht.",
+          "Streitigkeiten werden zunächst durch freundliche Einigung, dann durch zuständige ungarische Gerichte gelöst.",
+          "EU-Verbraucher können auch die Online-Streitbeilegungsplattform nutzen: ec.europa.eu/consumers/odr",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Kontakt",
+        items: [CONTACT_EMAIL],
+      },
+    ],
+  },
+  pl: {
+    legalLabel: "Dokument prawny",
+    title: "Regulamin",
+    summaryBadge: "Podsumowanie",
+    noticeLine1:
+      "To jest przetłumaczone podsumowanie najważniejszych punktów. Pełny, prawnie wiążący Regulamin sporządzony jest w języku węgierskim.",
+    noticeLine2: "Zobacz pełną wersję węgierską",
+    noticeLink: "/hu/aszf",
+    lastUpdated: "Ostatnia aktualizacja: 21 czerwca 2026",
+    footerPrivacy: "Polityka prywatności",
+    footerContact: "Kontakt",
+    sections: [
+      {
+        number: "1",
+        heading: "Czym jest ÁllatiMenhelyek.hu?",
+        items: [
+          "ÁllatiMenhelyek.hu to cyfrowa platforma pośrednicząca łącząca schroniska dla zwierząt z osobami chcącymi adoptować zwierzę.",
+          "Platforma nie jest właścicielem żadnych zwierząt – decyzje adopcyjne podejmują wyłącznie poszczególne schroniska.",
+        ],
+      },
+      {
+        number: "2",
+        heading: "Kto może korzystać z platformy?",
+        items: [
+          "Musisz mieć co najmniej 18 lat (lub posiadać zgodę swojego opiekuna prawnego).",
+          "Potwierdzasz, że podane przez Ciebie informacje są dokładne i aktualne.",
+        ],
+      },
+      {
+        number: "3",
+        heading: "Płatności i opłata platformy",
+        items: [
+          "Wszystkie płatności są bezpiecznie przetwarzane przez Stripe. Nie przechowujemy danych Twojej karty.",
+          "Do każdej płatności doliczana jest transparentna opłata platformy w wysokości 5%, wyświetlana jako osobna pozycja przy kasie – zawsze widzisz dokładnie, ile trafia do schroniska.",
+        ],
+      },
+      {
+        number: "4",
+        heading: "Subskrypcje",
+        items: [
+          "Miesięczne subskrypcje odnawiają się automatycznie co miesiąc.",
+          "Możesz anulować w dowolnym momencie w sekcji Profil → Subskrypcje.",
+          "Za każdy okres rozliczeniowy otrzymujesz automatyczną fakturę Stripe na e-mail.",
+        ],
+      },
+      {
+        number: "5",
+        heading: "Prawo odstąpienia i zwroty",
+        items: [
+          "Subskrypcje: masz 14 dni kalendarzowych od aktywacji na odstąpienie bez podania przyczyny i otrzymanie pełnego zwrotu, pod warunkiem że nie korzystałeś z usługi.",
+          `Jednorazowe darowizny są dobrowolne i nie podlegają zwrotowi. W przypadku błędu technicznego skontaktuj się z ${CONTACT_EMAIL} w ciągu 5 dni roboczych.`,
+          "Zwroty trafiają na pierwotną metodę płatności, zazwyczaj w ciągu 5–10 dni roboczych.",
+        ],
+      },
+      {
+        number: "6",
+        heading: "Prawo właściwe i spory",
+        items: [
+          "Niniejszy Regulamin podlega prawu węgierskiemu.",
+          "Spory rozwiązywane są najpierw w drodze polubownej, a następnie przez właściwe sądy węgierskie.",
+          "Konsumenci z UE mogą również skorzystać z platformy internetowego rozstrzygania sporów: ec.europa.eu/consumers/odr",
+        ],
+      },
+      {
+        number: "7",
+        heading: "Kontakt",
+        items: [CONTACT_EMAIL],
+      },
+    ],
+  },
+};
+
+function ASZFSummaryPage({ locale }: { locale: string }) {
+  const content = SUMMARIES[locale];
+  if (!content) return null;
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white border-b border-gray-100">
+        <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100">
+              <FileText className="h-6 w-6 text-brand-600" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
+                {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
+              </p>
+              <h1 className="text-3xl font-bold text-gray-900">{content.title}</h1>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-gray-500">
+            {content.lastUpdated} &nbsp;·&nbsp; Platform: <strong>{PLATFORM_NAME}</strong>
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <span>
+              {content.noticeLine1}{" "}
+              <Link
+                href={content.noticeLink}
+                className="font-semibold underline underline-offset-2 hover:text-amber-900"
+              >
+                {content.noticeLine2} →
+              </Link>
+            </span>
+          </div>
+
+          {content.sections.map((section) => (
+            <div key={section.number}>
+              <SectionHeading number={section.number} title={section.heading} />
+              <UL items={section.items} />
+            </div>
+          ))}
+
+          <div className="mt-10 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
+            {content.lastUpdated} &nbsp;·&nbsp;{" "}
+            <Link href="/adatvedelem" className="hover:text-brand-500">
+              {content.footerPrivacy}
+            </Link>
+            {" "}&nbsp;·&nbsp;{" "}
+            <Link href="/kapcsolat" className="hover:text-brand-500">
+              {content.footerContact}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ASZFPage({ params: { locale } }: { params: { locale: string } }) {
+  if (locale !== "hu") {
+    return <ASZFSummaryPage locale={locale} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -162,10 +461,10 @@ export default function ASZFPage() {
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {[
-              { Icon: Users,     title: "Örökbefogadás",        desc: "Állatok böngészése, szűrése, örökbefogadási kérelem benyújtása menhelyeknek." },
-              { Icon: ShieldCheck, title: "Bejelentések",       desc: "Elveszett, megtalált és kóbor állatok bejelentése interaktív térképpel." },
-              { Icon: CreditCard, title: "Adományozás",         desc: "Egyszeri adományok és havi előfizetések menhelyek támogatására kampányokon keresztül." },
-              { Icon: FileText,  title: "Önkéntesség & befogadás", desc: "Önkéntesi jelentkezés és ideiglenes befogadói profil létrehozása menhelyeknél." },
+              { Icon: Users,      title: "Örökbefogadás",           desc: "Állatok böngészése, szűrése, örökbefogadási kérelem benyújtása menhelyeknek." },
+              { Icon: ShieldCheck, title: "Bejelentések",           desc: "Elveszett, megtalált és kóbor állatok bejelentése interaktív térképpel." },
+              { Icon: CreditCard, title: "Adományozás",             desc: "Egyszeri adományok és havi előfizetések menhelyek támogatására kampányokon keresztül." },
+              { Icon: FileText,   title: "Önkéntesség & befogadás", desc: "Önkéntesi jelentkezés és ideiglenes befogadói profil létrehozása menhelyeknél." },
             ].map(({ Icon, title, desc }) => (
               <div key={title} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-100">
