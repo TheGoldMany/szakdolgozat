@@ -17,7 +17,6 @@
     "language": "Language",
     "map": "Map",
     "events": "Events",
-    "testBanner": "TEST MODE – This is a development/test environment. Data is not real; features are available for testing purposes only.",
     "favorites": "My favorites",
     "notifications": "Notifications",
     "markAllRead": "Mark all as read",
