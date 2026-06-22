@@ -25,7 +25,8 @@
     "myAppointments": "Moje terminy",
     "myFollowups": "Obserwacje",
     "myVolunteers": "Moje wolontariaty",
-    "myFoster": "Moje zwierzęta w opiece"
+    "myFoster": "Moje zwierzęta w opiece",
+    "myFinances": "Moje finanse"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
@@ -1477,5 +1478,15 @@
     "typeSurgery": "Operacja",
     "typeDental": "Stomatologia",
     "typeOther": "Inne"
+  },
+  "finances": {
+    "title": "Moje finanse",
+    "subtitle": "Twoje darowizny, subskrypcje i patronaty w jednym miejscu.",
+    "totalDonated": "Łącznie przekazano",
+    "activeSubs": "Aktywne subskrypcje",
+    "activeSpons": "Aktywne patronaty",
+    "myDonations": "Moje darowizny",
+    "noDonations": "Nie przekazałeś jeszcze żadnej darowizny.",
+    "directDonation": "Bezpośrednia darowizna"
   }
 }

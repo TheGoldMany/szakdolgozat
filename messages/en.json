@@ -25,7 +25,8 @@
     "myAppointments": "My appointments",
     "myFollowups": "Follow-ups",
     "myVolunteers": "My volunteering",
-    "myFoster": "My foster animals"
+    "myFoster": "My foster animals",
+    "myFinances": "My Finances"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
@@ -1480,5 +1481,15 @@
     "typeSurgery": "Surgery",
     "typeDental": "Dental treatment",
     "typeOther": "Other"
+  },
+  "finances": {
+    "title": "My Finances",
+    "subtitle": "Your donations, subscriptions and sponsorships in one place.",
+    "totalDonated": "Total donated",
+    "activeSubs": "Active subscriptions",
+    "activeSpons": "Active sponsorships",
+    "myDonations": "My Donations",
+    "noDonations": "You haven't donated yet.",
+    "directDonation": "Direct donation"
   }
 }
