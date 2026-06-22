@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 import { Role } from "@prisma/client";
+import { sendShelterAdminInviteEmail } from "@/lib/email";
 
 const schema = z.object({
   // Menhely adatok
@@ -92,6 +93,14 @@ export async function POST(req: NextRequest) {
 
       return { shelter, adminUser };
     });
+
+    // Send invite email (fire-and-forget — don't block response)
+    sendShelterAdminInviteEmail({
+      to:          result.adminUser.email,
+      adminName:   d.adminName,
+      shelterName: d.shelterName,
+      password:    d.adminPassword,
+    }).catch((err) => console.error("[shelter invite email]", err));
 
     return NextResponse.json({
       shelter: { id: result.shelter.id, name: result.shelter.name, slug: result.shelter.slug },
