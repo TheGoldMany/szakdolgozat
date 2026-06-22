@@ -609,6 +609,53 @@ export async function sendReportMatchEmail(opts: {
   });
 }
 
+export async function sendShelterAdminInviteEmail(opts: {
+  to:          string;
+  adminName:   string;
+  shelterName: string;
+  password:    string;
+}) {
+  const loginUrl = `${BASE}/auth/login`;
+
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Meghívó: menhely admin fiók – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+          Üdv a fedélzeten, ${opts.adminName}!
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Az ÁllatiMenhelyek.hu platformon létrehoztuk a
+          <strong>${opts.shelterName}</strong> menhely admin fiókját a te nevedre.
+          Az alábbiakkal tudsz bejelentkezni:
+        </p>
+        <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:20px 0;font-family:monospace">
+          <p style="margin:0 0 8px;font-size:13px;color:#374151">
+            <strong>E-mail:</strong> ${opts.to}
+          </p>
+          <p style="margin:0;font-size:13px;color:#374151">
+            <strong>Jelszó:</strong> ${opts.password}
+          </p>
+        </div>
+        <p style="color:#6b7280;font-size:13px;line-height:1.6">
+          Bejelentkezés után a Dashboard → Beállítások menüben változtasd meg a jelszavadat.
+        </p>
+        <a href="${loginUrl}"
+           style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                  font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+          Bejelentkezés
+        </a>
+        <p style="color:#9ca3af;font-size:12px">
+          Ha ez a meghívó nem neked szól, hagyd figyelmen kívül ezt az emailt.
+        </p>
+        ${SYSTEM_FOOTER}
+      </div>
+    `,
+  });
+}
+
 // ── System emails (security-critical – no opt-out, no unsubscribe link) ──────
 
 export async function sendVerificationEmail(email: string, token: string, name?: string | null) {
