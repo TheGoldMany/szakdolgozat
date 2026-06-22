@@ -2,37 +2,42 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Building2, MapPin, Phone, Mail, ExternalLink, BadgeCheck, Power, Loader2 } from "lucide-react";
+import {
+  Plus, Building2, MapPin, Phone, Mail, ExternalLink,
+  BadgeCheck, Power, Loader2, Trash2, AlertTriangle,
+} from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface ShelterAdmin {
   user: { name: string | null; email: string };
 }
 
 interface Shelter {
-  id: string;
-  name: string;
-  slug: string;
-  city: string;
-  address: string;
-  phone: string | null;
-  email: string | null;
-  isActive: boolean;
+  id:         string;
+  name:       string;
+  slug:       string;
+  city:       string;
+  address:    string;
+  phone:      string | null;
+  email:      string | null;
+  isActive:   boolean;
   isVerified: boolean;
-  createdAt: string;
-  admins: ShelterAdmin[];
-  _count: { animals: number };
+  createdAt:  string;
+  admins:     ShelterAdmin[];
+  _count:     { animals: number };
 }
 
 export default function DashboardSheltersPage() {
   const t = useTranslations("dashboard");
-  const [shelters, setShelters]     = useState<Shelter[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [showForm, setShowForm]     = useState(false);
-  const [busy, setBusy]             = useState<string | null>(null);
+  const [shelters, setShelters]         = useState<Shelter[]>([]);
+  const [loading, setLoading]           = useState(true);
+  const [showForm, setShowForm]         = useState(false);
+  const [busy, setBusy]                 = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Shelter | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -53,11 +58,34 @@ export default function DashboardSheltersPage() {
       });
       if (res.ok) {
         setShelters((prev) => prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
+        if (field === "isActive") {
+          toast.success(value ? t("shelterActivated") : t("shelterSuspended"));
+        }
+      } else {
+        const json = await res.json();
+        toast.error(json.error ?? t("shelterActionError"));
       }
     } finally {
       setBusy(null);
     }
-  }, []);
+  }, [t]);
+
+  const deleteShelter = useCallback(async (shelter: Shelter) => {
+    setConfirmDelete(null);
+    setBusy(`${shelter.id}:delete`);
+    try {
+      const res = await fetch(`/api/admin/shelters/${shelter.id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (res.ok) {
+        setShelters((prev) => prev.filter((s) => s.id !== shelter.id));
+        toast.success(t("shelterDeleted"));
+      } else {
+        toast.error(json.error ?? t("shelterActionError"));
+      }
+    } finally {
+      setBusy(null);
+    }
+  }, [t]);
 
   function handleClose() {
     setShowForm(false);
@@ -94,6 +122,38 @@ export default function DashboardSheltersPage() {
         </div>
       )}
 
+      {/* Törlés megerősítő dialóg */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-5 w-5 text-red-600" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900">{t("shelterDeleteTitle")}</h2>
+            </div>
+            <p className="mb-2 text-sm text-gray-600">
+              {t("shelterDeleteConfirm", { name: confirmDelete.name })}
+            </p>
+            <p className="mb-6 text-xs text-red-600 font-medium">{t("shelterDeleteWarning")}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                {t("shelterDeleteCancel")}
+              </button>
+              <button
+                onClick={() => deleteShelter(confirmDelete)}
+                className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+              >
+                {t("shelterDeleteConfirmBtn")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Lista */}
       {loading ? (
         <div className="space-y-3">
@@ -126,7 +186,7 @@ export default function DashboardSheltersPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {shelters.map((shelter) => (
-                <tr key={shelter.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={shelter.id} className={cn("transition-colors", shelter.isActive ? "hover:bg-gray-50" : "bg-amber-50/40 hover:bg-amber-50")}>
                   <td className="px-4 py-3">
                     <p className="font-semibold text-gray-900">{shelter.name}</p>
                     <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400">
@@ -163,16 +223,16 @@ export default function DashboardSheltersPage() {
 
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1.5">
-                      {/* Aktív / Inaktív kapcsoló */}
+                      {/* Felfüggesztés / Aktiválás */}
                       <button
                         onClick={() => toggle(shelter.id, "isActive", !shelter.isActive)}
-                        disabled={busy === `${shelter.id}:isActive`}
+                        disabled={!!busy}
                         title={shelter.isActive ? t("sheltersTooltipSuspend") : t("sheltersTooltipActivate")}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
                           shelter.isActive
                             ? "bg-green-100 text-green-700 hover:bg-green-200"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            : "bg-amber-100 text-amber-700 hover:bg-amber-200"
                         )}
                       >
                         {busy === `${shelter.id}:isActive`
@@ -181,10 +241,10 @@ export default function DashboardSheltersPage() {
                         {shelter.isActive ? t("sheltersStatusActive") : t("sheltersStatusInactive")}
                       </button>
 
-                      {/* Ellenőrzött kapcsoló */}
+                      {/* Hitelesítés */}
                       <button
                         onClick={() => toggle(shelter.id, "isVerified", !shelter.isVerified)}
-                        disabled={busy === `${shelter.id}:isVerified`}
+                        disabled={!!busy}
                         title={shelter.isVerified ? t("sheltersTooltipUnverify") : t("sheltersTooltipVerify")}
                         className={cn(
                           "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-colors disabled:opacity-50",
@@ -198,6 +258,21 @@ export default function DashboardSheltersPage() {
                           : <BadgeCheck className="h-3 w-3" />}
                         {shelter.isVerified ? t("sheltersStatusVerified") : t("sheltersStatusUnverified")}
                       </button>
+
+                      {/* Törlés – csak felfüggesztett menhelyen */}
+                      {!shelter.isActive && (
+                        <button
+                          onClick={() => setConfirmDelete(shelter)}
+                          disabled={!!busy}
+                          title={t("shelterDeleteTitle")}
+                          className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 hover:bg-red-200 transition-colors disabled:opacity-50"
+                        >
+                          {busy === `${shelter.id}:delete`
+                            ? <Loader2 className="h-3 w-3 animate-spin" />
+                            : <Trash2 className="h-3 w-3" />}
+                          {t("shelterDeleteBtn")}
+                        </button>
+                      )}
                     </div>
                   </td>
 
