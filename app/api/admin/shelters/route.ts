@@ -47,9 +47,21 @@ export async function POST(req: NextRequest) {
 
   try {
     // Ellenőrzés: admin email foglalt-e?
-    const existing = await prisma.user.findUnique({ where: { email: d.adminEmail } });
+    const existing = await prisma.user.findUnique({
+      where: { email: d.adminEmail },
+      include: { shelterAdmins: true },
+    });
+
     if (existing) {
-      return NextResponse.json({ error: "Ez az admin email cím már foglalt." }, { status: 409 });
+      // Ha van aktív menhely-kapcsolata, nem engedjük
+      if (existing.shelterAdmins.length > 0) {
+        return NextResponse.json({ error: "Ez az admin email cím már foglalt." }, { status: 409 });
+      }
+      // Ha SUPER_ADMIN, nem írhatjuk felül
+      if (existing.role === "SUPER_ADMIN") {
+        return NextResponse.json({ error: "Ez az admin email cím már foglalt." }, { status: 409 });
+      }
+      // Szabad felhasználó – frissítjük és hozzárendeljük az új menhelyhez
     }
 
     // Egyedi slug generálás
@@ -61,15 +73,25 @@ export async function POST(req: NextRequest) {
     const result = await prisma.$transaction(async (tx) => {
       const hashed = await hash(d.adminPassword, 10);
 
-      const adminUser = await tx.user.create({
-        data: {
-          name:          d.adminName,
-          email:         d.adminEmail,
-          password:      hashed,
-          role:          Role.SHELTER_ADMIN,
-          emailVerified: new Date(),
-        },
-      });
+      const adminUser = existing
+        ? await tx.user.update({
+            where: { id: existing.id },
+            data: {
+              name:          d.adminName,
+              password:      hashed,
+              role:          Role.SHELTER_ADMIN,
+              emailVerified: new Date(),
+            },
+          })
+        : await tx.user.create({
+            data: {
+              name:          d.adminName,
+              email:         d.adminEmail,
+              password:      hashed,
+              role:          Role.SHELTER_ADMIN,
+              emailVerified: new Date(),
+            },
+          });
 
       const shelter = await tx.shelter.create({
         data: {
