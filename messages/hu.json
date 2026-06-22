@@ -25,7 +25,8 @@
     "myAppointments": "Időpontjaim",
     "myFollowups": "Utánkövetések",
     "myVolunteers": "Önkéntességem",
-    "myFoster": "Ideiglenes befogadásaim"
+    "myFoster": "Ideiglenes befogadásaim",
+    "myFinances": "Pénzügyeim"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
@@ -1480,5 +1481,15 @@
     "typeSurgery": "Műtét",
     "typeDental": "Fogászati kezelés",
     "typeOther": "Egyéb"
+  },
+  "finances": {
+    "title": "Pénzügyeim",
+    "subtitle": "Adományaid, előfizetéseid és szponzorálásaid egy helyen.",
+    "totalDonated": "Összes adomány",
+    "activeSubs": "Aktív előfizetés",
+    "activeSpons": "Aktív szponzorálás",
+    "myDonations": "Adományaim",
+    "noDonations": "Még nem adományoztál.",
+    "directDonation": "Közvetlen adomány"
   }
 }

@@ -25,7 +25,8 @@
     "myAppointments": "Meine Termine",
     "myFollowups": "Nachverfolgungen",
     "myVolunteers": "Mein Ehrenamt",
-    "myFoster": "Meine Pflegetiere"
+    "myFoster": "Meine Pflegetiere",
+    "myFinances": "Meine Finanzen"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
@@ -1480,5 +1481,15 @@
     "typeSurgery": "Operation",
     "typeDental": "Zahnbehandlung",
     "typeOther": "Sonstiges"
+  },
+  "finances": {
+    "title": "Meine Finanzen",
+    "subtitle": "Deine Spenden, Abonnements und Patenschaften an einem Ort.",
+    "totalDonated": "Gesamt gespendet",
+    "activeSubs": "Aktive Abonnements",
+    "activeSpons": "Aktive Patenschaften",
+    "myDonations": "Meine Spenden",
+    "noDonations": "Du hast noch nicht gespendet.",
+    "directDonation": "Direktspende"
   }
 }

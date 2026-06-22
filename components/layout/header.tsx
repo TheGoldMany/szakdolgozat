@@ -215,6 +215,9 @@ export function Header() {
                     <Link href="/foster" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("myFoster")}
                     </Link>
+                    <Link href="/finances" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      {t("myFinances")}
+                    </Link>
                     {isAdmin && (
                       <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         {t("adminPanel")}
