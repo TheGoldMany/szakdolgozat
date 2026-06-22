@@ -609,6 +609,91 @@ export async function sendReportMatchEmail(opts: {
   });
 }
 
+export async function sendShelterSuspendedEmail(opts: {
+  to:          string;
+  adminName:   string;
+  shelterName: string;
+}) {
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Menhely felfüggesztve: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#b45309;margin-bottom:8px">
+          Menhely felfüggesztve
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.adminName}!<br/>
+          A(z) <strong>${opts.shelterName}</strong> menhely profilja felfüggesztésre került a platformon.
+          A felfüggesztés ideje alatt az oldal nem érhető el a látogatók számára.
+        </p>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Ha kérdésed van, vedd fel a kapcsolatot az adminisztrátorunkkal.
+        </p>
+        ${SYSTEM_FOOTER}
+      </div>
+    `,
+  });
+}
+
+export async function sendShelterReactivatedEmail(opts: {
+  to:          string;
+  adminName:   string;
+  shelterName: string;
+}) {
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Menhely újra aktív: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+          Menhely újra elérhető!
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.adminName}!<br/>
+          A(z) <strong>${opts.shelterName}</strong> menhely profilja ismét aktív, és elérhető a látogatók számára.
+        </p>
+        <a href="${BASE}/dashboard"
+           style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                  font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+          Dashboard megnyitása
+        </a>
+        ${SYSTEM_FOOTER}
+      </div>
+    `,
+  });
+}
+
+export async function sendShelterDeletedEmail(opts: {
+  to:          string;
+  adminName:   string;
+  shelterName: string;
+}) {
+  await transporter.sendMail({
+    from:    FROM,
+    to:      opts.to,
+    subject: `Menhely törölve: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#991b1b;margin-bottom:8px">
+          Menhely törölve
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.adminName}!<br/>
+          A(z) <strong>${opts.shelterName}</strong> menhely és az összes hozzá tartozó adat
+          törlésre került a platformról.
+        </p>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Ha úgy gondolod, hogy ez tévedés, vedd fel a kapcsolatot az adminisztrátorunkkal.
+        </p>
+        ${SYSTEM_FOOTER}
+      </div>
+    `,
+  });
+}
+
 export async function sendShelterAdminInviteEmail(opts: {
   to:          string;
   adminName:   string;

@@ -1026,6 +1026,10 @@ enum NotificationType {
   TRANSFER_REQUESTED // Target shelter admin: new transfer request
   TRANSFER_APPROVED // Requester: transfer was approved
   TRANSFER_REJECTED // Requester: transfer was rejected
+  // Shelter status (shelter admin)
+  SHELTER_SUSPENDED    // Shelter admin: shelter suspended by super admin
+  SHELTER_REACTIVATED  // Shelter admin: shelter reactivated by super admin
+  SHELTER_DELETED      // Shelter admin: shelter deleted by super admin
 }
 
 model Notification {
