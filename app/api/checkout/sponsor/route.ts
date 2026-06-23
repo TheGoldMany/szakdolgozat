@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, platformFee, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -44,9 +44,9 @@ export async function POST(req: NextRequest) {
   );
 
   const feeForint   = connectedAccountId ? platformFee(amount) : 0;
-  const totalForint = amount + feeForint;
+  const stripeFeeFt = connectedAccountId ? stripeProcessingFee(amount) : 0;
   const feePercent  = feeForint > 0
-    ? Math.round((feeForint / totalForint) * 10000) / 100
+    ? Math.round((feeForint / (amount + feeForint)) * 10000) / 100
     : 0;
 
   let checkoutSession;
@@ -72,6 +72,17 @@ export async function POST(req: NextRequest) {
                 currency:     "huf",
                 product_data: { name: `Platform díj (${PLATFORM_FEE_PERCENT}%)` },
                 unit_amount:  feeForint * 100,
+                recurring:    { interval: "month" as const },
+              },
+              quantity: 1,
+            }]
+          : []),
+        ...(stripeFeeFt > 0
+          ? [{
+              price_data: {
+                currency:     "huf",
+                product_data: { name: `Feldolgozási díj (${STRIPE_PERCENT_FEE}% + ${STRIPE_FIXED_FEE_HUF} Ft)` },
+                unit_amount:  stripeFeeFt * 100,
                 recurring:    { interval: "month" as const },
               },
               quantity: 1,

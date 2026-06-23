@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, platformFee, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -60,12 +60,15 @@ export async function POST(req: NextRequest) {
   const connectedAccountId = await resolveTransferDestination(candidateAccountId);
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit.
-  // When routing to a connected account, the 5% platform fee is added ON TOP
-  // of the donor's intended amount: the donor pays amount + fee, the shelter
-  // receives the full `amount`, and the platform keeps `fee`.
-  const amountInFiller = amount * 100;
-  const feeForint      = connectedAccountId ? platformFee(amount) : 0;
-  const feeInFiller    = feeForint * 100;
+  // When routing to a connected account three fees are added ON TOP:
+  //   • platform fee (5%) – kept by the platform  → application_fee_amount
+  //   • Stripe processing fee (1.4% + 25 HUF)     → passed through to Stripe
+  // The shelter receives the full `amount`; the donor pays amount + both fees.
+  const amountInFiller    = amount * 100;
+  const feeForint         = connectedAccountId ? platformFee(amount) : 0;
+  const feeInFiller       = feeForint * 100;
+  const stripeFeeFt       = connectedAccountId ? stripeProcessingFee(amount) : 0;
+  const stripeFeeInFiller = stripeFeeFt * 100;
 
   // Create pending Donation record (paidAt set by webhook after payment).
   // `amount` is the donor's intended donation that goes to the shelter.
@@ -99,13 +102,24 @@ export async function POST(req: NextRequest) {
           },
           quantity: 1,
         },
-        // Show the platform fee as a separate, transparent line item
+        // Platform fee shown as a transparent line item
         ...(feeInFiller > 0
           ? [{
               price_data: {
                 currency:     "huf",
                 product_data: { name: `Platform díj (${PLATFORM_FEE_PERCENT}%)` },
                 unit_amount:  feeInFiller,
+              },
+              quantity: 1,
+            }]
+          : []),
+        // Stripe processing fee passed through to the payer
+        ...(stripeFeeInFiller > 0
+          ? [{
+              price_data: {
+                currency:     "huf",
+                product_data: { name: `Feldolgozási díj (${STRIPE_PERCENT_FEE}% + ${STRIPE_FIXED_FEE_HUF} Ft)` },
+                unit_amount:  stripeFeeInFiller,
               },
               quantity: 1,
             }]

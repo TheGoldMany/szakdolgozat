@@ -8,6 +8,13 @@ import Stripe from "stripe";
 export const PLATFORM_FEE_PERCENT = 5;
 
 /**
+ * Stripe processing fee rates for HUF payments.
+ * Used to pass the processing cost through to the payer transparently.
+ */
+export const STRIPE_PERCENT_FEE      = 1.4;  // % of charge amount
+export const STRIPE_FIXED_FEE_HUF    = 25;   // flat HUF per transaction
+
+/**
  * Platform fee for a given amount, in the same whole-currency unit (HUF).
  * Rounded to whole forints so charges stay valid for HUF.
  *
@@ -17,6 +24,15 @@ export const PLATFORM_FEE_PERCENT = 5;
  */
 export function platformFee(amount: number): number {
   return Math.round((amount * PLATFORM_FEE_PERCENT) / 100);
+}
+
+/**
+ * Estimated Stripe processing fee passed through to the payer, in HUF.
+ * Applied to the donation/subscription amount (not the grossed-up total)
+ * as a transparent approximation.
+ */
+export function stripeProcessingFee(amount: number): number {
+  return Math.round(amount * STRIPE_PERCENT_FEE / 100) + STRIPE_FIXED_FEE_HUF;
 }
 
 // Lazy singleton – only instantiated on first use, never at build time
