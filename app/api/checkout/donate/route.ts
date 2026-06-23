@@ -57,7 +57,9 @@ export async function POST(req: NextRequest) {
       : (campaign.user?.stripeOnboardingComplete && campaign.user?.stripeAccountId)
       ? campaign.user.stripeAccountId
       : null;
+  console.log(`[donate] campaign=${campaignId} shelter.stripeOnboardingComplete=${campaign.shelter?.stripeOnboardingComplete} shelter.stripeAccountId=${campaign.shelter?.stripeAccountId} candidateAccountId=${candidateAccountId}`);
   const connectedAccountId = await resolveTransferDestination(candidateAccountId);
+  console.log(`[donate] connectedAccountId=${connectedAccountId}`);
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit.
   // When routing to a connected account three fees are added ON TOP:
