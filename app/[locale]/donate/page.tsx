@@ -5,6 +5,8 @@ import { CampaignCard } from "@/components/donate/campaign-card";
 import { TierCard } from "@/components/donate/tier-card";
 import { Heart, PlusCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DonatePage() {
-  const t = await getTranslations("donate");
+  const [t, session] = await Promise.all([
+    getTranslations("donate"),
+    getServerSession(authOptions),
+  ]);
 
   const [campaigns, shelters] = await Promise.all([
     prisma.campaign.findMany({
@@ -50,6 +55,17 @@ export default async function DonatePage() {
       take: 10,
     }),
   ]);
+
+  // Collect all tier IDs to check active subscriptions in one query
+  const allTierIds = shelters.flatMap((s) => s.tiers.map((t) => t.id));
+  const activeTierIds = new Set<string>();
+  if (session?.user?.id && allTierIds.length > 0) {
+    const activeSubs = await prisma.subscription.findMany({
+      where: { userId: session.user.id, tierId: { in: allTierIds }, status: "ACTIVE" },
+      select: { tierId: true },
+    });
+    activeSubs.forEach((s) => activeTierIds.add(s.tierId));
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,7 +135,7 @@ export default async function DonatePage() {
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {shelter.tiers.map((tier) => (
-                      <TierCard key={tier.id} tier={tier} />
+                      <TierCard key={tier.id} tier={tier} isSubscribed={activeTierIds.has(tier.id)} />
                     ))}
                   </div>
                 </div>

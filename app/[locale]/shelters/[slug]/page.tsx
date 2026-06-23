@@ -71,6 +71,20 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
     existingFosterStatus = foster?.status ?? null;
   }
 
+  // Fetch which tiers the user is already actively subscribed to
+  const activeTierIds = new Set<string>();
+  if (session?.user?.id && shelter.tiers.length > 0) {
+    const activeSubs = await prisma.subscription.findMany({
+      where: {
+        userId: session.user.id,
+        tierId: { in: shelter.tiers.map((t) => t.id) },
+        status: "ACTIVE",
+      },
+      select: { tierId: true },
+    });
+    activeSubs.forEach((s) => activeTierIds.add(s.tierId));
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -197,7 +211,9 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
               <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                 <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("monthlySubscriptions")}</h2>
                 <div className="flex flex-col gap-3">
-                  {shelter.tiers.map((tier) => <TierCard key={tier.id} tier={tier} />)}
+                  {shelter.tiers.map((tier) => (
+                    <TierCard key={tier.id} tier={tier} isSubscribed={activeTierIds.has(tier.id)} />
+                  ))}
                 </div>
               </div>
             )}

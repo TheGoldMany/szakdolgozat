@@ -46,6 +46,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A csomag nem aktív" }, { status: 409 });
   }
 
+  // Prevent duplicate active subscriptions to the same tier
+  const existing = await prisma.subscription.findFirst({
+    where: { userId: session.user.id, tierId, status: "ACTIVE" },
+  });
+  if (existing) {
+    return NextResponse.json({ error: "Már van aktív feliratkozásod erre a csomagra." }, { status: 409 });
+  }
+
   // Determine connected Stripe account for automatic transfer.
   // Verify it actually exists in Stripe – otherwise fall back to the platform
   // account so a stale/invalid acct_… id doesn't break checkout.
