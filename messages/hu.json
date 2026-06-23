@@ -1023,6 +1023,7 @@
     "settingsDocUploadFailed": "Feltöltés sikertelen.",
     "settingsDocNameRequired": "Add meg a dokumentum nevét először.",
     "settingsStripeActive": "Stripe fiók aktív – az adományok automatikusan érkeznek a számládra.",
+    "settingsStripeDashboard": "Stripe fiók kezelése",
     "settingsStripeIncomplete": "Az onboarding nem teljes. Kattints a gombra a folytatáshoz.",
     "settingsStripeConnect": "Stripe fiók csatlakoztatása",
     "settingsStripeConnecting": "Átirányítás...",
