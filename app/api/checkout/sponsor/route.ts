@@ -39,6 +39,14 @@ export async function POST(req: NextRequest) {
   });
   if (!animal) return NextResponse.json({ error: "Az állat nem található" }, { status: 404 });
 
+  // Prevent duplicate active sponsorships for the same animal
+  const existingSponsor = await prisma.sponsorship.findFirst({
+    where: { userId: session.user.id, animalId, status: "ACTIVE" },
+  });
+  if (existingSponsor) {
+    return NextResponse.json({ error: "Már van aktív virtuális örökbefogadásod ennél az állatnál." }, { status: 409 });
+  }
+
   const connectedAccountId = await resolveTransferDestination(
     animal.shelter.stripeOnboardingComplete ? animal.shelter.stripeAccountId : null
   );

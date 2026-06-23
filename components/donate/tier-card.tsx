@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Users } from "lucide-react";
+import { Users, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
@@ -14,13 +14,14 @@ interface TierCardProps {
     amount:      number;
     _count:      { subscriptions: number };
   };
+  isSubscribed?: boolean;
 }
 
 function formatHUF(amount: number) {
   return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
 }
 
-export function TierCard({ tier }: TierCardProps) {
+export function TierCard({ tier, isSubscribed = false }: TierCardProps) {
   const router  = useRouter();
   const t = useTranslations("donate");
   const [loading, setLoading] = useState(false);
@@ -69,9 +70,16 @@ export function TierCard({ tier }: TierCardProps) {
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
-      <Button onClick={handleSubscribe} loading={loading} className="w-full">
-        {t("subscribe")}
-      </Button>
+      {isSubscribed ? (
+        <div className="flex items-center justify-center gap-2 rounded-xl bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          Már feliratkoztál
+        </div>
+      ) : (
+        <Button onClick={handleSubscribe} loading={loading} className="w-full">
+          {t("subscribe")}
+        </Button>
+      )}
     </div>
   );
 }
