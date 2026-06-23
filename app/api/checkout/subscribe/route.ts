@@ -61,8 +61,12 @@ export async function POST(req: NextRequest) {
   const feeForint    = connectedAccountId ? platformFee(tier.amount) : 0;
   const stripeFeeFt  = connectedAccountId ? stripeProcessingFee(tier.amount) : 0;
   const totalForint  = tier.amount + feeForint + stripeFeeFt;
-  const feePercent   = feeForint > 0
-    ? Math.round((feeForint / (tier.amount + feeForint)) * 10000) / 100
+  // application_fee_percent must cover both the platform fee AND the Stripe
+  // processing fee we collected, so the shelter nets exactly tier.amount.
+  // It is applied to the total (tier + platform fee + stripe fee), so:
+  //   total × feePercent = platformFee + stripeFee
+  const feePercent   = (feeForint + stripeFeeFt) > 0
+    ? Math.round(((feeForint + stripeFeeFt) / totalForint) * 10000) / 100
     : 0;
 
   let checkoutSession;

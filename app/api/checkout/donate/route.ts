@@ -145,7 +145,10 @@ export async function POST(req: NextRequest) {
       metadata:    { donationId: donation.id },
       ...(connectedAccountId && {
         payment_intent_data: {
-          application_fee_amount: feeInFiller,
+          // application_fee_amount must cover both platform fee AND the Stripe
+          // processing fee we collected from the donor, so that the shelter
+          // receives exactly `amount` and not amount + stripe_fee_line_item.
+          application_fee_amount: feeInFiller + stripeFeeInFiller,
           transfer_data: { destination: connectedAccountId },
         },
       }),
