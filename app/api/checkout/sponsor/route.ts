@@ -45,8 +45,10 @@ export async function POST(req: NextRequest) {
 
   const feeForint   = connectedAccountId ? platformFee(amount) : 0;
   const stripeFeeFt = connectedAccountId ? stripeProcessingFee(amount) : 0;
-  const feePercent  = feeForint > 0
-    ? Math.round((feeForint / (amount + feeForint)) * 10000) / 100
+  const totalForint = amount + feeForint + stripeFeeFt;
+  // Cover both platform fee + Stripe processing fee so shelter nets exactly `amount`.
+  const feePercent  = (feeForint + stripeFeeFt) > 0
+    ? Math.round(((feeForint + stripeFeeFt) / totalForint) * 10000) / 100
     : 0;
 
   let checkoutSession;
