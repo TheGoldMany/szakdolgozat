@@ -1023,6 +1023,7 @@
     "settingsDocUploadFailed": "Upload fehlgeschlagen.",
     "settingsDocNameRequired": "Bitte gib zuerst den Dokumentnamen ein.",
     "settingsStripeActive": "Stripe-Konto aktiv – Spenden werden automatisch auf dein Konto überwiesen.",
+    "settingsStripeDashboard": "Stripe-Konto verwalten",
     "settingsStripeIncomplete": "Onboarding ist unvollständig. Klicke den Button, um fortzufahren.",
     "settingsStripeConnect": "Stripe-Konto verbinden",
     "settingsStripeConnecting": "Weiterleitung...",

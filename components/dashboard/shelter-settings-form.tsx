@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { useTranslations } from "next-intl";
-import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info } from "lucide-react";
+import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info, ExternalLink } from "lucide-react";
 
 interface ShelterDoc {
   id:        string;
@@ -62,8 +62,9 @@ export function ShelterSettingsForm({ shelter }: Props) {
   const [reqSaved,     setReqSaved]     = useState(false);
 
   // --- Stripe Connect ---
-  const [stripeLoading, setStripeLoading] = useState(false);
-  const [stripeError,   setStripeError]   = useState("");
+  const [stripeLoading,   setStripeLoading]   = useState(false);
+  const [stripeDashLoading, setStripeDashLoading] = useState(false);
+  const [stripeError,     setStripeError]     = useState("");
 
   async function handleStripeConnect() {
     setStripeLoading(true);
@@ -81,6 +82,26 @@ export function ShelterSettingsForm({ shelter }: Props) {
       const message = err instanceof Error ? err.message : t("tiersUnknownError");
       setStripeError(message);
       setStripeLoading(false);
+    }
+  }
+
+  async function handleStripeDashboard() {
+    setStripeDashLoading(true);
+    setStripeError("");
+    try {
+      const res = await fetch("/api/stripe/connect/dashboard", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ shelterId: shelter.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? t("analyticsError"));
+      window.open(data.url, "_blank");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t("tiersUnknownError");
+      setStripeError(message);
+    } finally {
+      setStripeDashLoading(false);
     }
   }
 
@@ -229,11 +250,24 @@ export function ShelterSettingsForm({ shelter }: Props) {
         </p>
 
         {shelter.stripeOnboardingComplete ? (
-          <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-            <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
-            <p className="text-sm font-medium text-green-800">
-              {t("settingsStripeActive")}
-            </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
+              <p className="text-sm font-medium text-green-800">
+                {t("settingsStripeActive")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleStripeDashboard}
+              disabled={stripeDashLoading}
+              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60 transition-colors"
+            >
+              {stripeDashLoading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <ExternalLink className="h-4 w-4" />}
+              {stripeDashLoading ? t("settingsStripeConnecting") : t("settingsStripeDashboard")}
+            </button>
           </div>
         ) : shelter.stripeAccountId ? (
           <div className="space-y-3">

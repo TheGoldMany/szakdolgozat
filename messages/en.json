@@ -1023,6 +1023,7 @@
     "settingsDocUploadFailed": "Upload failed.",
     "settingsDocNameRequired": "Please enter the document name first.",
     "settingsStripeActive": "Stripe account active – donations are automatically transferred to your account.",
+    "settingsStripeDashboard": "Manage Stripe account",
     "settingsStripeIncomplete": "Onboarding is incomplete. Click the button to continue.",
     "settingsStripeConnect": "Connect Stripe account",
     "settingsStripeConnecting": "Redirecting...",

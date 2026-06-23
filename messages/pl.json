@@ -1023,6 +1023,7 @@
     "settingsDocUploadFailed": "Przesyłanie nie powiodło się.",
     "settingsDocNameRequired": "Najpierw podaj nazwę dokumentu.",
     "settingsStripeActive": "Konto Stripe aktywne – darowizny są automatycznie przelewane na Twoje konto.",
+    "settingsStripeDashboard": "Zarządzaj kontem Stripe",
     "settingsStripeIncomplete": "Onboarding jest niekompletny. Kliknij przycisk, aby kontynuować.",
     "settingsStripeConnect": "Połącz konto Stripe",
     "settingsStripeConnecting": "Przekierowanie...",
