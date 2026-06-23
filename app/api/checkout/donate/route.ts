@@ -57,9 +57,22 @@ export async function POST(req: NextRequest) {
       : (campaign.user?.stripeOnboardingComplete && campaign.user?.stripeAccountId)
       ? campaign.user.stripeAccountId
       : null;
-  console.log(`[donate] campaign=${campaignId} shelter.stripeOnboardingComplete=${campaign.shelter?.stripeOnboardingComplete} shelter.stripeAccountId=${campaign.shelter?.stripeAccountId} candidateAccountId=${candidateAccountId}`);
+
+  if (!candidateAccountId) {
+    return NextResponse.json(
+      { error: "Ez a kampány jelenleg nem fogadhat adományokat. A menhely Stripe fiókja nincs beállítva." },
+      { status: 402 }
+    );
+  }
+
   const connectedAccountId = await resolveTransferDestination(candidateAccountId);
-  console.log(`[donate] connectedAccountId=${connectedAccountId}`);
+
+  if (!connectedAccountId) {
+    return NextResponse.json(
+      { error: "A menhely Stripe fiókja még nem aktív. Kérjük próbálj újra később." },
+      { status: 402 }
+    );
+  }
 
   // Stripe uses fillér (1 HUF = 100 fillér) as the smallest unit.
   // When routing to a connected account three fees are added ON TOP:

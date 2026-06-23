@@ -19,7 +19,7 @@ const createSchema = z.object({
   targetAmount: z.number().int().positive(),
   imageUrl:     z.string().url().optional().or(z.literal("")).optional(),
   endsAt:       z.string().datetime().optional().nullable(),
-  shelterId:    z.string().optional().nullable(),
+  shelterId:    z.string().min(1, "Kérjük válassz egy menhelyt"),
 });
 
 // GET /api/campaigns – list ACTIVE campaigns
