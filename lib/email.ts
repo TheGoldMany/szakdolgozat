@@ -621,6 +621,219 @@ export async function sendShelterDeletedEmail(opts: {
     `);
 }
 
+export async function sendPasswordChangedEmail(opts: {
+  to:   string;
+  name: string;
+}) {
+  await sendEmail(opts.to, `Jelszavad megváltozott – ÁllatiMenhelyek.hu`, `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#374151;margin-bottom:8px">
+          Jelszóváltoztatás megerősítése
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.name}!<br/>
+          Fiókod jelszava sikeresen megváltozott.
+        </p>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Ha te végezted ezt a változtatást, nincs további teendőd.<br/>
+          Ha nem te változtattad meg a jelszavadat, azonnal állítsd vissza a
+          <a href="${BASE}/auth/forgot-password" style="color:#16a34a">Elfelejtett jelszó</a>
+          oldalon, és vedd fel a kapcsolatot ügyfélszolgálatunkkal.
+        </p>
+        ${SYSTEM_FOOTER}
+      </div>
+    `);
+}
+
+export async function sendDonationThankYouEmail(opts: {
+  to:            string;
+  name:          string;
+  campaignTitle: string;
+  amount:        number;
+  campaignUrl:   string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Köszönjük az adományodat! – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+            Köszönjük az adományodat!
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.name}!<br/>
+            Adományod sikeresen megérkezett a(z) <strong>${opts.campaignTitle}</strong> kampányhoz.
+          </p>
+          <div style="background:#f0fdf4;border-radius:12px;padding:20px;text-align:center;margin:20px 0">
+            <span style="font-size:32px;font-weight:700;color:#166534">
+              ${opts.amount.toLocaleString("hu-HU")} Ft
+            </span>
+          </div>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Köszönjük, hogy hozzájárulsz az állatok jobb életéhez!
+          </p>
+          <a href="${opts.campaignUrl}"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Kampány megtekintése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
+export async function sendSubscriptionCancelledEmail(opts: {
+  to:          string;
+  name:        string;
+  tierName:    string;
+  shelterName: string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Előfizetés lemondva – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#374151;margin-bottom:8px">
+            Előfizetés lemondva
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.name}!<br/>
+            Megerősítjük, hogy lemondtad a(z) <strong>${opts.shelterName}</strong> menhely
+            <strong>${opts.tierName}</strong> előfizetésedet.
+          </p>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            A jelenlegi számlázási időszak végéig hozzáférésed megmarad.
+            Köszönjük az eddigi támogatásodat!
+          </p>
+          <a href="${BASE}/shelters"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Menhelyek böngészése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
+export async function sendSubscriptionAdminCancelledEmail(opts: {
+  to:          string;
+  name:        string;
+  tierName:    string;
+  shelterName: string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Előfizetésed törölve – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#374151;margin-bottom:8px">
+            Előfizetés törölve
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.name}!<br/>
+            A(z) <strong>${opts.shelterName}</strong> menhely adminisztrátorai törölték a
+            <strong>${opts.tierName}</strong> előfizetésedet.
+          </p>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Ha kérdésed van, vedd fel a kapcsolatot a menhely adminisztrátorával.
+          </p>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
+export async function sendSubscriptionCancelledAdminEmail(opts: {
+  to:             string;
+  adminName:      string;
+  subscriberName: string;
+  tierName:       string;
+  shelterName:    string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Előfizető lemondta előfizetését – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#374151;margin-bottom:8px">
+            Előfizetés lemondva
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.adminName}!<br/>
+            <strong>${opts.subscriberName}</strong> lemondta a(z) <strong>${opts.shelterName}</strong>
+            menhely <strong>${opts.tierName}</strong> előfizetését.
+          </p>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            A hozzáférése a jelenlegi számlázási időszak végéig megmarad.
+          </p>
+          <a href="${BASE}/dashboard/subscribers"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Előfizetők megtekintése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
+export async function sendNewAdoptionApplicationEmail(opts: {
+  to:             string;
+  adminName:      string;
+  animalName:     string;
+  applicantName:  string;
+  applicationUrl: string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Új örökbefogadási kérelem érkezett – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+            Új örökbefogadási kérelem
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.adminName}!<br/>
+            <strong>${opts.applicantName}</strong> örökbefogadási kérelmet nyújtott be
+            a(z) <strong>${opts.animalName}</strong> állatra.
+          </p>
+          <a href="${opts.applicationUrl}"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Kérelem megtekintése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
+export async function sendNewFosterApplicationEmail(opts: {
+  to:            string;
+  adminName:     string;
+  applicantName: string;
+  shelterName:   string;
+  motivation:    string | null;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Új ideiglenes befogadói jelentkezés – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+            Új ideiglenes befogadói jelentkezés
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.adminName}!<br/>
+            <strong>${opts.applicantName}</strong> ideiglenes befogadónak jelentkezett
+            a(z) <strong>${opts.shelterName}</strong> menhelyhez.
+          </p>
+          ${opts.motivation ? `
+          <blockquote style="border-left:3px solid #22c55e;margin:16px 0;padding:12px 16px;
+                             background:#f0fdf4;color:#374151;font-size:14px;line-height:1.6;border-radius:0 8px 8px 0">
+            ${opts.motivation.replace(/\n/g, "<br/>")}
+          </blockquote>` : ""}
+          <a href="${BASE}/dashboard/foster"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Jelentkezés megtekintése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
 export async function sendShelterAdminInviteEmail(opts: {
   to:          string;
   adminName:   string;

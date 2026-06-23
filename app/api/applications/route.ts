@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalStatus } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { getMobileUser } from "@/lib/mobile-auth";
+import { sendNewAdoptionApplicationEmail } from "@/lib/email";
 
 const applicationSchema = z.object({
   animalId:    z.string().min(1),
@@ -34,7 +35,18 @@ export async function POST(req: NextRequest) {
   const { animalId, ...rest } = parsed.data;
 
   // Check animal exists and is available
-  const animal = await prisma.animal.findUnique({ where: { id: animalId } });
+  const animal = await prisma.animal.findUnique({
+    where:   { id: animalId },
+    include: {
+      shelter: {
+        select: {
+          name:   true,
+          slug:   true,
+          admins: { select: { user: { select: { email: true, name: true } } } },
+        },
+      },
+    },
+  });
   if (!animal) {
     return NextResponse.json({ error: "Az állat nem található" }, { status: 404 });
   }
@@ -42,10 +54,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ez az állat jelenleg nem fogadható örökbe" }, { status: 409 });
   }
 
+  const applicantName = session?.user?.name ?? "Ismeretlen";
+
   try {
     const application = await prisma.adoptionApplication.create({
       data: { userId, animalId, ...rest },
     });
+
+    const appUrl = `${process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu"}/dashboard/applications`;
+    for (const admin of animal.shelter?.admins ?? []) {
+      sendNewAdoptionApplicationEmail({
+        to:             admin.user.email,
+        adminName:      admin.user.name ?? admin.user.email,
+        animalName:     animal.name,
+        applicantName,
+        applicationUrl: appUrl,
+      }).catch((err) => console.error("[adoption application email]", err));
+    }
+
     return NextResponse.json({ application }, { status: 201 });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {

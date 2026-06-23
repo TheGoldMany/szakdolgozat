@@ -4,6 +4,7 @@ import { z } from "zod";
 import { compare, hash } from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 const schema = z.object({
   currentPassword: z.string().min(1),
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = await prisma.user.findUnique({
       where:  { id: session.user.id },
-      select: { password: true },
+      select: { password: true, email: true, name: true },
     });
 
     if (!user?.password) {
@@ -48,6 +49,11 @@ export async function POST(req: NextRequest) {
       where: { id: session.user.id },
       data:  { password: hashed },
     });
+
+    if (user.email) {
+      sendPasswordChangedEmail({ to: user.email, name: user.name ?? user.email })
+        .catch((err) => console.error("[change-password email]", err));
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

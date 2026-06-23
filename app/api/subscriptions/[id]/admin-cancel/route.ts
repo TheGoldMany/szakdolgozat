@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { sendSubscriptionAdminCancelledEmail } from "@/lib/email";
 
 // POST /api/subscriptions/[id]/admin-cancel
 export async function POST(
@@ -21,8 +22,11 @@ export async function POST(
     }
 
     const subscription = await prisma.subscription.findUnique({
-      where: { id: params.id },
-      include: { tier: true },
+      where:   { id: params.id },
+      include: {
+        tier: { include: { shelter: { select: { name: true } } } },
+        user: { select: { email: true, name: true } },
+      },
     });
 
     if (!subscription) {
@@ -53,6 +57,15 @@ export async function POST(
       where: { id: params.id },
       data: { status: "CANCELLED", cancelledAt: new Date() },
     });
+
+    if (subscription.user?.email) {
+      sendSubscriptionAdminCancelledEmail({
+        to:          subscription.user.email,
+        name:        subscription.user.name ?? subscription.user.email,
+        tierName:    subscription.tier.name,
+        shelterName: subscription.tier.shelter?.name ?? "",
+      }).catch((err) => console.error("[admin-cancel sub email]", err));
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
