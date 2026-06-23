@@ -61,6 +61,7 @@ export function NewCampaignForm() {
     if (!title.trim()) { setError("A cím megadása kötelező."); return; }
     if (!description.trim()) { setError("A leírás megadása kötelező."); return; }
     if (isNaN(parsed) || parsed < 1000) { setError("A célösszeg minimum 1 000 Ft legyen."); return; }
+    if (!shelterId) { setError("Kérjük válassz egy menhelyt."); return; }
 
     setLoading(true);
     setError(null);
@@ -69,10 +70,10 @@ export function NewCampaignForm() {
         title: title.trim(),
         description: description.trim(),
         targetAmount: parsed,
+        shelterId,
       };
       if (imageUrl) body.imageUrl = imageUrl;
       if (endsAt) body.endsAt = new Date(endsAt).toISOString();
-      if (shelterId) body.shelterId = shelterId;
 
       const res = await fetch("/api/campaigns", {
         method: "POST",
@@ -183,24 +184,26 @@ export function NewCampaignForm() {
         />
       </div>
 
-      {/* Shelter select */}
-      {shelters.length > 0 && (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">
-            Kapcsolódó menhely (opcionális)
-          </label>
-          <select
-            value={shelterId}
-            onChange={(e) => setShelterId(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white"
-          >
-            <option value="">Nincs kapcsolódó menhely</option>
-            {shelters.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      {/* Shelter select – required */}
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+          Melyik menhelyért gyűjtesz? <span className="text-red-500">*</span>
+        </label>
+        <select
+          required
+          value={shelterId}
+          onChange={(e) => setShelterId(e.target.value)}
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white"
+        >
+          <option value="">– Válassz menhelyt –</option>
+          {shelters.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+        {shelters.length === 0 && (
+          <p className="mt-1 text-xs text-gray-400">Menhelyek betöltése…</p>
+        )}
+      </div>
 
       {error && (
         <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
