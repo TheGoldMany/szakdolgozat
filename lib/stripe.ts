@@ -71,12 +71,23 @@ export function getStripe(): Stripe {
 export async function resolveTransferDestination(
   accountId: string | null | undefined
 ): Promise<string | null> {
-  if (!accountId) return null;
+  if (!accountId) {
+    console.log("[stripe] resolveTransferDestination: no accountId");
+    return null;
+  }
   try {
     const account = await getStripe().accounts.retrieve(accountId);
-    return account.charges_enabled ? accountId : null;
-  } catch {
-    // Account doesn't exist / not accessible from this Stripe account
+    console.log(`[stripe] resolveTransferDestination: ${accountId} → charges_enabled=${account.charges_enabled} details_submitted=${account.details_submitted}`);
+    // For destination charges the platform creates the charge and Stripe
+    // automatically transfers funds. details_submitted is the real gate;
+    // charges_enabled only blocks *direct* charges on the connected account.
+    if (!account.details_submitted) {
+      console.log(`[stripe] resolveTransferDestination: rejected – details not submitted`);
+      return null;
+    }
+    return accountId;
+  } catch (err) {
+    console.log(`[stripe] resolveTransferDestination: error retrieving ${accountId}:`, err);
     return null;
   }
 }
