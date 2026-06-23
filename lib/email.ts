@@ -1,19 +1,27 @@
-import nodemailer from "nodemailer";
 import { createHmac } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-const transporter = nodemailer.createTransport({
-  host:   process.env.SMTP_HOST   ?? "smtp.gmail.com",
-  port:   Number(process.env.SMTP_PORT ?? 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-const FROM = process.env.SMTP_FROM ?? "ÁllatiMenhelyek.hu <noreply@allatimenhelyek.hu>";
+const FROM = process.env.RESEND_FROM ?? "ÁllatiMenhelyek.hu <onboarding@resend.dev>";
 const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
+
+// ── Core transport (Resend REST API) ─────────────────────────────────────────
+
+async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("[email] RESEND_API_KEY nincs beállítva – email kihagyva:", subject);
+    return;
+  }
+  const res = await fetch("https://api.resend.com/emails", {
+    method:  "POST",
+    headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body:    JSON.stringify({ from: FROM, to: [to], subject, html }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend hiba ${res.status}: ${err}`);
+  }
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -62,11 +70,7 @@ export async function sendNewMessageEmail(opts: {
   conversationUrl: string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Új üzenet érkezett – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Új üzenet érkezett – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Új üzenet érkezett
@@ -87,8 +91,7 @@ export async function sendNewMessageEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -102,12 +105,7 @@ export async function sendReportMessageEmail(opts: {
   message:      string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Üzenet a bejelentésedről – ÁllatiMenhelyek.hu`,
-      replyTo: opts.senderEmail,
-      html: `
+    await sendEmail(opts.to, `Üzenet a bejelentésedről – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Új üzenet érkezett
@@ -128,8 +126,7 @@ export async function sendReportMessageEmail(opts: {
           </p>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -146,11 +143,7 @@ export async function sendApplicationStatusEmail(opts: {
     : `Örökbefogadási kérelmed elutasítva – ÁllatiMenhelyek.hu`;
 
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject,
-      html: `
+    await sendEmail(opts.to, subject, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:${approved ? "#166534" : "#991b1b"};margin-bottom:8px">
             ${approved ? "Kérelmed jóváhagyva!" : "Kérelmed elutasítva"}
@@ -172,8 +165,7 @@ export async function sendApplicationStatusEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -186,11 +178,7 @@ export async function sendDonationReceivedEmail(opts: {
   campaignUrl:   string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Új adomány érkezett – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Új adomány érkezett – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Új adomány érkezett!
@@ -212,8 +200,7 @@ export async function sendDonationReceivedEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -226,11 +213,7 @@ export async function sendSubscriptionConfirmationEmail(opts: {
   shelterSlug:  string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Sikeres feliratkozás – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Sikeres feliratkozás – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Köszönjük a feliratkozást!
@@ -256,8 +239,7 @@ export async function sendSubscriptionConfirmationEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -275,11 +257,7 @@ export async function sendEventRegistrationEmail(opts: {
     : "";
 
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Sikeres jelentkezés: ${opts.eventTitle} – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Sikeres jelentkezés: ${opts.eventTitle} – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Sikeres esemény-jelentkezés!
@@ -302,8 +280,7 @@ export async function sendEventRegistrationEmail(opts: {
           <p style="color:#6b7280;font-size:12px">A jelentkezésedet bármikor lemondhatod az esemény oldalán.</p>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -314,11 +291,7 @@ export async function sendEventCancelledEmail(opts: {
   eventDate:  string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Esemény lemondva: ${opts.eventTitle} – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Esemény lemondva: ${opts.eventTitle} – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#991b1b;margin-bottom:8px">
             Esemény lemondva
@@ -341,8 +314,7 @@ export async function sendEventCancelledEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -359,11 +331,7 @@ export async function sendFosterStatusEmail(opts: {
     : `Ideiglenes befogadói jelentkezésed elutasítva – ÁllatiMenhelyek.hu`;
 
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject,
-      html: `
+    await sendEmail(opts.to, subject, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:${approved ? "#166534" : "#991b1b"};margin-bottom:8px">
             ${approved ? "Jelentkezésed jóváhagyva!" : "Jelentkezésed elutasítva"}
@@ -387,8 +355,7 @@ export async function sendFosterStatusEmail(opts: {
           </a>` : ""}
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -400,11 +367,7 @@ export async function sendSponsorshipStartedEmail(opts: {
   amount:      number;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Köszönjük! Virtuális örökbefogadás aktiválva – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Köszönjük! Virtuális örökbefogadás aktiválva – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Köszönjük a támogatást!
@@ -431,8 +394,7 @@ export async function sendSponsorshipStartedEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -443,11 +405,7 @@ export async function sendSponsorshipCancelledEmail(opts: {
   amount:     number;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Virtuális örökbefogadás lemondva – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Virtuális örökbefogadás lemondva – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#374151;margin-bottom:8px">
             Virtuális örökbefogadás lemondva
@@ -468,8 +426,7 @@ export async function sendSponsorshipCancelledEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -484,11 +441,7 @@ export async function sendTransferRequestEmail(opts: {
   transferUrl:     string;
 }) {
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Állat-áthelyezési kérelem érkezett – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Állat-áthelyezési kérelem érkezett – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Áthelyezési kérelem
@@ -514,8 +467,7 @@ export async function sendTransferRequestEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -532,11 +484,7 @@ export async function sendTransferResolvedEmail(opts: {
     : `Áthelyezési kérelem elutasítva: ${opts.animalName} – ÁllatiMenhelyek.hu`;
 
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject,
-      html: `
+    await sendEmail(opts.to, subject, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:${opts.approved ? "#166534" : "#991b1b"};margin-bottom:8px">
             ${opts.approved ? "Áthelyezés jóváhagyva!" : "Áthelyezés elutasítva"}
@@ -559,8 +507,7 @@ export async function sendTransferResolvedEmail(opts: {
           </a>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -578,11 +525,7 @@ export async function sendReportMatchEmail(opts: {
     : "";
 
   await sendNotificationEmail(opts.to, async () => {
-    await transporter.sendMail({
-      from:    FROM,
-      to:      opts.to,
-      subject: `Lehetséges egyezés a bejelentésedre – ÁllatiMenhelyek.hu`,
-      html: `
+    await sendEmail(opts.to, `Lehetséges egyezés a bejelentésedre – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
             Találtunk egy lehetséges egyezést! 🐾
@@ -604,8 +547,7 @@ export async function sendReportMatchEmail(opts: {
           </p>
           ${emailFooter(opts.to)}
         </div>
-      `,
-    });
+      `);
   });
 }
 
@@ -614,11 +556,7 @@ export async function sendShelterSuspendedEmail(opts: {
   adminName:   string;
   shelterName: string;
 }) {
-  await transporter.sendMail({
-    from:    FROM,
-    to:      opts.to,
-    subject: `Menhely felfüggesztve: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
-    html: `
+  await sendEmail(opts.to, `Menhely felfüggesztve: ${opts.shelterName} – ÁllatiMenhelyek.hu`, `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#b45309;margin-bottom:8px">
           Menhely felfüggesztve
@@ -633,8 +571,7 @@ export async function sendShelterSuspendedEmail(opts: {
         </p>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
 
 export async function sendShelterReactivatedEmail(opts: {
@@ -642,11 +579,7 @@ export async function sendShelterReactivatedEmail(opts: {
   adminName:   string;
   shelterName: string;
 }) {
-  await transporter.sendMail({
-    from:    FROM,
-    to:      opts.to,
-    subject: `Menhely újra aktív: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
-    html: `
+  await sendEmail(opts.to, `Menhely újra aktív: ${opts.shelterName} – ÁllatiMenhelyek.hu`, `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
           Menhely újra elérhető!
@@ -662,8 +595,7 @@ export async function sendShelterReactivatedEmail(opts: {
         </a>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
 
 export async function sendShelterDeletedEmail(opts: {
@@ -671,11 +603,7 @@ export async function sendShelterDeletedEmail(opts: {
   adminName:   string;
   shelterName: string;
 }) {
-  await transporter.sendMail({
-    from:    FROM,
-    to:      opts.to,
-    subject: `Menhely törölve: ${opts.shelterName} – ÁllatiMenhelyek.hu`,
-    html: `
+  await sendEmail(opts.to, `Menhely törölve: ${opts.shelterName} – ÁllatiMenhelyek.hu`, `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#991b1b;margin-bottom:8px">
           Menhely törölve
@@ -690,8 +618,7 @@ export async function sendShelterDeletedEmail(opts: {
         </p>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
 
 export async function sendShelterAdminInviteEmail(opts: {
@@ -702,11 +629,7 @@ export async function sendShelterAdminInviteEmail(opts: {
 }) {
   const loginUrl = `${BASE}/auth/login`;
 
-  await transporter.sendMail({
-    from:    FROM,
-    to:      opts.to,
-    subject: `Meghívó: menhely admin fiók – ÁllatiMenhelyek.hu`,
-    html: `
+  await sendEmail(opts.to, `Meghívó: menhely admin fiók – ÁllatiMenhelyek.hu`, `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
           Üdv a fedélzeten, ${opts.adminName}!
@@ -737,8 +660,7 @@ export async function sendShelterAdminInviteEmail(opts: {
         </p>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
 
 // ── System emails (security-critical – no opt-out, no unsubscribe link) ──────
@@ -746,11 +668,7 @@ export async function sendShelterAdminInviteEmail(opts: {
 export async function sendVerificationEmail(email: string, token: string, name?: string | null) {
   const url = `${BASE}/auth/verify-email?token=${token}`;
 
-  await transporter.sendMail({
-    from:    FROM,
-    to:      email,
-    subject: "Erősítsd meg az email-címed – ÁllatiMenhelyek.hu",
-    html: `
+  await sendEmail(email, "Erősítsd meg az email-címed – ÁllatiMenhelyek.hu", `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
           Üdv a fedélzeten${name ? `, ${name}` : ""}!
@@ -770,18 +688,13 @@ export async function sendVerificationEmail(email: string, token: string, name?:
         </p>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const url = `${BASE}/auth/reset-password?token=${token}`;
 
-  await transporter.sendMail({
-    from:    FROM,
-    to:      email,
-    subject: "Jelszó visszaállítása – ÁllatiMenhelyek.hu",
-    html: `
+  await sendEmail(email, "Jelszó visszaállítása – ÁllatiMenhelyek.hu", `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
         <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
           Jelszó visszaállítása
@@ -802,6 +715,5 @@ export async function sendPasswordResetEmail(email: string, token: string) {
         </p>
         ${SYSTEM_FOOTER}
       </div>
-    `,
-  });
+    `);
 }
