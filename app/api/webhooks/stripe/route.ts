@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendDonationReceivedEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail } from "@/lib/email";
+import { sendDonationReceivedEmail, sendDonationThankYouEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
 // Disable body parsing — we need the raw body for signature verification
@@ -120,6 +120,23 @@ export async function POST(req: NextRequest) {
               donorName,
               campaignUrl:   `${BASE_URL}/donate/${campaign.id}`,
             }).catch((err) => console.error("Donation email error:", err));
+          }
+
+          // Thank-you email to the donor (skip anonymous or guest donations)
+          if (donation.userId && !donation.isAnonymous) {
+            const donor = await prisma.user.findUnique({
+              where:  { id: donation.userId },
+              select: { email: true, name: true },
+            });
+            if (donor?.email) {
+              sendDonationThankYouEmail({
+                to:            donor.email,
+                name:          donor.name ?? donor.email,
+                campaignTitle: campaign.title,
+                amount:        donation.amount,
+                campaignUrl:   `${BASE_URL}/donate/${campaign.id}`,
+              }).catch((err) => console.error("Donation thank-you email error:", err));
+            }
           }
         }
       }

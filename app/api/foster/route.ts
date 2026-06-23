@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
+import { sendNewFosterApplicationEmail } from "@/lib/email";
 import { AnimalType } from "@prisma/client";
 
 const schema = z.object({
@@ -51,14 +52,30 @@ export async function POST(req: NextRequest) {
       include: { shelter: { select: { name: true } }, user: { select: { name: true } } },
     });
 
-    const admins = await prisma.shelterAdmin.findMany({ where: { shelterId }, select: { userId: true } });
+    const admins = await prisma.shelterAdmin.findMany({
+      where:  { shelterId },
+      select: { userId: true, user: { select: { email: true, name: true } } },
+    });
+
+    const applicantName = foster.user.name ?? "Ismeretlen";
+
     createNotifications(admins.map((a) => ({
       userId: a.userId,
       type:   "FOSTER_NEW" as const,
       title:  "Új ideiglenes befogadó jelentkezés",
-      body:   `${foster.user.name ?? "Ismeretlen"} ideiglenes befogadónak jelentkezett.`,
+      body:   `${applicantName} ideiglenes befogadónak jelentkezett.`,
       href:   "/dashboard/foster",
     }))).catch(() => {});
+
+    for (const admin of admins) {
+      sendNewFosterApplicationEmail({
+        to:            admin.user.email,
+        adminName:     admin.user.name ?? admin.user.email,
+        applicantName,
+        shelterName:   foster.shelter.name,
+        motivation:    motivation ?? null,
+      }).catch((err) => console.error("[foster application email]", err));
+    }
 
     return NextResponse.json(foster, { status: 201 });
   } catch (error) {

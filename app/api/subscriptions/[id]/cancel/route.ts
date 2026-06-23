@@ -4,6 +4,10 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { createNotification } from "@/lib/notifications";
+import {
+  sendSubscriptionCancelledEmail,
+  sendSubscriptionCancelledAdminEmail,
+} from "@/lib/email";
 
 // POST /api/subscriptions/[id]/cancel
 export async function POST(
@@ -18,7 +22,19 @@ export async function POST(
 
     const subscription = await prisma.subscription.findUnique({
       where:   { id: params.id },
-      include: { tier: { select: { name: true } } },
+      include: {
+        tier: {
+          select: {
+            name: true,
+            shelter: {
+              select: {
+                name: true,
+                admins: { select: { user: { select: { email: true, name: true } } } },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!subscription) {
@@ -53,6 +69,26 @@ export async function POST(
       body:   subscription.tier?.name ?? "Előfizetés",
       href:   "/profile",
     }).catch(() => {});
+
+    const tierName    = subscription.tier?.name ?? "Előfizetés";
+    const shelterName = subscription.tier?.shelter?.name ?? "";
+    const userEmail   = session.user.email;
+    const userName    = session.user.name ?? userEmail ?? "Felhasználó";
+
+    if (userEmail) {
+      sendSubscriptionCancelledEmail({ to: userEmail, name: userName, tierName, shelterName })
+        .catch((err) => console.error("[sub cancel email - user]", err));
+    }
+
+    for (const admin of subscription.tier?.shelter?.admins ?? []) {
+      sendSubscriptionCancelledAdminEmail({
+        to:             admin.user.email,
+        adminName:      admin.user.name ?? admin.user.email,
+        subscriberName: userName,
+        tierName,
+        shelterName,
+      }).catch((err) => console.error("[sub cancel email - admin]", err));
+    }
 
     return NextResponse.json({ ok: true, subscription: updated });
   } catch (err) {
