@@ -26,7 +26,10 @@
     "myFollowups": "Utánkövetések",
     "myVolunteers": "Önkéntességem",
     "myFoster": "Ideiglenes befogadásaim",
-    "myFinances": "Pénzügyeim"
+    "myFinances": "Pénzügyeim",
+    "settings": "Beállítások",
+    "profileAdmin": "Profil admin",
+    "myCampaigns": "Gyűjtéseim"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",

@@ -26,7 +26,10 @@
     "myFollowups": "Nachverfolgungen",
     "myVolunteers": "Mein Ehrenamt",
     "myFoster": "Meine Pflegetiere",
-    "myFinances": "Meine Finanzen"
+    "myFinances": "Meine Finanzen",
+    "settings": "Einstellungen",
+    "profileAdmin": "Profil-Admin",
+    "myCampaigns": "Meine Sammlungen"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
