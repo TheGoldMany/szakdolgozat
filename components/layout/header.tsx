@@ -200,9 +200,11 @@ export function Header() {
                     <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("settings")}
                     </Link>
-                    <Link href="/profile/admin" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("profileAdmin")}
-                    </Link>
+                    {isAdmin && (
+                      <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        {t("adminPanel")}
+                      </Link>
+                    )}
                     <hr className="my-1 border-gray-100" />
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
@@ -317,10 +319,12 @@ export function Header() {
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
                       {t("settings")}
                     </Link>
-                    <Link href="/profile/admin" onClick={() => setMobileOpen(false)}
-                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      {t("profileAdmin")}
-                    </Link>
+                    {isAdmin && (
+                      <Link href="/dashboard" onClick={() => setMobileOpen(false)}
+                        className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                        {t("adminPanel")}
+                      </Link>
+                    )}
                   </>
                 ) : (
                   <>
