@@ -6,6 +6,7 @@ import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
   ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -63,6 +64,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "groupSettings",
     items: [
+      { href: "/profile/admin", icon: UserCog,  labelKey: "navProfileAdmin",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/settings", icon: Settings, labelKey: "navShelterSettings", roles: ["SHELTER_ADMIN"] },
     ],
   },

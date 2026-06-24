@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   Heart, MessageCircle, CalendarCheck, RefreshCcw,
-  HandHelping, Home, Banknote, LayoutDashboard, PlusCircle,
+  HandHelping, Home, Banknote, PlusCircle,
   ExternalLink,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -28,7 +28,6 @@ export default async function ProfileAdminPage() {
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/profile/admin");
 
   const t = await getTranslations("nav");
-  const isAdmin = session.user.role === "SUPER_ADMIN" || session.user.role === "SHELTER_ADMIN";
 
   const campaigns = await prisma.campaign.findMany({
     where:   { userId: session.user.id },
@@ -57,7 +56,6 @@ export default async function ProfileAdminPage() {
     { href: "/volunteers",   icon: HandHelping,   label: t("myVolunteers"),     desc: "Önkéntes tevékenységed" },
     { href: "/foster",       icon: Home,          label: t("myFoster"),         desc: "Ideiglenes befogadásaid" },
     { href: "/finances",     icon: Banknote,      label: t("myFinances"),       desc: "Adományaid és előfizetéseid" },
-    ...(isAdmin ? [{ href: "/dashboard", icon: LayoutDashboard, label: t("adminPanel"), desc: "Menhely / platform kezelés" }] : []),
   ];
 
   return (
