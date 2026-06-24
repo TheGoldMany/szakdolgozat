@@ -29,7 +29,9 @@
     "myFinances": "Meine Finanzen",
     "settings": "Einstellungen",
     "profileAdmin": "Profil-Admin",
-    "myCampaigns": "Meine Sammlungen"
+    "myCampaigns": "Meine Sammlungen",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",

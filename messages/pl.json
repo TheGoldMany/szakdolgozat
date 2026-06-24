@@ -29,7 +29,9 @@
     "myFinances": "Moje finanse",
     "settings": "Ustawienia",
     "profileAdmin": "Admin profilu",
-    "myCampaigns": "Moje zbiórki"
+    "myCampaigns": "Moje zbiórki",
+    "openMenu": "Otwórz menu",
+    "closeMenu": "Zamknij menu"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",

@@ -29,7 +29,9 @@
     "myFinances": "Pénzügyeim",
     "settings": "Beállítások",
     "profileAdmin": "Profil admin",
-    "myCampaigns": "Gyűjtéseim"
+    "myCampaigns": "Gyűjtéseim",
+    "openMenu": "Menü megnyitása",
+    "closeMenu": "Menü bezárása"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
