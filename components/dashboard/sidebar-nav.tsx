@@ -24,26 +24,31 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    titleKey: "groupAdoption",
+    titleKey: "groupAnimals",
     items: [
-      { href: "/dashboard/applications", icon: ClipboardList, labelKey: "navApplications",  roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/animals",      icon: PawPrint,      labelKey: "navAnimals",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/appointments", icon: CalendarDays,  labelKey: "navAppointments",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/events",       icon: CalendarHeart, labelKey: "navEvents",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/volunteers",   icon: HandHeart,     labelKey: "navVolunteers",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/foster",       icon: Home,          labelKey: "navFoster",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/followups",    icon: ListChecks,    labelKey: "navFollowups",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/inventory",    icon: Package,          labelKey: "navInventory",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/feeding",      icon: UtensilsCrossed,  labelKey: "navFeeding",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/kennels",      icon: DoorOpen,         labelKey: "navKennels",        roles: ["SHELTER_ADMIN"] },
-      { href: "/dashboard/transfers",    icon: ArrowRightLeft, labelKey: "navTransfers",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/forms",        icon: FileText,      labelKey: "navForms",          roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/animals",   icon: PawPrint,        labelKey: "navAnimals",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/kennels",   icon: DoorOpen,        labelKey: "navKennels",   roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/feeding",   icon: UtensilsCrossed, labelKey: "navFeeding",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/inventory", icon: Package,         labelKey: "navInventory", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/transfers", icon: ArrowRightLeft,  labelKey: "navTransfers", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
   {
-    titleKey: "groupCommunication",
+    titleKey: "groupAdoption",
     items: [
-      { href: "/dashboard/messages", icon: MessageCircle, labelKey: "navMessages", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/applications", icon: ClipboardList, labelKey: "navApplications", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/appointments", icon: CalendarDays,  labelKey: "navAppointments", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/followups",    icon: ListChecks,    labelKey: "navFollowups",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/forms",        icon: FileText,      labelKey: "navForms",        roles: ["SHELTER_ADMIN"] },
+    ],
+  },
+  {
+    titleKey: "groupCommunity",
+    items: [
+      { href: "/dashboard/volunteers", icon: HandHeart,      labelKey: "navVolunteers", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/foster",     icon: Home,           labelKey: "navFoster",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/events",     icon: CalendarHeart,  labelKey: "navEvents",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/messages",   icon: MessageCircle,  labelKey: "navMessages",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
   {
@@ -64,7 +69,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "groupSettings",
     items: [
-      { href: "/profile/admin", icon: UserCog,  labelKey: "navProfileAdmin",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/profile/admin",      icon: UserCog, labelKey: "navProfileAdmin",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/settings", icon: Settings, labelKey: "navShelterSettings", roles: ["SHELTER_ADMIN"] },
     ],
   },
