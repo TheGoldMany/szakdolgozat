@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Menu, X, PawPrint, MessageCircle, Globe, Bell, Heart } from "lucide-react";
+import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -197,32 +197,12 @@ export function Header() {
                     <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("profile")}
                     </Link>
-                    <Link href="/favorites" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("favorites")}
+                    <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      {t("settings")}
                     </Link>
-                    <Link href="/messages" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myMessages")}
+                    <Link href="/profile/admin" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      {t("profileAdmin")}
                     </Link>
-                    <Link href="/appointments" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myAppointments")}
-                    </Link>
-                    <Link href="/followups" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myFollowups")}
-                    </Link>
-                    <Link href="/volunteers" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myVolunteers")}
-                    </Link>
-                    <Link href="/foster" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myFoster")}
-                    </Link>
-                    <Link href="/finances" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                      {t("myFinances")}
-                    </Link>
-                    {isAdmin && (
-                      <Link href="/dashboard" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                        {t("adminPanel")}
-                      </Link>
-                    )}
                     <hr className="my-1 border-gray-100" />
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
@@ -333,48 +313,14 @@ export function Header() {
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
                       {t("profile")}
                     </Link>
-                    <Link href="/messages" onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      <MessageCircle className="h-4 w-4 shrink-0" />
-                      {t("myMessages")}
-                      {unread > 0 && (
-                        <span className="ml-auto rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                          {unread}
-                        </span>
-                      )}
-                    </Link>
-                    <Link href="/favorites" onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      <Heart className="h-4 w-4 shrink-0" />
-                      {t("favorites")}
-                    </Link>
-                    <Link href="/notifications" onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      <Bell className="h-4 w-4 shrink-0" />
-                      {t("notifications")}
-                    </Link>
-                    <Link href="/appointments" onClick={() => setMobileOpen(false)}
+                    <Link href="/settings" onClick={() => setMobileOpen(false)}
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      {t("myAppointments")}
+                      {t("settings")}
                     </Link>
-                    <Link href="/followups" onClick={() => setMobileOpen(false)}
+                    <Link href="/profile/admin" onClick={() => setMobileOpen(false)}
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      {t("myFollowups")}
+                      {t("profileAdmin")}
                     </Link>
-                    <Link href="/volunteers" onClick={() => setMobileOpen(false)}
-                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      {t("myVolunteers")}
-                    </Link>
-                    <Link href="/foster" onClick={() => setMobileOpen(false)}
-                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                      {t("myFoster")}
-                    </Link>
-                    {isAdmin && (
-                      <Link href="/dashboard" onClick={() => setMobileOpen(false)}
-                        className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                        {t("adminPanel")}
-                      </Link>
-                    )}
                   </>
                 ) : (
                   <>

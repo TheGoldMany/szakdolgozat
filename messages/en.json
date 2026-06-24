@@ -26,7 +26,10 @@
     "myFollowups": "Follow-ups",
     "myVolunteers": "My volunteering",
     "myFoster": "My foster animals",
-    "myFinances": "My Finances"
+    "myFinances": "My Finances",
+    "settings": "Settings",
+    "profileAdmin": "Profile admin",
+    "myCampaigns": "My campaigns"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
