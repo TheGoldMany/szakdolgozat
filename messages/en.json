@@ -29,7 +29,9 @@
     "myFinances": "My Finances",
     "settings": "Settings",
     "profileAdmin": "Profile admin",
-    "myCampaigns": "My campaigns"
+    "myCampaigns": "My campaigns",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
