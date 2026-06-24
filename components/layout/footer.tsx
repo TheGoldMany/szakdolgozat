@@ -57,7 +57,7 @@ export function Footer() {
 
           {/* Navigation */}
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-600">
               {t("page")}
             </h3>
             <ul className="space-y-2">
@@ -73,7 +73,7 @@ export function Footer() {
 
           {/* Help */}
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-600">
               {t("help")}
             </h3>
             <ul className="space-y-2">
@@ -89,7 +89,7 @@ export function Footer() {
 
           {/* Legal + For shelters */}
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-600">
               {t("legal")}
             </h3>
             <ul className="space-y-2">
@@ -102,7 +102,7 @@ export function Footer() {
               ))}
             </ul>
             <div className="mt-6">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-600">
                 {t("forShelters")}
               </h3>
               <ul className="space-y-2">
@@ -129,10 +129,10 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-10 border-t border-gray-100 pt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} ÁllatiMenhelyek.hu – {t("copyright")}
           </p>
-          <p className="flex items-center gap-1 text-xs text-gray-400">
+          <p className="flex items-center gap-1 text-xs text-gray-500">
             Készült <Heart className="h-3 w-3 text-brand-500" /> {t("madeWith")}
           </p>
         </div>

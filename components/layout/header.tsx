@@ -99,7 +99,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-brand-500">
+        <Link href="/" className="flex items-center gap-2 font-bold text-brand-700">
           <PawPrint className="h-6 w-6" />
           <span className="text-lg">ÁllatiMenhelyek</span>
         </Link>
@@ -186,7 +186,7 @@ export function Header() {
                   <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg z-50">
                     <div className="px-4 pb-2 pt-2">
                       <p className="truncate text-sm font-semibold text-gray-800">{session.user?.name}</p>
-                      <p className="truncate text-xs text-gray-400">{session.user?.email}</p>
+                      <p className="truncate text-xs text-gray-500">{session.user?.email}</p>
                       {roleInfo && (
                         <span className={cn("mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold", roleInfo.color)}>
                           {roleInfo.label}
@@ -221,7 +221,7 @@ export function Header() {
               <Link href="/auth/login" className="text-sm font-medium text-gray-600 hover:text-brand-500">
                 {t("login")}
               </Link>
-              <Link href="/auth/register" className="rounded-xl bg-brand-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">
+              <Link href="/auth/register" className="rounded-xl bg-brand-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-800 transition-colors">
                 {t("register")}
               </Link>
             </>
@@ -254,7 +254,7 @@ export function Header() {
 
             {/* Drawer header */}
             <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-              <span className="font-bold text-brand-500 flex items-center gap-2">
+              <span className="font-bold text-brand-700 flex items-center gap-2">
                 <PawPrint className="h-5 w-5" />
                 ÁllatiMenhelyek
               </span>
@@ -278,7 +278,7 @@ export function Header() {
 
                 {/* Language switcher */}
                 <hr className="my-3 border-gray-100" />
-                <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("language")}</p>
+                <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-600">{t("language")}</p>
                 <div className="flex flex-wrap gap-2 px-3 pb-1">
                   {routing.locales.map((loc) => (
                     <button
@@ -287,7 +287,7 @@ export function Header() {
                       className={cn(
                         "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
                         loc === locale
-                          ? "bg-brand-500 text-white"
+                          ? "bg-brand-700 text-white"
                           : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                       )}
                     >
@@ -333,7 +333,7 @@ export function Header() {
                       {t("login")}
                     </Link>
                     <Link href="/auth/register" onClick={() => setMobileOpen(false)}
-                      className="mt-1 rounded-xl bg-brand-500 px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-600 active:bg-brand-700">
+                      className="mt-1 rounded-xl bg-brand-700 px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-brand-800 active:bg-brand-900">
                       {t("register")}
                     </Link>
                   </>

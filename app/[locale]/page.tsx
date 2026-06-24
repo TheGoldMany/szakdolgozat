@@ -60,7 +60,7 @@ export default async function HomePage() {
 
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                 {t("heroTitle")}{" "}
-                <span className="text-brand-500">{t("heroTitleHighlight")}</span>
+                <span className="text-brand-700">{t("heroTitleHighlight")}</span>
               </h1>
               <p className="mt-4 text-base leading-relaxed text-gray-500">
                 {t("heroDesc")}
@@ -73,7 +73,7 @@ export default async function HomePage() {
               {/* Quick-nav: type links + report */}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link href="/animals"
-                  className="flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
+                  className="flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800">
                   <PawPrint className="h-3.5 w-3.5" /> {t("allAnimals")}
                 </Link>
                 {[
@@ -155,9 +155,9 @@ export default async function HomePage() {
               { value: adoptedCount,   label: t("statsAdopted"),   Icon: Heart     },
             ].map(({ value, label, Icon }) => (
               <div key={label}>
-                <Icon className="mx-auto mb-1 h-5 w-5 text-brand-200" />
+                <Icon className="mx-auto mb-1 h-5 w-5 text-white/75" />
                 <p className="text-2xl font-bold sm:text-3xl">{value.toLocaleString("hu-HU")}</p>
-                <p className="mt-0.5 text-xs text-brand-200 sm:text-sm">{label}</p>
+                <p className="mt-0.5 text-xs text-white/75 sm:text-sm">{label}</p>
               </div>
             ))}
           </div>
@@ -214,7 +214,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-xl px-4">
           <PawPrint className="mx-auto mb-4 h-10 w-10 text-brand-300" />
           <h2 className="text-2xl font-bold">{t("ctaTitle")}</h2>
-          <p className="mt-2 text-sm text-brand-200">{t("ctaDesc")}</p>
+          <p className="mt-2 text-sm text-white/75">{t("ctaDesc")}</p>
           <Link
             href="/reports/new"
             className="mt-6 inline-block rounded-xl bg-white px-6 py-3 text-sm font-semibold text-brand-700 shadow transition-colors hover:bg-brand-50"
