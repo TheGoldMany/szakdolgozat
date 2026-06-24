@@ -36,7 +36,7 @@ export function CookieBanner() {
           <p className="text-sm font-semibold text-gray-900">{t("title")}</p>
         </div>
         <p className="text-xs leading-relaxed text-gray-500">{t("description")}{" "}
-          <Link href="/adatvedelem#cookie" className="text-brand-600 underline-offset-2 hover:underline">
+          <Link href="/adatvedelem#cookie" className="underline text-brand-700 underline-offset-2 hover:text-brand-800">
             {t("learnMore")}
           </Link>
         </p>
@@ -44,7 +44,7 @@ export function CookieBanner() {
           <button
             type="button"
             onClick={() => accept("all")}
-            className="flex-1 rounded-xl bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 transition-colors"
+            className="flex-1 rounded-xl bg-brand-700 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-800 transition-colors"
           >
             {t("acceptAll")}
           </button>
