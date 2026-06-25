@@ -1,8 +1,37 @@
-# 11 – Admin dashboard: állatok, kérelmek, készlet
+# 11 – Admin dashboard: állatok, kérelmek, készlet, közösség
 
 ## Összefoglalás
 
 Ez a modul fedi le a menhely adminisztrátor dashboard funkcióit. Az adminok KPI kártyákat és analytics paneleket látnak a főoldalon, kezelhetik az állatokat (hozzáadás, státuszváltás, egészségügyi napló), elbírálhatják az örökbefogadási kérelmeket, és kezelhetik a menhely készletét (tételek hozzáadása, be- és kivételezés, alacsony készlet riasztás). A dashboard a `/dashboard` útvonalon érhető el, amely csak `SHELTER_ADMIN` és `SUPER_ADMIN` szerepkörű felhasználóknak elérhető.
+
+### Oldalsáv navigáció struktúrája
+
+A bal oldali `SidebarNav` a bejelentkezett felhasználó szerepköre (`role`) alapján szűri a látható menüpontokat. A csoportok és az elérhetőség:
+
+| Csoport | Menüpont | URL | SHELTER_ADMIN | SUPER_ADMIN |
+|---|---|---|---|---|
+| *(főoldal)* | Áttekintés | `/dashboard` | ✅ | ✅ |
+| **Állatok** | Állatok | `/dashboard/animals` | ✅ | ✅ |
+| | Kennelkiosztás | `/dashboard/kennels` | ✅ | – |
+| | Etetési napló | `/dashboard/feeding` | ✅ | ✅ |
+| | Készlet | `/dashboard/inventory` | ✅ | ✅ |
+| | Átadások | `/dashboard/transfers` | ✅ | ✅ |
+| **Örökbefogadás** | Kérelmek | `/dashboard/applications` | ✅ | ✅ |
+| | Időpontok | `/dashboard/appointments` | ✅ | ✅ |
+| | Utánkövetés | `/dashboard/followups` | ✅ | ✅ |
+| | Kérdőívek | `/dashboard/forms` | ✅ | – |
+| **Közösség** | Posztok | `/dashboard/posts` | ✅ | ✅ |
+| | Önkéntesek | `/dashboard/volunteers` | ✅ | ✅ |
+| | Nevelőcsaládok | `/dashboard/foster` | ✅ | ✅ |
+| | Események | `/dashboard/events` | ✅ | ✅ |
+| | Üzenetek | `/dashboard/messages` | ✅ | ✅ |
+| **Adományozás** | Előfizetési csomagok | `/dashboard/tiers` | ✅ | ✅ (csak olvasás) |
+| | Gyűjtések | `/dashboard/campaigns` | – | ✅ |
+| | Előfizetések | `/dashboard/subscriptions` | ✅ | ✅ |
+| **Platform** | Menhelyek | `/dashboard/shelters` | – | ✅ |
+| | Felhasználók | `/dashboard/users` | – | ✅ |
+| **Beállítások** | Profil admin | `/profile/admin` | ✅ | ✅ |
+| | Menhely beállítások | `/dashboard/settings` | ✅ | – |
 
 ---
 
@@ -13,6 +42,7 @@ Ez a modul fedi le a menhely adminisztrátor dashboard funkcióit. Az adminok KP
 - **US-11-C**: Mint menhely adminisztrátor, szeretném elbírálni az örökbefogadási kérelmeket, hogy szervezett legyen az örökbeadási folyamat.
 - **US-11-D**: Mint menhely adminisztrátor, szeretném a menhely készletét nyilvántartani és mozgásokat rögzíteni, hogy soha ne fogyjon el az ellátmány.
 - **US-11-E**: Mint menhely adminisztrátor, szeretnék értesítést kapni, ha egy tétel az minimum szint alá süllyed.
+- **US-11-F**: Mint menhely adminisztrátor, szeretnék posztokat közzétenni a menhelyem nevében (szöveg, kép, csatolt állat/esemény/gyűjtés), hogy a látogatók a főoldalon egy „Neked" (For You) feedben értesüljenek a legfrissebb hírekről.
 
 ---
 
@@ -480,6 +510,91 @@ Az alacsony készlet riasztás megjelenik a dashboard-on és a készletlistában
 
 **Elvárt eredmény:**
 Az analytics diagramok betöltenek, az adatok a tényleges adatbázis-adatokat tükrözik. Az interaktív tooltipek funkcionálnak. Üres adatok esetén a diagramok nem törnek el.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-11-13: Oldalsáv navigáció – csoportok és szerepkör-szűrés ellenőrzése
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett `shelter@test.hu` / `Admin1234!` (SHELTER_ADMIN); külön ellenőrzés `admin@test.hu` / `Admin1234!` (SUPER_ADMIN) fiókkal |
+| **URL** | `/dashboard` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek (SHELTER_ADMIN):**
+- [ ] Megjelennek a csoportok: Állatok, Örökbefogadás, Közösség, Adományozás, Beállítások
+- [ ] A Közösség csoportban megjelenik: Posztok, Önkéntesek, Nevelőcsaládok, Események, Üzenetek
+- [ ] Az Adományozás csoportban megjelenik: Előfizetési csomagok, Előfizetések
+- [ ] NEM jelenik meg: Gyűjtések (Adományozás csoportban) – ez SUPER_ADMIN exkluzív
+- [ ] NEM jelenik meg: Platform csoport (Menhelyek, Felhasználók)
+- [ ] Megjelenik: Menhely beállítások (Beállítások csoportban)
+
+**Elfogadási feltételek (SUPER_ADMIN):**
+- [ ] Az Adományozás csoportban megjelenik: Előfizetési csomagok, Gyűjtések, Előfizetések
+- [ ] A Platform csoport megjelenik: Menhelyek, Felhasználók
+- [ ] NEM jelenik meg: Kennelkiosztás, Kérdőívek, Menhely beállítások
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd az oldalsáv csoport-struktúráját a fenti táblázat szerint.
+3. Ellenőrizd, hogy a Platform csoport (Menhelyek, Felhasználók) NEM látható.
+4. Ellenőrizd, hogy Gyűjtések menüpont NEM látható.
+5. Kijelentkezés, majd bejelentkezés `admin@test.hu` / `Admin1234!` fiókkal.
+6. Ellenőrizd, hogy a Platform csoport (Menhelyek, Felhasználók) LÁTHATÓ.
+7. Ellenőrizd, hogy Gyűjtések menüpont LÁTHATÓ az Adományozás csoportban.
+8. Ellenőrizd, hogy Kennelkiosztás és Kérdőívek NEM láthatók.
+9. Ellenőrizd, hogy Menhely beállítások NEM látható.
+
+**Elvárt eredmény:**
+A sidebar minden szerepkörnél pontosan a jogosult menüpontokat jeleníti meg. Sem felesleges, sem hiányzó elem nincs.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-11-14: Közösségi poszt létrehozása menhely admin által
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett `shelter@test.hu` / `Admin1234!` (SHELTER_ADMIN); a menhely legalább egy állattal, eseménnyel vagy gyűjtéssel rendelkezik |
+| **URL** | `/dashboard/posts` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A `/dashboard/posts` oldal betölt a `PostComposer` szerkesztőfelülettel és a menhely korábbi posztjainak listájával
+- [ ] A szerkesztőben kötelező mező: szöveges tartalom (textarea)
+- [ ] Opcionálisan feltölthető kép (`ImageUpload` komponens)
+- [ ] Opcionálisan csatolható entitás: állat, esemény vagy gyűjtés (select legördülő)
+- [ ] Sikeres mentés után a poszt megjelenik a listában és a publikus főoldalon (For You feed)
+- [ ] A poszt tartalmazza: a menhely profilképét és nevét, a közzététel idejét, a szöveget, a képet (ha van), a csatolt entitás kártyáját (ha van)
+- [ ] A poszt törölhető a `DeletePostButton` segítségével (megerősítő dialógussal)
+- [ ] `USER` szerepkörű felhasználó nem érheti el a `/dashboard/posts` oldalt
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/posts` oldalra bejelentkezve `shelter@test.hu` / `Admin1234!` fiókkal.
+2. Töltsd ki a szöveges mezőt: `Ez egy teszt közösségi poszt a menhely nevében.`
+3. Tölts fel egy teszt képet.
+4. A csatolás legördülőből válassz ki egy állatot.
+5. Kattints a „Közzétesz" gombra.
+6. Ellenőrizd, hogy a poszt megjelenik a listában.
+7. Navigálj a publikus főoldalra (`/hu`) – ellenőrizd, hogy a poszt megjelenik a „Neked" feedben.
+8. Navigálj vissza a `/dashboard/posts` oldalra és kattints a „Törlés" gombra.
+9. Erősítsd meg a törlést – ellenőrizd, hogy a poszt eltűnik a listából és a feedből.
+10. Kijelentkezés, majd bejelentkezés `user@test.hu` / `User1234!` fiókkal – navigálj a `/dashboard/posts` oldalra.
+11. Ellenőrizd, hogy átirányítás történik (nem elérhető `USER` számára).
+
+**Elvárt eredmény:**
+A poszt sikeresen létrejön, megjelenik a publikus főoldalon. A törlés funkcionál. `USER` szerepkörű felhasználó nem érheti el a szerkesztőfelületet.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
