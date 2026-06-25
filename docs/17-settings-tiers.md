@@ -4,6 +4,8 @@
 
 Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkcióit fedi le. A `/dashboard/settings` oldalon a menhely admin a `ShelterSettingsForm` komponensen keresztül kezeli a menhely logóját, kapacitását, örökbefogadási feltételeit, számlázási adatait (cégnév, adószám, bankszámla) és dokumentumait, valamint innen indítható a **Stripe Connect** onboarding (`POST /api/stripe/connect/onboard`), amellyel az adományok és előfizetési díjak közvetlenül a menhely Stripe Express számlájára érkeznek (5% platformdíjjal). A `/dashboard/tiers` oldalon a `TiersManager` komponenssel havi támogatói szintek (`DonationTier`) hozhatók létre és szerkeszthetők (minimum 175 Ft – Stripe limit); az aktív csomagok a publikus `/hu/donate` és `/hu/shelters/[slug]` oldalakon `TierCard`-ként jelennek meg „Feliratkozás" gombbal, amely Stripe Checkout fizetésre visz (`POST /api/checkout/subscribe`). Az előfizetések (`Subscription`, státuszok: `ACTIVE`, `CANCELLED`, `PAST_DUE`) a `/dashboard/subscriptions` oldalon listázhatók, szűrhetők és admin által lemondhatók (`POST /api/subscriptions/[id]/admin-cancel`).
 
+> **SUPER_ADMIN megjegyzés:** A `SUPER_ADMIN` szerepkörű felhasználó szintén eléri a `/dashboard/tiers` oldalt, de ott a `TiersManager` szerkesztő helyett egy read-only táblázat jelenik meg, amely az összes menhely összes csomagját, az aktív előfizetők számát és a csomag állapotát mutatja. A `/dashboard/subscriptions` oldalon a SUPER_ADMIN az összes menhely előfizetéseit látja (beleértve a menhely nevét), míg a SHELTER_ADMIN csak a saját menhelyéét. A `/dashboard/settings` (menhely beállítások) oldal kizárólag `SHELTER_ADMIN` számára érhető el.
+
 ---
 
 ## Felhasználói Történetek

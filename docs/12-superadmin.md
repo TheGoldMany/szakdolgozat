@@ -2,7 +2,17 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szerepkörű felhasználó (`admin@test.hu`) teljes körű hozzáféréssel rendelkezik a platformhoz: listázhatja és szerkesztheti az összes felhasználót és menhelyet, hitelesítheti a menhelyeket (verified badge), jóváhagyhatja vagy elutasíthatja a kampányokat. A Super Admin dashboard ugyanazon `/dashboard` útvonalon érhető el, de kiegészítő szekciókkal rendelkezik, amelyek `SHELTER_ADMIN` számára nem láthatók (pl. `/dashboard/users`, `/dashboard/shelters`, `/dashboard/campaigns`).
+Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szerepkörű felhasználó (`admin@test.hu`) teljes körű hozzáféréssel rendelkezik a platformhoz: listázhatja és szerkesztheti az összes felhasználót és menhelyet, hitelesítheti a menhelyeket (verified badge), jóváhagyhatja vagy elutasíthatja a kampányokat. A Super Admin dashboard ugyanazon `/dashboard` útvonalon érhető el, de kiegészítő szekciókkal rendelkezik, amelyek `SHELTER_ADMIN` számára nem láthatók.
+
+**SUPER_ADMIN-exkluzív oldalak:**
+
+| Oldal | URL | Leírás |
+|---|---|---|
+| Gyűjtések | `/dashboard/campaigns` | Összes kampány (minden státusz) szűrhető táblázatban; pending gyűjtések alatt jóváhagyás/elutasítás panel; alkalmazási kérdőívek jóváhagyása |
+| Előfizetési csomagok | `/dashboard/tiers` | Az összes menhely összes `DonationTier`-jének read-only áttekintése (aktív előfizetők száma, összeg, menhely neve) |
+| Előfizetések | `/dashboard/subscriptions` | Az összes menhely összes előfizetése szűrve (ACTIVE/CANCELLED), lemondás lehetőségével |
+| Menhelyek | `/dashboard/shelters` | Összes menhely kezelése (hitelesítés, aktiválás, új menhely) |
+| Felhasználók | `/dashboard/users` | Összes felhasználó, szerepkör-módosítás |
 
 ---
 
@@ -13,6 +23,9 @@ Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szere
 - **US-12-C**: Mint super admin, szeretném az összes menhelyet listázni és kezelni, hogy kontrollálhassam az aktív szervezeteket.
 - **US-12-D**: Mint super admin, szeretném a menhelyeket hitelesíteni, hogy a felhasználók megbízhassanak a jelölt szervezetekben.
 - **US-12-E**: Mint super admin, szeretném a beküldött kampányokat jóváhagyni vagy elutasítani, hogy csak megfelelő tartalom kerüljön nyilvánosságra.
+- **US-12-F**: Mint super admin, szeretném az összes kampányt (nem csak a pendingeket) áttekinteni státusz szerint szűrve, hogy lássam a platform teljes gyűjtési tevékenységét.
+- **US-12-G**: Mint super admin, szeretném az összes menhely összes előfizetési csomagját read-only nézetben látni, hogy átlássam a platform bevételi struktúráját.
+- **US-12-H**: Mint super admin, szeretném az összes menhely előfizetőit listázni és szükség esetén lemondani egy előfizetést, hogy platformszinten kezelhessem a bevételi rekordokat.
 
 ---
 
@@ -190,24 +203,28 @@ A toggle aktiválása után a menhely `isVerified` mezője `true`-ra vált az ad
 
 **Elfogadási feltételek:**
 - [ ] Az oldal kizárólag `SUPER_ADMIN` szerepkörű felhasználónak érhető el
-- [ ] A `PENDING` státuszú kampányok listázódnak (`CampaignApprovals` komponens)
-- [ ] Minden kampány sorában látható: cím, leírás, célösszeg, beküldő neve, e-mail-je, menhely neve (ha van), létrehozás dátuma
+- [ ] Az oldal tetején státusz-szűrő sor látható: Összes / Jóváhagyásra vár / Aktív / Befejezett / Visszautasított
+- [ ] Az összes kampány táblázatban jelenik meg: cím (kattintható link a `/donate/[id]` oldalra), menhely neve, összegyűlt / célösszeg, státusz badge, létrehozás dátuma
+- [ ] A táblázat alatt (ha van PENDING kampány) megjelenik a „Jóváhagyásra vár" alcím és a `CampaignApprovals` panel részletesebb adatokkal (beküldő neve, leírás, approve/reject gombok)
 - [ ] Az „Elfogad" / „Jóváhagyás" gombra kattintva a kampány `ACTIVE` státuszra vált
 - [ ] A jóváhagyás után a kampány megjelenik a nyilvános `/hu/donate` oldalon
 - [ ] A kampány létrehozója értesítést kap a jóváhagyásról
-- [ ] A jóváhagyott kampány eltűnik a `/dashboard/campaigns` PENDING listájából
+- [ ] A jóváhagyott kampány eltűnik a jóváhagyásra vár panelből, és ACTIVE badge-dzsel jelenik meg a táblázatban
 
 **Tesztelési lépések:**
 1. Navigálj a `/dashboard/campaigns` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
-2. Ellenőrizd, hogy a `PENDING` kampányok listázódnak.
-3. Ellenőrizd a kampány-sor tartalmát: cím, leírás, célösszeg, beküldő.
-4. Kattints az „Elfogad" / „Jóváhagyás" gombra a „Teszt Kampány 2026" (TC-07-07-ből) mellett.
-5. Ellenőrizd, hogy a kampány eltűnt a PENDING listából.
-6. Navigálj a `/hu/donate` nyilvános oldalra – ellenőrizd, hogy „Teszt Kampány 2026" megjelenik az aktív kampányok között.
-7. Jelentkezz be `user@test.hu` / `User1234!` fiókkal és ellenőrizd, hogy értesítés érkezett: „Kampányod jóváhagyva".
+2. Ellenőrizd, hogy a státusz-szűrők megjelennek az oldal tetején.
+3. Ellenőrizd, hogy az összes kampány táblázatban szerepel a helyes adatokkal.
+4. Kattints a „Jóváhagyásra vár" szűrőre – ellenőrizd, hogy csak PENDING kampányok maradnak a táblázatban.
+5. Görgess le a „Jóváhagyásra vár" panel szekciójához – keresdd a „Teszt Kampány 2026" kérelmet.
+6. Kattints az „Elfogad" / „Jóváhagyás" gombra.
+7. Ellenőrizd, hogy a kampány eltűnt a jóváhagyásra vár panelből.
+8. Kattints az „Összes" szűrőre – ellenőrizd, hogy a kampány ACTIVE badge-dzsel megjelenik a táblázatban.
+9. Navigálj a `/hu/donate` nyilvános oldalra – ellenőrizd, hogy „Teszt Kampány 2026" megjelenik az aktív kampányok között.
+10. Jelentkezz be `user@test.hu` / `User1234!` fiókkal és ellenőrizd, hogy értesítés érkezett: „Kampányod jóváhagyva".
 
 **Elvárt eredmény:**
-A kampány `ACTIVE` státuszra vált, megjelenik a nyilvános kampánylistán, a kampány létrehozója értesítést kap.
+A kampány `ACTIVE` státuszra vált, megjelenik a nyilvános kampánylistán és a Gyűjtések táblázatban ACTIVE badge-dzsel. A kampány létrehozója értesítést kap.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
@@ -248,6 +265,126 @@ A kampány `ACTIVE` státuszra vált, megjelenik a nyilvános kampánylistán, a
 
 **Elvárt eredmény:**
 A kampány `REJECTED` státuszra vált, a nyilvános oldalon nem jelenik meg, a kampány létrehozója értesítést kap. Az elutasított kampány nem tehető nyilvánossá.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-07: Összes gyűjtés áttekintése státusz szerinti szűréssel
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; az adatbázisban legalább egy ACTIVE és egy PENDING kampány létezik |
+| **URL** | `/dashboard/campaigns` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Az oldal betöltésekor (szűrő nélkül) az összes kampány látható a táblázatban, státuszuktól függetlenül
+- [ ] A státusz szűrők: „Összes", „Jóváhagyásra vár", „Aktív", „Befejezett", „Visszautasított"
+- [ ] Szűrő kiválasztásakor az URL frissül (`?status=ACTIVE` stb.) és csak a megfelelő státuszú kampányok maradnak
+- [ ] Minden táblázat-sorban látható: kampány cím (link), menhely neve, összegyűlt Ft / célösszeg Ft, státusz badge (színkódolt), létrehozás dátuma
+- [ ] A kampány cím linkje a publikus `/hu/donate/[id]` oldalra vezet (új lap nem szükséges, de a navigáció működik)
+- [ ] Ha egy státuszhoz 0 kampány tartozik, a táblázat üres állapot üzenetet mutat
+- [ ] Az oldal kizárólag `SUPER_ADMIN` szerepkörű felhasználónak érhető el; `SHELTER_ADMIN` átirányítódik
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/campaigns` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd, hogy az összes kampány szerepel a táblázatban (PENDING, ACTIVE, COMPLETED, REJECTED vegyesen).
+3. Kattints az „Aktív" szűrőre – ellenőrizd, hogy csak ACTIVE státuszú kampányok jelennek meg.
+4. Kattints a „Jóváhagyásra vár" szűrőre – ellenőrizd, hogy csak PENDING kampányok jelennek meg.
+5. Kattints a „Befejezett" szűrőre – ha nincs befejezett kampány, ellenőrizd az üres állapot üzenetet.
+6. Kattints a „Visszautasított" szűrőre – ellenőrizd a REJECTED kampányokat.
+7. Kattints az „Összes" szűrőre – ellenőrizd, hogy minden kampány visszatér.
+8. Kattints egy kampány-sor nevére – ellenőrizd, hogy a `/hu/donate/[id]` oldalra navigál.
+9. Kíséreld meg a `/dashboard/campaigns` oldalt SHELTER_ADMIN fiókkal (`shelter@test.hu`) elérni – ellenőrizd az átirányítást.
+
+**Elvárt eredmény:**
+A státusz-szűrők funkcionálnak, az URL frissül, a táblázat a megfelelő kampányokat mutatja. A kampány cím link funkcionál. SHELTER_ADMIN nem érheti el az oldalt.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-08: Előfizetési csomagok platformszintű áttekintése (SUPER_ADMIN)
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; legalább két menhely rendelkezik aktív `DonationTier` csomagokkal |
+| **URL** | `/dashboard/tiers` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A `/dashboard/tiers` oldal `SUPER_ADMIN` számára read-only táblázatot jelenít meg (NEM a `TiersManager` szerkesztő komponenst)
+- [ ] A táblázatban minden `DonationTier` látható az összes menhelyről
+- [ ] Minden sor tartalmazza: csomag neve, menhely neve + városa, összeg (Ft/hó), aktív előfizetők száma, állapot badge (Aktív / Inaktív)
+- [ ] A sorok menhely neve szerint ABC sorrendbe rendezetten jelennek meg, azon belül összeg szerint növekvően
+- [ ] Ha nincs egyetlen csomag sem, üres állapot üzenet jelenik meg
+- [ ] A táblázat NEM tartalmaz szerkesztési/törlési gombokat (SUPER_ADMIN csak megtekinthet)
+- [ ] `SHELTER_ADMIN` számára a szokott `TiersManager` szerkesztő jelenik meg (saját menhelyéhez)
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/tiers` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd, hogy read-only táblázat jelenik meg (NEM a TiersManager szerkesztő).
+3. Ellenőrizd a táblázat oszlopait: Csomag neve, Menhely, Összeg/hó, Aktív előfizetők, Állapot.
+4. Ellenőrizd, hogy legalább két különböző menhely csomagjai megjelennek.
+5. Ellenőrizd a sorrendet: menhelyek ABC-ben, azon belül összeg növekvően.
+6. Ellenőrizd, hogy aktív előfizetők száma helyes értéket mutat (valós adat).
+7. Ellenőrizd, hogy nincs „Szerkesztés" vagy „Törlés" gomb.
+8. Kijelentkezés, majd bejelentkezés `shelter@test.hu` / `Admin1234!` fiókkal.
+9. Navigálj a `/dashboard/tiers` oldalra – ellenőrizd, hogy a `TiersManager` komponens jelenik meg (szerkeszthető csomagok saját menhelyhez).
+
+**Elvárt eredmény:**
+SUPER_ADMIN read-only táblázatban látja az összes menhely összes előfizetési csomagját. SHELTER_ADMIN a saját menhelyének szerkeszthető `TiersManager` felületét látja.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-09: Előfizetések platformszintű kezelése (SUPER_ADMIN)
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; legalább egy `ACTIVE` és egy `CANCELLED` előfizetés létezik különböző menhelyekhez |
+| **URL** | `/dashboard/subscriptions` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Az oldal betöltésekor az összes menhely összes előfizetése látható (nincs shelter-szűrés)
+- [ ] Minden sorban látható: előfizető neve, e-mail-je, csomag neve, **menhely neve** (SUPER_ADMIN-exkluzív oszlop), összeg (HUF/hó), státusz badge, kezdés dátuma, lemondás gomb (csak ACTIVE-nál)
+- [ ] A státusz-szűrők (Összes / Aktív / Lemondott) funkcionálnak, URL frissül
+- [ ] Az „Aktív" szűrőre kattintva csak `ACTIVE` státuszú előfizetések jelennek meg
+- [ ] A „Lemondás" gombra kattintva az előfizetés `CANCELLED` státuszra vált (adminisztratív lemondás, `POST /api/subscriptions/[id]/admin-cancel`)
+- [ ] Az Adományok CSV és Előfizetők CSV exportáló gombok elérhetők és letöltik a helyes fájlt
+- [ ] Az oldal max. 100 előfizetést jelenít meg (pagináció hiányában ez a limit)
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/subscriptions` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd, hogy az összes menhely előfizetései megjelennek (nem csak egy menhely).
+3. Ellenőrizd, hogy a „Menhely neve" oszlop látható (ez csak SUPER_ADMIN-nál jelenik meg).
+4. Kattints az „Aktív" szűrőre – ellenőrizd, hogy csak ACTIVE státuszú előfizetések maradnak.
+5. Kattints a „Lemondott" szűrőre – ellenőrizd, hogy csak CANCELLED státuszú előfizetések maradnak.
+6. Kattints az „Összes" szűrőre – ellenőrizd, hogy minden visszatér.
+7. Kattints egy ACTIVE előfizetés „Lemondás" gombjára – erősítsd meg a lemondást.
+8. Ellenőrizd, hogy az előfizetés státusza `CANCELLED`-re változott.
+9. Kattints az „Adományok CSV" gombra – ellenőrizd, hogy CSV fájl letöltés indul a helyes adatokkal.
+10. Kattints az „Előfizetők CSV" gombra – ellenőrizd, hogy CSV fájl letöltés indul.
+11. Kijelentkezés, majd bejelentkezés `shelter@test.hu` / `Admin1234!` fiókkal.
+12. Navigálj a `/dashboard/subscriptions` oldalra – ellenőrizd, hogy csak a saját menhely előfizetései láthatók és a „Menhely neve" oszlop NEM jelenik meg.
+
+**Elvárt eredmény:**
+SUPER_ADMIN az összes menhely összes előfizetését látja, beleértve a menhely nevét. Az admin-lemondás funkcionál. SHELTER_ADMIN csak a saját menhely előfizetéseit látja.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
