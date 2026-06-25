@@ -138,6 +138,8 @@ model User {
   eventRegistrations  EventRegistration[]
   transferRequests    AnimalTransfer[]       @relation("TransferRequester")
   transferResolutions AnimalTransfer[]       @relation("TransferResolver")
+  posts               Post[]                 @relation("PostAuthor")
+  postLikes           PostLike[]
 }
 
 // -------------------------------------------------------
@@ -246,6 +248,7 @@ model Shelter {
   transfersFrom        AnimalTransfer[]  @relation("TransferFrom")
   transfersTo          AnimalTransfer[]  @relation("TransferTo")
   feedingSchedules     FeedingSchedule[]
+  posts                Post[]
 }
 
 model ShelterDocument {
@@ -317,6 +320,7 @@ model Animal {
   behaviorLogs  BehaviorLog[]
   sponsorships  Sponsorship[]
   transfers     AnimalTransfer[]
+  posts         Post[]
 
   @@index([kennelId])
   @@index([fosterId])
@@ -719,6 +723,7 @@ model Campaign {
   user      User?      @relation("CampaignCreator", fields: [userId], references: [id], onDelete: SetNull)
   shelter   Shelter?   @relation(fields: [shelterId], references: [id], onDelete: SetNull)
   donations Donation[]
+  posts     Post[]
 
   @@index([status])
   @@index([userId])
@@ -1184,6 +1189,7 @@ model Event {
   updatedAt   DateTime    @updatedAt
 
   registrations EventRegistration[]
+  posts         Post[]
 
   @@index([shelterId])
   @@index([status, startsAt])
@@ -1290,4 +1296,45 @@ model FeedingLog {
 
   @@index([scheduleId])
   @@index([executedAt])
+}
+
+// -------------------------------------------------------
+// Community posts (menhelyek közösségi posztjai a "Neked" feedhez)
+// -------------------------------------------------------
+
+model Post {
+  id         String   @id @default(cuid())
+  shelterId  String
+  authorId   String? // a posztot író menhely-admin (törölt usernél null)
+  content    String   @db.Text
+  imageUrl   String?
+  // Opcionális hivatkozás egy entitásra, amit a poszt kiemel
+  animalId   String?
+  eventId    String?
+  campaignId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  shelter  Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  author   User?      @relation("PostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  animal   Animal?    @relation(fields: [animalId], references: [id], onDelete: SetNull)
+  event    Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  campaign Campaign?  @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  likes    PostLike[]
+
+  @@index([shelterId])
+  @@index([createdAt])
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
 }

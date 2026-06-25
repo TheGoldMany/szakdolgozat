@@ -9,6 +9,7 @@ import Image from "next/image";
 import { ResolveButton } from "@/components/reports/resolve-button";
 import { ReportMatches, type MatchView } from "@/components/reports/report-matches";
 import { StaticMap } from "@/components/ui/static-map";
+import { ShareButton } from "@/components/ui/share-button";
 import { cn } from "@/lib/utils";
 import { ReportType, ReportStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
@@ -149,9 +150,12 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
                 </h1>
               </div>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
-              {statusLabel}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
+                {statusLabel}
+              </span>
+              <ShareButton url={`/reports/${report.id}`} title={`${report.name ?? report.breed ?? t("unknownAnimal")} – ÁllatiMenhelyek.hu`} />
+            </div>
           </div>
 
           {galleryImages.length > 0 && (

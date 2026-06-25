@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { CalendarDays, Users, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { DonateForm } from "@/components/donate/donate-form";
+import { ShareButton } from "@/components/ui/share-button";
 import { getTranslations } from "next-intl/server";
 
 function formatHUF(amount: number) {
@@ -95,7 +96,10 @@ export default async function CampaignDetailPage({
                 <span>›</span>
                 <span className="text-gray-600 truncate max-w-[200px]">{campaign.title}</span>
               </nav>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{campaign.title}</h1>
+              <div className="flex items-start justify-between gap-3">
+                <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{campaign.title}</h1>
+                <ShareButton url={`/donate/${campaign.id}`} title={`${campaign.title} – ÁllatiMenhelyek.hu`} />
+              </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
                 <span>{t("startedBy", { name: campaign.user?.name ?? t("anonymous") })}</span>

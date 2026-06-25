@@ -7,6 +7,7 @@ import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, 
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
+import { ShareButton } from "@/components/ui/share-button";
 import { RatingBadge } from "@/components/reviews/rating-stat";
 import { HealthTimeline } from "@/components/health/health-timeline";
 import { AppointmentButton } from "@/components/appointments/appointment-button";
@@ -184,8 +185,13 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
           {/* Details */}
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <h1 className="text-2xl font-bold text-gray-900">{animal.name}</h1>
-              {animal.breed && <p className="mt-0.5 text-sm text-gray-500">{animal.breed}</p>}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">{animal.name}</h1>
+                  {animal.breed && <p className="mt-0.5 text-sm text-gray-500">{animal.breed}</p>}
+                </div>
+                <ShareButton url={`/animals/${animal.slug}`} title={`${animal.name} – ÁllatiMenhelyek.hu`} />
+              </div>
 
               <div className="mt-4 space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
