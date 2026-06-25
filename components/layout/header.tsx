@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
@@ -239,9 +240,9 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile menu – slides in from right, below the header */}
-      {mobileOpen && (
-        <div className="fixed inset-x-0 bottom-0 z-50 md:hidden" style={{ top: "64px" }}>
+      {/* Mobile menu – rendered via portal so backdrop-filter on header doesn't trap it */}
+      {mobileOpen && createPortal(
+        <div className="fixed inset-x-0 bottom-0 z-[9999] md:hidden" style={{ top: "64px" }}>
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/30"
@@ -338,7 +339,8 @@ export function Header() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
