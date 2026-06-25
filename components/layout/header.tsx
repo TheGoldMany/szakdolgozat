@@ -239,12 +239,9 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile menu – full-screen overlay so content is always reachable */}
+      {/* Mobile menu – slides in from right, below the header */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-50 md:hidden"
-          style={{ top: 0 }}
-        >
+        <div className="fixed inset-x-0 bottom-0 z-50 md:hidden" style={{ top: "64px" }}>
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/30"
@@ -253,20 +250,6 @@ export function Header() {
 
           {/* Drawer panel */}
           <div className="absolute right-0 top-0 flex h-full w-4/5 max-w-sm flex-col bg-white shadow-xl">
-
-            {/* Drawer header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-4">
-              <span className="font-bold text-brand-700 flex items-center gap-2">
-                <PawPrint className="h-5 w-5" />
-                ÁllatiMenhelyek
-              </span>
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-4 py-3">
