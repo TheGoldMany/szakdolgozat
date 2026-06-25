@@ -55,16 +55,16 @@ const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: "groupDonation",
     items: [
-      { href: "/dashboard/tiers",         icon: Heart, labelKey: "navTiers",         roles: ["SHELTER_ADMIN"] },
-      { href: "/dashboard/subscriptions", icon: Users, labelKey: "navSubscriptions", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/tiers",         icon: Heart,          labelKey: "navTiers",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
+      { href: "/dashboard/campaigns",     icon: ClipboardCheck, labelKey: "navCampaigns",     roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/subscriptions", icon: Users,          labelKey: "navSubscriptions", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
   {
     titleKey: "groupPlatform",
     items: [
-      { href: "/dashboard/shelters",  icon: Building2,      labelKey: "navShelters",  roles: ["SUPER_ADMIN"] },
-      { href: "/dashboard/users",     icon: Users,          labelKey: "navUsers",     roles: ["SUPER_ADMIN"] },
-      { href: "/dashboard/campaigns", icon: ClipboardCheck, labelKey: "navCampaigns", roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/shelters", icon: Building2, labelKey: "navShelters", roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/users",    icon: Users,     labelKey: "navUsers",    roles: ["SUPER_ADMIN"] },
     ],
   },
   {
