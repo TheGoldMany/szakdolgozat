@@ -75,6 +75,8 @@
     "latestReports": "Latest reports",
     "latestReportsDesc": "Lost, found and stray animals",
     "all": "All",
+    "feedTitle": "For you",
+    "feedEmpty": "Nothing to show yet. Check back later!",
     "ctaTitle": "Lost your pet?",
     "ctaDesc": "Submit a report – the community will help you find them!"
   },
@@ -659,6 +661,7 @@
     "navCampaigns": "Approvals",
     "navAppointments": "Appointments",
     "navEvents": "Events",
+    "navPosts": "Posts",
     "navVolunteers": "Volunteers",
     "navFoster": "Foster carers",
     "navFollowups": "Follow-ups",

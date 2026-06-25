@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2 } from "lucide-react
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { TierCard } from "@/components/donate/tier-card";
+import { ShareButton } from "@/components/ui/share-button";
 import { ShelterReviews } from "@/components/reviews/shelter-reviews";
 import { RatingBadge } from "@/components/reviews/rating-stat";
 import { AnimalStatus } from "@prisma/client";
@@ -123,6 +124,9 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
                     <CheckCircle2 className="h-3 w-3" />{t("verified")}
                   </span>
                 )}
+                <span className="ml-auto">
+                  <ShareButton url={`/shelters/${shelter.slug}`} title={`${shelter.name} – ÁllatiMenhelyek.hu`} />
+                </span>
               </div>
 
               <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">

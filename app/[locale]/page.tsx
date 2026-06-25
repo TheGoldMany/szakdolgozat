@@ -1,38 +1,64 @@
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
-import { AnimalCard } from "@/components/animals/animal-card";
-import { ReportCard } from "@/components/reports/report-card";
 import { HomeSearch } from "@/components/home/home-search";
+import { FeedClient, type FeedItem } from "@/components/feed/feed-client";
+import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+
+const POSTS_PER_PAGE = 10;
 
 export default async function HomePage() {
   const t        = await getTranslations("home");
-  const tNav     = await getTranslations("nav");
   const tAnimals = await getTranslations("animals");
+  const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, latestAnimals, latestReports, heroPhotos] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroPhotos] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
       prisma.animal.count({ where: { status: AnimalStatus.ADOPTED } }),
+      prisma.post.findMany({
+        take: POSTS_PER_PAGE,
+        orderBy: { createdAt: "desc" },
+        include: {
+          shelter:  { select: { id: true, name: true, slug: true, logoUrl: true, city: true } },
+          author:   { select: { id: true, name: true, image: true } },
+          animal:   { select: { id: true, name: true, slug: true, images: { where: { isPrimary: true }, take: 1, select: { url: true } } } },
+          event:    { select: { id: true, slug: true, title: true, startsAt: true, location: true } },
+          campaign: { select: { id: true, slug: true, title: true, targetAmount: true, raisedAmount: true } },
+          _count:   { select: { likes: true } },
+        },
+      }),
       prisma.animal.findMany({
         where: { status: AnimalStatus.AVAILABLE },
         orderBy: { createdAt: "desc" },
-        take: 3,
-        include: {
-          images:  { where: { isPrimary: true }, take: 1 },
-          shelter: { select: { id: true, name: true, city: true } },
-        },
+        take: 10,
+        select: { id: true, name: true, slug: true, breed: true, shelter: { select: { city: true } }, images: { where: { isPrimary: true }, take: 1, select: { url: true } } },
+      }),
+      prisma.event.findMany({
+        where: { status: "PUBLISHED", startsAt: { gte: new Date() } },
+        orderBy: { startsAt: "asc" },
+        take: 8,
+        select: { id: true, title: true, slug: true, startsAt: true, location: true },
+      }),
+      prisma.campaign.findMany({
+        where: { status: "ACTIVE" },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        select: { id: true, title: true, slug: true, targetAmount: true, raisedAmount: true },
       }),
       prisma.animalReport.findMany({
         where: { status: ReportStatus.ACTIVE },
         orderBy: { createdAt: "desc" },
-        take: 4,
+        take: 8,
+        select: { id: true, type: true, animalType: true, city: true, imageUrl: true },
       }),
       prisma.animalImage.findMany({
         where: { isPrimary: true, animal: { status: AnimalStatus.AVAILABLE } },
@@ -42,6 +68,52 @@ export default async function HomePage() {
       }),
     ]);
 
+  // Kedvelt poszt-id-k a bejelentkezett felhasználóhoz.
+  let likedIds = new Set<string>();
+  if (session?.user?.id && posts.length) {
+    const likes = await prisma.postLike.findMany({
+      where:  { userId: session.user.id, postId: { in: posts.map((p) => p.id) } },
+      select: { postId: true },
+    });
+    likedIds = new Set(likes.map((l) => l.postId));
+  }
+
+  const feedPosts: FeedPost[] = posts.map((p) => ({
+    id:        p.id,
+    content:   p.content,
+    imageUrl:  p.imageUrl,
+    createdAt: p.createdAt.toISOString(),
+    shelter:   p.shelter,
+    author:    p.author,
+    animal:    p.animal,
+    event:     p.event ? { ...p.event, startsAt: p.event.startsAt.toISOString() } : null,
+    campaign:  p.campaign,
+    _count:    p._count,
+    likedByMe: likedIds.has(p.id),
+  }));
+
+  // "Neked" feed: posztok közé szőtt kiemelő sávok (rails).
+  const rails: FeedItem[] = [];
+  if (railAnimals.length)
+    rails.push({ kind: "animals", animals: railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, imageUrl: a.images[0]?.url ?? null })) });
+  if (railEvents.length)
+    rails.push({ kind: "events", events: railEvents.map((e) => ({ id: e.id, title: e.title, slug: e.slug, startsAt: e.startsAt.toISOString(), location: e.location })) });
+  if (railCampaigns.length)
+    rails.push({ kind: "campaigns", campaigns: railCampaigns });
+  if (railReports.length)
+    rails.push({ kind: "reports", reports: railReports });
+
+  const postItems: FeedItem[] = feedPosts.map((post) => ({ kind: "post", post }));
+  const feedItems: FeedItem[] = [];
+  let pi = 0;
+  for (const rail of rails) {
+    feedItems.push(rail);
+    feedItems.push(...postItems.slice(pi, pi + 2));
+    pi += 2;
+  }
+  feedItems.push(...postItems.slice(pi));
+
+  const nextCursor = posts.length === POSTS_PER_PAGE ? posts[posts.length - 1].id : null;
   const photos = heroPhotos.map((p) => p.url).filter(Boolean);
 
   return (
@@ -49,7 +121,7 @@ export default async function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="bg-gradient-to-br from-brand-50 via-white to-white">
-        <div className="mx-auto max-w-7xl px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8 lg:pb-10 lg:pt-10">
           <div className="grid items-center gap-10 lg:grid-cols-2">
 
             <div className="max-w-xl">
@@ -58,7 +130,7 @@ export default async function HomePage() {
                 {t("badge", { count: availableCount })}
               </div>
 
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
                 {t("heroTitle")}{" "}
                 <span className="text-brand-700">{t("heroTitleHighlight")}</span>
               </h1>
@@ -66,7 +138,7 @@ export default async function HomePage() {
                 {t("heroDesc")}
               </p>
 
-              <div className="mt-8 w-full">
+              <div className="mt-6 w-full">
                 <HomeSearch />
               </div>
 
@@ -125,28 +197,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Latest animals ───────────────────────────────── */}
-      {latestAnimals.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{t("latestAnimals")}</h2>
-              <p className="mt-1 text-sm text-gray-500">{t("latestAnimalsDesc")}</p>
-            </div>
-            <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
-              {t("all")} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {latestAnimals.map((animal) => (
-              <AnimalCard key={animal.id} animal={animal} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* ── Stats band ───────────────────────────────────── */}
-      <section className="bg-brand-600 py-8 text-white">
+      <section className="bg-brand-600 py-6 text-white">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <div className="grid grid-cols-3 gap-4 text-center">
             {[
@@ -164,15 +216,36 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── "Neked" feed ─────────────────────────────────── */}
+      <section className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
+            <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
+              {t("all")} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {feedItems.length > 0 ? (
+            <FeedClient initialItems={feedItems} initialCursor={nextCursor} />
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center">
+              <PawPrint className="mx-auto mb-3 h-10 w-10 text-brand-200" />
+              <p className="text-sm text-gray-500">{t("feedEmpty")}</p>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* ── How it works ─────────────────────────────────── */}
-      <section className="bg-gray-50 py-14">
+      <section className="bg-white py-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <h2 className="mb-10 text-center text-2xl font-bold text-gray-900">{t("howTitle")}</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[
-              { Icon: Search,      title: t("step1Title"), desc: t("step1Desc"), step: "1" },
+              { Icon: Search,        title: t("step1Title"), desc: t("step1Desc"), step: "1" },
               { Icon: ClipboardList, title: t("step2Title"), desc: t("step2Desc"), step: "2" },
-              { Icon: HandHeart,   title: t("step3Title"), desc: t("step3Desc"), step: "3" },
+              { Icon: HandHeart,     title: t("step3Title"), desc: t("step3Desc"), step: "3" },
             ].map(({ Icon, title, desc, step }) => (
               <div key={step} className="relative rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                 <span className="absolute right-4 top-4 text-3xl font-black text-gray-100">{step}</span>
@@ -186,28 +259,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── Latest reports ───────────────────────────────── */}
-      {latestReports.length > 0 && (
-        <section className="bg-gray-50 py-14">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{t("latestReports")}</h2>
-                <p className="mt-1 text-sm text-gray-500">{t("latestReportsDesc")}</p>
-              </div>
-              <Link href="/reports" className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
-                {t("all")} <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {latestReports.map((report) => (
-                <ReportCard key={report.id} report={report} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── CTA Banner ───────────────────────────────────── */}
       <section className="bg-brand-600 py-14 text-center text-white">

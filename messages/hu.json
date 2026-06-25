@@ -75,6 +75,8 @@
     "latestReports": "Friss bejelentések",
     "latestReportsDesc": "Elveszett, megtalált és kóbor állatok",
     "all": "Összes",
+    "feedTitle": "Neked",
+    "feedEmpty": "Még nincs megjeleníthető tartalom. Nézz vissza később!",
     "ctaTitle": "Elveszett a kedvenced?",
     "ctaDesc": "Add fel a bejelentést – a közösség segít megtalálni!"
   },
@@ -659,6 +661,7 @@
     "navCampaigns": "Jóváhagyások",
     "navAppointments": "Időpontok",
     "navEvents": "Események",
+    "navPosts": "Posztok",
     "navVolunteers": "Önkéntesek",
     "navFoster": "Ideiglenes befogadók",
     "navFollowups": "Utánkövetések",

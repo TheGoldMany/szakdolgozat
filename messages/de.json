@@ -75,6 +75,8 @@
     "latestReports": "Neueste Meldungen",
     "latestReportsDesc": "Verlorene, gefundene und streunende Tiere",
     "all": "Alle",
+    "feedTitle": "Für dich",
+    "feedEmpty": "Noch keine Inhalte. Schau später wieder vorbei!",
     "ctaTitle": "Haustier verloren?",
     "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!"
   },
@@ -659,6 +661,7 @@
     "navCampaigns": "Genehmigungen",
     "navAppointments": "Termine",
     "navEvents": "Veranstaltungen",
+    "navPosts": "Beiträge",
     "navVolunteers": "Freiwillige",
     "navFoster": "Pflegefamilien",
     "navFollowups": "Nachverfolgungen",

@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { EventRegisterButton } from "@/components/events/event-register-button";
+import { ShareButton } from "@/components/ui/share-button";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const event = await prisma.event.findUnique({ where: { slug: params.slug }, select: { title: true } });
@@ -68,9 +69,12 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main */}
           <div className="lg:col-span-2">
-            <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${EVENT_TYPE_COLORS[event.type]}`}>
-              {EVENT_TYPE_LABELS[event.type]}
-            </span>
+            <div className="flex items-start justify-between gap-3">
+              <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium ${EVENT_TYPE_COLORS[event.type]}`}>
+                {EVENT_TYPE_LABELS[event.type]}
+              </span>
+              <ShareButton url={`/events/${event.slug}`} title={`${event.title} – ÁllatiMenhelyek.hu`} />
+            </div>
             <h1 className="mt-3 text-3xl font-bold text-gray-900">{event.title}</h1>
 
             {event.status === "CANCELLED" && (

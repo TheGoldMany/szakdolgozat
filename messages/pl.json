@@ -75,6 +75,8 @@
     "latestReports": "Najnowsze zgłoszenia",
     "latestReportsDesc": "Zagubione, znalezione i bezdomne zwierzęta",
     "all": "Wszystkie",
+    "feedTitle": "Dla Ciebie",
+    "feedEmpty": "Brak treści do wyświetlenia. Zajrzyj później!",
     "ctaTitle": "Zgubiłeś swojego pupila?",
     "ctaDesc": "Złóż zgłoszenie – społeczność pomoże ci go znaleźć!"
   },
@@ -659,6 +661,7 @@
     "navCampaigns": "Zatwierdzenia",
     "navAppointments": "Wizyty",
     "navEvents": "Wydarzenia",
+    "navPosts": "Posty",
     "navVolunteers": "Wolontariusze",
     "navFoster": "Rodziny zastępcze",
     "navFollowups": "Obserwacje",
