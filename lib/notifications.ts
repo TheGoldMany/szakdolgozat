@@ -61,7 +61,7 @@ export async function notifyAnimalSponsors(
 export async function notifyNearbyShelters(reportId: string): Promise<void> {
   try {
     const report = await prisma.animalReport.findUnique({ where: { id: reportId } });
-    if (!report || report.type !== "STRAY" || report.lat == null || report.lng == null) return;
+    if (!report || report.lat == null || report.lng == null) return;
 
     // Aktív menhelyek koordinátával, az adminjaik elérhetőségeivel együtt.
     const shelters = await prisma.shelter.findMany({
@@ -79,6 +79,13 @@ export async function notifyNearbyShelters(reportId: string): Promise<void> {
       ? `${report.description.slice(0, 200)}…`
       : report.description;
 
+    const TYPE_LABEL: Record<string, string> = {
+      STRAY: "kóbor",
+      LOST:  "elveszett",
+      FOUND: "megtalált",
+    };
+    const typeLabel = TYPE_LABEL[report.type] ?? report.type.toLowerCase();
+
     // Egy admin több menhelyhez is tartozhat – a legközelebbi találat számít,
     // és userenként csak egy in-app értesítést / emailt küldünk.
     const notifiedUsers = new Set<string>();
@@ -95,8 +102,8 @@ export async function notifyNearbyShelters(reportId: string): Promise<void> {
         await createNotification({
           userId: user.id,
           type:   "REPORT_NEARBY",
-          title:  `Kóbor állat a közeletekben (${rounded} km)`,
-          body:   `Új kóbor ${animalLabel} bejelentés érkezett ${report.city} környékén.`,
+          title:  `${typeLabel.charAt(0).toUpperCase() + typeLabel.slice(1)} állat a közelben (${rounded} km)`,
+          body:   `Új ${typeLabel} ${animalLabel} bejelentés érkezett ${report.city} környékén.`,
           href:   `/reports/${report.id}`,
         }).catch((err) => console.error("nearby report notification error:", err));
 
@@ -104,6 +111,7 @@ export async function notifyNearbyShelters(reportId: string): Promise<void> {
           await sendNearbyReportEmail({
             to:          user.email,
             adminName:   user.name ?? "Menhely admin",
+            typeLabel,
             animalLabel,
             city:        report.city,
             distanceKm:  rounded,
