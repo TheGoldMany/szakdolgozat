@@ -551,6 +551,41 @@ export async function sendReportMatchEmail(opts: {
   });
 }
 
+export async function sendNearbyReportEmail(opts: {
+  to:           string;
+  adminName:    string;
+  animalLabel:  string;
+  city:         string;
+  distanceKm:   number;
+  description:  string;
+  reportUrl:    string;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Kóbor állat a közeletekben: ${opts.animalLabel} (${opts.city}) – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
+            Kóbor állat a közeletekben 🐾
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.adminName}!<br/>
+            Új kóbor <strong>${opts.animalLabel}</strong> bejelentés érkezett a menhelyetektől
+            kb. <strong>${opts.distanceKm} km</strong> távolságra.
+          </p>
+          <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:16px 0">
+            <p style="margin:0 0 4px;font-size:14px;color:#374151">📍 ${opts.city}</p>
+            <p style="margin:0;font-size:14px;color:#374151;line-height:1.6">${opts.description}</p>
+          </div>
+          <a href="${opts.reportUrl}"
+             style="display:inline-block;margin:16px 0;background:#22c55e;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Bejelentés megtekintése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
 export async function sendShelterSuspendedEmail(opts: {
   to:          string;
   adminName:   string;

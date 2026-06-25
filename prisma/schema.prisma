@@ -1003,6 +1003,7 @@ enum NotificationType {
   // Reports
   REPORT_RESOLVED // User: report status updated
   REPORT_MATCH_FOUND // User: a likely lost/found match was found for their report
+  REPORT_NEARBY // Shelter admin: a stray animal was reported near the shelter
   // Donations & subscriptions
   DONATION_RECEIVED // Admin: new donation received
   SUBSCRIPTION_STARTED // User: subscription confirmed
