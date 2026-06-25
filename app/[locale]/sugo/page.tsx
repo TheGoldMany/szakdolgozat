@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   PawPrint, Search, FileText, Heart, Bell, Building2, CreditCard, Upload,
@@ -514,6 +515,11 @@ function AdminContent() {
           <Step n={4} title="Dokumentumok feltöltése">
             Az állat profiljánál az Iratok fülön feltölthetsz PDF dokumentumokat (oltási könyv, ivartalanítási igazolás, stb.).
           </Step>
+          <Step n={5} title="Szerkesztés és törlés">
+            Bármely adat (leírás, fotók, egészségügyi adatok) szerkeszthető az állat részletoldalán a <strong>„Szerkesztés"</strong> gombbal.
+            Törléskor az állat eltűnik a publikus listáról és a kapcsolódó kérelmek is törlődnek —
+            örökbe fogadott állatnál inkább archivált státuszt alkalmazz.
+          </Step>
         </div>
         <Note type="tip">A jó leírás és minőségi fotók szignifikánsan növelik az örökbefogadás esélyét.</Note>
       </Section>
@@ -536,6 +542,10 @@ function AdminContent() {
           <Step n={4} title="Meghívó link küldése">
             Kérelem részletesén küldhetsz meghívó linket közvetlenül egy érdeklődőnek —
             a link automatikus kérelmet nyit meg a megadott állathoz.
+          </Step>
+          <Step n={5} title="Kérvény sablon szerkesztése és törlése">
+            Jóváhagyás előtt a sablon szerkeszthető: mezők hozzáadhatók, eltávolíthatók, átnevezhetők.
+            Jóváhagyott, állathoz rendelt sablon csak az összes hozzárendelés eltávolítása után törölhető.
           </Step>
         </div>
       </Section>
@@ -579,6 +589,10 @@ function AdminContent() {
             Ha egy önkéntes már nem aktív, módosítsd az állapotát
             <Badge label="Inaktív" color="bg-gray-100 text-gray-600 mx-1" /> státuszba.
             Így nem jelenik meg a feladatoknál, de az adatai megmaradnak.
+          </Step>
+          <Step n={5} title="Feladatok szerkesztése és törlése">
+            A meghirdetett feladatok szerkeszthetők: leírás, időpont és maximális létszám módosítható.
+            Feladat törlésekor a feljelentkezett önkéntesek értesítést kapnak a lemondásról.
           </Step>
         </div>
       </Section>
@@ -727,6 +741,12 @@ function AdminContent() {
             Ez szükséges az adományok fogadásához. Az összeg automatikusan a menhely bankszámlájára kerül
             (4% platform kezelési díj levonásával).
           </Step>
+          <Step n={5} title="Csomagok és kampányok szerkesztése és törlése">
+            Az előfizetési csomagok neve, leírása és összege szerkeszthető. Aktív előfizetőkkel rendelkező
+            csomag törlésekor az előfizetések az aktuális időszak végéig aktívak maradnak.
+            Kampányok PENDING vagy REJECTED állapotban szerkeszthetők és törölhetők; ACTIVE kampány szerkesztése
+            Super Admin jóváhagyást igényelhet.
+          </Step>
         </div>
       </Section>
 
@@ -819,6 +839,10 @@ function AdminContent() {
             A Dashboard UC-02 panelen látható, hogy az összes kennel milyen arányban foglalt.
             A piros jelzés a 100%-os kihasználtságot mutatja.
           </Step>
+          <Step n={4} title="Szerkesztés és törlés">
+            A kennel neve, típusa és kapacitása szerkeszthető a kennel részletoldalán.
+            Törlés előtt minden hozzárendelt állatot el kell mozgatni — üres, karbantartáson kívüli kennel törölhető.
+          </Step>
         </div>
         <Note type="info">A kennelek karbantartásba helyezhetők (maintenance state), ami ideiglenesen kizárja őket a kapacitásból.</Note>
         <QuickLink icon={Building2} label="Kennelek" href="/dashboard/kennels" />
@@ -846,6 +870,11 @@ function AdminContent() {
           <Step n={3} title="Dokumentumok">
             Áthelyezési engedélyek és egészségügyi dokumentumok csatolhatók az áthelyezési rekordhoz.
           </Step>
+          <Step n={4} title="Szerkesztés és törlés">
+            PLANNED státuszú áthelyezésnél módosítható a dátum és az indok.
+            Törlés helyett inkább <Badge label="Törölve" color="bg-red-100 text-red-700 mx-1" /> státuszba helyezés
+            ajánlott, hogy az előzmény megmaradjon.
+          </Step>
         </div>
         <QuickLink icon={ArrowLeftRight} label="Áthelyezések" href="/dashboard/transfers" />
       </Section>
@@ -872,6 +901,11 @@ function AdminContent() {
           </Step>
           <Step n={4} title="Esemény lezárása">
             Az esemény után zárhatod le azt — a regisztrációk archiválódnak, a résztvevői lista megmarad.
+          </Step>
+          <Step n={5} title="Szerkesztés és törlés">
+            Az esemény részletei (leírás, időpont, helyszín, maximális létszám) szerkeszthetők mindaddig,
+            amíg az esemény le nincs zárva. Törlés esetén az összes regisztráció is törlődik —
+            a résztvevők automatikus értesítést kapnak a lemondásról.
           </Step>
         </div>
         <QuickLink icon={CalendarDays} label="Események kezelése" href="/dashboard/events" />
@@ -1051,8 +1085,26 @@ function SuperAdminContent() {
 // ── Page ──────────────────────────────────────────────────────────────────
 
 export default function HelpPage() {
+  const { data: session, status } = useSession();
+  const role = (session?.user as { role?: string } | undefined)?.role;
+
   const [tab, setTab] = useState<TabId>("user");
-  const toc = tab === "user" ? TOC_USER : tab === "admin" ? TOC_ADMIN : TOC_SUPER;
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (role === "SUPER_ADMIN")   setTab("superadmin");
+      else if (role === "SHELTER_ADMIN") setTab("admin");
+    }
+  }, [status, role]);
+
+  const visibleTabs = TABS.filter(t => {
+    if (t.id === "superadmin") return role === "SUPER_ADMIN";
+    if (t.id === "admin")      return role === "SHELTER_ADMIN" || role === "SUPER_ADMIN";
+    return true;
+  });
+
+  const activeTab = visibleTabs.find(t => t.id === tab) ? tab : (visibleTabs[0]?.id ?? "user");
+  const toc = activeTab === "user" ? TOC_USER : activeTab === "admin" ? TOC_ADMIN : TOC_SUPER;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1070,13 +1122,13 @@ export default function HelpPage() {
 
           {/* Tab selector */}
           <div className="mt-6 inline-flex gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
-            {TABS.map(t => (
+            {visibleTabs.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
                   "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all",
-                  tab === t.id ? t.color + " border shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  activeTab === t.id ? t.color + " border shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <t.icon className="h-4 w-4" />
@@ -1109,9 +1161,9 @@ export default function HelpPage() {
 
           {/* Main content */}
           <main className="lg:col-span-3">
-            {tab === "user"       && <UserContent />}
-            {tab === "admin"      && <AdminContent />}
-            {tab === "superadmin" && <SuperAdminContent />}
+            {activeTab === "user"       && <UserContent />}
+            {activeTab === "admin"      && <AdminContent />}
+            {activeTab === "superadmin" && <SuperAdminContent />}
 
             {/* Footer CTA */}
             <div className="mt-10 rounded-2xl bg-brand-600 p-8 text-center text-white">
