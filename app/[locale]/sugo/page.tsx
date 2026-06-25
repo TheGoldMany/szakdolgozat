@@ -7,7 +7,7 @@ import {
   MessageCircle, ChevronRight, Users, CalendarDays, HandHeart, Package,
   ListChecks, BarChart2, Settings, ShieldCheck, AlertTriangle, CheckCircle2,
   Clock, ArrowDownCircle, ArrowUpCircle, RotateCcw, Info,
-  Home, Map, ArrowLeftRight, Star,
+  Home, Map, ArrowLeftRight, Star, MessagesSquare, Share2, Navigation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,28 +40,31 @@ const TOC_USER: TocItem[] = [
 ];
 
 const TOC_ADMIN: TocItem[] = [
-  { id: "a-attekinto",    label: "Dashboard áttekintő",     icon: BarChart2    },
-  { id: "a-allatok",      label: "Állatok kezelése",         icon: PawPrint     },
-  { id: "a-kerelmek",     label: "Kérelmek kezelése",        icon: FileText     },
-  { id: "a-idopontok",    label: "Időpontok kezelése",       icon: CalendarDays },
-  { id: "a-onkentesek",   label: "Önkéntesek kezelése",      icon: HandHeart    },
-  { id: "a-keszlet",      label: "Készletkezelés",           icon: Package      },
-  { id: "a-ertesitesek",  label: "Értesítések és riasztások", icon: Bell        },
-  { id: "a-utankovetes",  label: "Utánkövetések",            icon: ListChecks   },
-  { id: "a-adomanyok",    label: "Adományok és kampányok",   icon: Heart        },
-  { id: "a-elemzesek",    label: "Elemzések (Analytics)",   icon: BarChart2    },
-  { id: "a-beallitasok",  label: "Menhely beállításai",       icon: Settings     },
-  { id: "a-befogadok",    label: "Ideiglenes befogadók",      icon: Home         },
-  { id: "a-kenneleks",    label: "Kennelek kezelése",          icon: Building2    },
+  { id: "a-attekinto",    label: "Dashboard áttekintő",     icon: BarChart2      },
+  { id: "a-allatok",      label: "Állatok kezelése",         icon: PawPrint       },
+  { id: "a-kerelmek",     label: "Kérelmek kezelése",        icon: FileText       },
+  { id: "a-idopontok",    label: "Időpontok kezelése",       icon: CalendarDays   },
+  { id: "a-onkentesek",   label: "Önkéntesek kezelése",      icon: HandHeart      },
+  { id: "a-keszlet",      label: "Készletkezelés",           icon: Package        },
+  { id: "a-ertesitesek",  label: "Értesítések és riasztások", icon: Bell          },
+  { id: "a-utankovetes",  label: "Utánkövetések",            icon: ListChecks     },
+  { id: "a-posztok",      label: "Közösségi posztok",        icon: MessagesSquare },
+  { id: "a-adomanyok",    label: "Adományok és kampányok",   icon: Heart          },
+  { id: "a-elemzesek",    label: "Elemzések (Analytics)",    icon: BarChart2      },
+  { id: "a-beallitasok",  label: "Menhely beállításai",       icon: Settings       },
+  { id: "a-befogadok",    label: "Ideiglenes befogadók",      icon: Home           },
+  { id: "a-kenneleks",    label: "Kennelek kezelése",          icon: Building2      },
   { id: "a-atelyezesek",  label: "Állat áthelyezések",         icon: ArrowLeftRight },
-  { id: "a-esemenyek",    label: "Események kezelése",         icon: CalendarDays },
+  { id: "a-esemenyek",    label: "Események kezelése",         icon: CalendarDays   },
 ];
 
 const TOC_SUPER: TocItem[] = [
-  { id: "s-platform",     label: "Platform menedzsment",  icon: ShieldCheck  },
-  { id: "s-jovahagyasok", label: "Jóváhagyások",           icon: CheckCircle2 },
-  { id: "s-menhelyek",    label: "Menhelyek kezelése",      icon: Building2    },
-  { id: "s-elemzesek",    label: "Teljes analitika",        icon: BarChart2    },
+  { id: "s-platform",       label: "Platform menedzsment",     icon: ShieldCheck    },
+  { id: "s-gyujtesek",      label: "Gyűjtések kezelése",        icon: Heart          },
+  { id: "s-csomagok",       label: "Előfizetési csomagok",      icon: CheckCircle2   },
+  { id: "s-elofizetesek",   label: "Előfizetések",              icon: Users          },
+  { id: "s-menhelyek",      label: "Menhelyek kezelése",        icon: Building2      },
+  { id: "s-elemzesek",      label: "Teljes analitika",          icon: BarChart2      },
 ];
 
 // ── Reusable layout components ────────────────────────────────────────────
@@ -628,14 +631,15 @@ function AdminContent() {
         <div className="mt-3 space-y-3 rounded-xl border border-gray-100 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Admin értesítések típusai</p>
           {[
-            { icon: FileText,     color: "text-blue-500",   label: "Új örökbefogadási kérelem érkezett" },
-            { icon: CalendarDays, color: "text-sky-500",    label: "Új időpontfoglalási kérés" },
-            { icon: HandHeart,    color: "text-pink-500",   label: "Új önkéntes kérelmezte" },
-            { icon: Package,      color: "text-red-500",    label: "Alacsony készletszint (ha minimum be van állítva)" },
-            { icon: Clock,        color: "text-amber-500",  label: "Készlettétel hamarosan lejár (7 napon belül)" },
-            { icon: Heart,        color: "text-rose-500",   label: "Új adomány érkezett" },
-            { icon: MessageCircle,color: "text-purple-500", label: "Új üzenet a felhasználótól" },
-            { icon: ListChecks,   color: "text-orange-500", label: "Utánkövetés érkezett (az örökbefogadó kitöltötte)" },
+            { icon: FileText,      color: "text-blue-500",   label: "Új örökbefogadási kérelem érkezett" },
+            { icon: CalendarDays,  color: "text-sky-500",    label: "Új időpontfoglalási kérés" },
+            { icon: HandHeart,     color: "text-pink-500",   label: "Új önkéntes kérelmezte" },
+            { icon: Package,       color: "text-red-500",    label: "Alacsony készletszint (ha minimum be van állítva)" },
+            { icon: Clock,         color: "text-amber-500",  label: "Készlettétel hamarosan lejár (7 napon belül)" },
+            { icon: Heart,         color: "text-rose-500",   label: "Új adomány érkezett" },
+            { icon: MessageCircle, color: "text-purple-500", label: "Új üzenet a felhasználótól" },
+            { icon: ListChecks,    color: "text-orange-500", label: "Utánkövetés érkezett (az örökbefogadó kitöltötte)" },
+            { icon: Navigation,    color: "text-yellow-600", label: "Kóbor / elveszett / megtalált állat bejelentve 20 km-en belül" },
           ].map(({ icon: Icon, color, label }) => (
             <div key={label} className="flex items-center gap-2.5 text-sm text-gray-700">
               <Icon className={cn("h-4 w-4 shrink-0", color)} />
@@ -677,6 +681,31 @@ function AdminContent() {
         </div>
       </Section>
 
+      {/* Közösségi posztok */}
+      <Section id="a-posztok" icon={MessagesSquare} title="Közösségi posztok" color="bg-fuchsia-50 text-fuchsia-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A menhely nevében posztokat tehetsz közzé a platformon. A posztok a látogatók főoldalán
+          megjelenő „Neked" (For You) feedben jelennek meg, és megoszthatók közösségi médiában is.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Poszt létrehozása">
+            Dashboard → Posztok → Írd be a szöveget. Csatolhatsz képet, és egy entitást:
+            valamelyik menhelyeden lévő <strong>állatot</strong>, <strong>eseményt</strong> vagy <strong>gyűjtést</strong>.
+            A csatolt kártya a hírfolyamban kattintható.
+          </Step>
+          <Step n={2} title="Közzétesz és törlés">
+            A „Közzétesz" gombra kattintva a poszt azonnal megjelenik a főoldalon.
+            Szerkesztés nem lehetséges — ha hibás, töröld és hozz létre újat.
+          </Step>
+          <Step n={3} title="Lájkok és megosztás">
+            A látogatók lájkolhatják a posztot (bejelentkezés szükséges).
+            A megosztás gombbal Facebook, X (Twitter), WhatsApp vagy vágólapra másolva terjeszthető.
+          </Step>
+        </div>
+        <Note type="tip">Az állat-kártyás posztok a leghatékonyabbak — közvetlen link az örökbefogadási oldalra.</Note>
+        <QuickLink icon={MessagesSquare} label="Posztjaim" href="/dashboard/posts" />
+      </Section>
+
       {/* Adományok */}
       <Section id="a-adomanyok" icon={Heart} title="Adományok és kampányok" color="bg-rose-50 text-rose-800">
         <div className="space-y-4">
@@ -689,9 +718,9 @@ function AdminContent() {
             Dashboard → (Kampányok menü a navigációban). Új kampány célja, leírása, célosszege és
             határideje adható meg. A kampány Super Admin jóváhagyás után válik aktívvá és publikusan elérhetővé.
           </Step>
-          <Step n={3} title="Előfizetők listája">
-            Dashboard → Előfizetők. Látod az aktív előfizetőket, a csomag típusát és az előfizetés kezdetét.
-            Egyénileg nem módosítható — a felhasználó saját profilján mondhatja le.
+          <Step n={3} title="Előfizetések listája">
+            Dashboard → Előfizetések. Látod az aktív és lemondott előfizetőket, a csomag típusát és az előfizetés kezdetét.
+            Szükség esetén adminisztrátori lemondás is lehetséges a sorban lévő gombbal.
           </Step>
           <Step n={4} title="Stripe Connect beállítása">
             Dashboard → Menhely beállítások → Stripe fiók csatlakoztatása.
@@ -887,29 +916,94 @@ function SuperAdminContent() {
         </div>
       </Section>
 
-      {/* Jóváhagyások */}
-      <Section id="s-jovahagyasok" icon={CheckCircle2} title="Jóváhagyások" color="bg-blue-50 text-blue-800">
+      {/* Gyűjtések kezelése */}
+      <Section id="s-gyujtesek" icon={Heart} title="Gyűjtések kezelése" color="bg-blue-50 text-blue-800">
         <p className="text-sm text-gray-600 leading-relaxed">
-          Két típusú tartalom kerül Super Admin jóváhagyásra: kampányok és kérvény sablonok (ApplicationForm).
+          A Gyűjtések oldal az összes menhelyen lévő kampányt mutatja, státusztól függetlenül.
+          Innen jóváhagyhatók a beérkező kampányok és a kérvény-sablonok is.
         </p>
         <div className="space-y-4 mt-3">
-          <Step n={1} title="Kampányok jóváhagyása">
-            Dashboard → Jóváhagyások. A PENDING státuszú kampányok itt jelennek meg.
-            Olvasd el a kampány leírását és ellenőrizd a célt. Fogadd el (ACTIVE) vagy utasítsd el (REJECTED)
-            — a menhely adminisztrátora értesítést kap a döntésről.
+          <Step n={1} title="Összes kampány megtekintése">
+            Dashboard → Adományozás → Gyűjtések. Az oldal tetején státusz-szűrők láthatók:
+            <Badge label="Összes" color="bg-gray-100 text-gray-600 mx-1" />,
+            <Badge label="Jóváhagyásra vár" color="bg-yellow-100 text-yellow-700 mx-1" />,
+            <Badge label="Aktív" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Befejezett" color="bg-blue-100 text-blue-700 mx-1" />,
+            <Badge label="Visszautasított" color="bg-red-100 text-red-600 mx-1" />.
+            A táblázatban minden kampány neve, menhelye, összegyűlt és célösszege, státusza és dátuma látható.
           </Step>
-          <Step n={2} title="Kérvény sablonok jóváhagyása">
-            Ugyanitt jelennek meg a PENDING_APPROVAL státuszú kérdőív-sablonok is.
-            Ellenőrizd a mezőket (nincs-e szenzitív vagy jogellenesen gyűjtött adat),
-            majd fogadd el vagy utasítsd el.
+          <Step n={2} title="Kampány jóváhagyása">
+            Ha van PENDING kampány, az oldal alján megjelenik a jóváhagyás panel.
+            Olvasd el a leírást és a célösszeget. Kattints az <strong>„Elfogad"</strong> gombra —
+            a kampány ACTIVE státuszba kerül és azonnal megjelenik a nyilvános Támogatás oldalon.
+            A menhely adminisztrátor értesítést kap.
           </Step>
-          <Step n={3} title="Értesítés a várakozókról">
+          <Step n={3} title="Kampány elutasítása">
+            A <strong>„Elutasít"</strong> gombra kattintva a kampány REJECTED státuszba kerül és nem
+            jelenik meg nyilvánosan. A menhely adminisztrátor értesítést kap az elutasításról.
+          </Step>
+          <Step n={4} title="Kérvény sablonok jóváhagyása">
+            Az oldal alján a PENDING_APPROVAL státuszú örökbefogadási kérdőív-sablonok is megjelennek.
+            Ellenőrizd a mezőket (nincs-e szenzitív vagy jogellenesen gyűjtött adat), majd fogadd el vagy utasítsd el.
+          </Step>
+          <Step n={5} title="Értesítések a várakozókról">
             Ha új jóváhagyásra váró elem érkezik, a Super Admin push-értesítést kap
             <Badge label="Kampány jóváhagyásra vár" color="bg-yellow-100 text-yellow-700 mx-1" /> és
             <Badge label="Sablon jóváhagyásra vár" color="bg-yellow-100 text-yellow-700" /> típussal.
           </Step>
         </div>
-        <QuickLink icon={CheckCircle2} label="Jóváhagyások" href="/dashboard/campaigns" />
+        <QuickLink icon={Heart} label="Gyűjtések" href="/dashboard/campaigns" />
+      </Section>
+
+      {/* Előfizetési csomagok */}
+      <Section id="s-csomagok" icon={CheckCircle2} title="Előfizetési csomagok áttekintése" color="bg-emerald-50 text-emerald-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A Super Admin read-only nézetben látja az összes menhely összes havi támogatói csomagját.
+          Ez az oldal nem szerkeszthető — a csomagokat a menhely adminisztrátorok kezelik a saját dashboardjukon.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Csomagok áttekintése">
+            Dashboard → Adományozás → Előfizetési csomagok. A táblázatban látható:
+            csomag neve, menhely neve + városа, összeg (Ft/hó), aktív előfizetők száma, aktív/inaktív állapot.
+            A sorok menhelyek szerint ABC-sorrendben, azon belül összeg szerint növekvően jelennek meg.
+          </Step>
+          <Step n={2} title="Kire vonatkozik?">
+            Hasznos a platform bevételi struktúrájának áttekintésekor: melyik menhely mennyi előfizetővel rendelkezik,
+            és milyen csomagokat kínál. Szerkesztéshez a menhely adminisztrátorát kell kérni.
+          </Step>
+        </div>
+        <QuickLink icon={CheckCircle2} label="Előfizetési csomagok" href="/dashboard/tiers" />
+      </Section>
+
+      {/* Előfizetések */}
+      <Section id="s-elofizetesek" icon={Users} title="Előfizetések kezelése" color="bg-violet-50 text-violet-800">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          A Super Admin az összes menhely összes előfizetését látja egy helyen. Ez az oldal a Menhely Admin
+          számára is elérhető, de ők csak a saját menhelyük előfizetéseit látják.
+        </p>
+        <div className="space-y-4 mt-3">
+          <Step n={1} title="Előfizetések listája">
+            Dashboard → Adományozás → Előfizetések. Minden sorban látható: előfizető neve, e-mail-je,
+            csomag neve, <strong>menhely neve</strong> (csak Super Adminnál jelenik meg),
+            összeg (HUF/hó), státusz, előfizetés kezdete.
+          </Step>
+          <Step n={2} title="Szűrés státusz szerint">
+            Az oldal tetején szűrhetsz:
+            <Badge label="Összes" color="bg-gray-100 text-gray-600 mx-1" />,
+            <Badge label="Aktív" color="bg-green-100 text-green-700 mx-1" />,
+            <Badge label="Lemondott" color="bg-red-100 text-red-600 mx-1" />.
+          </Step>
+          <Step n={3} title="Adminisztrátori lemondás">
+            Aktív előfizetésnél a sor végén megjelenik a „Lemondás" gomb.
+            Megerősítés után az előfizetés CANCELLED státuszba kerül.
+            Ezt csak kivételes esetben alkalmazd (pl. felhasználói kérésre, visszaéléskor).
+          </Step>
+          <Step n={4} title="Adatok exportálása">
+            Az Adományok CSV és Előfizetők CSV gombokkal exportálhatod a listát,
+            pl. pénzügyi riporthoz vagy könyvelési célokra.
+          </Step>
+        </div>
+        <QuickLink icon={Users} label="Előfizetések" href="/dashboard/subscriptions" />
       </Section>
 
       {/* Menhelyek kezelése */}
