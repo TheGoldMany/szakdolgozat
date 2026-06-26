@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
-import { FeedClient, type FeedItem } from "@/components/feed/feed-client";
+import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
 
@@ -19,7 +19,7 @@ export default async function HomePage() {
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroPhotos] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroPhotos, composerShelter] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
@@ -66,6 +66,13 @@ export default async function HomePage() {
         take: 3,
         select: { url: true },
       }),
+      // Shelter logo for post composer (SHELTER_ADMIN / SUPER_ADMIN only)
+      session?.user?.id && (session.user.role === "SHELTER_ADMIN" || session.user.role === "SUPER_ADMIN")
+        ? prisma.shelterAdmin.findFirst({
+            where:   { userId: session.user.id },
+            select:  { shelter: { select: { name: true, logoUrl: true } } },
+          })
+        : Promise.resolve(null),
     ]);
 
   // Kedvelt poszt-id-k a bejelentkezett felhasználóhoz.
@@ -92,26 +99,14 @@ export default async function HomePage() {
     likedByMe: likedIds.has(p.id),
   }));
 
-  // "Neked" feed: posztok közé szőtt kiemelő sávok (rails).
-  const rails: FeedItem[] = [];
-  if (railAnimals.length)
-    rails.push({ kind: "animals", animals: railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, shelterName: a.shelter.name, shelterLogoUrl: a.shelter.logoUrl ?? null, imageUrl: a.images[0]?.url ?? null })) });
-  if (railEvents.length)
-    rails.push({ kind: "events", events: railEvents.map((e) => ({ id: e.id, title: e.title, slug: e.slug, startsAt: e.startsAt.toISOString(), location: e.location })) });
-  if (railCampaigns.length)
-    rails.push({ kind: "campaigns", campaigns: railCampaigns.map((c) => ({ id: c.id, title: c.title, slug: c.slug, targetAmount: c.targetAmount, raisedAmount: c.raisedAmount, imageUrl: c.imageUrl ?? null, shelter: c.shelter ? { name: c.shelter.name, slug: c.shelter.slug, logoUrl: c.shelter.logoUrl ?? null } : null, user: c.user ? { name: c.user.name ?? null, image: c.user.image ?? null } : null })) });
-  if (railReports.length)
-    rails.push({ kind: "reports", reports: railReports });
+  const feedAnimals   = railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, shelterName: a.shelter.name, shelterLogoUrl: a.shelter.logoUrl ?? null, imageUrl: a.images[0]?.url ?? null }));
+  const feedEvents    = railEvents.map((e) => ({ id: e.id, title: e.title, slug: e.slug, startsAt: e.startsAt.toISOString(), location: e.location }));
+  const feedCampaigns = railCampaigns.map((c) => ({ id: c.id, title: c.title, slug: c.slug, targetAmount: c.targetAmount, raisedAmount: c.raisedAmount, imageUrl: c.imageUrl ?? null, shelter: c.shelter ? { name: c.shelter.name, slug: c.shelter.slug, logoUrl: c.shelter.logoUrl ?? null } : null, user: c.user ? { name: c.user.name ?? null, image: c.user.image ?? null } : null }));
+  const feedReports   = railReports;
 
-  const postItems: FeedItem[] = feedPosts.map((post) => ({ kind: "post", post }));
-  const feedItems: FeedItem[] = [];
-  let pi = 0;
-  for (const rail of rails) {
-    feedItems.push(rail);
-    feedItems.push(...postItems.slice(pi, pi + 2));
-    pi += 2;
-  }
-  feedItems.push(...postItems.slice(pi));
+  const composerInfo = (session?.user && composerShelter)
+    ? { userImage: session.user.image ?? null, userName: session.user.name ?? null, shelterName: composerShelter.shelter.name, shelterLogoUrl: composerShelter.shelter.logoUrl ?? null }
+    : null;
 
   const nextCursor = posts.length === POSTS_PER_PAGE ? posts[posts.length - 1].id : null;
   const photos = heroPhotos.map((p) => p.url).filter(Boolean);
@@ -226,8 +221,16 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {feedItems.length > 0 ? (
-            <FeedClient initialItems={feedItems} initialCursor={nextCursor} />
+          {(feedAnimals.length || feedCampaigns.length || feedEvents.length || feedPosts.length) ? (
+            <FeedClient
+              animals={feedAnimals}
+              campaigns={feedCampaigns}
+              events={feedEvents}
+              reports={feedReports}
+              initialPosts={feedPosts}
+              initialCursor={nextCursor}
+              composer={composerInfo}
+            />
           ) : (
             <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center">
               <PawPrint className="mx-auto mb-3 h-10 w-10 text-brand-200" />
