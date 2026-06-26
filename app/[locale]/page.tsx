@@ -40,7 +40,7 @@ export default async function HomePage() {
         where: { status: AnimalStatus.AVAILABLE },
         orderBy: { createdAt: "desc" },
         take: 10,
-        select: { id: true, name: true, slug: true, breed: true, shelter: { select: { city: true } }, images: { where: { isPrimary: true }, take: 1, select: { url: true } } },
+        select: { id: true, name: true, slug: true, breed: true, shelter: { select: { city: true, name: true, logoUrl: true } }, images: { where: { isPrimary: true }, take: 1, select: { url: true } } },
       }),
       prisma.event.findMany({
         where: { status: "PUBLISHED", startsAt: { gte: new Date() } },
@@ -52,7 +52,7 @@ export default async function HomePage() {
         where: { status: "ACTIVE" },
         orderBy: { createdAt: "desc" },
         take: 8,
-        select: { id: true, title: true, slug: true, targetAmount: true, raisedAmount: true },
+        select: { id: true, title: true, slug: true, targetAmount: true, raisedAmount: true, imageUrl: true, shelter: { select: { name: true, slug: true, logoUrl: true } }, user: { select: { name: true, image: true } } },
       }),
       prisma.animalReport.findMany({
         where: { status: ReportStatus.ACTIVE },
@@ -95,11 +95,11 @@ export default async function HomePage() {
   // "Neked" feed: posztok közé szőtt kiemelő sávok (rails).
   const rails: FeedItem[] = [];
   if (railAnimals.length)
-    rails.push({ kind: "animals", animals: railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, imageUrl: a.images[0]?.url ?? null })) });
+    rails.push({ kind: "animals", animals: railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, shelterName: a.shelter.name, shelterLogoUrl: a.shelter.logoUrl ?? null, imageUrl: a.images[0]?.url ?? null })) });
   if (railEvents.length)
     rails.push({ kind: "events", events: railEvents.map((e) => ({ id: e.id, title: e.title, slug: e.slug, startsAt: e.startsAt.toISOString(), location: e.location })) });
   if (railCampaigns.length)
-    rails.push({ kind: "campaigns", campaigns: railCampaigns });
+    rails.push({ kind: "campaigns", campaigns: railCampaigns.map((c) => ({ id: c.id, title: c.title, slug: c.slug, targetAmount: c.targetAmount, raisedAmount: c.raisedAmount, imageUrl: c.imageUrl ?? null, shelter: c.shelter ? { name: c.shelter.name, slug: c.shelter.slug, logoUrl: c.shelter.logoUrl ?? null } : null, user: c.user ? { name: c.user.name ?? null, image: c.user.image ?? null } : null })) });
   if (railReports.length)
     rails.push({ kind: "reports", reports: railReports });
 

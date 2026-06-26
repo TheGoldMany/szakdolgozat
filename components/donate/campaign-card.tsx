@@ -13,8 +13,8 @@ interface CampaignCardProps {
     targetAmount: number;
     raisedAmount: number;
     endsAt: string | null;
-    user: { name: string | null } | null;
-    shelter: { name: string; slug: string } | null;
+    user: { name: string | null; image?: string | null } | null;
+    shelter: { name: string; slug: string; logoUrl?: string | null } | null;
     _count: { donations: number };
   };
 }
@@ -80,15 +80,6 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           <div className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5 shrink-0" />
             <span>{t("donors", { count: campaign._count.donations })}</span>
-            {campaign.shelter && (
-              <>
-                <span className="text-gray-300">·</span>
-                <span className="font-medium text-gray-500">{campaign.shelter.name}</span>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-400">
-            <span>{t("startedBy", { name: campaign.user?.name ?? "–" })}</span>
           </div>
           {endsAtFormatted && (
             <div className="flex items-center gap-1.5">
@@ -98,6 +89,23 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
           )}
         </div>
       </div>
+
+      {/* Shelter / user avatar footer */}
+      {(campaign.shelter || campaign.user) && (() => {
+        const avatar = campaign.shelter?.logoUrl ?? campaign.user?.image ?? null;
+        const label  = campaign.shelter?.name ?? campaign.user?.name ?? null;
+        if (!label) return null;
+        return (
+          <div className="flex items-center gap-2 border-t border-gray-100 px-4 py-2.5">
+            <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-gray-100">
+              {avatar
+                ? <Image src={avatar} alt={label} fill className="object-cover" sizes="24px" />
+                : <span className="flex h-full w-full items-center justify-center text-[9px] font-bold text-gray-400">{label[0]}</span>}
+            </div>
+            <span className="truncate text-xs text-gray-500 font-medium">{label}</span>
+          </div>
+        );
+      })()}
     </Link>
   );
 }
