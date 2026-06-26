@@ -25,8 +25,8 @@ export default async function DonatePage() {
     prisma.campaign.findMany({
       where: { status: "ACTIVE" },
       include: {
-        user:    { select: { name: true } },
-        shelter: { select: { name: true, slug: true } },
+        user:    { select: { name: true, image: true } },
+        shelter: { select: { name: true, slug: true, logoUrl: true } },
         _count:  { select: { donations: true } },
       },
       orderBy: { createdAt: "desc" },
