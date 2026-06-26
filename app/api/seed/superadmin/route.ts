@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 
-export async function POST(req: NextRequest) {
-  if (process.env.NODE_ENV === "production") {
+// Only callable in Vercel preview or local dev — never in production
+export async function POST() {
+  const env = process.env.VERCEL_ENV;
+  if (env === "production") {
     return NextResponse.json({ error: "Not available in production" }, { status: 403 });
-  }
-
-  const token = req.headers.get("x-seed-token");
-  if (!process.env.SEED_SECRET || token !== process.env.SEED_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const password = await hash("123456", 12);
