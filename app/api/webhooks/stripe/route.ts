@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendDonationReceivedEmail, sendDonationThankYouEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail } from "@/lib/email";
+import { sendDonationReceivedEmail, sendDonationThankYouEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail, sendPaymentFailedEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
 // Disable body parsing — we need the raw body for signature verification
@@ -43,6 +43,78 @@ export async function POST(req: NextRequest) {
       where: { stripeSubId: stripeSub.id },
       data:  { status: "CANCELLED", cancelledAt: new Date() },
     });
+  }
+
+  // Subscription status changed (e.g. active → past_due → canceled) — keep DB in sync
+  if (event.type === "customer.subscription.updated") {
+    const stripeSub = event.data.object as Stripe.Subscription;
+    const status: "ACTIVE" | "PAST_DUE" | "CANCELLED" =
+      stripeSub.status === "active" || stripeSub.status === "trialing"
+        ? "ACTIVE"
+        : stripeSub.status === "past_due" || stripeSub.status === "unpaid"
+        ? "PAST_DUE"
+        : stripeSub.status === "canceled"
+        ? "CANCELLED"
+        : "ACTIVE";
+
+    await prisma.subscription.updateMany({
+      where: { stripeSubId: stripeSub.id },
+      data:  status === "CANCELLED"
+        ? { status, cancelledAt: new Date() }
+        : { status },
+    });
+    await prisma.sponsorship.updateMany({
+      where: { stripeSubId: stripeSub.id },
+      data:  status === "CANCELLED"
+        ? { status, cancelledAt: new Date() }
+        : { status },
+    });
+  }
+
+  // Recurring payment failed — mark PAST_DUE and notify the subscriber
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
+    const rawSub = invoice.subscription;
+    const stripeSubId = rawSub
+      ? (typeof rawSub === "string" ? rawSub : rawSub.id)
+      : null;
+    if (stripeSubId) {
+      const sub = await prisma.subscription.findUnique({
+        where:   { stripeSubId },
+        include: {
+          user: { select: { id: true, email: true, name: true } },
+          tier: { include: { shelter: { select: { name: true } } } },
+        },
+      });
+
+      if (sub) {
+        await prisma.subscription.update({
+          where: { id: sub.id },
+          data:  { status: "PAST_DUE" },
+        });
+
+        if (sub.user) {
+          const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(sub.tier.amount);
+          createNotification({
+            userId: sub.user.id,
+            type:   "SUBSCRIPTION_PAYMENT_FAILED",
+            title:  "Sikertelen havi fizetés",
+            body:   `${sub.tier.name} – ${amountStr}/hó (${sub.tier.shelter.name}). Kérjük ellenőrizd a kártyádat.`,
+            href:   "/profile",
+          }).catch((err) => console.error("Payment-failed notification error:", err));
+
+          if (sub.user.email) {
+            sendPaymentFailedEmail({
+              to:          sub.user.email,
+              name:        sub.user.name ?? "Felhasználó",
+              shelterName: sub.tier.shelter.name,
+              tierName:    sub.tier.name,
+              amount:      sub.tier.amount,
+            }).catch((err) => console.error("Payment-failed email error:", err));
+          }
+        }
+      }
+    }
   }
 
   if (event.type === "checkout.session.completed") {

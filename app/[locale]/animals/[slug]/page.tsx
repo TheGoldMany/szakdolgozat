@@ -19,10 +19,31 @@ import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const animal = await prisma.animal.findUnique({
-    where: { slug: params.slug }, select: { name: true, breed: true },
+    where:  { slug: params.slug },
+    select: {
+      name: true, breed: true, description: true,
+      images: { where: { isPrimary: true }, take: 1, select: { url: true } },
+    },
   });
   if (!animal) return { title: "Not found" };
-  return { title: `${animal.name}${animal.breed ? ` – ${animal.breed}` : ""}` };
+
+  const title       = `${animal.name}${animal.breed ? ` – ${animal.breed}` : ""}`;
+  const description = animal.description?.slice(0, 160) ?? `Ismerd meg ${animal.name} állatot, aki gazdira vár.`;
+  const image       = animal.images[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title, description, type: "article",
+      ...(image ? { images: [{ url: image, alt: animal.name }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title, description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
 }
 
 function Trait({ ok, label }: { ok: boolean | null; label: string }) {

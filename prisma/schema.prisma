@@ -1013,6 +1013,7 @@ enum NotificationType {
   DONATION_RECEIVED // Admin: new donation received
   SUBSCRIPTION_STARTED // User: subscription confirmed
   SUBSCRIPTION_CANCELLED // User: subscription cancelled
+  SUBSCRIPTION_PAYMENT_FAILED // User: recurring payment failed
   // Virtual adoption / sponsorship
   SPONSORSHIP_STARTED // User: virtual adoption confirmed
   SPONSOR_UPDATE // Virtual owner: sponsored animal updated (health/photo/adopted)

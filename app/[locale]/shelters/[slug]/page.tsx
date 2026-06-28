@@ -19,11 +19,31 @@ import type { FosterStatus } from "@prisma/client";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const [shelter, t] = await Promise.all([
-    prisma.shelter.findUnique({ where: { slug: params.slug }, select: { name: true, city: true } }),
+    prisma.shelter.findUnique({
+      where:  { slug: params.slug },
+      select: { name: true, city: true, description: true, logoUrl: true, coverUrl: true },
+    }),
     getTranslations("shelters"),
   ]);
   if (!shelter) return { title: t("notFound") };
-  return { title: `${shelter.name} – ${shelter.city}` };
+
+  const title       = `${shelter.name} – ${shelter.city}`;
+  const description = shelter.description?.slice(0, 160) ?? `${shelter.name} (${shelter.city}) – nézd meg az örökbefogadható állatokat.`;
+  const image       = shelter.coverUrl ?? shelter.logoUrl ?? undefined;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title, description, type: "website",
+      ...(image ? { images: [{ url: image, alt: shelter.name }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title, description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
 }
 
 export default async function ShelterDetailPage({ params }: { params: { slug: string } }) {

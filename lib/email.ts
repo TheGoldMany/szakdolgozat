@@ -243,6 +243,44 @@ export async function sendSubscriptionConfirmationEmail(opts: {
   });
 }
 
+export async function sendPaymentFailedEmail(opts: {
+  to:           string;
+  name:         string;
+  shelterName:  string;
+  tierName:     string;
+  amount:       number;
+}) {
+  await sendNotificationEmail(opts.to, async () => {
+    await sendEmail(opts.to, `Sikertelen fizetés – ÁllatiMenhelyek.hu`, `
+        <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+          <h1 style="font-size:22px;font-weight:700;color:#b91c1c;margin-bottom:8px">
+            Sikertelen havi fizetés
+          </h1>
+          <p style="color:#374151;font-size:14px;line-height:1.6">
+            Kedves ${opts.name}!<br/>
+            A(z) <strong>${opts.shelterName}</strong> menhely <strong>${opts.tierName}</strong>
+            csomagjának havi díját nem sikerült levonni a kártyádról.
+          </p>
+          <div style="background:#fef2f2;border-radius:12px;padding:20px;text-align:center;margin:20px 0">
+            <span style="font-size:24px;font-weight:700;color:#b91c1c">
+              ${opts.amount.toLocaleString("hu-HU")} Ft / hó
+            </span>
+          </div>
+          <p style="color:#374151;font-size:13px;line-height:1.6">
+            Kérjük, ellenőrizd a kártyaadataidat. A Stripe automatikusan újra megpróbálja a levonást
+            a következő napokban. Ha többszöri próbálkozás után sem sikerül, az előfizetés megszűnik.
+          </p>
+          <a href="${BASE}/profile"
+             style="display:inline-block;margin:8px 0;background:#dc2626;color:#fff;font-weight:600;
+                    font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+            Előfizetéseim kezelése
+          </a>
+          ${emailFooter(opts.to)}
+        </div>
+      `);
+  });
+}
+
 export async function sendEventRegistrationEmail(opts: {
   to:            string;
   name:          string;
