@@ -1037,6 +1037,8 @@ enum NotificationType {
   SHELTER_SUSPENDED    // Shelter admin: shelter suspended by super admin
   SHELTER_REACTIVATED  // Shelter admin: shelter reactivated by super admin
   SHELTER_DELETED      // Shelter admin: shelter deleted by super admin
+  SHELTER_REGISTRATION_PENDING // Super admin: a new shelter self-registered, awaiting verification
+  SHELTER_VERIFIED     // Shelter admin: shelter approved/verified by super admin
 }
 
 model Notification {

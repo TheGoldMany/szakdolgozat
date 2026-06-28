@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { PawPrint, Heart, Shield, Bell, MailCheck } from "lucide-react";
+import { PawPrint, Heart, Shield, Bell, MailCheck, Building2 } from "lucide-react";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -256,6 +256,16 @@ export default function RegisterPage() {
                   {t("signInLink")}
                 </Link>
               </p>
+
+              <div className="border-t border-gray-100 pt-4 text-center">
+                <Link
+                  href="/auth/register/shelter"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:underline"
+                >
+                  <Building2 className="h-4 w-4" />
+                  {t("registerAsShelter")}
+                </Link>
+              </div>
             </form>
           </div>
           )}

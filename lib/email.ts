@@ -673,6 +673,36 @@ export async function sendShelterReactivatedEmail(opts: {
     `);
 }
 
+export async function sendShelterVerifiedEmail(opts: {
+  to:          string;
+  adminName:   string;
+  shelterName: string;
+  shelterSlug: string;
+}) {
+  await sendEmail(opts.to, `Menhelyed jóváhagyva: ${opts.shelterName} – ÁllatiMenhelyek.hu`, `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
+        <h1 style="font-size:22px;font-weight:700;color:#1d4ed8;margin-bottom:8px">
+          Menhelyed hitelesítve! ✓
+        </h1>
+        <p style="color:#374151;font-size:14px;line-height:1.6">
+          Kedves ${opts.adminName}!<br/>
+          A(z) <strong>${opts.shelterName}</strong> menhelyet a moderátoraink jóváhagyták.
+          Mostantól <strong>hitelesített</strong> jelzéssel jelenik meg a platformon, ami növeli
+          a látogatók bizalmát.
+        </p>
+        <div style="background:#eff6ff;border-radius:12px;padding:16px;text-align:center;margin:20px 0">
+          <span style="font-size:14px;font-weight:600;color:#1d4ed8">✓ Hitelesített menhely</span>
+        </div>
+        <a href="${BASE}/shelters/${opts.shelterSlug}"
+           style="display:inline-block;margin:8px 0;background:#2563eb;color:#fff;font-weight:600;
+                  font-size:14px;padding:12px 28px;border-radius:12px;text-decoration:none">
+          Menhely megtekintése
+        </a>
+        ${SYSTEM_FOOTER}
+      </div>
+    `);
+}
+
 export async function sendShelterDeletedEmail(opts: {
   to:          string;
   adminName:   string;
