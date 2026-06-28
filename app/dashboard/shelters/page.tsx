@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Plus, Building2, MapPin, Phone, Mail, ExternalLink,
-  BadgeCheck, Power, Loader2, Trash2, AlertTriangle,
+  BadgeCheck, Power, Loader2, Trash2, AlertTriangle, Clock,
 } from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
@@ -92,6 +92,8 @@ export default function DashboardSheltersPage() {
     load();
   }
 
+  const pending = shelters.filter((s) => s.isActive && !s.isVerified);
+
   return (
     <div className="space-y-6">
       {/* Fejléc */}
@@ -111,6 +113,24 @@ export default function DashboardSheltersPage() {
           {t("sheltersAddButton")}
         </button>
       </div>
+
+      {/* Jóváhagyásra váró menhelyek bannere */}
+      {!loading && pending.length > 0 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100">
+            <Clock className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-blue-900">
+              {pending.length} menhely vár hitelesítésre
+            </p>
+            <p className="mt-0.5 text-xs text-blue-700">
+              Önregisztrált menhelyek. Ellenőrizd az adataikat, majd a{" "}
+              <BadgeCheck className="inline h-3.5 w-3.5" /> Hitelesítés gombbal hagyd jóvá őket.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Hozzáadás panel */}
       {showForm && (
@@ -186,7 +206,13 @@ export default function DashboardSheltersPage() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {shelters.map((shelter) => (
-                <tr key={shelter.id} className={cn("transition-colors", shelter.isActive ? "hover:bg-gray-50" : "bg-amber-50/40 hover:bg-amber-50")}>
+                <tr key={shelter.id} className={cn("transition-colors",
+                  !shelter.isActive
+                    ? "bg-amber-50/40 hover:bg-amber-50"
+                    : !shelter.isVerified
+                    ? "bg-blue-50/40 hover:bg-blue-50"
+                    : "hover:bg-gray-50"
+                )}>
                   <td className="px-4 py-3">
                     <p className="font-semibold text-gray-900">{shelter.name}</p>
                     <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400">

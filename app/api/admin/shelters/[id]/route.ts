@@ -8,6 +8,7 @@ import {
   sendShelterSuspendedEmail,
   sendShelterReactivatedEmail,
   sendShelterDeletedEmail,
+  sendShelterVerifiedEmail,
 } from "@/lib/email";
 
 const patchSchema = z.object({
@@ -23,9 +24,11 @@ async function getShelterWithAdmins(id: string) {
   return prisma.shelter.findUnique({
     where: { id },
     select: {
-      id:       true,
-      name:     true,
-      isActive: true,
+      id:         true,
+      name:       true,
+      slug:       true,
+      isActive:   true,
+      isVerified: true,
       admins: {
         select: {
           user: { select: { id: true, name: true, email: true } },
@@ -82,6 +85,30 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         const fn = suspended ? sendShelterSuspendedEmail : sendShelterReactivatedEmail;
         fn({ to: u.email, adminName: u.name ?? u.email, shelterName: shelter.name })
           .catch((err) => console.error("[shelter status email]", err));
+      }
+    }
+
+    // Notify when shelter gets verified (false → true)
+    if (parsed.data.isVerified === true && !shelter.isVerified) {
+      const adminUsers = shelter.admins.map((a) => a.user);
+
+      void createNotifications(
+        adminUsers.map((u) => ({
+          userId: u.id,
+          type:   "SHELTER_VERIFIED" as const,
+          title:  "Menhely hitelesítve",
+          body:   `${shelter.name} – mostantól hitelesített jelzéssel jelenik meg.`,
+          href:   "/dashboard",
+        }))
+      ).catch((err) => console.error("[shelter verified notification]", err));
+
+      for (const u of adminUsers) {
+        sendShelterVerifiedEmail({
+          to:          u.email,
+          adminName:   u.name ?? u.email,
+          shelterName: shelter.name,
+          shelterSlug: shelter.slug,
+        }).catch((err) => console.error("[shelter verified email]", err));
       }
     }
 
