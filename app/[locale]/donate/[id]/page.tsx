@@ -19,11 +19,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const t = await getTranslations("donate");
   const campaign = await prisma.campaign.findUnique({
-    where: { id: params.id },
-    select: { title: true },
+    where:  { id: params.id },
+    select: { title: true, description: true, imageUrl: true },
   });
   if (!campaign) return { title: t("notFound") };
-  return { title: campaign.title };
+
+  const description = campaign.description?.slice(0, 160) ?? campaign.title;
+  const image       = campaign.imageUrl ?? undefined;
+
+  return {
+    title: campaign.title,
+    description,
+    openGraph: {
+      title: campaign.title, description, type: "article",
+      ...(image ? { images: [{ url: image, alt: campaign.title }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title: campaign.title, description,
+      ...(image ? { images: [image] } : {}),
+    },
+  };
 }
 
 export default async function CampaignDetailPage({
