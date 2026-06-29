@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,7 +94,14 @@ function LoginForm() {
       }
       return;
     }
-    router.push(callbackUrl);
+    // Admin szerepkör + nincs explicit cél → irány a dashboard (új menhelyek itt kapják a bemutatót)
+    let dest = callbackUrl;
+    if (callbackUrl === "/") {
+      const session = await getSession();
+      const role = (session?.user as { role?: string } | undefined)?.role;
+      if (role === "SHELTER_ADMIN" || role === "SUPER_ADMIN") dest = "/dashboard";
+    }
+    router.push(dest);
     router.refresh();
   }
 

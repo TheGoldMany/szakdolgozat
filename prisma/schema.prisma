@@ -109,6 +109,7 @@ model User {
   birthDate                DateTime?
   deletionScheduledAt      DateTime?
   emailNotifications       Boolean   @default(true)
+  dashboardTourSeen        Boolean   @default(false)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 

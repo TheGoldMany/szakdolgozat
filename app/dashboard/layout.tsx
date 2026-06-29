@@ -6,10 +6,12 @@ import { NextIntlClientProvider } from "next-intl";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
+import { DashboardTourLauncher } from "@/components/onboarding/dashboard-tour-launcher";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -34,6 +36,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const role = session.user.role;
   if (role !== "SHELTER_ADMIN" && role !== "SUPER_ADMIN") redirect("/");
+
+  // Auto-start the guided tour for shelter admins who haven't seen it yet
+  const dbUser = session.user.id
+    ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { dashboardTourSeen: true } })
+    : null;
+  const autoStartTour = role === "SHELTER_ADMIN" && dbUser?.dashboardTourSeen === false;
 
   // Read locale from cookie set by next-intl middleware (NEXT_LOCALE cookie)
   const cookieStore = await cookies();
@@ -61,6 +69,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
               <Footer />
             </div>
+            <DashboardTourLauncher autoStart={autoStartTour} />
           </Providers>
         </NextIntlClientProvider>
       </body>

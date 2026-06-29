@@ -6,7 +6,7 @@ import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
   ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
-  UserCog, MessagesSquare,
+  UserCog, MessagesSquare, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -14,17 +14,19 @@ import { useTranslations } from "next-intl";
 type IconType = typeof LayoutDashboard;
 
 interface NavItem { href: string; icon: IconType; labelKey: string; roles: string[] }
-interface NavGroup { titleKey: string | null; items: NavItem[] }
+interface NavGroup { titleKey: string | null; tourKey?: string; items: NavItem[] }
 
 const NAV_GROUPS: NavGroup[] = [
   {
     titleKey: null,
+    tourKey: "nav-overview",
     items: [
       { href: "/dashboard", icon: LayoutDashboard, labelKey: "navOverview", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
   {
     titleKey: "groupAnimals",
+    tourKey: "group-animals",
     items: [
       { href: "/dashboard/animals",   icon: PawPrint,        labelKey: "navAnimals",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/kennels",   icon: DoorOpen,        labelKey: "navKennels",   roles: ["SHELTER_ADMIN"] },
@@ -35,6 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "groupAdoption",
+    tourKey: "group-adoption",
     items: [
       { href: "/dashboard/applications", icon: ClipboardList, labelKey: "navApplications", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/appointments", icon: CalendarDays,  labelKey: "navAppointments", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
@@ -44,6 +47,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "groupCommunity",
+    tourKey: "group-community",
     items: [
       { href: "/dashboard/posts",      icon: MessagesSquare, labelKey: "navPosts",      roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/volunteers", icon: HandHeart,      labelKey: "navVolunteers", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
@@ -54,6 +58,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "groupDonation",
+    tourKey: "group-donation",
     items: [
       { href: "/dashboard/tiers",         icon: Heart,          labelKey: "navTiers",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/campaigns",     icon: ClipboardCheck, labelKey: "navCampaigns",     roles: ["SUPER_ADMIN"] },
@@ -62,6 +67,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "groupPlatform",
+    tourKey: "group-platform",
     items: [
       { href: "/dashboard/shelters", icon: Building2, labelKey: "navShelters", roles: ["SUPER_ADMIN"] },
       { href: "/dashboard/users",    icon: Users,     labelKey: "navUsers",    roles: ["SUPER_ADMIN"] },
@@ -69,6 +75,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "groupSettings",
+    tourKey: "group-settings",
     items: [
       { href: "/profile/admin",      icon: UserCog, labelKey: "navProfileAdmin",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/settings", icon: Settings, labelKey: "navShelterSettings", roles: ["SHELTER_ADMIN"] },
@@ -92,7 +99,7 @@ export function SidebarNav({ role }: { role: string }) {
   return (
     <nav className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
       {groups.map((group, gi) => (
-        <div key={gi} className={cn(gi > 0 && "mt-4")}>
+        <div key={gi} className={cn(gi > 0 && "mt-4")} data-tour={group.tourKey}>
           {group.titleKey && (
             <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
               {t(group.titleKey)}
@@ -120,6 +127,18 @@ export function SidebarNav({ role }: { role: string }) {
           </div>
         </div>
       ))}
+
+      {/* Bemutató (tutoriál) újraindítása */}
+      <div className="mt-4 border-t border-gray-100 pt-3">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event("start-dashboard-tour"))}
+          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-brand-50 hover:text-brand-600"
+        >
+          <Sparkles className="h-4 w-4 shrink-0 text-gray-400" />
+          {t("navRestartTour")}
+        </button>
+      </div>
     </nav>
   );
 }
