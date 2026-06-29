@@ -3,7 +3,8 @@
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { useTranslations } from "next-intl";
-import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info, ExternalLink } from "lucide-react";
+import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info, ExternalLink, MapPin } from "lucide-react";
+import { LocationPicker } from "@/components/ui/location-picker";
 
 interface ShelterDoc {
   id:        string;
@@ -20,6 +21,10 @@ interface Props {
     logoUrl:                 string | null;
     adoptionRequirements:    string | null;
     capacity:                number | null;
+    city:                    string | null;
+    address:                 string | null;
+    lat:                     number | null;
+    lng:                     number | null;
     documents:               ShelterDoc[];
     companyName:             string | null;
     taxNumber:               string | null;
@@ -60,6 +65,41 @@ export function ShelterSettingsForm({ shelter }: Props) {
   const [requirements, setRequirements] = useState(shelter.adoptionRequirements ?? "");
   const [reqSaving,    setReqSaving]    = useState(false);
   const [reqSaved,     setReqSaved]     = useState(false);
+
+  // --- Location ---
+  const [loc, setLoc] = useState<{ lat: number | null; lng: number | null; city: string; address: string }>({
+    lat:     shelter.lat,
+    lng:     shelter.lng,
+    city:    shelter.city ?? "",
+    address: shelter.address ?? "",
+  });
+  const [locSaving, setLocSaving] = useState(false);
+  const [locSaved,  setLocSaved]  = useState(false);
+  const [locError,  setLocError]  = useState("");
+
+  async function saveLocation() {
+    if (loc.lat == null || loc.lng == null) {
+      setLocError("Előbb jelölj ki egy pontot a térképen.");
+      return;
+    }
+    setLocSaving(true);
+    setLocSaved(false);
+    setLocError("");
+    try {
+      const res = await fetch(`/api/shelters/${shelter.id}/location`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ lat: loc.lat, lng: loc.lng, city: loc.city || undefined, address: loc.address || undefined }),
+      });
+      if (!res.ok) throw new Error();
+      setLocSaved(true);
+      setTimeout(() => setLocSaved(false), 3000);
+    } catch {
+      setLocError(t("settingsSaveFailed"));
+    } finally {
+      setLocSaving(false);
+    }
+  }
 
   // --- Stripe Connect ---
   const [stripeLoading,   setStripeLoading]   = useState(false);
@@ -344,6 +384,43 @@ export function ShelterSettingsForm({ shelter }: Props) {
             </p>
             {logoError && <p className="mt-1 text-xs text-red-500">{logoError}</p>}
           </div>
+        </div>
+      </div>
+
+      {/* Helyszín a térképen */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="mb-1 flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-gray-500" />
+          <h2 className="text-sm font-semibold text-gray-700">Helyszín a térképen</h2>
+        </div>
+        <p className="mb-4 text-xs text-gray-400">
+          Jelöld ki a menhely pontos helyét a térképen — ez alapján jelenik meg a nyilvános térképen.
+          Kattints a térképre a pozíció beállításához.
+        </p>
+
+        {loc.lat == null && (
+          <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <p className="text-sm text-amber-800">
+              Ennek a menhelynek még nincs koordinátája, ezért nem jelenik meg a térképen. Jelöld ki lent!
+            </p>
+          </div>
+        )}
+
+        <LocationPicker
+          lat={loc.lat}
+          lng={loc.lng}
+          onChange={(d) => setLoc({ lat: d.lat, lng: d.lng, city: d.city || loc.city, address: d.address || loc.address })}
+        />
+
+        <div className="mt-4 flex items-center gap-3">
+          <button type="button" onClick={saveLocation} disabled={locSaving}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
+            <Save className="h-4 w-4" />
+            {locSaving ? t("settingsSaving") : t("settingsSave")}
+          </button>
+          {locSaved && <span className="text-sm text-brand-600">{t("settingsSaved")}</span>}
+          {locError && <span className="text-sm text-red-500">{locError}</span>}
         </div>
       </div>
 
