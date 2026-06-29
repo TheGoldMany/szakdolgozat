@@ -6,6 +6,7 @@ import { shelterRegisterSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { issueVerificationToken } from "@/lib/verification";
 import { createNotifications } from "@/lib/notifications";
+import { geocodeAddress } from "@/lib/geo";
 
 function slugify(text: string) {
   return text
@@ -46,6 +47,14 @@ export async function POST(req: NextRequest) {
 
     const hashed = await hash(d.password, 10);
 
+    // Cím → koordináta, hogy a menhely megjelenjen a térképen (hibatűrő)
+    const coords = await geocodeAddress({
+      address: d.address,
+      city:    d.city,
+      zipCode: d.zipCode,
+      country: "Hungary",
+    });
+
     const { shelter } = await prisma.$transaction(async (tx) => {
       // Admin fiók — email NINCS megerősítve, a felhasználónak igazolnia kell (mint a sima regisztrációnál)
       const adminUser = await tx.user.create({
@@ -71,6 +80,8 @@ export async function POST(req: NextRequest) {
           country:     "HU",
           isActive:    true,
           isVerified:  false,
+          lat:         coords?.lat ?? null,
+          lng:         coords?.lng ?? null,
         },
       });
 
