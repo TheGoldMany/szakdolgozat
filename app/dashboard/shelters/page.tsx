@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Plus, Building2, MapPin, Phone, Mail, ExternalLink,
-  BadgeCheck, Power, Loader2, Trash2, AlertTriangle, Clock,
+  BadgeCheck, Power, Loader2, Trash2, AlertTriangle, Clock, MapPinned,
 } from "lucide-react";
 import { AddShelterForm } from "@/components/dashboard/add-shelter-form";
 import { cn } from "@/lib/utils";
@@ -37,6 +37,7 @@ export default function DashboardSheltersPage() {
   const [loading, setLoading]           = useState(true);
   const [showForm, setShowForm]         = useState(false);
   const [busy, setBusy]                 = useState<string | null>(null);
+  const [geocoding, setGeocoding]       = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Shelter | null>(null);
 
   const load = useCallback(async () => {
@@ -92,6 +93,26 @@ export default function DashboardSheltersPage() {
     load();
   }
 
+  const geocodeMissing = useCallback(async () => {
+    setGeocoding(true);
+    try {
+      const res  = await fetch("/api/admin/shelters/geocode", { method: "POST" });
+      const json = await res.json();
+      if (res.ok) {
+        if (json.total === 0) {
+          toast.success("Minden menhelynek van már koordinátája.");
+        } else {
+          toast.success(`${json.updated} menhely koordinátája pótolva${json.failed ? `, ${json.failed} sikertelen` : ""}.`);
+        }
+        load();
+      } else {
+        toast.error(json.error ?? "Hiba történt.");
+      }
+    } finally {
+      setGeocoding(false);
+    }
+  }, [load]);
+
   const pending = shelters.filter((s) => s.isActive && !s.isVerified);
 
   return (
@@ -105,13 +126,24 @@ export default function DashboardSheltersPage() {
           </div>
           <p className="mt-1 text-sm text-gray-500">{t("sheltersCountLabel", { count: shelters.length })}</p>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          {t("sheltersAddButton")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={geocodeMissing}
+            disabled={geocoding}
+            title="Térképkoordináták pótlása a koordináta nélküli menhelyeknek"
+            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-60"
+          >
+            {geocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPinned className="h-4 w-4" />}
+            Koordináták pótlása
+          </button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            {t("sheltersAddButton")}
+          </button>
+        </div>
       </div>
 
       {/* Jóváhagyásra váró menhelyek bannere */}

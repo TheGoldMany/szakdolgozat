@@ -6,6 +6,7 @@ import { hash } from "bcryptjs";
 import { z } from "zod";
 import { Role } from "@prisma/client";
 import { sendShelterAdminInviteEmail } from "@/lib/email";
+import { geocodeAddress } from "@/lib/geo";
 
 const schema = z.object({
   // Menhely adatok
@@ -69,6 +70,14 @@ export async function POST(req: NextRequest) {
     const count = await prisma.shelter.count({ where: { slug: { startsWith: slug } } });
     if (count > 0) slug = `${slug}-${count + 1}`;
 
+    // Cím → koordináta, hogy a menhely megjelenjen a térképen (hibatűrő)
+    const coords = await geocodeAddress({
+      address: d.address,
+      city:    d.city,
+      zipCode: d.zipCode,
+      country: "Hungary",
+    });
+
     // Tranzakcióban hozzuk létre a menhelyt és az admin usert
     const result = await prisma.$transaction(async (tx) => {
       const hashed = await hash(d.adminPassword, 10);
@@ -106,6 +115,8 @@ export async function POST(req: NextRequest) {
           country:     "HU",
           isActive:    true,
           isVerified:  true,
+          lat:         coords?.lat ?? null,
+          lng:         coords?.lng ?? null,
         },
       });
 
