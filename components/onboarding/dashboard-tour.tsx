@@ -31,11 +31,16 @@ export function DashboardTour({ steps, autoStart }: { steps: TourStep[]; autoSta
     setActive(true);
   }, []);
 
-  // Auto-start once on first visit + manual restart via custom event
+  // Auto-start once on first visit + manual restart via custom event.
+  // Mark as seen as soon as it auto-opens, so it never reappears on its own
+  // even if the user navigates away mid-tour (the sidebar button can restart it).
   useEffect(() => {
     if (autoStart && !startedRef.current) {
       startedRef.current = true;
-      const t = setTimeout(start, 600); // let the dashboard settle
+      const t = setTimeout(() => {
+        start();
+        fetch("/api/onboarding", { method: "POST" }).catch(() => {});
+      }, 600); // let the dashboard settle
       return () => clearTimeout(t);
     }
   }, [autoStart, start]);
