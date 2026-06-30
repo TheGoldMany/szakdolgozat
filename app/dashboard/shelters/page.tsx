@@ -93,16 +93,20 @@ export default function DashboardSheltersPage() {
     load();
   }
 
-  const geocodeMissing = useCallback(async () => {
+  const geocode = useCallback(async (all: boolean) => {
     setGeocoding(true);
     try {
-      const res  = await fetch("/api/admin/shelters/geocode", { method: "POST" });
+      const res  = await fetch("/api/admin/shelters/geocode", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ all }),
+      });
       const json = await res.json();
       if (res.ok) {
         if (json.total === 0) {
-          toast.success("Minden menhelynek van már koordinátája.");
+          toast.success("Nincs feldolgozandó menhely.");
         } else {
-          toast.success(`${json.updated} menhely koordinátája pótolva${json.failed ? `, ${json.failed} sikertelen` : ""}.`);
+          toast.success(`${json.updated} menhely koordinátája ${all ? "frissítve" : "pótolva"}${json.failed ? `, ${json.failed} sikertelen` : ""}.`);
         }
         load();
       } else {
@@ -128,13 +132,22 @@ export default function DashboardSheltersPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={geocodeMissing}
+            onClick={() => geocode(false)}
             disabled={geocoding}
             title="Térképkoordináták pótlása a koordináta nélküli menhelyeknek"
             className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-60"
           >
             {geocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPinned className="h-4 w-4" />}
             Koordináták pótlása
+          </button>
+          <button
+            onClick={() => geocode(true)}
+            disabled={geocoding}
+            title="Az összes menhely újra-geokódolása a pontos címük alapján (felülírja a jelenlegi koordinátákat)"
+            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-60"
+          >
+            {geocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPinned className="h-4 w-4" />}
+            Pontosítás cím alapján
           </button>
           <button
             onClick={() => setShowForm(true)}
