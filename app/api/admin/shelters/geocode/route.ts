@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -6,16 +6,24 @@ import { geocodeAddress } from "@/lib/geo";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// POST /api/admin/shelters/geocode — geocode shelters that have no coordinates yet
-export async function POST() {
+// POST /api/admin/shelters/geocode — geocode shelters by address.
+// Body { all: true } re-geocodes every shelter (refine to exact address);
+// otherwise only shelters missing coordinates are processed.
+export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
   }
 
+  let all = false;
+  try {
+    const body = await req.json();
+    all = body?.all === true;
+  } catch { /* nincs body — marad a hiányzók pótlása */ }
+
   try {
     const missing = await prisma.shelter.findMany({
-      where:  { OR: [{ lat: null }, { lng: null }] },
+      where:  all ? undefined : { OR: [{ lat: null }, { lng: null }] },
       select: { id: true, address: true, city: true, zipCode: true },
     });
 

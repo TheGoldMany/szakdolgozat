@@ -91,33 +91,51 @@ export async function geocodeAddress(parts: {
   zipCode?: string | null;
   country?: string | null;
 }): Promise<{ lat: number; lng: number } | null> {
-  const query = [parts.address, parts.zipCode, parts.city, parts.country ?? "Hungary"]
-    .filter(Boolean)
-    .join(", ");
+  const country = parts.country ?? "Hungary";
 
-  if (query.trim()) {
-    try {
-      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(url, {
-        headers: { "User-Agent": "AllatiMenhelyek.hu/1.0 (shelter geocoding)" },
-        signal:  controller.signal,
-      });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const data = (await res.json()) as { lat: string; lon: string }[];
-        if (data.length) {
-          const lat = parseFloat(data[0].lat);
-          const lng = parseFloat(data[0].lon);
-          if (!Number.isNaN(lat) && !Number.isNaN(lng)) return { lat, lng };
-        }
-      }
-    } catch {
-      /* ignoráljuk – jön a városszintű tartalék */
-    }
+  // 1) Strukturált lekérdezés (utca/házszám + irányítószám + város) — ez a legpontosabb
+  if (parts.address?.trim()) {
+    const structured = new URLSearchParams({
+      street:     parts.address.trim(),
+      city:       parts.city ?? "",
+      postalcode: parts.zipCode ?? "",
+      country,
+      format:     "json",
+      limit:      "1",
+    });
+    const hit = await queryNominatim(`https://nominatim.openstreetmap.org/search?${structured}`);
+    if (hit) return hit;
   }
 
-  // Tartalék: város középpontja
+  // 2) Szabad szöveges lekérdezés (ha a strukturált nem talált)
+  const freeform = [parts.address, parts.zipCode, parts.city, country].filter(Boolean).join(", ");
+  if (freeform.trim()) {
+    const hit = await queryNominatim(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(freeform)}&format=json&limit=1`);
+    if (hit) return hit;
+  }
+
+  // 3) Tartalék: város középpontja
   return cityCentroid(parts.city);
+}
+
+/** Egyetlen Nominatim hívás – hibatűrő, koordinátát vagy null-t ad vissza. */
+async function queryNominatim(url: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, {
+      headers: { "User-Agent": "AllatiMenhelyek.hu/1.0 (shelter geocoding)" },
+      signal:  controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const data = (await res.json()) as { lat: string; lon: string }[];
+    if (!data.length) return null;
+    const lat = parseFloat(data[0].lat);
+    const lng = parseFloat(data[0].lon);
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+    return { lat, lng };
+  } catch {
+    return null;
+  }
 }
