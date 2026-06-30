@@ -92,11 +92,12 @@ export async function geocodeAddress(parts: {
   country?: string | null;
 }): Promise<{ lat: number; lng: number } | null> {
   const country = parts.country ?? "Hungary";
+  const street  = parts.address ? cleanStreet(parts.address) : "";
 
-  // 1) Strukturált lekérdezés (utca/házszám + irányítószám + város) — ez a legpontosabb
-  if (parts.address?.trim()) {
+  // 1) Strukturált lekérdezés (utca + házszám, lakás-kiegészítők nélkül) — ez a legpontosabb
+  if (street) {
     const structured = new URLSearchParams({
-      street:     parts.address.trim(),
+      street,
       city:       parts.city ?? "",
       postalcode: parts.zipCode ?? "",
       country,
@@ -107,8 +108,8 @@ export async function geocodeAddress(parts: {
     if (hit) return hit;
   }
 
-  // 2) Szabad szöveges lekérdezés (ha a strukturált nem talált)
-  const freeform = [parts.address, parts.zipCode, parts.city, country].filter(Boolean).join(", ");
+  // 2) Szabad szöveges lekérdezés (a megtisztított utcával)
+  const freeform = [street, parts.zipCode, parts.city, country].filter(Boolean).join(", ");
   if (freeform.trim()) {
     const hit = await queryNominatim(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(freeform)}&format=json&limit=1`);
     if (hit) return hit;
@@ -116,6 +117,17 @@ export async function geocodeAddress(parts: {
 
   // 3) Tartalék: város középpontja
   return cityCentroid(parts.city);
+}
+
+/**
+ * Lakcím megtisztítása geokódoláshoz: csak az utcanév + házszám marad,
+ * az emelet/ajtó/épület kiegészítők (pl. "A. 2/6", "fszt 3") levágva.
+ * "Bartók Béla út 83. A. 2/6" → "Bartók Béla út 83"
+ */
+function cleanStreet(address: string): string {
+  const trimmed = address.trim();
+  const m = trimmed.match(/^(.+?\s\d+)/); // utcanév az első házszámig
+  return (m ? m[1] : trimmed).replace(/[.,;\s]+$/, "").trim();
 }
 
 /** Egyetlen Nominatim hívás – hibatűrő, koordinátát vagy null-t ad vissza. */
