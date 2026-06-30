@@ -19,7 +19,8 @@ const createSchema = z.object({
   targetAmount: z.number().int().positive(),
   imageUrl:     z.string().url().optional().or(z.literal("")).optional(),
   endsAt:       z.string().datetime().optional().nullable(),
-  shelterId:    z.string().min(1, "Kérjük válassz egy menhelyt"),
+  shelterId:    z.string().optional().nullable(), // opcionális – menhelyhez köthető
+  animalId:     z.string().optional().nullable(), // opcionális – állathoz köthető
 });
 
 // GET /api/campaigns – list ACTIVE campaigns
@@ -55,7 +56,34 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
 
+  // Csak az indíthat gyűjtést, akinek a saját Stripe fiókja be van kötve és aktív,
+  // hogy az adományok be tudjanak folyni (menhely nélküli gyűjtésnél is).
+  const creator = await prisma.user.findUnique({
+    where:  { id: session.user.id },
+    select: { stripeOnboardingComplete: true },
+  });
+  if (!creator?.stripeOnboardingComplete) {
+    return NextResponse.json(
+      { error: "Gyűjtés indításához előbb csatlakoztatnod kell a Stripe fiókodat." },
+      { status: 402 }
+    );
+  }
+
   try {
+    // Opcionális állat-kötés validálása; ha van állat, a menhelyt is abból vesszük
+    let shelterId = d.shelterId || null;
+    if (d.animalId) {
+      const animal = await prisma.animal.findUnique({
+        where:  { id: d.animalId },
+        select: { id: true, shelterId: true },
+      });
+      if (!animal) {
+        return NextResponse.json({ error: "A kiválasztott állat nem található." }, { status: 400 });
+      }
+      // Ha állatot köt, de menhelyt nem, az állat menhelyét használjuk
+      if (!shelterId) shelterId = animal.shelterId;
+    }
+
     // Generate unique slug: slugified-title + random suffix
     const baseSlug = slugify(d.title);
     const suffix   = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
@@ -64,7 +92,8 @@ export async function POST(req: NextRequest) {
     const campaign = await prisma.campaign.create({
       data: {
         userId:       session.user.id,
-        shelterId:    d.shelterId ?? null,
+        shelterId,
+        animalId:     d.animalId || null,
         title:        d.title,
         slug,
         description:  d.description,

@@ -3,14 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 
-interface Shelter {
-  id: string;
-  name: string;
-}
+interface Shelter { id: string; name: string }
+interface Animal  { id: string; name: string; breed: string | null }
 
-export function NewCampaignForm() {
+export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -18,22 +16,54 @@ export function NewCampaignForm() {
   const [imageUploading, setImageUploading] = useState(false);
   const [endsAt, setEndsAt] = useState("");
   const [shelterId, setShelterId] = useState("");
+  const [animalId, setAnimalId] = useState("");
   const [shelters, setShelters] = useState<Shelter[]>([]);
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [animalsLoading, setAnimalsLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [stripeLoading, setStripeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!stripeConnected) return;
     fetch("/api/shelters/list")
       .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setShelters(data);
-      })
-      .catch(() => {
-        // shelters list endpoint may not be available – silently skip
+      .then((data) => { if (Array.isArray(data)) setShelters(data); })
+      .catch(() => {});
+  }, [stripeConnected]);
+
+  // Load the selected shelter's animals for the optional animal link
+  useEffect(() => {
+    setAnimalId("");
+    setAnimals([]);
+    if (!shelterId) return;
+    setAnimalsLoading(true);
+    fetch(`/api/animals?shelterId=${shelterId}&status=AVAILABLE&limit=100`)
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data?.animals)) setAnimals(data.animals); })
+      .catch(() => {})
+      .finally(() => setAnimalsLoading(false));
+  }, [shelterId]);
+
+  async function connectStripe() {
+    setStripeLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/stripe/connect/onboard", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ type: "user" }),
       });
-  }, []);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Hiba a Stripe csatlakozáskor.");
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ismeretlen hiba.");
+      setStripeLoading(false);
+    }
+  }
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -61,7 +91,6 @@ export function NewCampaignForm() {
     if (!title.trim()) { setError("A cím megadása kötelező."); return; }
     if (!description.trim()) { setError("A leírás megadása kötelező."); return; }
     if (isNaN(parsed) || parsed < 1000) { setError("A célösszeg minimum 1 000 Ft legyen."); return; }
-    if (!shelterId) { setError("Kérjük válassz egy menhelyt."); return; }
 
     setLoading(true);
     setError(null);
@@ -70,10 +99,11 @@ export function NewCampaignForm() {
         title: title.trim(),
         description: description.trim(),
         targetAmount: parsed,
-        shelterId,
       };
-      if (imageUrl) body.imageUrl = imageUrl;
-      if (endsAt) body.endsAt = new Date(endsAt).toISOString();
+      if (shelterId) body.shelterId = shelterId;
+      if (animalId)  body.animalId  = animalId;
+      if (imageUrl)  body.imageUrl  = imageUrl;
+      if (endsAt)    body.endsAt    = new Date(endsAt).toISOString();
 
       const res = await fetch("/api/campaigns", {
         method: "POST",
@@ -100,6 +130,32 @@ export function NewCampaignForm() {
         <p className="text-sm text-gray-600">
           Gyűjtésed admin jóváhagyásra vár. Értesítünk, amint elfogadják.
         </p>
+      </div>
+    );
+  }
+
+  // Stripe nincs bekötve → nem indítható gyűjtés
+  if (!stripeConnected) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100">
+          <CreditCard className="h-6 w-6 text-amber-600" />
+        </div>
+        <h2 className="text-lg font-bold text-gray-900">Előbb kösd be a Stripe fiókod</h2>
+        <p className="text-sm text-gray-600">
+          Gyűjtést csak csatlakoztatott Stripe fiókkal indíthatsz, hogy az adományok
+          közvetlenül hozzád (vagy a választott menhelyhez) érkezhessenek.
+        </p>
+        <button
+          type="button"
+          onClick={connectStripe}
+          disabled={stripeLoading}
+          className="mt-2 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
+        >
+          {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
+          Stripe fiók csatlakoztatása
+        </button>
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
     );
   }
@@ -184,26 +240,48 @@ export function NewCampaignForm() {
         />
       </div>
 
-      {/* Shelter select – required */}
+      {/* Shelter select – OPTIONAL */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Melyik menhelyért gyűjtesz? <span className="text-red-500">*</span>
+          Melyik menhelyért gyűjtesz? <span className="text-gray-400">(opcionális)</span>
         </label>
         <select
-          required
           value={shelterId}
           onChange={(e) => setShelterId(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white"
         >
-          <option value="">– Válassz menhelyt –</option>
+          <option value="">– Nincs menhelyhez kötve –</option>
           {shelters.map((s) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
-        {shelters.length === 0 && (
-          <p className="mt-1 text-xs text-gray-400">Menhelyek betöltése…</p>
-        )}
       </div>
+
+      {/* Animal select – OPTIONAL, only when a shelter is chosen */}
+      {shelterId && (
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            Konkrét állathoz kötöd? <span className="text-gray-400">(opcionális)</span>
+          </label>
+          <select
+            value={animalId}
+            onChange={(e) => setAnimalId(e.target.value)}
+            disabled={animalsLoading}
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white disabled:opacity-60"
+          >
+            <option value="">– Nincs konkrét állat –</option>
+            {animals.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}{a.breed ? ` – ${a.breed}` : ""}
+              </option>
+            ))}
+          </select>
+          {animalsLoading && <p className="mt-1 text-xs text-gray-400">Állatok betöltése…</p>}
+          {!animalsLoading && animals.length === 0 && (
+            <p className="mt-1 text-xs text-gray-400">Ennek a menhelynek nincs elérhető állata.</p>
+          )}
+        </div>
+      )}
 
       {error && (
         <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
