@@ -56,18 +56,11 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
 
-  // Csak az indíthat gyűjtést, akinek a saját Stripe fiókja be van kötve és aktív,
-  // hogy az adományok be tudjanak folyni (menhely nélküli gyűjtésnél is).
+  // A gyűjtés indítójának saját Stripe fiókja (tartalék célpont, ha nincs menhely)
   const creator = await prisma.user.findUnique({
     where:  { id: session.user.id },
     select: { stripeOnboardingComplete: true },
   });
-  if (!creator?.stripeOnboardingComplete) {
-    return NextResponse.json(
-      { error: "Gyűjtés indításához előbb csatlakoztatnod kell a Stripe fiókodat." },
-      { status: 402 }
-    );
-  }
 
   try {
     // Opcionális állat-kötés validálása; ha van állat, a menhelyt is abból vesszük
@@ -82,6 +75,21 @@ export async function POST(req: NextRequest) {
       }
       // Ha állatot köt, de menhelyt nem, az állat menhelyét használjuk
       if (!shelterId) shelterId = animal.shelterId;
+    }
+
+    // Érvényes Stripe-célpont kell: a választott menhely Stripe-ja, VAGY az indító személyes Stripe-ja.
+    const shelterStripeOk = shelterId
+      ? (await prisma.shelter.findUnique({
+          where:  { id: shelterId },
+          select: { stripeOnboardingComplete: true },
+        }))?.stripeOnboardingComplete ?? false
+      : false;
+
+    if (!shelterStripeOk && !creator?.stripeOnboardingComplete) {
+      return NextResponse.json(
+        { error: "Gyűjtés indításához vagy a saját Stripe fiókod, vagy a választott menhely Stripe fiókja legyen bekötve." },
+        { status: 402 }
+      );
     }
 
     // Generate unique slug: slugified-title + random suffix
