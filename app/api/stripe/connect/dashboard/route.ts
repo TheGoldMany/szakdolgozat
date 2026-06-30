@@ -13,31 +13,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
     }
 
-    const { shelterId } = await req.json();
-    if (!shelterId) {
-      return NextResponse.json({ error: "shelterId hiányzik" }, { status: 400 });
-    }
+    const { shelterId } = await req.json().catch(() => ({}));
 
-    const isSuperAdmin = (session.user as { role?: string }).role === "SUPER_ADMIN";
-    if (!isSuperAdmin) {
-      const adminRecord = await prisma.shelterAdmin.findUnique({
-        where: { userId_shelterId: { userId: session.user.id, shelterId } },
-      });
-      if (!adminRecord) {
-        return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    let accountId: string | null;
+
+    if (shelterId) {
+      // Menhely Stripe vezérlőpult – admin vagy super admin
+      const isSuperAdmin = (session.user as { role?: string }).role === "SUPER_ADMIN";
+      if (!isSuperAdmin) {
+        const adminRecord = await prisma.shelterAdmin.findUnique({
+          where: { userId_shelterId: { userId: session.user.id, shelterId } },
+        });
+        if (!adminRecord) {
+          return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+        }
       }
+      const shelter = await prisma.shelter.findUnique({
+        where:  { id: shelterId },
+        select: { stripeAccountId: true },
+      });
+      accountId = shelter?.stripeAccountId ?? null;
+    } else {
+      // Saját (felhasználói) Stripe vezérlőpult
+      const user = await prisma.user.findUnique({
+        where:  { id: session.user.id },
+        select: { stripeAccountId: true },
+      });
+      accountId = user?.stripeAccountId ?? null;
     }
 
-    const shelter = await prisma.shelter.findUnique({
-      where:  { id: shelterId },
-      select: { stripeAccountId: true },
-    });
-
-    if (!shelter?.stripeAccountId) {
+    if (!accountId) {
       return NextResponse.json({ error: "Stripe fiók nem található" }, { status: 404 });
     }
 
-    const loginLink = await getStripe().accounts.createLoginLink(shelter.stripeAccountId);
+    const loginLink = await getStripe().accounts.createLoginLink(accountId);
     return NextResponse.json({ url: loginLink.url });
   } catch (err) {
     console.error("Stripe dashboard link error:", err);

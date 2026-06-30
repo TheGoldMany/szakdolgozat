@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
+import { blockIfSuspended } from "@/lib/account-status";
 function slugify(text: string) {
   return text
     .toLowerCase()
@@ -48,6 +49,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
+  const suspendedBlock = await blockIfSuspended(session.user.id);
+  if (suspendedBlock) return suspendedBlock;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) {

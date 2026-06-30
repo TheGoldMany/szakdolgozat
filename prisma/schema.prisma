@@ -108,6 +108,8 @@ model User {
   stripeOnboardingComplete Boolean   @default(false)
   birthDate                DateTime?
   deletionScheduledAt      DateTime?
+  suspendedAt              DateTime?
+  suspendedReason          String?
   emailNotifications       Boolean   @default(true)
   dashboardTourSeen        Boolean   @default(false)
   createdAt                DateTime  @default(now())

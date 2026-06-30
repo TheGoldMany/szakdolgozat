@@ -13,6 +13,7 @@ import { ProfileReports } from "@/components/profile/profile-reports";
 import { DeleteAccountButton } from "@/components/profile/delete-account-button";
 import { EmailNotificationsToggle } from "@/components/profile/email-notifications-toggle";
 import { DownloadDataButton } from "@/components/profile/download-data-button";
+import { StripeConnectSection } from "@/components/profile/stripe-connect-section";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -43,6 +44,8 @@ export default async function ProfilePage() {
       role:               true,
       password:           true,
       emailNotifications: true,
+      stripeAccountId:          true,
+      stripeOnboardingComplete: true,
       createdAt:          true,
       _count: { select: { applications: true } },
       subscriptions: {
@@ -178,6 +181,12 @@ export default async function ProfilePage() {
               <ChangePasswordForm />
             </div>
           )}
+
+          {/* Stripe fiók kezelése */}
+          <StripeConnectSection
+            stripeAccountId={user.stripeAccountId}
+            stripeOnboardingComplete={user.stripeOnboardingComplete}
+          />
 
           {/* Subscriptions */}
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">

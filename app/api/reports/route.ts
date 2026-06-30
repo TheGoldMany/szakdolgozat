@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalType, ReportType } from "@prisma/client";
+import { blockIfSuspended } from "@/lib/account-status";
 
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
@@ -26,6 +27,10 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
+  if (session?.user?.id) {
+    const suspended = await blockIfSuspended(session.user.id);
+    if (suspended) return suspended;
+  }
   const body = await req.json();
   const parsed = schema.safeParse(body);
 

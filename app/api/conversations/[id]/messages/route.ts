@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { sendNewMessageEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
+import { blockIfSuspended } from "@/lib/account-status";
 
 const schema = z.object({
   content:        z.string().max(2000).optional(),
@@ -23,6 +24,8 @@ export async function POST(
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const suspended = await blockIfSuspended(session.user.id);
+  if (suspended) return suspended;
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: params.id },

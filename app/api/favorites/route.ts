@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { blockIfSuspended } from "@/lib/account-status";
 
 // GET /api/favorites – the current user's favorited animal IDs
 export async function GET() {
@@ -32,6 +33,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
+  const suspended = await blockIfSuspended(session.user.id);
+  if (suspended) return suspended;
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
