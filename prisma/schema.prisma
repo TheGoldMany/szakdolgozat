@@ -322,6 +322,7 @@ model Animal {
   sponsorships  Sponsorship[]
   transfers     AnimalTransfer[]
   posts         Post[]
+  campaigns     Campaign[]
 
   @@index([kennelId])
   @@index([fosterId])
@@ -708,6 +709,7 @@ model Campaign {
   id           String         @id @default(cuid())
   userId       String?
   shelterId    String?
+  animalId     String?
   title        String
   slug         String         @unique
   description  String         @db.Text
@@ -723,11 +725,13 @@ model Campaign {
 
   user      User?      @relation("CampaignCreator", fields: [userId], references: [id], onDelete: SetNull)
   shelter   Shelter?   @relation(fields: [shelterId], references: [id], onDelete: SetNull)
+  animal    Animal?    @relation(fields: [animalId], references: [id], onDelete: SetNull)
   donations Donation[]
   posts     Post[]
 
   @@index([status])
   @@index([userId])
+  @@index([animalId])
 }
 
 model Donation {
