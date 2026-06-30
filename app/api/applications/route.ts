@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalStatus } from "@prisma/client";
 import { Prisma } from "@prisma/client";
 import { getMobileUser } from "@/lib/mobile-auth";
+import { blockIfSuspended } from "@/lib/account-status";
 import { sendNewAdoptionApplicationEmail } from "@/lib/email";
 
 const applicationSchema = z.object({
@@ -25,6 +26,8 @@ export async function POST(req: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
+  const suspended = await blockIfSuspended(userId);
+  if (suspended) return suspended;
 
   const body = await req.json();
   const parsed = applicationSchema.safeParse(body);

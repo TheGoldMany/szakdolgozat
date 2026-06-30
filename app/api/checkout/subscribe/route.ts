@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { blockIfSuspended } from "@/lib/account-status";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
+  const suspended = await blockIfSuspended(session.user.id);
+  if (suspended) return suspended;
 
   const parsed = subscribeSchema.safeParse(await req.json());
   if (!parsed.success) {

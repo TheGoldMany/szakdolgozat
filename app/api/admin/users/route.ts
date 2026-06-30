@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
         where,
         select: {
           id: true, name: true, email: true, role: true,
-          emailVerified: true, createdAt: true,
+          emailVerified: true, createdAt: true, suspendedAt: true,
           _count: { select: { applications: true, shelterAdmins: true } },
         },
         orderBy: { createdAt: "desc" },
