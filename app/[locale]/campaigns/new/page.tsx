@@ -11,11 +11,18 @@ export default async function NewCampaignPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/campaigns/new");
 
-  const user = await prisma.user.findUnique({
-    where:  { id: session.user.id },
-    select: { stripeOnboardingComplete: true },
-  });
-  const stripeConnected = user?.stripeOnboardingComplete ?? false;
+  const [user, shelterStripeCount] = await Promise.all([
+    prisma.user.findUnique({
+      where:  { id: session.user.id },
+      select: { stripeOnboardingComplete: true },
+    }),
+    // Van-e olyan menhely, amelynek admina és aktív a Stripe fiókja?
+    prisma.shelterAdmin.count({
+      where: { userId: session.user.id, shelter: { stripeOnboardingComplete: true } },
+    }),
+  ]);
+  // Gyűjtést indíthat, akinek a saját Stripe-ja kész VAGY van Stripe-os menhelye
+  const stripeConnected = (user?.stripeOnboardingComplete ?? false) || shelterStripeCount > 0;
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">

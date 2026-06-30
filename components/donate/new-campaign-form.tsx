@@ -153,8 +153,13 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
           className="mt-2 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
         >
           {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-          Stripe fiók csatlakoztatása
+          Saját Stripe fiók csatlakoztatása
         </button>
+        <p className="text-xs text-gray-500">
+          Menhely adminként a menhelyed Stripe fiókját a{" "}
+          <a href="/dashboard/settings" className="font-medium text-brand-600 hover:underline">Menhely beállításoknál</a>{" "}
+          kötheted be — onnantól a menhelyedért indíthatsz gyűjtést.
+        </p>
         {error && <p className="text-sm text-red-600">{error}</p>}
       </div>
     );
