@@ -1,11 +1,11 @@
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
 import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
+import { HeroSlideshow } from "@/components/home/hero-slideshow";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
@@ -19,7 +19,7 @@ export default async function HomePage() {
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroPhotos, composerShelter] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, composerShelter] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
@@ -60,11 +60,16 @@ export default async function HomePage() {
         take: 8,
         select: { id: true, type: true, animalType: true, city: true, imageUrl: true },
       }),
-      prisma.animalImage.findMany({
-        where: { isPrimary: true, animal: { status: AnimalStatus.AVAILABLE } },
+      // Hero diavetítés: az utolsó 5 feltöltött, fotóval rendelkező elérhető állat
+      prisma.animal.findMany({
+        where:   { status: AnimalStatus.AVAILABLE, images: { some: { isPrimary: true } } },
         orderBy: { createdAt: "desc" },
-        take: 3,
-        select: { url: true },
+        take: 5,
+        select: {
+          name: true, slug: true,
+          shelter: { select: { name: true } },
+          images:  { where: { isPrimary: true }, take: 1, select: { url: true } },
+        },
       }),
       // Shelter logo for post composer (SHELTER_ADMIN / SUPER_ADMIN only)
       session?.user?.id && (session.user.role === "SHELTER_ADMIN" || session.user.role === "SUPER_ADMIN")
@@ -109,7 +114,9 @@ export default async function HomePage() {
     : null;
 
   const nextCursor = posts.length === POSTS_PER_PAGE ? posts[posts.length - 1].id : null;
-  const photos = heroPhotos.map((p) => p.url).filter(Boolean);
+  const heroSlides = heroAnimals
+    .map((a) => ({ url: a.images[0]?.url ?? "", name: a.name, slug: a.slug, shelterName: a.shelter.name }))
+    .filter((s) => s.url);
 
   return (
     <main className="min-h-screen bg-white">
@@ -165,28 +172,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Photo collage */}
-            <div className="relative hidden h-80 lg:block">
-              {photos[0] && (
-                <div className="absolute right-0 top-0 h-56 w-52 overflow-hidden rounded-2xl shadow-xl rotate-2">
-                  <Image src={photos[0]} alt="Állat" fill className="object-cover" sizes="208px" />
-                </div>
-              )}
-              {photos[1] && (
-                <div className="absolute left-4 top-10 h-52 w-48 overflow-hidden rounded-2xl shadow-lg -rotate-2">
-                  <Image src={photos[1]} alt="Állat" fill className="object-cover" sizes="192px" />
-                </div>
-              )}
-              {photos[2] && (
-                <div className="absolute bottom-0 right-16 h-48 w-44 overflow-hidden rounded-2xl shadow-md rotate-1">
-                  <Image src={photos[2]} alt="Állat" fill className="object-cover" sizes="176px" />
-                </div>
-              )}
-              {photos.length === 0 && (
-                <div className="flex h-full items-center justify-center">
-                  <PawPrint className="h-40 w-40 text-brand-100" />
-                </div>
-              )}
+            {/* Hero diavetítés – az utolsó 5 feltöltött állat fotója */}
+            <div className="relative h-64 sm:h-80 lg:h-[22rem]">
+              <HeroSlideshow slides={heroSlides} />
             </div>
           </div>
         </div>
