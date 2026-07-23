@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szerepkörű felhasználó (`admin@test.hu`) teljes körű hozzáféréssel rendelkezik a platformhoz: listázhatja és szerkesztheti az összes felhasználót és menhelyet, hitelesítheti a menhelyeket (verified badge), jóváhagyhatja vagy elutasíthatja a kampányokat. A Super Admin dashboard ugyanazon `/dashboard` útvonalon érhető el, de kiegészítő szekciókkal rendelkezik, amelyek `SHELTER_ADMIN` számára nem láthatók.
+Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szerepkörű felhasználó (`admin@test.hu`) teljes körű hozzáféréssel rendelkezik a platformhoz: listázhatja és szerkesztheti az összes felhasználót és menhelyet, módosíthatja a felhasználók szerepkörét, felfüggesztheti, újraaktiválhatja és törölheti a felhasználói fiókokat, hitelesítheti a menhelyeket (verified badge), jóváhagyhatja vagy elutasíthatja a kampányokat. A felfüggesztett felhasználó bejelentkezhet és böngészhet, de minden módosító művelete HTTP 403-mal blokkolódik (`blockIfSuspended()` őr). A Super Admin dashboard ugyanazon `/dashboard` útvonalon érhető el, de kiegészítő szekciókkal rendelkezik, amelyek `SHELTER_ADMIN` számára nem láthatók.
 
 **SUPER_ADMIN-exkluzív oldalak:**
 
@@ -12,7 +12,7 @@ Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szere
 | Előfizetési csomagok | `/dashboard/tiers` | Az összes menhely összes `DonationTier`-jének read-only áttekintése (aktív előfizetők száma, összeg, menhely neve) |
 | Előfizetések | `/dashboard/subscriptions` | Az összes menhely összes előfizetése szűrve (ACTIVE/CANCELLED), lemondás lehetőségével |
 | Menhelyek | `/dashboard/shelters` | Összes menhely kezelése (hitelesítés, aktiválás, új menhely) |
-| Felhasználók | `/dashboard/users` | Összes felhasználó, szerepkör-módosítás |
+| Felhasználók | `/dashboard/users` | Összes felhasználó, szerepkör-módosítás, fiók felfüggesztése / újraaktiválása / törlése (a saját és más SUPER_ADMIN sorok kivételével) |
 
 ---
 
@@ -26,6 +26,9 @@ Ez a modul fedi le a Super Admin kizárólagos funkcióit. A `SUPER_ADMIN` szere
 - **US-12-F**: Mint super admin, szeretném az összes kampányt (nem csak a pendingeket) áttekinteni státusz szerint szűrve, hogy lássam a platform teljes gyűjtési tevékenységét.
 - **US-12-G**: Mint super admin, szeretném az összes menhely összes előfizetési csomagját read-only nézetben látni, hogy átlássam a platform bevételi struktúráját.
 - **US-12-H**: Mint super admin, szeretném az összes menhely előfizetőit listázni és szükség esetén lemondani egy előfizetést, hogy platformszinten kezelhessem a bevételi rekordokat.
+- **US-12-I**: Mint super admin, szeretném egy felhasználói fiókot felfüggeszteni, hogy a szabályokat megsértő felhasználó ne végezhessen módosító műveleteket (kérelem beküldése, üzenetküldés, értékelés, foglalás, adományozás stb.), miközben a fiók még bejelentkezhet és böngészhet.
+- **US-12-J**: Mint super admin, szeretném egy felfüggesztett felhasználó fiókját újraaktiválni, hogy visszaadjam a teljes hozzáférését, ha a probléma megoldódott.
+- **US-12-K**: Mint super admin, szeretném egy felhasználói fiókot véglegesen törölni (megerősítő dialógussal), hogy eltávolítsam a platformról a nem kívánt fiókokat; a saját fiókomat és más super admin fiókokat nem tudom felfüggeszteni vagy törölni.
 
 ---
 
@@ -385,6 +388,120 @@ SUPER_ADMIN read-only táblázatban látja az összes menhely összes előfizet�
 
 **Elvárt eredmény:**
 SUPER_ADMIN az összes menhely összes előfizetését látja, beleértve a menhely nevét. Az admin-lemondás funkcionál. SHELTER_ADMIN csak a saját menhely előfizetéseit látja.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-10: Felhasználó felfüggesztése és a módosító művelet blokkolása (403)
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; az adatbázisban létezik `USER` szerepkörű, aktív (nem felfüggesztett) felhasználó (pl. `user@test.hu`) |
+| **URL** | `/dashboard/users` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Minden felhasználó sorában elérhető a „Felfüggesztés" gomb (amber/borostyán színű), kivéve a super admin saját sorát és más `SUPER_ADMIN` sorokat
+- [ ] A „Felfüggesztés" gombra kattintva `PATCH /api/admin/users/[id]` kérés indul `{ suspended: true }` payloaddal
+- [ ] A sikeres válasz után a felhasználó sora piros árnyalatú lesz, és megjelenik egy piros „Felfüggesztve" badge
+- [ ] A felhasználó `suspendedAt` mezője kitöltődik (és opcionálisan a `suspendedReason`)
+- [ ] A felfüggesztett felhasználó továbbra is be tud jelentkezni és böngészheti a nyilvános oldalakat
+- [ ] A felfüggesztett felhasználó bármely módosító művelete HTTP 403-mal elutasításra kerül (`blockIfSuspended()` őr): örökbefogadási kérelem beküldése, üzenetküldés, értékelés írása, időpontfoglalás, önkéntes/ideiglenes befogadó jelentkezés, kedvencek, kampányindítás, adományozás/előfizetés/szponzorálás, bejelentés (report) létrehozása
+- [ ] A felfüggesztett felhasználó egyértelmű hibaüzenetet kap arról, hogy a fiókja fel van függesztve
+- [ ] A super admin a saját sorában NEM lát „Felfüggesztés" gombot
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/users` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd, hogy a saját (`admin@test.hu`) sorban nincs „Felfüggesztés" gomb.
+3. Keresd meg a `user@test.hu` felhasználót – ellenőrizd, hogy a sorában van amber színű „Felfüggesztés" gomb.
+4. Kattints a „Felfüggesztés" gombra.
+5. Ellenőrizd (DevTools → Network), hogy `PATCH /api/admin/users/[id]` indul `{ suspended: true }` payloaddal.
+6. Ellenőrizd, hogy a felhasználó sora piros árnyalatú lesz és megjelenik a piros „Felfüggesztve" badge.
+7. Jelentkezz ki, majd jelentkezz be `user@test.hu` / `User1234!` fiókkal – ellenőrizd, hogy a bejelentkezés sikeres és a nyilvános oldalak böngészhetők.
+8. Kísérelj meg egy módosító műveletet (pl. örökbefogadási kérelem beküldése egy állat adatlapján, vagy üzenet küldése egy menhelynek).
+9. Ellenőrizd, hogy a művelet HTTP 403-mal elutasításra kerül, és egyértelmű üzenet jelenik meg, hogy a fiók fel van függesztve.
+
+**Elvárt eredmény:**
+A felhasználó felfüggesztésre kerül: `suspendedAt` kitöltődik, a sor piros árnyalatú lesz „Felfüggesztve" badge-dzsel. A felfüggesztett felhasználó bejelentkezhet és böngészhet, de minden módosító művelete 403-mal blokkolódik, egyértelmű hibaüzenettel. A super admin a saját sorát nem tudja felfüggeszteni.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-11: Felfüggesztett felhasználó újraaktiválása
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; létezik egy felfüggesztett felhasználó (pl. TC-12-10 lefutott a `user@test.hu` fiókra) |
+| **URL** | `/dashboard/users` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A felfüggesztett felhasználó sorában a „Felfüggesztés" gomb helyett egy zöld „Aktiválás" gomb jelenik meg
+- [ ] Az „Aktiválás" gombra kattintva `PATCH /api/admin/users/[id]` kérés indul `{ suspended: false }` payloaddal
+- [ ] A sikeres válasz után eltűnik a piros „Felfüggesztve" badge és a sor piros árnyalata, a sor visszaáll normál állapotba
+- [ ] A felhasználó `suspendedAt` (és `suspendedReason`) mezője kiürül (null)
+- [ ] Az újraaktivált felhasználó minden módosító művelete ismét engedélyezett (nincs 403)
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/users` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Keresd meg a felfüggesztett `user@test.hu` felhasználót – ellenőrizd a piros „Felfüggesztve" badge-et és a zöld „Aktiválás" gombot.
+3. Kattints az „Aktiválás" gombra.
+4. Ellenőrizd (DevTools → Network), hogy `PATCH /api/admin/users/[id]` indul `{ suspended: false }` payloaddal.
+5. Ellenőrizd, hogy a badge és a piros árnyalat eltűnik, és ismét megjelenik az amber „Felfüggesztés" gomb.
+6. Jelentkezz ki, majd jelentkezz be `user@test.hu` / `User1234!` fiókkal.
+7. Végezz el egy korábban blokkolt módosító műveletet (pl. üzenetküldés egy menhelynek) – ellenőrizd, hogy immár sikeres (nincs 403).
+
+**Elvárt eredmény:**
+A felhasználó újraaktiválódik: a `suspendedAt` kiürül, a badge és a piros árnyalat eltűnik. A felhasználó módosító műveletei ismét engedélyezettek.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-12-12: Felhasználó törlése megerősítő dialógussal és a saját/super admin védelmek
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett `admin@test.hu` / `Admin1234!` super admin; az adatbázisban létezik egy törölhető teszt-felhasználó (`USER` szerepkör), valamint legalább még egy `SUPER_ADMIN` fiók a védelmek teszteléséhez |
+| **URL** | `/dashboard/users` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Minden felhasználó sorában elérhető egy piros „Törlés" (kuka ikon) gomb, kivéve a super admin saját sorát és más `SUPER_ADMIN` sorokat
+- [ ] A „Törlés" gombra kattintva megerősítő dialógus jelenik meg (a törlés csak megerősítés után történik meg)
+- [ ] Megerősítés után `DELETE /api/admin/users/[id]` kérés indul, és a felhasználó eltűnik a listából
+- [ ] A felhasználó véglegesen törlődik az adatbázisból
+- [ ] A super admin a saját fiókját NEM tudja törölni (nincs gomb, vagy az API 403-mal elutasít)
+- [ ] Egy másik `SUPER_ADMIN` fiók NEM törölhető (nincs gomb, vagy az API 403-mal elutasít)
+- [ ] Ugyanezek a védelmek a felfüggesztésre is érvényesek: a saját és más super admin fiók nem függeszthető fel
+
+**Tesztelési lépések:**
+1. Navigálj a `/dashboard/users` oldalra bejelentkezve `admin@test.hu` / `Admin1234!` fiókkal.
+2. Ellenőrizd, hogy a saját (`admin@test.hu`) sorban nincs „Törlés" gomb.
+3. Ellenőrizd, hogy egy másik `SUPER_ADMIN` felhasználó sorában sincs „Törlés" (és „Felfüggesztés") gomb.
+4. Keresd meg a törölhető teszt-felhasználót – kattints a piros „Törlés" (kuka) gombra.
+5. Ellenőrizd, hogy megerősítő dialógus jelenik meg.
+6. Szakítsd meg (Mégse) – ellenőrizd, hogy a felhasználó megmarad a listában.
+7. Kattints ismét a „Törlés" gombra, majd erősítsd meg.
+8. Ellenőrizd (DevTools → Network), hogy `DELETE /api/admin/users/[id]` indul.
+9. Ellenőrizd, hogy a felhasználó eltűnik a listából és oldalfrissítés után sem tér vissza.
+
+**Elvárt eredmény:**
+A felhasználó törlése csak megerősítő dialógus után történik meg, és véglegesen eltávolítja a fiókot. A super admin a saját fiókját és más super admin fiókokat nem tudja törölni vagy felfüggeszteni.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

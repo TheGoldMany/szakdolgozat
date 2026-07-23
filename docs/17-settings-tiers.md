@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkcióit fedi le. A `/dashboard/settings` oldalon a menhely admin a `ShelterSettingsForm` komponensen keresztül kezeli a menhely logóját, kapacitását, örökbefogadási feltételeit, számlázási adatait (cégnév, adószám, bankszámla) és dokumentumait, valamint innen indítható a **Stripe Connect** onboarding (`POST /api/stripe/connect/onboard`), amellyel az adományok és előfizetési díjak közvetlenül a menhely Stripe Express számlájára érkeznek (5% platformdíjjal). A `/dashboard/tiers` oldalon a `TiersManager` komponenssel havi támogatói szintek (`DonationTier`) hozhatók létre és szerkeszthetők (minimum 175 Ft – Stripe limit); az aktív csomagok a publikus `/hu/donate` és `/hu/shelters/[slug]` oldalakon `TierCard`-ként jelennek meg „Feliratkozás" gombbal, amely Stripe Checkout fizetésre visz (`POST /api/checkout/subscribe`). Az előfizetések (`Subscription`, státuszok: `ACTIVE`, `CANCELLED`, `PAST_DUE`) a `/dashboard/subscriptions` oldalon listázhatók, szűrhetők és admin által lemondhatók (`POST /api/subscriptions/[id]/admin-cancel`).
+Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkcióit fedi le. A `/dashboard/settings` oldalon a menhely admin a `ShelterSettingsForm` komponensen keresztül kezeli a menhely logóját, kapacitását, örökbefogadási feltételeit, számlázási adatait (cégnév, adószám, bankszámla) és dokumentumait, továbbá egy interaktív **térképes helyszínválasztóval** („Helyszín a térképen") beállíthatja a menhely pontos koordinátáit (lat/lng), amelyet a `POST /api/shelters/[id]/location` végpont ment; ez felülírja az automatikus geokódolást és pontosan elhelyezi a menhely markerét a publikus `/map` oldalon. Innen indítható a **Stripe Connect** onboarding (`POST /api/stripe/connect/onboard`), amellyel az adományok és előfizetési díjak közvetlenül a menhely Stripe Express számlájára érkeznek (5% platformdíjjal). A `/dashboard/tiers` oldalon a `TiersManager` komponenssel havi támogatói szintek (`DonationTier`) hozhatók létre és szerkeszthetők (minimum 175 Ft – Stripe limit); az aktív csomagok a publikus `/hu/donate` és `/hu/shelters/[slug]` oldalakon `TierCard`-ként jelennek meg „Feliratkozás" gombbal, amely Stripe Checkout fizetésre visz (`POST /api/checkout/subscribe`). Az előfizetések (`Subscription`, státuszok: `ACTIVE`, `CANCELLED`, `PAST_DUE`) a `/dashboard/subscriptions` oldalon listázhatók, szűrhetők és admin által lemondhatók (`POST /api/subscriptions/[id]/admin-cancel`).
 
 > **SUPER_ADMIN megjegyzés:** A `SUPER_ADMIN` szerepkörű felhasználó szintén eléri a `/dashboard/tiers` oldalt, de ott a `TiersManager` szerkesztő helyett egy read-only táblázat jelenik meg, amely az összes menhely összes csomagját, az aktív előfizetők számát és a csomag állapotát mutatja. A `/dashboard/subscriptions` oldalon a SUPER_ADMIN az összes menhely előfizetéseit látja (beleértve a menhely nevét), míg a SHELTER_ADMIN csak a saját menhelyéét. A `/dashboard/settings` (menhely beállítások) oldal kizárólag `SHELTER_ADMIN` számára érhető el.
 
@@ -16,6 +16,7 @@ Ez a modul a menhely admin felület beállítási és bevétel-kezelési funkci�
 - **US-17-D**: Mint menhely admin, szeretnék havi támogatói szinteket létrehozni és árazni, hogy a támogatók rendszeres adományokkal segíthessék a menhelyet.
 - **US-17-E**: Mint támogató felhasználó, szeretnék egy támogatói szintre feliratkozni bankkártyával, hogy havonta automatikusan támogassam a kiválasztott menhelyet.
 - **US-17-F**: Mint menhely admin, szeretném látni az előfizetőim listáját és szükség esetén lemondani egy előfizetést, hogy átlássam és kezelni tudjam a rendszeres bevételeket.
+- **US-17-G**: Mint menhely admin, szeretném a menhelyem pontos helyét egy térképen kattintással beállítani, hogy a publikus térképen a marker a valós helyszínen jelenjen meg, felülírva az automatikus geokódolást.
 
 ---
 
@@ -287,6 +288,41 @@ A feliratkozás csak bejelentkezve, aktív csomagra indítható. A Stripe teszt 
 
 **Elvárt eredmény:**
 A lista szerepkör szerint helyesen szűrt, a státusz-szűrők működnek. Az admin lemondás a Stripe-ban azonnal érvényesül, a rekord `CANCELLED` lesz, és ez a felhasználói oldalon is látszik. A CSV export letölthető.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-17-08: Menhely helyszínének beállítása térképes helyszínválasztóval
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | `shelter@test.hu` bejelentkezve (SHELTER_ADMIN), a fiók menhelyhez rendelt |
+| **URL** | `/dashboard/settings` (Helyszín a térképen szekció) |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A beállítások oldalon megjelenik a „Helyszín a térképen" szekció egy interaktív térképpel
+- [ ] A térképen kattintással elhelyezhető a menhely markere a kívánt pontra (lat/lng koordináták)
+- [ ] A mentés `POST /api/shelters/[id]/location` hívással történik, a beállított `lat`/`lng` koordinátákkal
+- [ ] A kézzel beállított koordináta felülírja az automatikus geokódolást
+- [ ] A menhely a publikus `/map` oldalon pontosan a beállított ponton jelenik meg
+- [ ] A beállított helyszín oldal-újratöltés után is megmarad
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal, és navigálj a `/dashboard/settings` oldalra.
+2. Keresd meg a „Helyszín a térképen" szekciót, és ellenőrizd az interaktív térkép betöltését.
+3. Kattints a térképen egy konkrét pontra – ellenőrizd, hogy a marker odakerül, és megjelennek a koordináták (lat/lng).
+4. Mentsd a helyszínt – ellenőrizd a sikeres mentés visszajelzését (`POST /api/shelters/[id]/location`).
+5. Töltsd újra az oldalt – ellenőrizd, hogy a marker a mentett ponton maradt.
+6. Nyisd meg a publikus `/hu/map` oldalt – ellenőrizd, hogy a menhely markere pontosan a beállított koordinátán jelenik meg (az automatikus geokódolt helyet felülírva).
+
+**Elvárt eredmény:**
+A térképes helyszínválasztóval a menhely admin pontosan beállíthatja a menhely koordinátáit. A mentett pozíció felülírja az automatikus geokódolást, perzisztens, és a publikus térképen a marker a beállított ponton jelenik meg.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

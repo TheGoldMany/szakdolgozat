@@ -9,25 +9,25 @@
 
 | Fájl | Terület | Tesztesetek |
 |---|---|---|
-| [01-auth.md](./01-auth.md) | Regisztráció, bejelentkezés, OAuth | TC-01-01 – TC-01-06 |
-| [02-animals.md](./02-animals.md) | Állat böngészés, szűrés, kedvencek | TC-02-01 – TC-02-07 |
+| [01-auth.md](./01-auth.md) | Regisztráció (user + menhely önregisztráció), bejelentkezés, OAuth, felfüggesztett fiók | TC-01-01 – TC-01-08 |
+| [02-animals.md](./02-animals.md) | Állat böngészés, szűrés, kedvencek, hivatalos papírok | TC-02-01 – TC-02-09 |
 | [03-adoption.md](./03-adoption.md) | Örökbefogadási kérelem teljes folyamat | TC-03-01 – TC-03-08 |
-| [04-shelters-reviews.md](./04-shelters-reviews.md) | Menhely profil, értékelések | TC-04-01 – TC-04-05 |
+| [04-shelters-reviews.md](./04-shelters-reviews.md) | Menhely profil, önregisztráció, geokódolás, értékelések | TC-04-01 – TC-04-08 |
 | [05-appointments.md](./05-appointments.md) | Időpontfoglalás (user + admin) | TC-05-01 – TC-05-06 |
 | [06-messages.md](./06-messages.md) | Üzenetváltás | TC-06-01 – TC-06-05 |
-| [07-donations.md](./07-donations.md) | Kampányok, előfizetések, Stripe | TC-07-01 – TC-07-07 |
+| [07-donations.md](./07-donations.md) | Kampányok (Stripe-feltétel, opcionális menhely/állat), előfizetések | TC-07-01 – TC-07-10 |
 | [08-volunteers-foster.md](./08-volunteers-foster.md) | Önkéntesség, ideiglenes befogadás | TC-08-01 – TC-08-08 |
-| [09-reports-map.md](./09-reports-map.md) | Bejelentések, interaktív térkép | TC-09-01 – TC-09-06 |
+| [09-reports-map.md](./09-reports-map.md) | Bejelentések, interaktív térkép, menhely-jelzők | TC-09-01 – TC-09-07 |
 | [10-notifications.md](./10-notifications.md) | Értesítési rendszer | TC-10-01 – TC-10-05 |
-| [11-dashboard.md](./11-dashboard.md) | Admin dashboard: állatok, kérelmek, készlet | TC-11-01 – TC-11-12 |
-| [12-superadmin.md](./12-superadmin.md) | Super Admin: felhasználók, menhelyek | TC-12-01 – TC-12-06 |
-| [13-profile.md](./13-profile.md) | Profil, avatar, jelszóváltás, nyelvváltás | TC-13-01 – TC-13-06 |
+| [11-dashboard.md](./11-dashboard.md) | Admin dashboard: állatok, papírok, kérelmek, készlet, bemutató | TC-11-01 – TC-11-16 |
+| [12-superadmin.md](./12-superadmin.md) | Super Admin: felhasználók (felfüggesztés/törlés), menhelyek | TC-12-01 – TC-12-12 |
+| [13-profile.md](./13-profile.md) | Profil, avatar, jelszó, Stripe fiók, nyelvváltás | TC-13-01 – TC-13-08 |
 | [14-followups.md](./14-followups.md) | Örökbefogadás utáni utánkövetés | TC-14-01 – TC-14-06 |
 | [15-events.md](./15-events.md) | Események (publikus + admin) | TC-15-01 – TC-15-07 |
 | [16-forms-kennels-transfers.md](./16-forms-kennels-transfers.md) | Kérvénysablonok, kennelek, áthelyezések | TC-16-01 – TC-16-09 |
-| [17-settings-tiers.md](./17-settings-tiers.md) | Menhely beállítások, Stripe Connect, támogatói szintek | TC-17-01 – TC-17-07 |
+| [17-settings-tiers.md](./17-settings-tiers.md) | Menhely beállítások, Stripe Connect, térképes helyszín, támogatói szintek | TC-17-01 – TC-17-08 |
 
-**Összesen: ~111 teszteset**
+**Összesen: ~127 teszteset**
 
 > Rendszer-architektúra áttekintés új fejlesztőknek: [ARCHITECTURE.md](./ARCHITECTURE.md)
 

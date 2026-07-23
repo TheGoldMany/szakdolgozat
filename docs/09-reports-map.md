@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le az elveszett, talált és kóborló állatok bejelentési rendszerét, valamint az interaktív Leaflet alapú térképet. A felhasználók bejelentéseket hozhatnak létre helyszínmegjelöléssel, fotóval és elérhetőségi adatokkal. A bejelentések listája típus és státusz szerint szűrhető. A bejelentő saját bejelentéseit lezárhatja (`RESOLVED` státuszra állíthatja). A térkép megjeleníti a bejelentéseket és a menhelyeket markerekkel, mobilon oldalsó panel nyitható a szűréshez.
+Ez a modul fedi le az elveszett, talált és kóborló állatok bejelentési rendszerét, valamint az interaktív Leaflet alapú térképet. A felhasználók bejelentéseket hozhatnak létre helyszínmegjelöléssel, fotóval és elérhetőségi adatokkal. A bejelentések listája típus és státusz szerint szűrhető. A bejelentő saját bejelentéseit lezárhatja (`RESOLVED` státuszra állíthatja). A térkép megjeleníti a bejelentéseket és a menhelyeket markerekkel, mobilon oldalsó panel nyitható a szűréshez. A hitelesített/aktív, koordinátákkal rendelkező menhelyek is markerként jelennek meg a térképen (`/hu/map`, adatforrás: `/api/map`), a menhely markerre kattintva a popup a menhely nevét, címét, egy „X állat örökbefogadható" sort és a menhely oldalára mutató linket mutatja. Egy újonnan regisztrált menhely a geokódolás után (koordinátákkal) automatikusan megjelenik a térképen.
 
 ---
 
@@ -12,6 +12,7 @@ Ez a modul fedi le az elveszett, talált és kóborló állatok bejelentési ren
 - **US-09-B**: Mint látogató, szeretnék bejelentéseket szűrni és böngészni, hogy megtudjam, van-e az enyémhez hasonló bejelentés.
 - **US-09-C**: Mint bejelentő felhasználó, szeretném lezárni a bejelentésemet, ha az állat gazdára talált.
 - **US-09-D**: Mint látogató, szeretnék interaktív térképen látni a bejelentéseket és menhelyeket, hogy gyorsan tájékozódjak az adott területen.
+- **US-09-E**: Mint látogató, szeretném a hitelesített/aktív menhelyeket markerként látni a térképen, hogy egy pillantással lássam, hol vannak menhelyek, és hány örökbefogadható állatuk van.
 
 ---
 
@@ -262,6 +263,46 @@ A Leaflet térkép betölt, a csempék megjelennek, a bejelentés és menhely ma
 
 **Elvárt eredmény:**
 A szűrők funkcionálnak: a kiválasztott típus/státusz alapján csak a megfelelő markerek jelennek meg a térképen. Mobilos nézetben a szűrőpanel nyitható és csukható.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-09-07: Menhely markerek megjelenítése a térképen és menhely popup tartalma
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Az adatbázisban legalább egy hitelesített/aktív, koordinátákkal rendelkező menhely létezik, amelyhez legalább egy örökbefogadható (`AVAILABLE`) állat tartozik; a `/api/map` végpont elérhető |
+| **URL** | `/hu/map` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Az aktív, koordinátákkal rendelkező menhelyek markerként megjelennek a térképen a bejelentés-markerek mellett
+- [ ] A menhely markerek adata a `/api/map` végpontról érkezik (a bejelentésekkel együtt)
+- [ ] A menhely marker megkülönböztethető a bejelentés-markerektől (eltérő ikon/szín)
+- [ ] Menhely markerre kattintva popup jelenik meg, amely tartalmazza a menhely nevét
+- [ ] A popup megjeleníti a menhely címét
+- [ ] A popup tartalmaz egy „X állat örökbefogadható" sort, ahol X a menhely `AVAILABLE` állatainak száma
+- [ ] A popup tartalmaz egy linket a menhely oldalára (`/hu/shelters/[slug]`)
+- [ ] Egy újonnan regisztrált menhely a geokódolás után (koordinátákkal) megjelenik a térképen
+
+**Tesztelési lépések:**
+1. Navigálj a `/hu/map` URL-re bejelentkezés nélkül.
+2. Ellenőrizd, hogy a menhely markerek megjelennek a térképen, és megkülönböztethetők a bejelentés-markerektől.
+3. (Opcionális) Nyisd meg a `/api/map` végpontot vagy a hálózati panelt, és ellenőrizd, hogy a válasz tartalmazza a menhely rekordokat koordinátákkal.
+4. Kattints egy menhely markerre.
+5. Ellenőrizd, hogy a popup megjeleníti a menhely nevét és címét.
+6. Ellenőrizd, hogy a popup tartalmazza az „X állat örökbefogadható" sort, és X értéke megegyezik a menhely `AVAILABLE` állatainak számával.
+7. Kattints a popupban lévő linkre, és ellenőrizd, hogy a menhely profiloldalára (`/hu/shelters/[slug]`) navigál.
+8. Regisztrálj egy új menhelyt geokódolható címmel (lásd TC-04-06 / TC-04-07), majd töltsd újra a `/hu/map` oldalt.
+9. Ellenőrizd, hogy az új, immár koordinátákkal rendelkező menhely markerként megjelenik a térképen.
+
+**Elvárt eredmény:**
+A hitelesített/aktív, koordinátákkal rendelkező menhelyek a `/api/map` adatai alapján markerként megjelennek a térképen a bejelentések mellett. A menhely popup a nevet, címet, az „X állat örökbefogadható" sort és a menhely oldalára mutató linket tartalmazza. Egy újonnan regisztrált, geokódolt menhely a koordináták birtokában szintén megjelenik a térképen.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

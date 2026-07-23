@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le az adományozási és előfizetési rendszert. A platform lehetővé teszi aktív kampányok böngészését és egyszeri adomány beküldését Stripe Checkout segítségével. A menhelyek havi előfizetési szinteket (tierek) hozhatnak létre, amelyekre a felhasználók feliratkozhatnak. Az előfizetések kezelése (lemondás) a saját profiloldalon érhető el. Kampányokat bejelentkezett felhasználók is indíthatnak, amelyek adminisztratív jóváhagyásra várnak. A Stripe webhook feldolgozza a sikeres fizetéseket és frissíti az adatbázis-rekordokat.
+Ez a modul fedi le az adományozási és előfizetési rendszert. A platform lehetővé teszi aktív kampányok böngészését és egyszeri adomány beküldését Stripe Checkout segítségével. A menhelyek havi előfizetési szinteket (tierek) hozhatnak létre, amelyekre a felhasználók feliratkozhatnak. Az előfizetések kezelése (lemondás) a saját profiloldalon érhető el. Kampányokat bejelentkezett felhasználók is indíthatnak, amelyek adminisztratív jóváhagyásra várnak. A saját gyűjtés indításához (`/campaigns/new`) érvényes Stripe kifizetési célpont szükséges: vagy a felhasználó saját, összekötött Stripe fiókja (`User.stripeOnboardingComplete`), vagy a kiválasztott menhely összekötött Stripe fiókja. A menhely kiválasztása opcionális; ha nincs menhely megadva, az adományok a kampányt létrehozó saját Stripe fiókjára futnak be. Menhely választása esetén opcionálisan egy konkrét (elérhető, `AVAILABLE`) állat is összeköthető a kampánnyal. A Stripe webhook feldolgozza a sikeres fizetéseket és frissíti az adatbázis-rekordokat.
 
 ---
 
@@ -13,6 +13,8 @@ Ez a modul fedi le az adományozási és előfizetési rendszert. A platform leh
 - **US-07-C**: Mint bejelentkezett felhasználó, szeretnék havi előfizetéssel támogatni egy menhelyet, hogy rendszeres bevételt biztosítsak számukra.
 - **US-07-D**: Mint előfizető felhasználó, szeretném lemondani az előfizetésemet a profiloldalamon, hogy ne terhelje tovább a bankszámlámat.
 - **US-07-E**: Mint bejelentkezett felhasználó, szeretnék saját kampányt indítani, hogy állatokat vagy programokat támogassak.
+- **US-07-F**: Mint kampányt indító felhasználó, szeretnék az adományokat érvényes Stripe kifizetési célpontra irányítani (saját összekötött Stripe fiók vagy a választott menhely Stripe fiókja), hogy a beérkező pénz biztonságosan célba érjen.
+- **US-07-G**: Mint kampányt indító felhasználó, szeretnék menhely nélkül is gyűjtést indítani, vagy opcionálisan egy konkrét menhelyet és állatot összekötni a kampányommal, hogy rugalmasan tudjak támogatást szervezni.
 
 ---
 
@@ -294,6 +296,128 @@ Az előfizetés sikeresen lemondódik, státusza `CANCELLED`-re vált az adatbá
 
 **Elvárt eredmény:**
 A kampány `PENDING` státusszal jön létre, a nyilvános oldalon nem látható, de az admin jóváhagyási listán megjelenik. Bejelentkezés nélkül az oldal nem érhető el.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-07-08: Kampány indítása menhely-adminként, ha a menhelynek van összekötött Stripe fiókja
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett menhely-admin (`shelter@test.hu` / `Admin1234!`); a menhelyéhez tartozik érvényes, összekötött Stripe fiók (Menhely beállítások → Stripe csatlakoztatva); a menhely-adminnak NINCS saját összekötött Stripe fiókja (`User.stripeOnboardingComplete` = false) |
+| **URL** | `/hu/campaigns/new` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Mivel érvényes Stripe kifizetési célpont elérhető (a menhely összekötött Stripe fiókja), a form megjelenik – NEM a „Előbb kösd be a Stripe fiókod" felhívó kártya
+- [ ] A „Melyik menhelyért gyűjtesz?" legördülő helyesen betöltődik (nem ragad be a „Menhelyek betöltése…" állapotban), az adatok a `/api/shelters/list` végpontról érkeznek
+- [ ] A legördülőben kiválasztható a menhely-admin saját menhelye
+- [ ] A saját menhely kiválasztásával (amelynek van összekötött Stripe fiókja) a form beküldhető saját személyes Stripe nélkül is
+- [ ] Sikeres beküldés után a kampány `PENDING` státusszal jön létre a kiválasztott menhelyhez kötve
+- [ ] A `POST /api/campaigns` végpont NEM ad vissza HTTP 402 hibát, mert a menhely Stripe fiókja érvényes kifizetési célpont
+- [ ] A kampányra érkező adományok a menhely összekötött Stripe fiókjára futnak be
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal.
+2. Győződj meg róla, hogy a menhelyhez a Menhely beállítások oldalon Stripe fiók van csatlakoztatva.
+3. Navigálj a `/hu/campaigns/new` oldalra.
+4. Ellenőrizd, hogy a kampányindító form megjelenik (nem a Stripe-csatlakoztatási felhívó kártya).
+5. Nyisd le a „Melyik menhelyért gyűjtesz?" legördülőt, és ellenőrizd, hogy a menhelyek betöltődnek (nem ragad be a „Menhelyek betöltése…" szövegnél).
+6. Válaszd ki a saját menhelyedet a legördülőből.
+7. Töltsd ki a mezőket:
+   - Kampány neve: `Menhelyi Téli Gyűjtés 2026`
+   - Leírás: `Gyűjtés a menhely téli ellátmányára.`
+   - Célösszeg: `50000`
+8. Kattints a „Kampány indítása" / „Küldés" gombra.
+9. Ellenőrizd, hogy sikerüzenet jelenik meg, és a beküldés nem ad 402-es hibát.
+10. Jelentkezz be `admin@test.hu` / `Admin1234!` fiókkal, és a `/dashboard/campaigns` oldalon ellenőrizd, hogy a `Menhelyi Téli Gyűjtés 2026` kampány `PENDING` státusszal, a kiválasztott menhelyhez kötve szerepel.
+
+**Elvárt eredmény:**
+A menhely-admin saját személyes Stripe fiók nélkül is sikeresen indít kampányt, mert a kiválasztott menhelynek van érvényes, összekötött Stripe fiókja. A kampány `PENDING` státusszal, a menhelyhez kötve jön létre; a `POST /api/campaigns` nem ad 402 hibát.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-07-09: Stripe kifizetési célpont nélküli felhasználó nem tud kampányt indítani
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Bejelentkezett felhasználó (`user@test.hu` / `User1234!`), akinek NINCS saját összekötött Stripe fiókja (`User.stripeOnboardingComplete` = false), és nem választ (vagy nem tud választani) összekötött Stripe fiókkal rendelkező menhelyet |
+| **URL** | `/hu/campaigns/new` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Mivel nincs érvényes Stripe kifizetési célpont, a kampányindító form helyett a „Előbb kösd be a Stripe fiókod" felhívó kártya jelenik meg
+- [ ] A kártyán elérhető a „Saját Stripe fiók csatlakoztatása" gomb
+- [ ] A gomb elindítja a személyes Stripe Connect onboardingot a `POST /api/stripe/connect/onboard {type:"user"}` hívással
+- [ ] A kártyán megjelenik egy tipp/segítő szöveg arról, hogy a menhely-adminok a menhelyük Stripe fiókját a Menhely beállítások oldalon köthetik be
+- [ ] A kampányindító mezők (Kampány neve, Leírás, Célösszeg, menhely-választó) nem érhetők el, amíg nincs érvényes Stripe célpont
+- [ ] Ha a felhasználó közvetlenül (pl. API-n keresztül) próbál kampányt létrehozni érvényes célpont nélkül, a `POST /api/campaigns` végpont HTTP 402 hibával válaszol
+
+**Tesztelési lépések:**
+1. Jelentkezz be `user@test.hu` / `User1234!` fiókkal, amelyhez nincs összekötött Stripe fiók.
+2. Navigálj a `/hu/campaigns/new` oldalra.
+3. Ellenőrizd, hogy a kampányindító form helyett a „Előbb kösd be a Stripe fiókod" felhívó kártya jelenik meg.
+4. Ellenőrizd, hogy a kártyán ott a „Saját Stripe fiók csatlakoztatása" gomb és a menhely-adminoknak szóló tipp (Menhely beállítások).
+5. Ellenőrizd, hogy a szokásos kampányindító mezők nem érhetők el.
+6. Kattints a „Saját Stripe fiók csatlakoztatása" gombra, és ellenőrizd, hogy elindul a személyes Stripe Connect onboarding (a `POST /api/stripe/connect/onboard {type:"user"}` hívás megtörténik, és Stripe onboarding oldalra irányít).
+7. (Opcionális, API-ellenőrzés) Küldj egy `POST /api/campaigns` kérést érvényes célpont nélkül, és ellenőrizd, hogy a válasz HTTP 402.
+
+**Elvárt eredmény:**
+Érvényes Stripe kifizetési célpont hiányában a felhasználó nem tud kampányt indítani: a form helyett a Stripe-csatlakoztatási felhívó kártya jelenik meg a „Saját Stripe fiók csatlakoztatása" gombbal és a menhely-adminoknak szóló tippel. A `POST /api/campaigns` végpont HTTP 402 hibát ad érvényes célpont nélkül.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-07-10: Kampány indítása menhely nélkül, illetve opcionális állat összekötésével
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett felhasználó érvényes Stripe kifizetési célponttal: saját összekötött Stripe fiókkal rendelkező felhasználó (`User.stripeOnboardingComplete` = true) a menhely nélküli esethez; az állat-összekötés ellenőrzéséhez legalább egy menhely összekötött Stripe fiókkal és legalább egy `AVAILABLE` státuszú állattal |
+| **URL** | `/hu/campaigns/new` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A „Melyik menhelyért gyűjtesz?" legördülő opcionális, és alapértelmezett választása a „Nincs menhelyhez kötve"
+- [ ] Menhely kiválasztása nélkül a form beküldhető, és a kampány létrejön menhely nélkül
+- [ ] Menhely nélküli kampány esetén az adományok a kampányt létrehozó saját Stripe fiókjára futnak be (a checkout előbb a menhely Stripe fiókját preferálja, majd a létrehozóéra esik vissza)
+- [ ] Amikor menhelyet választanak, megjelenik egy második, opcionális legördülő az adott menhely `AVAILABLE` státuszú állataival
+- [ ] Az állat-legördülőben elérhető a „Nincs konkrét állat" opció, és az állat kiválasztása teljesen opcionális
+- [ ] Állat kiválasztása esetén a kampány az adott állathoz kötődik (`Campaign.animalId`), és a kampány menhelye is az állat menhelyére áll be
+- [ ] Mindkét esetben a kampány sikeresen létrejön `PENDING` státusszal, és a `POST /api/campaigns` nem ad 402 hibát (mert van érvényes Stripe célpont)
+
+**Tesztelési lépések:**
+1. Jelentkezz be saját összekötött Stripe fiókkal rendelkező felhasználóval, és navigálj a `/hu/campaigns/new` oldalra.
+2. Ellenőrizd, hogy a „Melyik menhelyért gyűjtesz?" legördülő alapértelmezett értéke „Nincs menhelyhez kötve".
+3. Töltsd ki a mezőket menhely kiválasztása nélkül:
+   - Kampány neve: `Menhely Nélküli Gyűjtés 2026`
+   - Leírás: `Általános célú gyűjtés, menhelyhez nem kötve.`
+   - Célösszeg: `20000`
+4. Kattints a „Kampány indítása" / „Küldés" gombra, és ellenőrizd, hogy a kampány sikeresen létrejön (nincs 402 hiba), menhely nélkül.
+5. (Opcionális) Ellenőrizd, hogy egy erre a kampányra beérkező adomány a létrehozó saját Stripe fiókjára fut be.
+6. Indíts új kampányt: a `/hu/campaigns/new` oldalon most válassz ki egy összekötött Stripe fiókkal és `AVAILABLE` állattal rendelkező menhelyet.
+7. Ellenőrizd, hogy megjelenik egy második, opcionális legördülő a menhely elérhető állataival, „Nincs konkrét állat" alapértelmezéssel.
+8. Válassz ki egy konkrét állatot a legördülőből.
+9. Töltsd ki a további mezőket (pl. Kampány neve: `Bodri Kezelése`, Leírás, Célösszeg: `30000`), és küldd be a formot.
+10. Ellenőrizd, hogy a kampány létrejön az adott állathoz kötve (`Campaign.animalId` beállítva), és a kampány menhelye az állat menhelyére áll be.
+
+**Elvárt eredmény:**
+Menhely kiválasztása nélkül a kampány létrejön menhely nélkül, és az adományok a létrehozó saját Stripe fiókjára futnak be. Menhely kiválasztásakor megjelenik az opcionális állat-legördülő; állat kiválasztásával a kampány az adott állathoz és menhelyhez kötődik. Mindkét esetben a kampány `PENDING` státusszal jön létre, 402 hiba nélkül.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
