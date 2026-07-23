@@ -8,6 +8,7 @@ import { z } from "zod";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { MultiImageUpload } from "@/components/ui/multi-image-upload";
+import { MultiDocumentUpload, type DocItem } from "@/components/ui/multi-document-upload";
 
 function makeSchema(t: (key: string) => string) {
   return z.object({
@@ -27,6 +28,12 @@ function makeSchema(t: (key: string) => string) {
     isGoodWithDogs: z.boolean().nullable().optional(),
     isGoodWithCats: z.boolean().nullable().optional(),
     imageUrls:      z.array(z.string()).optional(),
+    documents:      z.array(z.object({
+      url:       z.string(),
+      name:      z.string(),
+      fileType:  z.string(),
+      sizeBytes: z.number(),
+    })).optional(),
   }).superRefine((data, ctx) => {
     if (data.type === "OTHER" && !data.breed?.trim()) {
       ctx.addIssue({
@@ -55,6 +62,7 @@ type FormData = {
   isGoodWithDogs?: boolean | null;
   isGoodWithCats?: boolean | null;
   imageUrls?: string[];
+  documents?: DocItem[];
 };
 
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition bg-white";
@@ -80,7 +88,7 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
     useForm<FormData>({
       resolver: zodResolver(schema),
       defaultValues: {
-        type: "DOG", isVaccinated: false, isNeutered: false, isMicrochipped: false, imageUrls: [],
+        type: "DOG", isVaccinated: false, isNeutered: false, isMicrochipped: false, imageUrls: [], documents: [],
       },
     });
 
@@ -178,6 +186,19 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
           <MultiImageUpload
             label={t("animalsFormPhotos")}
             value={field.value ?? []}
+            onChange={field.onChange}
+          />
+        )}
+      />
+
+      {/* Official documents */}
+      <Controller
+        name="documents"
+        control={control}
+        render={({ field }) => (
+          <MultiDocumentUpload
+            label={t("animalsFormDocuments")}
+            value={(field.value as DocItem[]) ?? []}
             onChange={field.onChange}
           />
         )}
