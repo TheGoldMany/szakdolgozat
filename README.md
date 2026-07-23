@@ -10,20 +10,24 @@ Teljes körű webalkalmazás, amely összeköti az állami és civil menhelyeket
 
 | Terület | Funkciók |
 |---|---|
-| **Állatok** | Böngészés, szűrés (faj, méret, kor, helyszín), kedvencek, részletes profil, egészségügyi napló |
+| **Állatok** | Böngészés, szűrés (faj, méret, kor, helyszín), kedvencek, részletes profil, egészségügyi napló, hivatalos papírok (feltöltés már a létrehozáskor is) |
 | **Örökbefogadás** | Egyedi kérdőívek, kérelem-nyomkövetés, utánkövetési kérdőívek (30/90 nap) |
-| **Menhelyek** | Profil (logó, borítókép, leírás), értékelési rendszer, csillagos minősítés |
-| **Térkép** | Leaflet alapú, elveszett/megtalált/kóbor bejelentések, menhely-jelzők |
-| **Adományozás** | Egyszeri kampány-adományok és havi előfizetési csomagok (Stripe Connect) |
+| **Menhelyek** | Önkiszolgáló menhely-regisztráció (super admin jóváhagyással), profil (logó, borítókép, leírás), értékelési rendszer, csillagos minősítés |
+| **Térkép** | Leaflet alapú, elveszett/megtalált/kóbor bejelentések, menhely-jelzők; automatikus geokódolás (cím → koordináta) + kézi térképes helymegadás |
+| **Adományozás** | Egyszeri kampány-adományok és havi előfizetési csomagok (Stripe Connect); saját gyűjtés indítása bekötött Stripe-pal, opcionális menhely-/állat-kötéssel |
+| **Közösségi hírfolyam** | Menhelyi posztok (kép, állat/esemény/kampány hivatkozás), lájkok, „For You" főoldali folyam |
 | **Önkéntesség** | Jelentkezés, feladat-hozzárendelés, jelenléti napló |
 | **Ideiglenes befogadás** | Foster profil, ellátmány-napló |
 | **Események** | Nyílt napok, örökbefogadási napok, gyűjtések – regisztrációval |
 | **Üzenetrendszer** | Felhasználó–menhely chat, olvasatlan jelzők, 30 s-os polling |
 | **Értesítések** | Rendszer-értesítők (kérelem, időpont, önkéntes, készlet) |
-| **Bejelentések** | Elveszett/megtalált/kóbor állatok – térkép + lista |
-| **Készletkezelés** | Takarmány, gyógyszer, minimum-riasztás, mozgástörténet |
+| **Bejelentések** | Elveszett/megtalált/kóbor állatok – térkép + lista, több kép, automatikus egyezés-keresés |
+| **Készletkezelés** | Takarmány, gyógyszer, minimum-riasztás, mozgástörténet, etetési napló és -rend |
 | **Kennelek** | Kennel-hozzárendelés, kapacitás-kihasználtság |
 | **Áthelyezések** | Menhely-közi állat-transzfer dokumentálás |
+| **Profil / Stripe** | Saját adatok szerkesztése, GDPR-export, fiók törlése, saját Stripe fiók kezelése |
+| **Moderáció** | Super admin: felhasználók felfüggesztése (csak böngészés), visszaaktiválás, törlés |
+| **Onboarding** | Vezérelt dashboard-bemutató új menhely adminoknak |
 | **Analytics** | UC-01–04 panelek (örökbefogadási trend, kapacitás, bejelentések, visszakerülési ráta) |
 | **Lokalizáció** | 4 nyelv: Magyar / English / Deutsch / Polski |
 
@@ -223,19 +227,22 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ### Fő adatbázis – `prisma/schema.prisma`
 
-42 Prisma modell, főbb csoportok:
+48 Prisma modell, főbb csoportok:
 
 | Csoport | Modellek |
 |---|---|
-| Auth | `User`, `Account`, `Session`, `VerificationToken`, `PasswordResetToken` |
-| Menhelyek | `Shelter`, `ShelterAdmin`, `ShelterDocument` |
+| Auth | `User` (`suspendedAt`, `stripeAccountId`), `Account`, `Session`, `VerificationToken`, `PasswordResetToken` |
+| Menhelyek | `Shelter` (`lat`/`lng`, `isVerified`), `ShelterAdmin`, `ShelterDocument` |
 | Állatok | `Animal`, `AnimalImage`, `AnimalDocument`, `BehaviorLog`, `HealthRecord`, `Kennel` |
+| Etetés | `FeedingSchedule`, `FeedingLog` |
 | Örökbefogadás | `AdoptionApplication`, `AdoptionFollowUp`, `ApplicationForm`, `FormField`, `FormFieldResponse` |
 | Kommunikáció | `Conversation`, `Message`, `Review`, `Notification` |
-| Pénzügy | `DonationTier`, `Subscription`, `Campaign`, `Donation`, `Sponsorship` |
+| Közösség | `Post`, `PostLike` |
+| Pénzügy | `DonationTier`, `Subscription`, `Campaign` (`animalId`), `Donation`, `Sponsorship` |
 | Önkéntesség | `Volunteer`, `VolunteerTask`, `VolunteerTaskAssignment`, `VolunteerAttendance` |
 | Ideiglenes befogadás | `FosterProfile`, `FosterSupplyLog` |
 | Készlet | `InventoryItem`, `InventoryTransaction` |
+| Bejelentések | `AnimalReport`, `ReportImage`, `ReportMatch` |
 | Egyéb | `Event`, `EventRegistration`, `AnimalTransfer`, `Appointment` |
 
 ### Data Warehouse – `prisma/dwh.prisma`
@@ -249,9 +256,11 @@ ETL frissítés: `POST /api/etl` (fejléc: `Authorization: Bearer <ETL_SECRET>`)
 
 | Szerepkör | Leírás |
 |---|---|
-| `USER` | Böngészés, kedvencek, kérelem, üzenet, önkéntes-/foster-jelentkezés |
-| `SHELTER_ADMIN` | Saját menhely teljes kezelése (dashboard hozzáféréssel) |
-| `SUPER_ADMIN` | Teljes platform-hozzáférés, menhelyek jóváhagyása, analytics |
+| `USER` | Böngészés, kedvencek, kérelem, üzenet, önkéntes-/foster-jelentkezés, saját gyűjtés indítása (bekötött Stripe-pal) |
+| `SHELTER_ADMIN` | Saját menhely teljes kezelése (dashboard hozzáféréssel); önkiszolgáló regisztrációval is elnyerhető |
+| `SUPER_ADMIN` | Teljes platform-hozzáférés, menhelyek jóváhagyása, felhasználók moderálása (felfüggesztés/törlés), analytics |
+
+> **Fiók-felfüggesztés:** a super admin felfüggeszthet egy felhasználót – a felfüggesztett fiók továbbra is **böngészhet**, de minden művelet (kérelem, üzenet, adomány, gyűjtés stb.) HTTP 403-mal tiltott, amíg vissza nem aktiválják.
 
 ---
 

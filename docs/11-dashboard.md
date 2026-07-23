@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le a menhely adminisztrátor dashboard funkcióit. Az adminok KPI kártyákat és analytics paneleket látnak a főoldalon, kezelhetik az állatokat (hozzáadás, státuszváltás, egészségügyi napló), elbírálhatják az örökbefogadási kérelmeket, és kezelhetik a menhely készletét (tételek hozzáadása, be- és kivételezés, alacsony készlet riasztás). A dashboard a `/dashboard` útvonalon érhető el, amely csak `SHELTER_ADMIN` és `SUPER_ADMIN` szerepkörű felhasználóknak elérhető.
+Ez a modul fedi le a menhely adminisztrátor dashboard funkcióit. Az adminok KPI kártyákat és analytics paneleket látnak a főoldalon, kezelhetik az állatokat (hozzáadás, státuszváltás, egészségügyi napló, hivatalos papírok feltöltése), elbírálhatják az örökbefogadási kérelmeket, és kezelhetik a menhely készletét (tételek hozzáadása, be- és kivételezés, alacsony készlet riasztás). Új állat hozzáadásakor a hivatalos papírok (PDF/DOC/DOCX) már a létrehozás pillanatában feltölthetők. Az első bejelentkezéskor a menhely adminokat egy vezetett bemutató (onboarding tour) segíti a dashboard megismerésében. A dashboard a `/dashboard` útvonalon érhető el, amely csak `SHELTER_ADMIN` és `SUPER_ADMIN` szerepkörű felhasználóknak elérhető.
 
 ### Oldalsáv navigáció struktúrája
 
@@ -595,6 +595,86 @@ A sidebar minden szerepkörnél pontosan a jogosult menüpontokat jeleníti meg.
 
 **Elvárt eredmény:**
 A poszt sikeresen létrejön, megjelenik a publikus főoldalon. A törlés funkcionál. `USER` szerepkörű felhasználó nem érheti el a szerkesztőfelületet.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-11-15: Hivatalos papírok feltöltése új állat hozzáadásakor (menhely admin)
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett `shelter@test.hu` / `Admin1234!` (SHELTER_ADMIN); rendelkezésre áll legalább egy érvényes PDF vagy DOCX teszt dokumentum (max 10 MB) |
+| **URL** | `/dashboard/animals` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Az „Új állat" panel (`AddAnimalForm`) tartalmaz egy „Hivatalos papírok" szekciót
+- [ ] A szekcióban PDF, DOC és DOCX fájlok tölthetők fel, fájlonként legfeljebb 10 MB méretben
+- [ ] A dokumentumok a mentés ELŐTT feltölthetők; a feltöltés kliens oldalon a Vercel Blob tárolóba történik a `/api/upload/document` végponton keresztül
+- [ ] A feltöltött dokumentumok eltávolítható listaként jelennek meg a formban
+- [ ] Mentéskor a dokumentumok az állattal együtt, atomi módon mentődnek `AnimalDocument` rekordként (a `/api/animals` POST a `documents[]` tömböt `{url, name, fileType, sizeBytes}` mezőkkel fogadja)
+- [ ] A menhely admin korábban is tudott dokumentumot csatolni utólag az állat részletes oldalán (`/dashboard/animals/[id]`); most a létrehozás pillanatában is megteheti
+- [ ] Mentés után a dokumentumok megjelennek az állat dashboard részletes oldalának dokumentumok szekciójában
+- [ ] A dokumentumok a nyilvános `/hu/animals/[slug]` oldalon is megjelennek
+- [ ] Nem támogatott fájltípus vagy 10 MB feletti fájl feltöltése hibaüzenettel elutasításra kerül
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal, és navigálj a `/dashboard/animals` oldalra.
+2. Kattints az „Új állat" gombra a hozzáadó panel (`AddAnimalForm`) megnyitásához.
+3. Töltsd ki a kötelező mezőket (Faj: `CAT`, Név: `Cirmi Papíros`).
+4. Görgess a „Hivatalos papírok" szekcióhoz, és tölts fel egy érvényes PDF vagy DOCX dokumentumot.
+5. Ellenőrizd, hogy a dokumentum megjelenik az eltávolítható listában a fájlnevével.
+6. Opcionálisan tölts fel egy második dokumentumot, majd az egyiket távolítsd el a listából – ellenőrizd, hogy eltűnik.
+7. Kattints a „Mentés" / „Hozzáadás" gombra.
+8. Nyisd meg az állat részletes dashboard oldalát (`/dashboard/animals/[id]`), és ellenőrizd, hogy a megmaradt dokumentum a dokumentumok szekcióban megjelenik.
+9. Navigálj a nyilvános `/hu/animals/[slug]` oldalra, és ellenőrizd, hogy a dokumentum ott is látható.
+10. Próbálj meg egy nem támogatott típusú fájlt (pl. `.png`) vagy egy 10 MB-nál nagyobb fájlt feltölteni – ellenőrizd a validációs hibaüzenetet.
+
+**Elvárt eredmény:**
+A menhely admin az új állat létrehozásakor hivatalos papírokat csatolhat. A dokumentumok `AnimalDocument` rekordként, az állattal együtt egyetlen mentési műveletben jönnek létre, és megjelennek a dashboard részletes oldalon, valamint a nyilvános állat oldalon. A típus- és méret-validáció érvényesül.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-11-16: Vezetett bemutató (onboarding tour) első bejelentkezéskor
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Olyan `SHELTER_ADMIN` fiók, amely még nem látta a bemutatót (`User.dashboardTourSeen = false`); az ellenőrzéshez javasolt egy friss teszt menhely admin fiók, vagy a `shelter@test.hu` fiók `dashboardTourSeen` mezőjének visszaállítása `false`-ra |
+| **URL** | `/dashboard` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Első bejelentkezéskor a `SHELTER_ADMIN` felhasználó a `/dashboard` oldalon vezetett bemutatót (lépésenkénti kiemelésekkel a dashboard elemein) lát
+- [ ] A bemutató lépésről lépésre végigvezet a dashboard fő területein (highlight + magyarázó szöveg)
+- [ ] A bemutató befejezése (vagy bezárása) után a `POST /api/onboarding` hívás megjelöli a `User.dashboardTourSeen` mezőt `true`-ként
+- [ ] A bemutató NEM jelenik meg újra a következő látogatáskor vagy az oldal újratöltésekor (F5)
+- [ ] A dashboardon elérhető egy „Bemutató" / súgó gomb, amellyel a bemutató igény szerint újraindítható
+- [ ] A „Bemutató" gombbal újraindított tour lejátszása után a bemutató továbbra sem indul el automatikusan a következő látogatáskor
+
+**Tesztelési lépések:**
+1. Biztosítsd, hogy a teszt `SHELTER_ADMIN` fiók `dashboardTourSeen` mezője `false` (friss fiók vagy visszaállított érték).
+2. Jelentkezz be a fiókkal, és navigálj a `/dashboard` oldalra.
+3. Ellenőrizd, hogy a vezetett bemutató automatikusan elindul, és lépésenként kiemeli a dashboard elemeit magyarázó szöveggel.
+4. Lépkedj végig a bemutató lépésein, majd fejezd be (vagy zárd be).
+5. Ellenőrizd (pl. hálózati kérésekben), hogy a `POST /api/onboarding` hívás lefut, és a `User.dashboardTourSeen` `true`-ra vált.
+6. Töltsd újra a `/dashboard` oldalt (F5) – ellenőrizd, hogy a bemutató NEM indul el újra.
+7. Jelentkezz ki, majd újra be, és navigálj a `/dashboard` oldalra – ellenőrizd, hogy a bemutató továbbra sem jelenik meg automatikusan.
+8. Keresd meg a „Bemutató" / súgó gombot, és kattints rá – ellenőrizd, hogy a bemutató igény szerint újraindul.
+9. Fejezd be a manuálisan indított bemutatót, töltsd újra az oldalt, és ellenőrizd, hogy nem indul el automatikusan.
+
+**Elvárt eredmény:**
+A vezetett bemutató az első `SHELTER_ADMIN` bejelentkezéskor egyszer jelenik meg, a `User.dashboardTourSeen` mező a `POST /api/onboarding` híváson keresztül `true`-ra vált, így a bemutató a további látogatásoknál és újratöltéseknél nem jelenik meg. A „Bemutató" gombbal a tour bármikor újrajátszható, anélkül hogy az automatikus megjelenés visszaállna.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

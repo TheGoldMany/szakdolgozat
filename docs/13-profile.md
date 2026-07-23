@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le a felhasználói profiloldalt és a hozzá tartozó beállításokat. A `/hu/profile` oldal bejelentkezett felhasználóknak érhető el, és megjeleníti a fiókadatokat (e-mail, szerepkör, regisztráció dátuma, kérelmek száma), a személyes adatok szerkesztő űrlapját (`ProfileForm`), az avatar feltöltést (`AvatarUpload`, Vercel Blob tárolóval), a jelszóváltó űrlapot (`ChangePasswordForm` – csak jelszavas fiókoknál), valamint a felhasználó saját aktivitását: előfizetések (`SubscriptionsList`), virtuális örökbefogadások (`SponsorshipsList`) és az örökbefogadási előzmények listáját. A nyelvváltás a fejléc Globe ikonos nyelvi váltójával történik (hu/en/de/pl), a `next-intl` útválasztással.
+Ez a modul fedi le a felhasználói profiloldalt és a hozzá tartozó beállításokat. A `/hu/profile` oldal bejelentkezett felhasználóknak érhető el, és megjeleníti a fiókadatokat (e-mail, szerepkör, regisztráció dátuma, kérelmek száma), a személyes adatok szerkesztő űrlapját (`ProfileForm` – név, telefon, város, cím), az avatar feltöltést (`AvatarUpload`, Vercel Blob tárolóval), a jelszóváltó űrlapot (`ChangePasswordForm` – csak jelszavas fiókoknál), az e-mail értesítési beállításokat, a fióktörlést, a GDPR-adatexportot, valamint a felhasználó saját aktivitását: előfizetések (`SubscriptionsList`), virtuális örökbefogadások (`SponsorshipsList`) és az örökbefogadási előzmények listáját. A profilon a felhasználó a saját Stripe fiókját is kezelheti a „Stripe fiók" szekcióban (csatlakoztatás, regisztráció befejezése, vezérlőpult megnyitása), így az általa indított kampányokhoz adományokat fogadhat. A nyelvváltás a fejléc Globe ikonos nyelvi váltójával történik (hu/en/de/pl), a `next-intl` útválasztással.
 
 ---
 
@@ -14,6 +14,7 @@ Ez a modul fedi le a felhasználói profiloldalt és a hozzá tartozó beállít
 - **US-13-D**: Mint felhasználó, szeretném megváltoztatni a jelszavamat, hogy biztonságban tartsam a fiókomat.
 - **US-13-E**: Mint felhasználó, szeretnék nyelvet váltani az oldalon (magyar, angol, német, lengyel), hogy a számomra kényelmes nyelven használjam a platformot.
 - **US-13-F**: Mint felhasználó, szeretném a profilomon egy helyen látni a kérelmeimet, előfizetéseimet, virtuális örökbefogadásaimat és az örökbefogadási előzményeimet, hogy átlássam az aktivitásomat.
+- **US-13-G**: Mint felhasználó, szeretném a saját Stripe fiókomat a profilomról csatlakoztatni és kezelni, hogy az általam indított kampányokhoz adományokat fogadhassak, és a bevételeimet a Stripe vezérlőpultján áttekinthessem.
 
 ---
 
@@ -242,6 +243,77 @@ A nyelvváltó mind a 4 nyelvet (hu/en/de/pl) felkínálja, váltáskor az URL l
 
 **Elvárt eredmény:**
 A profilon a felhasználó teljes aktivitása megjelenik: előfizetések, virtuális örökbefogadások és örökbefogadási előzmények. A linkek a megfelelő oldalakra visznek, üres listáknál üres állapot látható.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-13-07: Saját Stripe fiók csatlakoztatása a profilról
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | `user@test.hu` / `User1234!` bejelentkezve; a felhasználónak még NINCS csatlakoztatott Stripe fiókja; a Stripe Connect konfigurálva van (teszt módban) |
+| **URL** | `/hu/profile` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A profiloldalon megjelenik a „Stripe fiók" szekció
+- [ ] Csatlakoztatatlan állapotban a szekció egy „Stripe fiók csatlakoztatása" gombot mutat
+- [ ] A gombra kattintva `POST /api/stripe/connect/onboard` kérés indul `{ type: "user" }` payloaddal
+- [ ] A sikeres válasz után a felhasználó a Stripe onboarding (regisztrációs) folyamatához irányítódik
+- [ ] Befejezetlen onboarding esetén a szekció a „Regisztráció befejezése" gombot mutatja (nem az „aktív" állapotot)
+- [ ] A Stripe onboarding sikeres befejezése után a szekció a zöld „aktív" státuszra vált
+- [ ] Az aktív állapot lehetővé teszi, hogy a felhasználó az általa indított kampányokhoz adományokat fogadjon
+
+**Tesztelési lépések:**
+1. Jelentkezz be `user@test.hu` / `User1234!` fiókkal és navigálj a `/hu/profile` oldalra.
+2. Görgess a „Stripe fiók" szekcióhoz – ellenőrizd, hogy a „Stripe fiók csatlakoztatása" gomb jelenik meg (csatlakoztatatlan állapot).
+3. Kattints a „Stripe fiók csatlakoztatása" gombra.
+4. Ellenőrizd (DevTools → Network), hogy `POST /api/stripe/connect/onboard` indul `{ type: "user" }` payloaddal.
+5. Ellenőrizd, hogy a rendszer a Stripe onboarding folyamatához irányít.
+6. (Befejezetlen eset) Szakítsd meg az onboardingot és térj vissza a profilra – ellenőrizd, hogy a szekció a „Regisztráció befejezése" gombot mutatja.
+7. Fejezd be a Stripe onboardingot (teszt adatokkal) és térj vissza a profilra.
+8. Ellenőrizd, hogy a „Stripe fiók" szekció zöld „aktív" státuszra váltott.
+
+**Elvárt eredmény:**
+A felhasználó a profilról elindíthatja a saját Stripe fiókja csatlakoztatását (`type: "user"`). Befejezetlen onboarding esetén a „Regisztráció befejezése" gomb jelenik meg, sikeres befejezés után pedig a zöld „aktív" státusz, amellyel a felhasználó adományokat fogadhat a kampányaihoz.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-13-08: Stripe vezérlőpult megnyitása csatlakoztatott fiókkal
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | `user@test.hu` / `User1234!` bejelentkezve; a felhasználónak MÁR van csatlakoztatott, aktív Stripe fiókja (TC-13-07 lefutott) |
+| **URL** | `/hu/profile` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Csatlakoztatott, aktív fiók esetén a „Stripe fiók" szekció zöld „aktív" státuszt és egy „Stripe vezérlőpult megnyitása" gombot mutat
+- [ ] A gombra kattintva `POST /api/stripe/connect/dashboard` kérés indul a felhasználó saját fiókjára (a végpont a menhelyek mellett a felhasználó saját fiókját is támogatja)
+- [ ] A sikeres válasz egy Stripe Express dashboard bejelentkezési linket ad vissza, amely megnyílik (a Stripe Express vezérlőpultjára navigál)
+- [ ] Az „aktív" állapotban NEM jelenik meg a „Stripe fiók csatlakoztatása" vagy a „Regisztráció befejezése" gomb
+
+**Tesztelési lépések:**
+1. Jelentkezz be `user@test.hu` / `User1234!` fiókkal és navigálj a `/hu/profile` oldalra.
+2. Görgess a „Stripe fiók" szekcióhoz – ellenőrizd a zöld „aktív" státuszt és a „Stripe vezérlőpult megnyitása" gombot.
+3. Ellenőrizd, hogy nem jelenik meg a „Stripe fiók csatlakoztatása" vagy a „Regisztráció befejezése" gomb.
+4. Kattints a „Stripe vezérlőpult megnyitása" gombra.
+5. Ellenőrizd (DevTools → Network), hogy `POST /api/stripe/connect/dashboard` indul a felhasználó saját fiókjára.
+6. Ellenőrizd, hogy a Stripe Express vezérlőpult bejelentkezési linkje megnyílik.
+
+**Elvárt eredmény:**
+Aktív, csatlakoztatott Stripe fiók esetén a felhasználó a profilról megnyithatja a saját Stripe Express vezérlőpultját a `POST /api/stripe/connect/dashboard` végponton keresztül, amely a felhasználó saját fiókját is támogatja.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

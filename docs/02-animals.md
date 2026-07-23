@@ -2,7 +2,7 @@
 
 ## Összefoglalás
 
-Ez a modul fedi le az állatböngészési felületet: az állatok listázását, szűrését, keresését, az egyedi állatprofilok megtekintését, valamint a bejelentkezett felhasználók kedvenckezelési funkcióit. Az oldal fő belépési pontja a `/hu/animals` útvonal, ahol a látogatók és a regisztrált felhasználók egyaránt böngészhetnek az örökbefogadható állatok között.
+Ez a modul fedi le az állatböngészési felületet: az állatok listázását, szűrését, keresését, az egyedi állatprofilok megtekintését, valamint a bejelentkezett felhasználók kedvenckezelési funkcióit. Az oldal fő belépési pontja a `/hu/animals` útvonal, ahol a látogatók és a regisztrált felhasználók egyaránt böngészhetnek az örökbefogadható állatok között. Az állat részletes profilján az adott állathoz feltöltött hivatalos papírok (PDF/DOC/DOCX dokumentumok) is megtekinthetők, amennyiben a menhely csatolt ilyeneket. A dokumentumok feltöltése a dashboard felől történik: az állat létrehozásakor (`AddAnimalForm`, „Hivatalos papírok" szekció) vagy utólag az állat dashboard részletes oldalán.
 
 ## Felhasználói Történetek
 
@@ -287,6 +287,84 @@ A bejelentkezett felhasználó kedvencnek jelölhet állatokat a lista- és a r�
 
 **Elvárt eredmény:**
 A kedvencek eltávolítása azonnal és szinkronizáltan működik az összes nézetben. A kedvencek oldal szűrhető, az üres állapot kezelése megfelelő, és a bejelentkezés védi az oldalt.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-02-08: Állat létrehozása hivatalos papírokkal (dokumentum-feltöltés mentés előtt)
+
+| | |
+|---|---|
+| **Prioritás** | 🟡 Közepes |
+| **Előfeltétel** | Bejelentkezett admin: `admin@test.hu` / `Admin1234!` (super admin) VAGY `shelter@test.hu` / `Admin1234!` (menhely admin); rendelkezésre áll legalább egy érvényes PDF (max 10 MB) teszt dokumentum |
+| **URL** | /dashboard/animals |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Az „Új állat" panelben (`AddAnimalForm`) megjelenik a „Hivatalos papírok" szekció
+- [ ] A szekcióban PDF, DOC és DOCX kiterjesztésű fájlok tölthetők fel, fájlonként legfeljebb 10 MB méretben
+- [ ] A dokumentumok a mentés ELŐTT feltölthetők (kliens oldali feltöltés a Vercel Blob tárolóba a `/api/upload/document` végponton keresztül)
+- [ ] A sikeresen feltöltött dokumentumok eltávolítható listaként jelennek meg a formban (fájlnév látható)
+- [ ] Az állat mentésekor a dokumentumok atomi módon, az állattal együtt mentődnek `AnimalDocument` rekordként (a `/api/animals` POST a `documents[]` tömböt `{url, name, fileType, sizeBytes}` mezőkkel fogadja)
+- [ ] Mentés után a feltöltött dokumentumok megjelennek az állat dashboard részletes oldalának dokumentumok szekciójában (`/dashboard/animals/[id]`)
+- [ ] A dokumentumok megjelennek a nyilvános állat oldalon (`/hu/animals/[slug]`) is
+- [ ] A funkció super admin és menhely admin számára egyaránt működik (közös form)
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` (vagy `admin@test.hu` / `Admin1234!`) fiókkal, és navigálj a `/dashboard/animals` oldalra.
+2. Kattints az „Új állat" gombra a hozzáadó panel megnyitásához.
+3. Töltsd ki a kötelező mezőket (Faj: `DOG`, Név: `Papíros Teszt`), és tetszőlegesen a többit.
+4. Görgess a „Hivatalos papírok" szekcióhoz.
+5. Tölts fel egy érvényes PDF dokumentumot (pl. `oltasi_konyv.pdf`, max 10 MB).
+6. Ellenőrizd, hogy a feltöltés után a dokumentum megjelenik a form eltávolítható listájában, a fájlnevével.
+7. Kattints a „Mentés" / „Hozzáadás" gombra.
+8. Ellenőrizd, hogy az állat létrejön, és nyisd meg a részletes dashboard oldalát (`/dashboard/animals/[id]`).
+9. Ellenőrizd, hogy a feltöltött dokumentum megjelenik a dokumentumok szekcióban, és megnyitható/letölthető.
+10. Navigálj a nyilvános `/hu/animals/[slug]` oldalra, és ellenőrizd, hogy a dokumentum ott is megjelenik.
+
+**Elvárt eredmény:**
+Az állat a hozzá feltöltött hivatalos papírokkal együtt, egyetlen mentési műveletben jön létre. A dokumentumok `AnimalDocument` rekordként mentődnek, és megjelennek mind a dashboard részletes oldalon, mind a nyilvános állat oldalon. A funkció super admin és menhely admin szerepkörrel egyaránt működik.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-02-09: Dokumentum eltávolítása mentés előtt és fájl-validáció (típus, méret)
+
+| | |
+|---|---|
+| **Prioritás** | 🟢 Alacsony |
+| **Előfeltétel** | Bejelentkezett admin: `admin@test.hu` / `Admin1234!` vagy `shelter@test.hu` / `Admin1234!`; rendelkezésre áll egy érvényes DOCX teszt fájl, egy nem támogatott típusú fájl (pl. `.png` vagy `.txt`), és egy 10 MB-nál nagyobb fájl |
+| **URL** | /dashboard/animals |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A „Hivatalos papírok" szekcióban feltöltött dokumentum a listából eltávolítható a mentés előtt
+- [ ] Az eltávolított dokumentum nem kerül mentésre az állattal együtt (nem jön létre `AnimalDocument` rekord hozzá)
+- [ ] Nem támogatott fájltípus (nem PDF/DOC/DOCX) feltöltése elutasításra kerül, hibaüzenettel
+- [ ] A 10 MB-os fájlméret-korlátot meghaladó fájl feltöltése elutasításra kerül, hibaüzenettel
+- [ ] Az érvényes (elfogadott típusú, méreten belüli) dokumentumok továbbra is feltölthetők és megjelennek a listában
+
+**Tesztelési lépések:**
+1. Jelentkezz be `shelter@test.hu` / `Admin1234!` fiókkal, és navigálj a `/dashboard/animals` oldalra.
+2. Nyisd meg az „Új állat" panelt, és töltsd ki a kötelező mezőket.
+3. A „Hivatalos papírok" szekcióban tölts fel két érvényes dokumentumot (pl. egy PDF-et és egy DOCX-et).
+4. Ellenőrizd, hogy mindkét dokumentum megjelenik az eltávolítható listában.
+5. Távolítsd el az egyik dokumentumot a lista eltávolítás gombjával.
+6. Ellenőrizd, hogy a dokumentum eltűnik a listából.
+7. Kíséreld meg egy nem támogatott típusú fájl (pl. `kep.png` vagy `jegyzet.txt`) feltöltését – ellenőrizd, hogy a rendszer elutasítja, és hibaüzenetet jelenít meg.
+8. Kíséreld meg egy 10 MB-nál nagyobb fájl feltöltését – ellenőrizd az elutasítást és a hibaüzenetet.
+9. Mentsd az állatot, és ellenőrizd, hogy csak a megmaradt (eltávolítás után visszamaradt) érvényes dokumentum mentődött el.
+
+**Elvárt eredmény:**
+A mentés előtt eltávolított dokumentumok nem mentődnek. A nem támogatott típusú, illetve a 10 MB-ot meghaladó fájlok feltöltése validációs hibaüzenettel elutasításra kerül. Csak az érvényes és a listában megmaradt dokumentumok jönnek létre `AnimalDocument` rekordként.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

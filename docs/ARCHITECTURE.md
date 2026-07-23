@@ -148,18 +148,25 @@ szerveroldalon **újra ellenőrzi** a session-t és a szerepkört (defense in de
 
 ## 4. Adatmodell (`prisma/schema.prisma`)
 
-Az OLTP séma **42 modellt** tartalmaz, PostgreSQL-en. Logikai csoportosítás:
+Az OLTP séma **48 modellt** tartalmaz, PostgreSQL-en. Logikai csoportosítás:
 
 ### 4.1 Felhasználók és autentikáció
 - **`User`** – központi modell, ~25 relációval. Mezők: `role` (`Role` enum),
   `stripeAccountId` + `stripeOnboardingComplete` (egyéni kampányindítóknak is lehet
-  Connect-fiókja), cím-adatok.
+  Connect-fiókja), `suspendedAt` + `suspendedReason` (super admin általi
+  felfüggesztés – felfüggesztett fiók böngészhet, de nem végezhet műveletet),
+  `dashboardTourSeen` (onboarding-bemutató), cím-adatok.
 - **`Account`, `Session`, `VerificationToken`** – szabványos NextAuth (Prisma adapter) táblák.
 - **`PasswordResetToken`** – jelszó-visszaállító tokenek.
 
 ### 4.2 Menhelyek és üzemeltetés
 - **`Shelter`** – menhely: slug, cím + `lat`/`lng` (térkép), `isVerified`, `capacity`,
-  cég- és bankadatok, `stripeAccountId`.
+  cég- és bankadatok, `stripeAccountId`. A menhelyek **önkiszolgáló módon is
+  regisztrálhatók** a `/auth/register` oldalon (a user egyben `SHELTER_ADMIN` lesz,
+  a menhely `isActive: true` / `isVerified: false`, super admin hitelesítésre vár).
+  A cím → koordináta konverzió automatikus (Nominatim, lásd `lib/geo.ts`:
+  strukturált → szabad szöveges → városközpont tartalék; lakás/emelet toldalék levágva),
+  a beállításokban pedig kézi térképes helymegadás is elérhető.
 - **`ShelterAdmin`** – kapcsolótábla `User` ↔ `Shelter` között (`@@unique([userId, shelterId])`).
   Egy `SHELTER_ADMIN` szerepkörű user ezen keresztül van menhelyhez rendelve.
 - **`ShelterDocument`** – menhelyi dokumentumok (pl. működési engedély).
@@ -168,6 +175,8 @@ Az OLTP séma **42 modellt** tartalmaz, PostgreSQL-en. Logikai csoportosítás:
 - **`InventoryItem` + `InventoryTransaction`** – készletkezelés
   (`InventoryCategory`: `FOOD`, `MEDICINE`, `SUPPLIES`, `CLEANING`, `EQUIPMENT`, `OTHER`;
   `InventoryTxType`: `IN`, `OUT`, `ADJUST`).
+- **`FeedingSchedule` + `FeedingLog`** – etetési rend (állat/kennel szintű) és a
+  ténylegesen kiadott adagok naplója.
 - **`AnimalTransfer`** – menhelyek közötti áthelyezési kérelem
   (`fromShelter` / `toShelter` relációk, `TransferStatus`).
 
@@ -199,7 +208,9 @@ Az OLTP séma **42 modellt** tartalmaz, PostgreSQL-en. Logikai csoportosítás:
 ### 4.5 Pénzügyek
 - **`Campaign`** – adománygyűjtő kampány (user vagy menhely indítja;
   `CampaignStatus`: `PENDING`, `ACTIVE`, `COMPLETED`, `REJECTED` — super admin hagyja jóvá),
-  `targetAmount` / `raisedAmount`.
+  `targetAmount` / `raisedAmount`. Opcionálisan menhelyhez (`shelterId`) **és/vagy
+  állathoz** (`animalId`) köthető. Gyűjtés indításához érvényes Stripe-célpont kell:
+  vagy az indító saját, vagy a választott menhely Connect-fiókja.
 - **`Donation`** – egyszeri adomány, `stripeSessionId`-vel és `paidAt`-tal.
 - **`DonationTier` + `Subscription`** – menhelyi havi támogatási csomagok és
   előfizetések (`SubscriptionStatus`: `ACTIVE`, `CANCELLED`, `PAST_DUE`; `stripeSubId`).
@@ -219,9 +230,13 @@ Az OLTP séma **42 modellt** tartalmaz, PostgreSQL-en. Logikai csoportosítás:
 - **`Notification`** – in-app értesítések; a `NotificationType` enum ~35 értéket fed le
   (kérelem, időpont, önkéntes, foster, kampány, űrlap, adomány, esemény, üzenet,
   utánkövetés, készlet-riasztás, transzfer…). Létrehozás: `lib/notifications.ts`.
-- **`AnimalReport`** – elveszett/talált/kóbor bejelentés (`ReportType`: `LOST`,
-  `FOUND`, `STRAY`; `ReportStatus`: `ACTIVE`, `RESOLVED`, `CLOSED`), koordinátákkal
-  a térképhez.
+- **`AnimalReport` + `ReportImage` + `ReportMatch`** – elveszett/talált/kóbor
+  bejelentés (`ReportType`: `LOST`, `FOUND`, `STRAY`; `ReportStatus`: `ACTIVE`,
+  `RESOLVED`, `CLOSED`), koordinátákkal a térképhez, több képpel és automatikus
+  egyezés-jelöltekkel (elveszett ↔ talált).
+- **`Post` + `PostLike`** – menhelyi közösségi hírfolyam: posztok (opcionális kép,
+  valamint állat-/esemény-/kampány-hivatkozás) és lájkok; a főoldali „For You" folyam
+  ezekből épül.
 - **`Event` + `EventRegistration`** – események (`EventType`: `ADOPTION_DAY`,
   `FUNDRAISER`, `VOLUNTEER_DAY`, `OPEN_DAY`, `EDUCATION`, `OTHER`; `EventStatus`,
   `EventRegistrationStatus`).
@@ -292,6 +307,14 @@ A jogosultság-ellenőrzés **három rétegben** történik:
    Tehát a shelter admin **soha nem kap** kliensoldalról `shelterId`-t — azt a
    `ShelterAdmin` táblából oldja fel a szerver. A super admin küldhet `shelterId`-t.
 
+4. **Fiók-felfüggesztés** — a mutáló felhasználói végpontok a session-ellenőrzés
+   után meghívják a `blockIfSuspended(userId)` guardot (`lib/account-status.ts`),
+   amely `403`-at ad, ha a `User.suspendedAt` ki van töltve. Így a felfüggesztett
+   fiók továbbra is böngészhet, de kérelmet, üzenetet, adományt, gyűjtést,
+   értékelést, foglalást, jelentkezést stb. nem küldhet. A super admin a
+   `PATCH /api/admin/users/[id]` (`{ suspended }`) és `DELETE /api/admin/users/[id]`
+   végpontokkal moderál (saját magát és másik super admint nem érinthet).
+
 ---
 
 ## 6. API réteg (`app/api/`)
@@ -318,8 +341,11 @@ Fontosabb endpoint-csoportok:
 | `/api/conversations`, `/api/messages`, `/api/messages/unread` | Chat, olvasatlan számláló |
 | `/api/checkout/donate` \| `subscribe` \| `sponsor` | Stripe Checkout session létrehozás (lásd 7. fejezet) |
 | `/api/webhooks/stripe` | Stripe webhook (fizetés-visszaigazolás) |
-| `/api/stripe/connect/onboard` \| `callback` | Stripe Connect onboarding menhelynek/usernek |
-| `/api/campaigns`, `/api/subscriptions`, `/api/sponsorships` | Kampányok, előfizetések, virtuális örökbefogadások kezelése |
+| `/api/stripe/connect/onboard` \| `callback` \| `dashboard` | Stripe Connect onboarding és Express-vezérlőpult menhelynek **és** felhasználónak |
+| `/api/campaigns`, `/api/subscriptions`, `/api/sponsorships` | Kampányok (opcionális menhely/állat + Stripe-feltétel), előfizetések, virtuális örökbefogadások |
+| `/api/shelters/list` | Aktív menhelyek könnyű listája (kampány-űrlap legördülő) |
+| `/api/onboarding` | A dashboard-bemutató „látott" állapotának mentése (`dashboardTourSeen`) |
+| `/api/posts`, `/api/posts/[id]/like` | Közösségi hírfolyam posztok és lájkok |
 | `/api/kennels`, `/api/inventory`, `/api/transfers` | Menhely-üzemeltetés (kennelek, készlet, áthelyezések) |
 | `/api/volunteers`, `/api/volunteer-tasks`, `/api/foster` | Önkéntes- és foster-kezelés |
 | `/api/events`, `/api/favorites`, `/api/reviews`, `/api/reports`, `/api/map` | Események, kedvencek, értékelések, bejelentések, térkép-adatok |
@@ -327,7 +353,8 @@ Fontosabb endpoint-csoportok:
 | `/api/notifications`, `/api/notifications/read-all` | Értesítések lekérése / olvasottra állítása |
 | `/api/upload/avatar` \| `attachment` \| `document` | Vercel Blob kliensoldali feltöltés (`handleUpload`, típus- és méretkorlátokkal) |
 | `/api/dashboard/*` | Admin-aggregátumok (analytics, animals, applications, followups) |
-| `/api/admin/*` | SUPER_ADMIN: users, shelters, campaigns kezelése |
+| `/api/admin/*` | SUPER_ADMIN: users (szerepkör, **felfüggesztés/törlés**), shelters (hitelesítés, **geokódolás**: `/api/admin/shelters/geocode`), campaigns |
+| `/api/shelters/[id]/location` | Menhely pontos koordinátáinak mentése a térképes helyválasztóból |
 | `/api/export` | CSV-export (animals, applications, volunteers, sponsorships, events, subscribers, donations) |
 | `/api/etl` | DWH betöltés (lásd 9. fejezet) |
 | `/api/seed`, `/api/seed/extras` | Demó-adat feltöltés |
