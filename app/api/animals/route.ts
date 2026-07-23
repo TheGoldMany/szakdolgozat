@@ -85,6 +85,12 @@ const createSchema = z.object({
   isGoodWithDogs:  z.boolean().nullable().optional(),
   isGoodWithCats:  z.boolean().nullable().optional(),
   imageUrls:       z.array(z.string().url()).optional(),
+  documents:       z.array(z.object({
+    url:       z.string().url(),
+    name:      z.string().min(1).max(200),
+    fileType:  z.string().min(1).max(150),
+    sizeBytes: z.number().int().positive().optional(),
+  })).optional(),
 }).superRefine((data, ctx) => {
   // "Egyéb" faj esetén kötelező a faj megnevezése (breed mező)
   if (data.type === AnimalType.OTHER && !data.breed?.trim()) {
@@ -180,6 +186,13 @@ async function createAnimal(data: z.infer<typeof createSchema>, shelterId: strin
           images: {
             create: data.imageUrls.map((url, i) => ({
               url, alt: data.name, isPrimary: i === 0, order: i,
+            })),
+          },
+        }),
+        ...((data.documents?.length) && {
+          documents: {
+            create: data.documents.map((d) => ({
+              name: d.name, url: d.url, fileType: d.fileType, sizeBytes: d.sizeBytes ?? null,
             })),
           },
         }),
