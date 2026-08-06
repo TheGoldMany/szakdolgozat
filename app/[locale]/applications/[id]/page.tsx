@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, FileText } from "lucide-react";
 import { ContractDownloadButton } from "@/components/applications/contract-download-button";
+import { ApplicationTimeline } from "@/components/applications/application-timeline";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -121,6 +122,13 @@ export default async function UserApplicationDetailPage({
             </div>
           )}
         </div>
+
+        {/* Állapot idővonal */}
+        <ApplicationTimeline
+          status={app.status}
+          createdAt={app.createdAt.toISOString()}
+          reviewedAt={app.reviewedAt ? app.reviewedAt.toISOString() : null}
+        />
 
         {/* Submitted form responses */}
         {app.responses.length > 0 ? (
