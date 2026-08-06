@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import {
   PawPrint, ClipboardList, CalendarDays, Heart,
   TrendingUp, Building2, Users, DollarSign,
+  Clock, ClipboardCheck, Syringe, PackageMinus,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
@@ -13,6 +14,7 @@ import { AnimalStatus, ApplicationStatus, SubscriptionStatus, CampaignStatus, Fo
 import { cn } from "@/lib/utils";
 import { groupByMonth } from "@/lib/stats";
 import { KpiCard } from "@/components/dashboard/stats/kpi-card";
+import { TodoWidget, type TodoItem } from "@/components/dashboard/todo-widget";
 import { AnimalsDonut } from "@/components/dashboard/stats/animals-donut";
 import { ApplicationsBar } from "@/components/dashboard/stats/applications-bar";
 import { AdoptionsLine } from "@/components/dashboard/stats/adoptions-line";
@@ -57,6 +59,9 @@ export default async function DashboardPage() {
     const now      = new Date();
     const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday   = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const in7days      = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const [
       animalsByStatus,
@@ -70,6 +75,11 @@ export default async function DashboardPage() {
       donationsAgg,
       recentApps,
       recentAdoptions,
+      todoNewApps,
+      todoTodayAppts,
+      todoDueVax,
+      todoLowStockItems,
+      todoDueFollowups,
     ] = await Promise.all([
       prisma.animal.groupBy({
         by: ["status"],
@@ -112,7 +122,41 @@ export default async function DashboardPage() {
         where:   { shelterId, status: AnimalStatus.ADOPTED, adoptedAt: { gte: sixMonthsAgo } },
         select:  { adoptedAt: true },
       }),
+      // ── Teendők widget adatai ──────────────────────────────────────────────
+      prisma.adoptionApplication.count({
+        where: { animal: { shelterId }, status: { in: [ApplicationStatus.PENDING, ApplicationStatus.REVIEWING] } },
+      }),
+      prisma.appointment.count({
+        where: { shelterId, status: "CONFIRMED", proposedAt: { gte: startOfToday, lt: endOfToday } },
+      }),
+      prisma.healthRecord.count({
+        where: { nextDueDate: { gte: startOfToday, lte: in7days }, animal: { shelterId } },
+      }),
+      prisma.inventoryItem.findMany({
+        where:  { shelterId, minQuantity: { not: null } },
+        select: { quantity: true, minQuantity: true },
+      }),
+      prisma.adoptionFollowUp.count({
+        where: {
+          application: { animal: { shelterId } },
+          OR: [{ status: "OVERDUE" }, { status: "PENDING", scheduledAt: { lte: now } }],
+        },
+      }),
     ]);
+
+    // Alacsony készlet: a Prisma nem hasonlít össze két oszlopot, ezért JS-ben szűrünk
+    const lowStockCount = todoLowStockItems.filter(
+      (i) => i.minQuantity != null && i.quantity <= i.minQuantity,
+    ).length;
+
+    const todoItems: TodoItem[] = [
+      { key: "today-appts",   label: "Mai megerősített időpontok",       count: todoTodayAppts,        href: "/dashboard/appointments", icon: CalendarDays   },
+      { key: "pending-appts", label: "Válaszra váró időpont-kérések",    count: pendingAppointments,   href: "/dashboard/appointments", icon: Clock          },
+      { key: "new-apps",      label: "Feldolgozásra váró kérelmek",      count: todoNewApps,           href: "/dashboard/applications", icon: ClipboardList  },
+      { key: "due-followups", label: "Esedékes utánkövetések",           count: todoDueFollowups,      href: "/dashboard/followups",    icon: ClipboardCheck },
+      { key: "due-vax",       label: "Közelgő oltások / kezelések (7 nap)", count: todoDueVax,         href: "/dashboard/animals",      icon: Syringe        },
+      { key: "low-stock",     label: "Alacsony készlet",                 count: lowStockCount,         href: "/dashboard/inventory",    icon: PackageMinus   },
+    ];
 
     // ── Build chart data ──────────────────────────────────────────────────
     const animalStatusData = animalsByStatus.map(a => ({
@@ -180,6 +224,9 @@ export default async function DashboardPage() {
             trend={{ value: adoptionTrend, label: t("kpiVsPrevMonth") }}
           />
         </div>
+
+        {/* Teendők */}
+        <TodoWidget items={todoItems} />
 
         {/* Charts row */}
         <div className="grid gap-6 lg:grid-cols-5">
