@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && (prisma db push --accept-data-loss || echo '⚠️  DB push skipped (unreachable) — continuing build') && (prisma db push --schema=prisma/dwh.prisma --accept-data-loss || echo '⚠️  DWH db push skipped (unreachable) — continuing build') && next build",
+    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && (prisma db push --accept-data-loss || DATABASE_URL=\"${POSTGRES_URL_NON_POOLING:-$DATABASE_URL}\" prisma db push --accept-data-loss || echo '⚠️  DB push skipped (unreachable) — continuing build') && (prisma db push --schema=prisma/dwh.prisma --accept-data-loss || echo '⚠️  DWH db push skipped (unreachable) — continuing build') && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
