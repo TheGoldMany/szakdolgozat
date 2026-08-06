@@ -54,8 +54,15 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Csak a bejelentkezéshez szükséges oszlopokat kérjük le – így egy
+        // esetleges séma-eltérés (pl. újonnan felvett, DB-ben még nem létező
+        // oszlop) nem tudja bedönteni a teljes lekérdezést és a login-t.
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where:  { email: credentials.email },
+          select: {
+            id: true, email: true, name: true, image: true,
+            role: true, password: true, emailVerified: true,
+          },
         });
 
         if (!user || !user.password) return null;
