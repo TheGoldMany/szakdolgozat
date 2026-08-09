@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // DELETE /api/favorites/[animalId] – remove an animal from favorites
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { animalId: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     await prisma.favorite.deleteMany({
-      where: { userId: session.user.id, animalId: params.animalId },
+      where: { userId: user!.id, animalId: params.animalId },
     });
 
     return NextResponse.json({ success: true });

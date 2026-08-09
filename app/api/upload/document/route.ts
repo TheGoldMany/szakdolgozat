@@ -1,11 +1,10 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getAuthUser } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const authUser = await getAuthUser(request);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
@@ -22,7 +21,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ],
         maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB
-        tokenPayload: JSON.stringify({ userId: session.user.id }),
+        tokenPayload: JSON.stringify({ userId: authUser.id }),
       }),
       onUploadCompleted: async ({ blob }) => {
         console.log("Document uploaded:", blob.url);

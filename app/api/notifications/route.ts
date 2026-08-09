@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/notifications – user's notifications
 //   ?filter=unread  → only unread
 //   ?limit=N        → max rows (default 40, max 100)
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
@@ -18,7 +17,7 @@ export async function GET(req: NextRequest) {
     const limit    = Math.min(100, Math.max(1, isNaN(rawLimit) ? 40 : rawLimit));
 
     const where = {
-      userId: session.user.id,
+      userId: authUser.id,
       ...(filter === "unread" && { readAt: null }),
     };
 
@@ -29,7 +28,7 @@ export async function GET(req: NextRequest) {
         take:    limit,
       }),
       prisma.notification.count({
-        where: { userId: session.user.id, readAt: null },
+        where: { userId: authUser.id, readAt: null },
       }),
     ]);
 

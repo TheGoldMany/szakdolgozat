@@ -1,18 +1,15 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // POST /api/notifications/read-all – mark all as read
-export async function POST() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     await prisma.notification.updateMany({
-      where: { userId: session.user.id, readAt: null },
+      where: { userId: user!.id, readAt: null },
       data:  { readAt: new Date() },
     });
 

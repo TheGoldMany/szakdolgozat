@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/conversations/[id] – get full conversation with messages
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -41,13 +40,13 @@ export async function GET(
   }
 
   // Access check: user must be the conversation's user, or a shelter admin for this shelter, or super admin
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-  const isConversationUser = conversation.userId === session.user.id;
+  const isSuperAdmin = authUser.role === "SUPER_ADMIN";
+  const isConversationUser = conversation.userId === authUser.id;
 
   let isShelterAdmin = false;
-  if (session.user.role === "SHELTER_ADMIN") {
+  if (authUser.role === "SHELTER_ADMIN") {
     const adminRecord = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id, shelterId: conversation.shelterId },
+      where: { userId: authUser.id, shelterId: conversation.shelterId },
     });
     isShelterAdmin = !!adminRecord;
   }
@@ -60,7 +59,7 @@ export async function GET(
   await prisma.message.updateMany({
     where: {
       conversationId: params.id,
-      senderId: { not: session.user.id },
+      senderId: { not: authUser.id },
       readAt: null,
     },
     data: { readAt: new Date() },

@@ -1,17 +1,16 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/profile/export – GDPR Art. 20 data portability
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id },
+    where:  { id: authUser.id },
     select: {
       id:                 true,
       name:               true,

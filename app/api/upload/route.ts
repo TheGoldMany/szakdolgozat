@@ -1,10 +1,9 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getAuthUser } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const session = await getServerSession(authOptions);
+  const authUser = await getAuthUser(request);
 
   const body = (await request.json()) as HandleUploadBody;
 
@@ -17,7 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return {
           allowedContentTypes: ["image/jpeg", "image/png", "image/webp", "image/gif"],
           maximumSizeInBytes: 5 * 1024 * 1024, // 5 MB
-          tokenPayload: JSON.stringify({ userId: session?.user?.id ?? "anonymous" }),
+          tokenPayload: JSON.stringify({ userId: authUser?.id ?? "anonymous" }),
         };
       },
       onUploadCompleted: async ({ blob }) => {
