@@ -1,18 +1,15 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // POST /api/onboarding — mark the dashboard tour as seen for the current user
-export async function POST() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+export async function POST(req: NextRequest) {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user!.id },
       data:  { dashboardTourSeen: true },
     });
     return NextResponse.json({ ok: true });

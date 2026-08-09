@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // PATCH /api/notifications/[id] – mark single notification as read
 export async function PATCH(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const n = await prisma.notification.findUnique({ where: { id: params.id } });
-    if (!n || n.userId !== session.user.id) {
+    if (!n || n.userId !== user!.id) {
       return NextResponse.json({ error: "Nem található" }, { status: 404 });
     }
 
@@ -35,17 +32,15 @@ export async function PATCH(
 
 // DELETE /api/notifications/[id] – remove a single notification
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const n = await prisma.notification.findUnique({ where: { id: params.id } });
-    if (!n || n.userId !== session.user.id) {
+    if (!n || n.userId !== user!.id) {
       return NextResponse.json({ error: "Nem található" }, { status: 404 });
     }
 

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 const updateSchema = z.object({
   name:               z.string().min(2, "Legalább 2 karakter szükséges").max(100).optional(),
@@ -13,10 +12,8 @@ const updateSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user: authUser, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const body = await req.json();
   const parsed = updateSchema.safeParse(body);
@@ -29,7 +26,7 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const user = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: authUser!.id },
       data: parsed.data,
       select: { id: true, name: true, email: true, phone: true, address: true, city: true, role: true },
     });

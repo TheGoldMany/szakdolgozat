@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 
 // POST /api/conversations – create or find conversation for an animal
 const createSchema = z.object({
@@ -10,10 +9,8 @@ const createSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const body = await req.json();
   const parsed = createSchema.safeParse(body);
@@ -33,11 +30,11 @@ export async function POST(req: NextRequest) {
 
   // Upsert conversation (one per animal+user pair)
   const conversation = await prisma.conversation.upsert({
-    where: { animalId_userId: { animalId, userId: session.user.id } },
+    where: { animalId_userId: { animalId, userId: user!.id } },
     update: {},
     create: {
       animalId,
-      userId: session.user.id,
+      userId: user!.id,
       shelterId: animal.shelterId,
     },
   });
@@ -46,27 +43,27 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/conversations – list conversations for the current user or shelter admin
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const isShelterAdmin =
-    session.user.role === "SHELTER_ADMIN" || session.user.role === "SUPER_ADMIN";
+    authUser.role === "SHELTER_ADMIN" || authUser.role === "SUPER_ADMIN";
 
   let conversations;
 
   if (isShelterAdmin) {
     // Find shelter(s) this admin manages
     const shelterAdmins = await prisma.shelterAdmin.findMany({
-      where: { userId: session.user.id },
+      where: { userId: authUser.id },
       select: { shelterId: true },
     });
     const shelterIds = shelterAdmins.map((s) => s.shelterId);
 
     conversations = await prisma.conversation.findMany({
-      where: session.user.role === "SUPER_ADMIN"
+      where: authUser.role === "SUPER_ADMIN"
         ? {}
         : { shelterId: { in: shelterIds } },
       include: {
@@ -82,7 +79,7 @@ export async function GET() {
     });
   } else {
     conversations = await prisma.conversation.findMany({
-      where: { userId: session.user.id },
+      where: { userId: authUser.id },
       include: {
         animal: { select: { name: true, slug: true, images: { where: { isPrimary: true }, take: 1 } } },
         shelter: { select: { name: true, slug: true } },
@@ -101,7 +98,7 @@ export async function GET() {
     by: ["conversationId"],
     where: {
       conversationId: { in: conversations.map((c) => c.id) },
-      senderId: { not: session.user.id },
+      senderId: { not: authUser.id },
       readAt: null,
     },
     _count: { _all: true },

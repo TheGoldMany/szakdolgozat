@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { sendNewMessageEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
-import { blockIfSuspended } from "@/lib/account-status";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   content:        z.string().max(2000).optional(),
@@ -20,12 +18,8 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const suspended = await blockIfSuspended(session.user.id);
-  if (suspended) return suspended;
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const conversation = await prisma.conversation.findUnique({
     where: { id: params.id },
@@ -48,12 +42,12 @@ export async function POST(
   }
 
   // Access check
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-  const isConversationUser = conversation.userId === session.user.id;
+  const isSuperAdmin = user!.role === "SUPER_ADMIN";
+  const isConversationUser = conversation.userId === user!.id;
   let isShelterAdmin = false;
-  if (session.user.role === "SHELTER_ADMIN") {
+  if (user!.role === "SHELTER_ADMIN") {
     const adminRecord = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id, shelterId: conversation.shelterId },
+      where: { userId: user!.id, shelterId: conversation.shelterId },
     });
     isShelterAdmin = !!adminRecord;
   }
@@ -72,7 +66,7 @@ export async function POST(
     prisma.message.create({
       data: {
         conversationId: params.id,
-        senderId:       session.user.id,
+        senderId:       user!.id,
         content:        parsed.data.content ?? null,
         attachmentUrl:  parsed.data.attachmentUrl  ?? null,
         attachmentName: parsed.data.attachmentName ?? null,
@@ -89,11 +83,11 @@ export async function POST(
   const BASE        = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
   const convUrl     = `${BASE}/messages/${params.id}`;
   const animalName  = conversation.animal?.name ?? "Ismeretlen állat";
-  const senderName  = session.user.name ?? "Ismeretlen";
+  const senderName  = message.sender?.name ?? "Ismeretlen";
   const preview     = parsed.data.content
     ? parsed.data.content.slice(0, 200)
     : `[Csatolmány: ${parsed.data.attachmentName ?? "fájl"}]`;
-  const senderIsUser = conversation.userId === session.user.id;
+  const senderIsUser = conversation.userId === user!.id;
 
   void (async () => {
     try {
@@ -151,11 +145,11 @@ export async function POST(
 
 // GET /api/conversations/[id]/messages – fetch messages (for polling)
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -167,12 +161,12 @@ export async function GET(
     return NextResponse.json({ error: "Nem található" }, { status: 404 });
   }
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-  const isConversationUser = conversation.userId === session.user.id;
+  const isSuperAdmin = authUser.role === "SUPER_ADMIN";
+  const isConversationUser = conversation.userId === authUser.id;
   let isShelterAdmin = false;
-  if (session.user.role === "SHELTER_ADMIN") {
+  if (authUser.role === "SHELTER_ADMIN") {
     const adminRecord = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id, shelterId: conversation.shelterId },
+      where: { userId: authUser.id, shelterId: conversation.shelterId },
     });
     isShelterAdmin = !!adminRecord;
   }
@@ -189,7 +183,7 @@ export async function GET(
 
   // Mark incoming as read
   await prisma.message.updateMany({
-    where: { conversationId: params.id, senderId: { not: session.user.id }, readAt: null },
+    where: { conversationId: params.id, senderId: { not: authUser.id }, readAt: null },
     data: { readAt: new Date() },
   });
 

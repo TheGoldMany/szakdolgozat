@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // POST /api/conversations/[id]/invite
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
-  if (session.user.role !== "SHELTER_ADMIN") {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
+
+  if (user!.role !== "SHELTER_ADMIN") {
     return NextResponse.json({ error: "Csak menhely admin küldhet meghívót" }, { status: 403 });
   }
 
@@ -32,7 +30,7 @@ export async function POST(
 
   // Verify shelter admin belongs to this conversation's shelter
   const adminRecord = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId: conversation.shelterId },
+    where: { userId: user!.id, shelterId: conversation.shelterId },
   });
   if (!adminRecord) {
     return NextResponse.json({ error: "Nincs hozzáférés ehhez a beszélgetéshez" }, { status: 403 });
@@ -85,7 +83,7 @@ export async function POST(
   await prisma.message.create({
     data: {
       conversationId: params.id,
-      senderId:       session.user.id,
+      senderId:       user!.id,
       content:        "Kérvény meghívó",
       type:           "INVITE",
       inviteToken,

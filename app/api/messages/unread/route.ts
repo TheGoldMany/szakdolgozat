@@ -1,15 +1,14 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/api-auth";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ count: 0 });
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) return NextResponse.json({ count: 0 });
 
   try {
-    const userId = session.user.id;
-    const isShelterAdmin = session.user.role === "SHELTER_ADMIN";
+    const userId = authUser.id;
+    const isShelterAdmin = authUser.role === "SHELTER_ADMIN";
 
     let conversationFilter = {};
 
