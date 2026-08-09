@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { blockIfSuspended } from "@/lib/account-status";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 
 // GET /api/favorites – the current user's favorited animal IDs
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ animalIds: [] });
   }
 
   try {
     const favorites = await prisma.favorite.findMany({
-      where:  { userId: session.user.id },
+      where:  { userId: authUser.id },
       select: { animalId: true },
     });
 
@@ -29,12 +27,8 @@ export async function GET() {
 const schema = z.object({ animalId: z.string().min(1) });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
-  const suspended = await blockIfSuspended(session.user.id);
-  if (suspended) return suspended;
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
@@ -52,8 +46,8 @@ export async function POST(req: NextRequest) {
     }
 
     await prisma.favorite.upsert({
-      where:  { userId_animalId: { userId: session.user.id, animalId: parsed.data.animalId } },
-      create: { userId: session.user.id, animalId: parsed.data.animalId },
+      where:  { userId_animalId: { userId: user!.id, animalId: parsed.data.animalId } },
+      create: { userId: user!.id, animalId: parsed.data.animalId },
       update: {},
     });
 
