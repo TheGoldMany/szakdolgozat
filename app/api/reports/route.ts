@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalType, ReportType } from "@prisma/client";
 import { blockIfSuspended } from "@/lib/account-status";
+import { getAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
@@ -26,9 +25,9 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (session?.user?.id) {
-    const suspended = await blockIfSuspended(session.user.id);
+  const authUser = await getAuthUser(req);
+  if (authUser) {
+    const suspended = await blockIfSuspended(authUser.id);
     if (suspended) return suspended;
   }
   const body = await req.json();
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
       data: {
         ...data,
         imageUrl: primaryUrl,
-        userId: session?.user?.id ?? null,
+        userId: authUser?.id ?? null,
         ...(gallery.length && {
           images: {
             create: gallery.map((url, i) => ({

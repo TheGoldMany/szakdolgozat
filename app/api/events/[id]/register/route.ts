@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 import { sendEventRegistrationEmail } from "@/lib/email";
+import { requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   guests: z.number().int().min(0).max(20).optional(),
@@ -13,10 +12,9 @@ const schema = z.object({
 
 // POST /api/events/[id]/register – user registers (or re-activates) for an event
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  // `authUser` néven, hogy ne ütközzön a lentebbi Prisma `user` változóval
+  const { user: authUser, error: authError } = await requireAuthUser(req);
+  if (authError) return authError;
 
   const parsed = schema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
@@ -39,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     const existing = await prisma.eventRegistration.findUnique({
-      where: { eventId_userId: { eventId: params.id, userId: session.user.id } },
+      where: { eventId_userId: { eventId: params.id, userId: authUser!.id } },
     });
 
     // Capacity check (counts head + guests of active registrations)
@@ -61,16 +59,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     const registration = await prisma.eventRegistration.upsert({
-      where:  { eventId_userId: { eventId: params.id, userId: session.user.id } },
+      where:  { eventId_userId: { eventId: params.id, userId: authUser!.id } },
       update: { status: "REGISTERED", guests, note: note ?? null },
-      create: { eventId: params.id, userId: session.user.id, status: "REGISTERED", guests, note: note ?? null },
+      create: { eventId: params.id, userId: authUser!.id, status: "REGISTERED", guests, note: note ?? null },
     });
 
     // Notify shelter admins + send confirmation email on a genuinely new registration
     if (!existing || existing.status !== "REGISTERED") {
       const [admins, user] = await Promise.all([
         prisma.shelterAdmin.findMany({ where: { shelterId: event.shelterId }, select: { userId: true } }),
-        prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, email: true } }),
+        prisma.user.findUnique({ where: { id: authUser!.id }, select: { name: true, email: true } }),
       ]);
       createNotifications(admins.map(a => ({
         userId: a.userId,
@@ -102,20 +100,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 // DELETE /api/events/[id]/register – user cancels their registration
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const existing = await prisma.eventRegistration.findUnique({
-      where: { eventId_userId: { eventId: params.id, userId: session.user.id } },
+      where: { eventId_userId: { eventId: params.id, userId: user!.id } },
     });
     if (!existing) return NextResponse.json({ error: "Nincs jelentkezésed" }, { status: 404 });
 
     await prisma.eventRegistration.update({
-      where: { eventId_userId: { eventId: params.id, userId: session.user.id } },
+      where: { eventId_userId: { eventId: params.id, userId: user!.id } },
       data:  { status: "CANCELLED" },
     });
 

@@ -129,6 +129,127 @@ export function getMyApplications(): Promise<MyApplication[]> {
   return request<MyApplication[]>("/api/applications/my");
 }
 
+// ── Favourites ─────────────────────────────────────────
+export function getFavoriteIds(): Promise<{ animalIds: string[] }> {
+  return request<{ animalIds: string[] }>("/api/favorites");
+}
+
+export function addFavorite(animalId: string): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>("/api/favorites", {
+    method: "POST",
+    body: JSON.stringify({ animalId }),
+  });
+}
+
+export function removeFavorite(animalId: string): Promise<unknown> {
+  return request(`/api/favorites/${animalId}`, { method: "DELETE" });
+}
+
+// ── Notifications ──────────────────────────────────────
+export interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export function getNotifications(): Promise<Notification[]> {
+  return request<Notification[]>("/api/notifications");
+}
+
+export function markNotificationRead(id: string): Promise<unknown> {
+  return request(`/api/notifications/${id}`, { method: "PATCH" });
+}
+
+export function markAllNotificationsRead(): Promise<unknown> {
+  return request("/api/notifications/read-all", { method: "POST" });
+}
+
+// ── Messaging ──────────────────────────────────────────
+export interface Conversation {
+  id: string;
+  updatedAt: string;
+  animal:  { id: string; name: string; slug: string; images: AnimalImage[] } | null;
+  shelter: { id: string; name: string } | null;
+}
+
+export interface Message {
+  id: string;
+  content: string | null;
+  attachmentUrl: string | null;
+  attachmentName: string | null;
+  createdAt: string;
+  readAt: string | null;
+  sender: { id: string; name: string | null; role: string };
+}
+
+export function getConversations(): Promise<Conversation[]> {
+  return request<Conversation[]>("/api/conversations");
+}
+
+export function getMessages(conversationId: string): Promise<Message[]> {
+  return request<Message[]>(`/api/conversations/${conversationId}/messages`);
+}
+
+export function sendMessage(conversationId: string, content: string): Promise<Message> {
+  return request<Message>(`/api/conversations/${conversationId}/messages`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export function getUnreadCount(): Promise<{ count: number }> {
+  return request<{ count: number }>("/api/messages/unread");
+}
+
+// ── Profile ────────────────────────────────────────────
+export interface Profile {
+  id: string;
+  name: string | null;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  role: string;
+}
+
+export function updateProfile(data: Partial<Pick<Profile, "name" | "phone" | "address" | "city">>): Promise<{ user: Profile }> {
+  return request<{ user: Profile }>("/api/profile", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+// ── Appointments ───────────────────────────────────────
+export interface Appointment {
+  id: string;
+  status: string;
+  proposedAt: string;
+  confirmedAt: string | null;
+  note: string | null;
+  shelter: { name: string; city: string; slug: string };
+  animal:  { name: string; slug: string } | null;
+}
+
+export function getMyAppointments(): Promise<Appointment[]> {
+  return request<Appointment[]>("/api/appointments");
+}
+
+export function requestAppointment(data: {
+  shelterId: string;
+  animalId?: string;
+  proposedAt: string;
+  note?: string;
+}): Promise<Appointment> {
+  return request<Appointment>("/api/appointments", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Auth ───────────────────────────────────────────────
 export async function apiLogin(
   email: string,
