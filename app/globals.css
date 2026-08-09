@@ -26,3 +26,13 @@
 .animate-sheet-up {
   animation: sheetSlideUp 0.22s ease-out;
 }
+
+/* Mobil űrlap-élmény: 16px betűméret, hogy az iOS Safari ne közelítsen rá
+   fókuszáláskor; a jelölőnégyzeteket/rádiógombokat kihagyjuk. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
