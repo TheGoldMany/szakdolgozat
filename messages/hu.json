@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Kezdőlap",
     "animals": "Állatok",
     "shelters": "Menhelyek",
     "reports": "Bejelentések",
@@ -1435,7 +1436,7 @@
   "feeding": {
     "pageTitle": "Etetési rend",
     "pageDesc": "Automatikus készletlevonás etetési ütemterv alapján.",
-    "newSchedule": "Új ütemterv",
+    "newSchedule": "Új etetési beosztás",
     "noSchedules": "Még nincs etetési ütemterv.",
     "noSchedulesDesc": "Hozz létre egyet, hogy az etetések automatikusan vonják le a készletet.",
     "active": "Aktív",
@@ -1486,8 +1487,7 @@
     "validWeekDaysRequired": "Legalább egy napot válassz",
     "insufficientStock": "Nincs elegendő készlet",
     "autoNote": "Automatikus etetés",
-    "editSchedule": "Etetési beosztás szerkesztése",
-    "newSchedule": "Új etetési beosztás"
+    "editSchedule": "Etetési beosztás szerkesztése"
   },
   "kennels": {
     "newKennel": "Új férőhely",

@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Strona główna",
     "animals": "Zwierzęta",
     "shelters": "Schroniska",
     "reports": "Zgłoszenia",
@@ -1432,7 +1433,7 @@
   "feeding": {
     "pageTitle": "Plan karmienia",
     "pageDesc": "Automatyczne odliczanie zapasów na podstawie harmonogramu karmienia.",
-    "newSchedule": "Nowy harmonogram",
+    "newSchedule": "Nowy harmonogram karmienia",
     "noSchedules": "Brak harmonogramów karmienia.",
     "noSchedulesDesc": "Utwórz jeden, aby karmienia automatycznie odliczały zapasy.",
     "active": "Aktywny",
@@ -1483,8 +1484,7 @@
     "validWeekDaysRequired": "Wybierz co najmniej jeden dzień",
     "insufficientStock": "Niewystarczające zapasy",
     "autoNote": "Automatyczne karmienie",
-    "editSchedule": "Edytuj harmonogram",
-    "newSchedule": "Nowy harmonogram karmienia"
+    "editSchedule": "Edytuj harmonogram"
   },
   "kennels": {
     "newKennel": "Nowe legowisko",
