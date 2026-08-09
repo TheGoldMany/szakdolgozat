@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Startseite",
     "animals": "Tiere",
     "shelters": "Tierheime",
     "reports": "Meldungen",
@@ -1435,7 +1436,7 @@
   "feeding": {
     "pageTitle": "Fütterungsplan",
     "pageDesc": "Automatischer Bestandsabzug auf Basis des Fütterungsplans.",
-    "newSchedule": "Neuer Plan",
+    "newSchedule": "Neuer Fütterungsplan",
     "noSchedules": "Noch kein Fütterungsplan vorhanden.",
     "noSchedulesDesc": "Erstelle einen, damit Fütterungen automatisch den Bestand reduzieren.",
     "active": "Aktiv",
@@ -1486,8 +1487,7 @@
     "validWeekDaysRequired": "Wähle mindestens einen Tag aus",
     "insufficientStock": "Unzureichender Bestand",
     "autoNote": "Automatische Fütterung",
-    "editSchedule": "Fütterungsplan bearbeiten",
-    "newSchedule": "Neuer Fütterungsplan"
+    "editSchedule": "Fütterungsplan bearbeiten"
   },
   "kennels": {
     "newKennel": "Neues Gehege",

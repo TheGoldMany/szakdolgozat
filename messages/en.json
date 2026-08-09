@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Home",
     "animals": "Animals",
     "shelters": "Shelters",
     "reports": "Reports",
@@ -1435,7 +1436,7 @@
   "feeding": {
     "pageTitle": "Feeding schedule",
     "pageDesc": "Automatic stock deduction based on feeding timetable.",
-    "newSchedule": "New schedule",
+    "newSchedule": "New feeding schedule",
     "noSchedules": "No feeding schedules yet.",
     "noSchedulesDesc": "Create one so that feedings automatically deduct from stock.",
     "active": "Active",
@@ -1486,8 +1487,7 @@
     "validWeekDaysRequired": "Select at least one day",
     "insufficientStock": "Insufficient stock",
     "autoNote": "Automatic feeding",
-    "editSchedule": "Edit feeding schedule",
-    "newSchedule": "New feeding schedule"
+    "editSchedule": "Edit feeding schedule"
   },
   "kennels": {
     "newKennel": "New kennel",
