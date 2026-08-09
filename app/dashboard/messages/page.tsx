@@ -81,8 +81,8 @@ export default async function DashboardMessagesPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+          <table className="w-full min-w-[680px] text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
               <tr>
                 <th className="px-4 py-3 text-left">{t("messagesColAnimal")}</th>
