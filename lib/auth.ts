@@ -33,6 +33,10 @@ export const authOptions: NextAuthOptions = {
       ? [GoogleProvider({
           clientId:     process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          // A Google hitelesíti az e-mail tulajdonjogát, ezért biztonságos az
+          // azonos e-mailű, meglévő fiókkal való automatikus összekötés
+          // (különben "OAuthAccountNotLinked" hibát kap a jelszavas felhasználó).
+          allowDangerousEmailAccountLinking: true,
         })]
       : []),
 
@@ -41,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       ? [FacebookProvider({
           clientId:     process.env.FACEBOOK_CLIENT_ID,
           clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+          allowDangerousEmailAccountLinking: true,
         })]
       : []),
 
