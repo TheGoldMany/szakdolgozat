@@ -206,7 +206,8 @@
       "experiencePlaceholder": "Volt-e már háziállatod? Milyen tapasztalataid vannak?",
       "submitting": "Küldés...",
       "submitButton": "Kérelem beküldése"
-    }
+    },
+    "showResults": "Mutasd az eredményeket"
   },
   "shelters": {
     "title": "Menhelyek",

@@ -206,7 +206,8 @@
       "experiencePlaceholder": "Hatten Sie schon einmal ein Haustier? Welche Erfahrungen haben Sie?",
       "submitting": "Wird gesendet...",
       "submitButton": "Antrag einreichen"
-    }
+    },
+    "showResults": "Ergebnisse anzeigen"
   },
   "shelters": {
     "title": "Tierheime",
