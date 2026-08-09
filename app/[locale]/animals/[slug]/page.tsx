@@ -182,25 +182,49 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
           {/* Images */}
           <div className="lg:col-span-3 space-y-3">
-            <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[4/3]">
-              {primaryImage ? (
-                <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="(max-width: 768px) 100vw, 60vw" />
+
+            {/* Mobil: swipe-elhető galéria (minden kép) */}
+            <div className="lg:hidden">
+              {animal.images.length > 0 ? (
+                <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {animal.images.map((img, i) => (
+                    <div key={img.id} className="relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-2xl bg-gray-100">
+                      <Image src={img.url} alt={img.alt ?? animal.name} fill className="object-cover" priority={i === 0} sizes="88vw" />
+                      {i === 0 && (
+                        <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
+                          {statusLabel}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <div className="flex h-full items-center justify-center text-6xl">🐾</div>
+                <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gray-100 text-6xl">🐾</div>
               )}
-              <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
-                {statusLabel}
-              </span>
             </div>
-            {extraImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
-                {extraImages.slice(0, 4).map((img) => (
-                  <div key={img.id} className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
-                    <Image src={img.url} alt={img.alt ?? ""} fill className="object-cover" sizes="25vw" />
-                  </div>
-                ))}
+
+            {/* Desktop: fő kép + bélyegképek */}
+            <div className="hidden space-y-3 lg:block">
+              <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[4/3]">
+                {primaryImage ? (
+                  <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="60vw" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-6xl">🐾</div>
+                )}
+                <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
+                  {statusLabel}
+                </span>
               </div>
-            )}
+              {extraImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {extraImages.slice(0, 4).map((img) => (
+                    <div key={img.id} className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
+                      <Image src={img.url} alt={img.alt ?? ""} fill className="object-cover" sizes="25vw" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Details */}
