@@ -1,22 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getMobileUser } from "@/lib/mobile-auth";
+import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/applications/my – saját kérelmek (web session vagy mobil Bearer token)
 export async function GET(req: NextRequest) {
-  const session    = await getServerSession(authOptions);
-  const mobileUser = session?.user?.id ? null : await getMobileUser(req);
-  const userId     = session?.user?.id ?? mobileUser?.id;
+  const authUser = await getAuthUser(req);
 
-  if (!userId) {
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
   try {
     const applications = await prisma.adoptionApplication.findMany({
-      where:   { userId },
+      where:   { userId: authUser.id },
       orderBy: { createdAt: "desc" },
       select: {
         id:        true,

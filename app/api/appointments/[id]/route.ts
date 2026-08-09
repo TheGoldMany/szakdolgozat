@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotification } from "@/lib/notifications";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 
 const patchSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("CONFIRM"), confirmedAt: z.string().datetime(), adminNote: z.string().max(500).optional() }),
@@ -17,10 +16,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const appt = await prisma.appointment.findUnique({
@@ -35,11 +32,11 @@ export async function PATCH(
       return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
     }
 
-    const isOwner = appt.userId === session.user.id;
+    const isOwner = appt.userId === user!.id;
     const isAdmin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id, shelterId: appt.shelter.id },
+      where: { userId: user!.id, shelterId: appt.shelter.id },
     });
-    const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+    const isSuperAdmin = user!.role === "SUPER_ADMIN";
 
     const { action } = parsed.data;
 
@@ -119,11 +116,11 @@ export async function PATCH(
 
 // GET /api/appointments/[id]
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
@@ -138,12 +135,12 @@ export async function GET(
     });
     if (!appt) return NextResponse.json({ error: "Nem található" }, { status: 404 });
 
-    const isOwner = appt.userId === session.user.id;
+    const isOwner = appt.userId === authUser.id;
     const isAdmin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id, shelterId: appt.shelterId },
+      where: { userId: authUser.id, shelterId: appt.shelterId },
     });
 
-    if (!isOwner && !isAdmin && session.user.role !== "SUPER_ADMIN") {
+    if (!isOwner && !isAdmin && authUser.role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
 

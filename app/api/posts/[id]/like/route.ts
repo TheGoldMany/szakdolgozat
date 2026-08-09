@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUser } from "@/lib/api-auth";
 
 // POST /api/posts/[id]/like – kedvelés ki/be kapcsolása (toggle)
-export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const post = await prisma.post.findUnique({ where: { id: params.id }, select: { id: true } });
   if (!post) {
@@ -16,13 +13,13 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
   }
 
   const existing = await prisma.postLike.findUnique({
-    where: { postId_userId: { postId: params.id, userId: session.user.id } },
+    where: { postId_userId: { postId: params.id, userId: user!.id } },
   });
 
   if (existing) {
     await prisma.postLike.delete({ where: { id: existing.id } });
   } else {
-    await prisma.postLike.create({ data: { postId: params.id, userId: session.user.id } });
+    await prisma.postLike.create({ data: { postId: params.id, userId: user!.id } });
   }
 
   const count = await prisma.postLike.count({ where: { postId: params.id } });

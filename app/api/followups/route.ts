@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/followups – current user's follow-ups
-export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
@@ -18,13 +17,13 @@ export async function GET() {
       where: {
         status:      "PENDING",
         scheduledAt: { lt: now },
-        application: { userId: session.user.id },
+        application: { userId: authUser.id },
       },
       data: { status: "OVERDUE" },
     });
 
     const followUps = await prisma.adoptionFollowUp.findMany({
-      where:   { application: { userId: session.user.id } },
+      where:   { application: { userId: authUser.id } },
       include: {
         application: {
           select: {

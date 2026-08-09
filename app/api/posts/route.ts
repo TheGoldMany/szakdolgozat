@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 
 const createSchema = z.object({
   shelterId:  z.string().min(1),
@@ -25,7 +24,7 @@ const postInclude = {
 
 // GET /api/posts?cursor=xxx&limit=10 – publikus feed (lapozható)
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const authUser = await getAuthUser(req);
   const cursor = req.nextUrl.searchParams.get("cursor");
   const limit  = Math.min(Number(req.nextUrl.searchParams.get("limit") ?? 10), 30);
 
@@ -41,9 +40,9 @@ export async function GET(req: NextRequest) {
 
   // A bejelentkezett felhasználó kedvelései a megjelenített posztokra.
   let likedIds = new Set<string>();
-  if (session?.user?.id && page.length) {
+  if (authUser && page.length) {
     const likes = await prisma.postLike.findMany({
-      where:  { userId: session.user.id, postId: { in: page.map((p) => p.id) } },
+      where:  { userId: authUser.id, postId: { in: page.map((p) => p.id) } },
       select: { postId: true },
     });
     likedIds = new Set(likes.map((l) => l.postId));
@@ -57,10 +56,8 @@ export async function GET(req: NextRequest) {
 
 // POST /api/posts – menhely-admin új posztot ír
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) {
@@ -69,9 +66,9 @@ export async function POST(req: NextRequest) {
   const d = parsed.data;
 
   const isAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id, shelterId: d.shelterId },
+    where: { userId: user!.id, shelterId: d.shelterId },
   });
-  if (!isAdmin && session.user.role !== "SUPER_ADMIN") {
+  if (!isAdmin && user!.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
   }
 
@@ -92,7 +89,7 @@ export async function POST(req: NextRequest) {
   const post = await prisma.post.create({
     data: {
       shelterId:  d.shelterId,
-      authorId:   session.user.id,
+      authorId:   user!.id,
       content:    d.content,
       imageUrl:   d.imageUrl || null,
       animalId:   d.animalId || null,

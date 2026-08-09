@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatus } from "@prisma/client";
+import { requireAuthUser } from "@/lib/api-auth";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const application = await prisma.adoptionApplication.findUnique({
@@ -22,7 +19,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Kérelem nem található" }, { status: 404 });
     }
 
-    if (application.userId !== session.user.id) {
+    if (application.userId !== user!.id) {
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
 

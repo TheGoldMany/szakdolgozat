@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 import { sendNewFosterApplicationEmail } from "@/lib/email";
-import { blockIfSuspended } from "@/lib/account-status";
+import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 import { AnimalType } from "@prisma/client";
 
 const schema = z.object({
@@ -18,12 +16,8 @@ const schema = z.object({
 
 // POST /api/foster – user jelentkezik ideiglenes befogadónak
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
-  const suspended = await blockIfSuspended(session.user.id);
-  if (suspended) return suspended;
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const body   = await req.json();
   const parsed = schema.safeParse(body);
@@ -37,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!shelter) return NextResponse.json({ error: "Menhely nem található" }, { status: 404 });
 
     const existing = await prisma.fosterProfile.findUnique({
-      where: { userId_shelterId: { userId: session.user.id, shelterId } },
+      where: { userId_shelterId: { userId: user!.id, shelterId } },
     });
     if (existing) {
       return NextResponse.json({ error: "Már jelentkeztél ehhez a menhelyhez" }, { status: 409 });
@@ -45,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const foster = await prisma.fosterProfile.create({
       data: {
-        userId:         session.user.id,
+        userId:         user!.id,
         shelterId,
         preferredTypes: preferredTypes ?? [],
         maxWeightKg,
@@ -88,15 +82,15 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/foster – a bejelentkezett user ideiglenes befogadói profiljai
-export async function GET(_req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const authUser = await getAuthUser(req);
+  if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
   }
 
   try {
     const records = await prisma.fosterProfile.findMany({
-      where:   { userId: session.user.id },
+      where:   { userId: authUser.id },
       include: {
         shelter:         { select: { name: true, city: true, slug: true } },
         fosteredAnimals: { select: { id: true, name: true, slug: true } },

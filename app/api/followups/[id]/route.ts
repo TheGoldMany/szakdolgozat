@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
+import { requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   wellbeing: z.number().int().min(1).max(5),
@@ -16,10 +15,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   try {
     const followUp = await prisma.adoptionFollowUp.findUnique({
@@ -37,7 +34,7 @@ export async function PATCH(
     if (!followUp) {
       return NextResponse.json({ error: "Nem található" }, { status: 404 });
     }
-    if (followUp.application.userId !== session.user.id) {
+    if (followUp.application.userId !== user!.id) {
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
     if (followUp.status === "COMPLETED") {

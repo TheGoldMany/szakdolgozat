@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { blockIfSuspended } from "@/lib/account-status";
+import { requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   shelterId:    z.string().optional(),
@@ -39,12 +37,8 @@ export async function GET(req: NextRequest) {
 
 // POST /api/reviews – bármely bejelentkezett user értékelhet bárkit (Uber-modell)
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
-  const suspended = await blockIfSuspended(session.user.id);
-  if (suspended) return suspended;
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
 
   const body   = await req.json();
   const parsed = schema.safeParse(body);
@@ -62,14 +56,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Önértékelés tiltása
-  if (targetUserId === session.user.id) {
+  if (targetUserId === user!.id) {
     return NextResponse.json({ error: "Saját magadat nem értékelheted" }, { status: 400 });
   }
 
   try {
     const review = await prisma.review.create({
       data: {
-        authorId:     session.user.id,
+        authorId:     user!.id,
         shelterId:    shelterId    ?? null,
         targetUserId: targetUserId ?? null,
         rating,
