@@ -206,7 +206,8 @@
       "experiencePlaceholder": "Czy miałeś już wcześniej zwierzę? Jakie masz doświadczenia?",
       "submitting": "Wysyłanie...",
       "submitButton": "Złóż wniosek"
-    }
+    },
+    "showResults": "Pokaż wyniki"
   },
   "shelters": {
     "title": "Schroniska",

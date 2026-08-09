@@ -3,8 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useCallback, useState, useTransition, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
-import { SlidersHorizontal, ChevronDown, X, PawPrint, Dog, Cat, Rabbit, Bird, MapPin } from "lucide-react";
+import { SlidersHorizontal, X, PawPrint, Dog, Cat, Rabbit, Bird, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
@@ -84,34 +85,28 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
     update(key, searchParams.get(key) === "1" ? "" : "1");
   }, [update, searchParams]);
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+  const activeCount = (type ? 1 : 0) + (size ? 1 : 0) + (gender ? 1 : 0) + (q ? 1 : 0) + (city ? 1 : 0) + activeProps.length;
 
-      {/* Mobile toggle */}
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="flex w-full items-center justify-between px-5 py-4 lg:hidden"
-      >
-        <div className="flex items-center gap-2 font-semibold text-gray-800">
-          <SlidersHorizontal className="h-4 w-4 text-brand-500" />
-          {t("filterLabel")}
-          {hasFilters && (
-            <span className="h-2 w-2 rounded-full bg-brand-500" />
-          )}
-        </div>
-        <ChevronDown className={cn(
-          "h-4 w-4 text-gray-400 transition-transform duration-200",
-          open && "rotate-180",
-        )} />
-      </button>
+  // Görgetés-zár, amíg a mobil szűrő-lap nyitva van
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
-      {/* Filter body */}
-      <div className={cn(
-        "space-y-5 border-t border-gray-100 p-5 lg:border-t-0",
-        !open && "hidden lg:block",
-      )}>
-        <h2 className="hidden text-sm font-bold text-gray-800 lg:block">{t("filterLabel")}</h2>
+  const clearButton = (
+    <button
+      onClick={() => startTransition(() => router.push(pathname))}
+      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2.5 text-sm text-gray-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+    >
+      <X className="h-3.5 w-3.5" />
+      {t("clearFilters")}
+    </button>
+  );
 
+  // A tényleges szűrő-vezérlők (desktop oldalsávban és mobil lapon is ezt használjuk)
+  const controls = (
+    <>
         {/* Search */}
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -239,18 +234,85 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
             })}
           </div>
         </div>
+    </>
+  );
 
-        {/* Clear */}
-        {hasFilters && (
-          <button
-            onClick={() => startTransition(() => router.push(pathname))}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2 text-sm text-gray-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
-          >
-            <X className="h-3.5 w-3.5" />
-            {t("clearFilters")}
-          </button>
-        )}
+  return (
+    <>
+      {/* ── Desktop: oldalsáv (lg+) ─────────────────────────── */}
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
+        <div className="space-y-5 p-5">
+          <h2 className="text-sm font-bold text-gray-800">{t("filterLabel")}</h2>
+          {controls}
+          {hasFilters && clearButton}
+        </div>
       </div>
-    </div>
+
+      {/* ── Mobil: „Szűrők" gomb (lg alatt) ─────────────────── */}
+      <button
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm lg:hidden"
+      >
+        <span className="flex items-center gap-2 font-semibold text-gray-800">
+          <SlidersHorizontal className="h-4 w-4 text-brand-500" />
+          {t("filterLabel")}
+        </span>
+        {activeCount > 0 && (
+          <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-500 px-2 text-xs font-bold text-white">
+            {activeCount}
+          </span>
+        )}
+      </button>
+
+      {/* ── Mobil: alulról felcsúszó szűrő-lap ───────────────── */}
+      {open && createPortal(
+        <div className="fixed inset-0 z-[9999] lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="animate-sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-3xl bg-white shadow-2xl">
+            {/* Fejléc */}
+            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+              <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">
+                <SlidersHorizontal className="h-4 w-4 text-brand-500" />
+                {t("filterLabel")}
+              </h2>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label={t("clearFilters")}
+                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Görgethető törzs */}
+            <div className="flex-1 space-y-5 overflow-y-auto p-5">
+              {controls}
+            </div>
+
+            {/* Lábléc */}
+            <div
+              className="flex gap-3 border-t border-gray-100 p-4"
+              style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+            >
+              {hasFilters && (
+                <button
+                  onClick={() => startTransition(() => router.push(pathname))}
+                  className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                >
+                  {t("clearFilters")}
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+              >
+                {t("showResults")}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }

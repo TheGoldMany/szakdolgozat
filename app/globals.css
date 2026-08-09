@@ -17,3 +17,12 @@
     overflow-x: hidden;
   }
 }
+
+/* Bottom sheet felcsúszó animáció (mobil) */
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.animate-sheet-up {
+  animation: sheetSlideUp 0.22s ease-out;
+}

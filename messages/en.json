@@ -206,7 +206,8 @@
       "experiencePlaceholder": "Have you had a pet before? What experience do you have?",
       "submitting": "Submitting...",
       "submitButton": "Submit application"
-    }
+    },
+    "showResults": "Show results"
   },
   "shelters": {
     "title": "Shelters",
