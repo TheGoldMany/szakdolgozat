@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "sdkVersion": "54.0.0",
+    "sdkVersion": "56.0.0",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "hu.allatimenhelyek.app"
@@ -25,7 +25,10 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
     "experiments": {
       "typedRoutes": true
     }
