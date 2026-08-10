@@ -14,6 +14,7 @@ import { DeleteAccountButton } from "@/components/profile/delete-account-button"
 import { EmailNotificationsToggle } from "@/components/profile/email-notifications-toggle";
 import { DownloadDataButton } from "@/components/profile/download-data-button";
 import { StripeConnectSection } from "@/components/profile/stripe-connect-section";
+import { MyCampaigns } from "@/components/profile/my-campaigns";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -30,7 +31,7 @@ export default async function ProfilePage() {
     redirect("/auth/login?callbackUrl=/profile");
   }
 
-  const [user, adoptedApps, userReports] = await Promise.all([
+  const [user, adoptedApps, userReports, myCampaigns] = await Promise.all([
     prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -113,6 +114,23 @@ export default async function ProfilePage() {
         },
       },
     }),
+    // Saját gyűjtések (bármely felhasználó indíthat)
+    prisma.campaign.findMany({
+      where:   { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id:           true,
+        title:        true,
+        status:       true,
+        targetAmount: true,
+        shelter:      { select: { name: true } },
+        _count:       { select: { donations: true } },
+        donations: {
+          where:  { paidAt: { not: null } },
+          select: { amount: true },
+        },
+      },
+    }),
   ]);
 
   if (!user) redirect("/auth/login");
@@ -187,6 +205,11 @@ export default async function ProfilePage() {
             stripeAccountId={user.stripeAccountId}
             stripeOnboardingComplete={user.stripeOnboardingComplete}
           />
+
+          {/* Saját gyűjtések */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <MyCampaigns campaigns={myCampaigns} />
+          </div>
 
           {/* Subscriptions */}
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
