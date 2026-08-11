@@ -6,7 +6,7 @@ import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
   ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
-  UserCog, MessagesSquare, Sparkles,
+  UserCog, MessagesSquare, Sparkles, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -61,7 +61,7 @@ const NAV_GROUPS: NavGroup[] = [
     tourKey: "group-donation",
     items: [
       { href: "/dashboard/tiers",         icon: Heart,          labelKey: "navTiers",         roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/campaigns",     icon: ClipboardCheck, labelKey: "navCampaigns",     roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/campaigns",     icon: ClipboardCheck, labelKey: "navCampaigns",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/subscriptions", icon: Users,          labelKey: "navSubscriptions", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
@@ -69,8 +69,9 @@ const NAV_GROUPS: NavGroup[] = [
     titleKey: "groupPlatform",
     tourKey: "group-platform",
     items: [
-      { href: "/dashboard/shelters", icon: Building2, labelKey: "navShelters", roles: ["SUPER_ADMIN"] },
-      { href: "/dashboard/users",    icon: Users,     labelKey: "navUsers",    roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/approvals", icon: ShieldCheck, labelKey: "navApprovals", roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/shelters",  icon: Building2,   labelKey: "navShelters",  roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/users",     icon: Users,       labelKey: "navUsers",     roles: ["SUPER_ADMIN"] },
     ],
   },
   {

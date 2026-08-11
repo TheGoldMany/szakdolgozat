@@ -2,12 +2,9 @@ import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
-import { CampaignApprovals } from "@/components/dashboard/campaign-approvals";
-import { FormApprovalActions } from "@/components/dashboard/form-approval-actions";
 import { cn } from "@/lib/utils";
 import type { CampaignStatus } from "@prisma/client";
 
@@ -37,33 +34,38 @@ interface PageProps { searchParams: { status?: string } }
 
 export default async function CampaignApprovalsPage({ searchParams }: PageProps) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/campaigns");
-  if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
+  if (!session?.user?.id) redirect("/auth/login?callbackUrl=/dashboard/campaigns");
 
-  const t = await getTranslations("dashboard");
+  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+  if (!isSuperAdmin && session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");
+
+  // Menhely admin csak a saját menhelye gyűjtéseit látja
+  let shelterId: string | null = null;
+  if (!isSuperAdmin) {
+    const admin = await prisma.shelterAdmin.findFirst({
+      where:  { userId: session.user.id },
+      select: { shelterId: true },
+    });
+    if (!admin) redirect("/dashboard");
+    shelterId = admin.shelterId;
+  }
 
   const validStatuses: CampaignStatus[] = ["PENDING", "ACTIVE", "COMPLETED", "REJECTED"];
   const statusFilter = validStatuses.includes(searchParams.status as CampaignStatus)
     ? (searchParams.status as CampaignStatus)
     : null;
 
-  const [allCampaigns, pendingForms] = await Promise.all([
-    prisma.campaign.findMany({
-      where: statusFilter ? { status: statusFilter } : undefined,
-      include: {
-        user:    { select: { name: true, email: true } },
-        shelter: { select: { name: true } },
-      },
-      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-    }),
-    prisma.applicationForm.findMany({
-      where:   { status: "PENDING_APPROVAL" },
-      include: { shelter: { select: { name: true } }, _count: { select: { fields: true } } },
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
-
-  const pendingCampaigns = allCampaigns.filter((c) => c.status === "PENDING");
+  const allCampaigns = await prisma.campaign.findMany({
+    where: {
+      ...(statusFilter ? { status: statusFilter } : {}),
+      ...(shelterId ? { shelterId } : {}),
+    },
+    include: {
+      user:    { select: { name: true, email: true } },
+      shelter: { select: { name: true } },
+    },
+    orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+  });
 
   return (
     <div className="space-y-8">
@@ -147,55 +149,15 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
         </div>
       </div>
 
-      {/* Pending approvals (quick approve/reject) */}
-      {pendingCampaigns.length > 0 && (
-        <div>
-          <h2 className="mb-4 text-lg font-semibold text-gray-700">{t("campaignsSection")}</h2>
-          <CampaignApprovals
-            campaigns={pendingCampaigns.map((c) => ({
-              id:           c.id,
-              title:        c.title,
-              description:  c.description,
-              targetAmount: c.targetAmount,
-              createdAt:    c.createdAt.toISOString(),
-              user:         c.user,
-              shelter:      c.shelter,
-            }))}
-          />
-        </div>
+      {/* A jóváhagyás a dedikált Jóváhagyások oldalon történik */}
+      {isSuperAdmin && (
+        <Link
+          href="/dashboard/approvals"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:underline"
+        >
+          Jóváhagyásra váró tételek →
+        </Link>
       )}
-
-      {/* Form approvals */}
-      <div>
-        <h2 className="mb-4 text-lg font-semibold text-gray-700">{t("campaignFormsSection")}</h2>
-        {pendingForms.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-sm text-gray-500">{t("campaignsNoPendingForms")}</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {pendingForms.map((form) => (
-              <div key={form.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-gray-900">{form.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {form.shelter.name} · {t("campaignsFormFields", { count: form._count.fields })}
-                    </p>
-                    {form.description && (
-                      <p className="mt-1 text-sm text-gray-600 line-clamp-2">{form.description}</p>
-                    )}
-                    <p className="mt-1 text-xs text-gray-400">
-                      {t("campaignsSubmittedAt")} {new Date(form.createdAt).toLocaleDateString("hu-HU")}
-                    </p>
-                  </div>
-                </div>
-                <FormApprovalActions formId={form.id} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
