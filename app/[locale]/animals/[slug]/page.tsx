@@ -170,7 +170,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
         <nav className="mb-6 text-sm text-gray-500">
           <Link href="/animals" className="hover:text-brand-500">{t("breadcrumb")}</Link>
@@ -225,6 +225,14 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 </div>
               )}
             </div>
+
+            {/* Leírás – a képek alatt, hogy a bal oszlop ne maradjon üresen */}
+            {animal.description && (
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <h2 className="mb-3 text-lg font-semibold text-gray-800">{t("descSection")}</h2>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{animal.description}</p>
+              </div>
+            )}
           </div>
 
           {/* Details */}
@@ -348,13 +356,6 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
           )}
           </div>
         </div>
-
-        {animal.description && (
-          <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-gray-800">{t("descSection")}</h2>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{animal.description}</p>
-          </div>
-        )}
 
         {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
