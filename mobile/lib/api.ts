@@ -251,10 +251,17 @@ export function requestAppointment(data: {
 }
 
 // ── Auth ───────────────────────────────────────────────
+export interface AuthUser {
+  id:    string;
+  name:  string;
+  email: string;
+  role:  string;
+}
+
 export async function apiLogin(
   email: string,
   password: string
-): Promise<{ token: string; user: { id: string; name: string; email: string } }> {
+): Promise<{ token: string; user: AuthUser }> {
   const res = await fetch(`${BASE_URL}/api/auth/mobile`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -262,4 +269,33 @@ export async function apiLogin(
   });
   if (!res.ok) throw new Error("Hibás e-mail vagy jelszó");
   return res.json();
+}
+
+// ── Menhely admin áttekintő ────────────────────────────
+export interface AdminApplication {
+  id: string; status: string; createdAt: string;
+  user:   { name: string | null; email: string } | null;
+  animal: { name: string; slug: string };
+}
+
+export interface AdminAppointment {
+  id: string; status: string; proposedAt: string;
+  confirmedAt: string | null; note: string | null;
+  user:   { name: string | null; email: string } | null;
+  animal: { name: string; slug: string } | null;
+}
+
+export interface ShelterAdminOverview {
+  shelter: { id: string; name: string };
+  counts: {
+    pendingApplications: number;
+    upcomingAppointments: number;
+    availableAnimals: number;
+  };
+  pendingApplications:  AdminApplication[];
+  upcomingAppointments: AdminAppointment[];
+}
+
+export function getShelterAdminOverview(): Promise<ShelterAdminOverview> {
+  return request<ShelterAdminOverview>("/api/shelter-admin/overview");
 }
