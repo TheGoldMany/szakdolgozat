@@ -117,7 +117,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
       </div>
 
       <div className="border-b border-gray-100 bg-white shadow-sm">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:gap-5">
 
             <div className="relative -mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md sm:-mt-14 sm:h-28 sm:w-28">
@@ -163,7 +163,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-3">
 
           {/* Animals column */}
@@ -251,7 +251,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
         {/* Önkéntesség */}
         {session && (
-          <div className="mx-auto max-w-5xl px-4 pb-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-base font-semibold text-gray-800">{t("volunteer")}</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
@@ -265,7 +265,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         )}
 
         {/* Értékelések */}
-        <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
           <ShelterReviews shelterId={shelter.id} />
         </div>
       </div>
