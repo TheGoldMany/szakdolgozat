@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 
@@ -37,6 +38,15 @@ export async function POST(
       status: "REJECTED",
       ...(reason !== undefined && { description: form.description ? `${form.description}\n\nElutasítás oka: ${reason}` : `Elutasítás oka: ${reason}` }),
     },
+  });
+
+  logAudit({
+    actorId:    session.user.id,
+    action:     "FORM_REJECTED",
+    targetType: "ApplicationForm",
+    targetId:   updated.id,
+    targetName: form.title,
+    reason:     reason ?? null,
   });
 
   // Notify shelter admins

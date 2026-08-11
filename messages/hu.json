@@ -1274,7 +1274,8 @@
     "addShelterInvalidEmail": "Érvénytelen email",
     "addShelterMinChar6": "Min. 6 karakter",
     "addShelterUnknownError": "Ismeretlen hiba",
-    "navApprovals": "Jóváhagyások"
+    "navApprovals": "Jóváhagyások",
+    "navAudit": "Audit napló"
   },
   "foster": {
     "title": "Ideiglenes befogadásaim",

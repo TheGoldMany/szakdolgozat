@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 
@@ -26,6 +27,14 @@ export async function POST(
     const updated = await prisma.applicationForm.update({
       where: { id: params.id },
       data: { status: "APPROVED" },
+    });
+
+    logAudit({
+      actorId:    session.user.id,
+      action:     "FORM_APPROVED",
+      targetType: "ApplicationForm",
+      targetId:   updated.id,
+      targetName: form.title,
     });
 
     // Notify shelter admins
