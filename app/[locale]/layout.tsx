@@ -47,7 +47,8 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Suspense><Header /></Suspense>
-            <main className="pt-20">{children}</main>
+            {/* pt-16 = a fix fejléc magassága (h-16), így nincs fehér csík alatta */}
+            <main className="min-h-[60vh] pt-16">{children}</main>
             <Footer />
             {/* Alsó térköz, hogy a fix mobil-navigáció ne takarja a tartalmat */}
             <div className="h-16 md:hidden" aria-hidden />

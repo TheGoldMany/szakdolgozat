@@ -36,3 +36,29 @@
     font-size: 16px !important;
   }
 }
+
+@layer base {
+  /* Halvány háttér a beviteli mezőknek, hogy a doboz elváljon a kártyától.
+     A Tailwind bg-* utility ezt bármikor felülírja, ha valahol más kell. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]),
+  select,
+  textarea {
+    @apply bg-gray-50;
+  }
+
+  /* Fókuszban világosodjon, hogy látszódjon az aktív mező */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]):focus,
+  select:focus,
+  textarea:focus {
+    @apply bg-white;
+  }
+}
+
+/* A fejléc fix és 4rem magas, a főtartalom ezért pt-16-tal indul.
+   A teljes képernyős oldalak (min-h-screen) így pontosan a maradék helyet
+   töltsék ki, különben a fejléc magasságával túlcsordulnának (fölösleges
+   görgetés és hézag a lábléc alatt).
+   A `main .min-h-screen` szelektor specifikusabb a Tailwind utilitynél. */
+main .min-h-screen {
+  min-height: calc(100vh - 4rem);
+}

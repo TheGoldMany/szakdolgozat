@@ -65,7 +65,7 @@ type FormData = {
   documents?: DocItem[];
 };
 
-const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition bg-white";
+const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition";
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
