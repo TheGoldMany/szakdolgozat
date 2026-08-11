@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -57,6 +58,17 @@ export async function PATCH(
       data,
       select: { id: true, name: true, email: true, role: true, suspendedAt: true },
     });
+
+    const who = user.name ?? user.email;
+    if (parsed.data.suspended === true) {
+      logAudit({ actorId: session.user.id, action: "USER_SUSPENDED", targetType: "User", targetId: user.id, targetName: who, reason: parsed.data.reason });
+    } else if (parsed.data.suspended === false) {
+      logAudit({ actorId: session.user.id, action: "USER_REACTIVATED", targetType: "User", targetId: user.id, targetName: who });
+    }
+    if (parsed.data.role !== undefined) {
+      logAudit({ actorId: session.user.id, action: "USER_ROLE_CHANGED", targetType: "User", targetId: user.id, targetName: who, reason: `${target.role} → ${parsed.data.role}` });
+    }
+
     return NextResponse.json(user);
   } catch (error) {
     console.error("[api/admin/users/[id] PATCH]", error);
@@ -78,7 +90,7 @@ export async function DELETE(
 
   const target = await prisma.user.findUnique({
     where:  { id: params.id },
-    select: { id: true, role: true },
+    select: { id: true, role: true, name: true, email: true },
   });
   if (!target) {
     return NextResponse.json({ error: "A felhasználó nem található" }, { status: 404 });
@@ -89,6 +101,13 @@ export async function DELETE(
 
   try {
     await prisma.user.delete({ where: { id: params.id } });
+    logAudit({
+      actorId:    session.user.id,
+      action:     "USER_DELETED",
+      targetType: "User",
+      targetId:   target.id,
+      targetName: target.name ?? target.email,
+    });
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/users/[id] DELETE]", error);

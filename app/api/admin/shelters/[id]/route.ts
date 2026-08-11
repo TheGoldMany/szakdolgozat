@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { createNotifications } from "@/lib/notifications";
@@ -61,6 +62,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       data:   parsed.data,
       select: { id: true, isActive: true, isVerified: true },
     });
+
+    if (parsed.data.isVerified !== undefined) {
+      logAudit({
+        actorId:    session.user.id,
+        action:     parsed.data.isVerified ? "SHELTER_VERIFIED" : "SHELTER_UNVERIFIED",
+        targetType: "Shelter",
+        targetId:   updated.id,
+        targetName: shelter.name,
+      });
+    }
 
     // Send notifications when isActive changes
     if (parsed.data.isActive !== undefined) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
@@ -48,6 +49,14 @@ export async function PATCH(
         action === "APPROVE"
           ? { status: "ACTIVE", approvedById: session.user.id, approvedAt: new Date() }
           : { status: "REJECTED" },
+    });
+
+    logAudit({
+      actorId:    session.user.id,
+      action:     action === "APPROVE" ? "CAMPAIGN_APPROVED" : "CAMPAIGN_REJECTED",
+      targetType: "Campaign",
+      targetId:   updated.id,
+      targetName: campaign.title,
     });
 
     // Notify campaign owner(s)

@@ -143,6 +143,7 @@ model User {
   transferResolutions AnimalTransfer[]       @relation("TransferResolver")
   posts               Post[]                 @relation("PostAuthor")
   postLikes           PostLike[]
+  auditLogs           AuditLog[]             @relation("AuditActor")
 }
 
 // -------------------------------------------------------
@@ -1347,4 +1348,36 @@ model PostLike {
 
   @@unique([postId, userId])
   @@index([postId])
+}
+
+/// Adminisztrátori műveletek naplója (ki, mit, mikor, min).
+/// Csak SUPER_ADMIN olvashatja; a bejegyzések nem módosíthatók.
+model AuditLog {
+  id         String        @id @default(cuid())
+  actorId    String?
+  action     AuditAction
+  targetType String
+  targetId   String
+  targetName String?
+  reason     String?
+  createdAt  DateTime      @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([targetType, targetId])
+}
+
+enum AuditAction {
+  USER_SUSPENDED
+  USER_REACTIVATED
+  USER_DELETED
+  USER_ROLE_CHANGED
+  SHELTER_VERIFIED
+  SHELTER_UNVERIFIED
+  CAMPAIGN_APPROVED
+  CAMPAIGN_REJECTED
+  FORM_APPROVED
+  FORM_REJECTED
 }

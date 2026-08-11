@@ -1271,7 +1271,8 @@
     "addShelterInvalidEmail": "Nieprawidłowy email",
     "addShelterMinChar6": "Min. 6 znaków",
     "addShelterUnknownError": "Nieznany błąd",
-    "navApprovals": "Zatwierdzenia"
+    "navApprovals": "Zatwierdzenia",
+    "navAudit": "Dziennik audytu"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",
