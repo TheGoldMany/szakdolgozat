@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
 import { HeroSlideshow } from "@/components/home/hero-slideshow";
+import { HomeSidebar } from "@/components/home/home-sidebar";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
@@ -19,7 +20,7 @@ export default async function HomePage() {
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, composerShelter] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters, composerShelter] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
@@ -69,6 +70,16 @@ export default async function HomePage() {
           name: true, slug: true,
           shelter: { select: { name: true } },
           images:  { where: { isPrimary: true }, take: 1, select: { url: true } },
+        },
+      }),
+      // Oldalsáv: kiemelt menhelyek
+      prisma.shelter.findMany({
+        where:   { isActive: true },
+        orderBy: { animals: { _count: "desc" } },
+        take: 5,
+        select: {
+          id: true, name: true, slug: true, city: true, logoUrl: true,
+          _count: { select: { animals: true } },
         },
       }),
       // Shelter logo for post composer (SHELTER_ADMIN / SUPER_ADMIN only)
@@ -201,30 +212,62 @@ export default async function HomePage() {
 
       {/* ── "Neked" feed ─────────────────────────────────── */}
       <section className="bg-gray-50 py-8">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
-            <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
-              {t("all")} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center gap-6">
 
-          {(feedAnimals.length || feedCampaigns.length || feedEvents.length || feedPosts.length) ? (
-            <FeedClient
-              animals={feedAnimals}
-              campaigns={feedCampaigns}
-              events={feedEvents}
-              reports={feedReports}
-              initialPosts={feedPosts}
-              initialCursor={nextCursor}
-              composer={composerInfo}
-            />
-          ) : (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center">
-              <PawPrint className="mx-auto mb-3 h-10 w-10 text-brand-200" />
-              <p className="text-sm text-gray-500">{t("feedEmpty")}</p>
+            {/* Folyam – olvasható szélességen tartva */}
+            <div className="w-full max-w-2xl">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
+                <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
+                  {t("all")} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+
+              {(feedAnimals.length || feedReports.length || feedPosts.length) ? (
+                <FeedClient
+                  animals={feedAnimals}
+                  campaigns={[]}
+                  events={[]}
+                  reports={feedReports}
+                  initialPosts={feedPosts}
+                  initialCursor={nextCursor}
+                  composer={composerInfo}
+                />
+              ) : (
+                <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center">
+                  <PawPrint className="mx-auto mb-3 h-10 w-10 text-brand-200" />
+                  <p className="text-sm text-gray-500">{t("feedEmpty")}</p>
+                </div>
+              )}
+
+              {/* Mobilon az oldalsáv tartalma a folyam alá kerül */}
+              <div className="mt-4 lg:hidden">
+                <HomeSidebar
+                  events={feedEvents}
+                  campaigns={feedCampaigns}
+                  shelters={sidebarShelters.map((s) => ({
+                    id: s.id, name: s.name, slug: s.slug, city: s.city,
+                    logoUrl: s.logoUrl, animalCount: s._count.animals,
+                  }))}
+                />
+              </div>
             </div>
-          )}
+
+            {/* Oldalsáv – csak nagy képernyőn, a folyammal együtt görgethető */}
+            <div className="hidden w-80 shrink-0 lg:block">
+              <div className="sticky top-20">
+                <HomeSidebar
+                  events={feedEvents}
+                  campaigns={feedCampaigns}
+                  shelters={sidebarShelters.map((s) => ({
+                    id: s.id, name: s.name, slug: s.slug, city: s.city,
+                    logoUrl: s.logoUrl, animalCount: s._count.animals,
+                  }))}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
