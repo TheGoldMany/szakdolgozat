@@ -1273,7 +1273,8 @@
     "addShelterRequired": "Required",
     "addShelterInvalidEmail": "Invalid email",
     "addShelterMinChar6": "Min. 6 characters",
-    "addShelterUnknownError": "Unknown error"
+    "addShelterUnknownError": "Unknown error",
+    "navApprovals": "Approvals"
   },
   "foster": {
     "title": "My foster applications",

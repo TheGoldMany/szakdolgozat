@@ -1273,7 +1273,8 @@
     "addShelterRequired": "Pflichtfeld",
     "addShelterInvalidEmail": "Ungültige E-Mail",
     "addShelterMinChar6": "Min. 6 Zeichen",
-    "addShelterUnknownError": "Unbekannter Fehler"
+    "addShelterUnknownError": "Unbekannter Fehler",
+    "navApprovals": "Genehmigungen"
   },
   "foster": {
     "title": "Meine Pflegeanträge",

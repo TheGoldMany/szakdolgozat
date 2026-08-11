@@ -1270,7 +1270,8 @@
     "addShelterRequired": "Wymagane",
     "addShelterInvalidEmail": "Nieprawidłowy email",
     "addShelterMinChar6": "Min. 6 znaków",
-    "addShelterUnknownError": "Nieznany błąd"
+    "addShelterUnknownError": "Nieznany błąd",
+    "navApprovals": "Zatwierdzenia"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",
