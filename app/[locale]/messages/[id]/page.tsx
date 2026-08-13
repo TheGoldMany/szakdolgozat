@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Globe, ArrowLeft } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, ArrowLeft, PawPrint } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/chat-window";
@@ -108,7 +108,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={img.url} alt={conversation.animal.name} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-lg">🐾</div>
+                  <div className="flex h-full items-center justify-center"><PawPrint className="h-5 w-5 text-gray-300" /></div>
                 )}
               </div>
               <div>
@@ -172,7 +172,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={img.url} alt={conversation.animal.name} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-xl">🐾</div>
+                    <div className="flex h-full items-center justify-center"><PawPrint className="h-6 w-6 text-gray-300" /></div>
                   )}
                 </div>
                 <div>

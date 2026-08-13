@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList } from "lucide-react";
+import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList, PawPrint } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
@@ -199,7 +199,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                   ))}
                 </div>
               ) : (
-                <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gray-100 text-6xl">🐾</div>
+                <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gray-100"><PawPrint className="h-16 w-16 text-gray-300" /></div>
               )}
             </div>
 
@@ -209,7 +209,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 {primaryImage ? (
                   <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="60vw" />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-6xl">🐾</div>
+                  <div className="flex h-full items-center justify-center"><PawPrint className="h-16 w-16 text-gray-300" /></div>
                 )}
                 <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
                   {statusLabel}

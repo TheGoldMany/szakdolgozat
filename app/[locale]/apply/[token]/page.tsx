@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { PawPrint } from "lucide-react";
 import { ApplicationFormFiller } from "@/components/apply/application-form-filler";
 
 export const dynamic = "force-dynamic";
@@ -55,8 +56,8 @@ export default async function ApplyPage({ params }: { params: { token: string; l
               className="h-16 w-16 shrink-0 rounded-xl object-cover"
             />
           ) : (
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-2xl">
-              🐾
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gray-100">
+              <PawPrint className="h-7 w-7 text-gray-300" />
             </div>
           )}
           <div>

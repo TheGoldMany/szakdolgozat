@@ -5,7 +5,7 @@ import { DashboardTour, type TourStep } from "@/components/onboarding/dashboard-
 const STEPS: TourStep[] = [
   {
     selector: null,
-    title: "Üdv a vezérlőpultban! 🐾",
+    title: "Üdv a vezérlőpultban!",
     body:  "Köszöntünk a menhelyed irányítópultján! Pár lépésben végigvezetünk a legfontosabb funkciókon. Bármikor kihagyhatod, és később újraindíthatod.",
   },
   {
@@ -40,7 +40,7 @@ const STEPS: TourStep[] = [
   },
   {
     selector: null,
-    title: "Készen állsz! 🎉",
+    title: "Készen állsz!",
     body:  "Ez minden, amit tudnod kell az induláshoz. A bal oldali menü alján lévő „Bemutató” gombbal bármikor újraindíthatod ezt a végigvezetést.",
   },
 ];

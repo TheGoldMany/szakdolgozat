@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Info, X } from "lucide-react";
+import { Info, X, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -275,7 +275,7 @@ export function PageInfo({ page, className }: { page: string; className?: string
 
           {content.tip && (
             <div className="mt-3 rounded-xl bg-brand-50 border border-brand-100 px-3 py-2 text-xs leading-relaxed text-brand-800">
-              💡 {content.tip}
+              <Lightbulb className="mr-1 inline h-3.5 w-3.5 align-text-bottom" /> {content.tip}
             </div>
           )}
         </div>

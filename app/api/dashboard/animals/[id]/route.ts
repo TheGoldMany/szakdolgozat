@@ -56,7 +56,7 @@ export async function PATCH(
   if (parsed.data.status === AnimalStatus.ADOPTED && animal.status !== AnimalStatus.ADOPTED) {
     notifyAnimalSponsors(
       params.id,
-      `${updated.name} gazdira talált! 🎉`,
+      `${updated.name} gazdira talált!`,
       "A virtuális örökbefogadásoddal támogatott állat új otthonba került. Köszönjük a segítséget!",
       `/animals/${updated.slug}`,
     ).catch(() => {});

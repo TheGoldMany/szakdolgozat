@@ -15,6 +15,7 @@ import { EmailNotificationsToggle } from "@/components/profile/email-notificatio
 import { DownloadDataButton } from "@/components/profile/download-data-button";
 import { StripeConnectSection } from "@/components/profile/stripe-connect-section";
 import { MyCampaigns } from "@/components/profile/my-campaigns";
+import { PawPrint } from "lucide-react";
 import { Role } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -256,7 +257,7 @@ export default async function ProfilePage() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={img.url} alt={app.animal.name} className="h-full w-full object-cover" />
                           ) : (
-                            <div className="flex h-full items-center justify-center text-lg">🐾</div>
+                            <div className="flex h-full items-center justify-center"><PawPrint className="h-5 w-5 text-gray-300" /></div>
                           )}
                         </div>
                         <div className="min-w-0 flex-1">

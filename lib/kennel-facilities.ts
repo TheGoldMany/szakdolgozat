@@ -5,16 +5,16 @@
  * ugyanazt a mezőkészletet használja.
  */
 export const KENNEL_FACILITIES = [
-  { key: "isCovered",   label: "Fedett",         icon: "🏠" },
-  { key: "isFenced",    label: "Kerített",       icon: "🚧" },
-  { key: "hasFeeder",   label: "Etető",          icon: "🍽️" },
-  { key: "hasWaterer",  label: "Itató",          icon: "💧" },
-  { key: "hasHouse",    label: "Kutyaház",       icon: "🛖" },
-  { key: "hasBedding",  label: "Fekhely",        icon: "🛏️" },
-  { key: "hasHeating",  label: "Fűtés",          icon: "🔥" },
-  { key: "hasLighting", label: "Világítás",      icon: "💡" },
-  { key: "hasDrainage", label: "Vízelvezetés",   icon: "🚿" },
-  { key: "hasToys",     label: "Játékok",        icon: "🧸" },
+  { key: "isCovered",   label: "Fedett" },
+  { key: "isFenced",    label: "Kerített" },
+  { key: "hasFeeder",   label: "Etető" },
+  { key: "hasWaterer",  label: "Itató" },
+  { key: "hasHouse",    label: "Kutyaház" },
+  { key: "hasBedding",  label: "Fekhely" },
+  { key: "hasHeating",  label: "Fűtés" },
+  { key: "hasLighting", label: "Világítás" },
+  { key: "hasDrainage", label: "Vízelvezetés" },
+  { key: "hasToys",     label: "Játékok" },
 ] as const;
 
 export type KennelFacilityKey = (typeof KENNEL_FACILITIES)[number]["key"];

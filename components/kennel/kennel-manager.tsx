@@ -158,7 +158,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
             <div className="mt-4">
               <p className="mb-2 text-xs font-semibold text-gray-600">Felszereltség</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {KENNEL_FACILITIES.map(({ key, label, icon }) => (
+                {KENNEL_FACILITIES.map(({ key, label }) => (
                   <label
                     key={key}
                     className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-colors ${
@@ -173,7 +173,6 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                       onChange={(e) => setFacilities(f => ({ ...f, [key]: e.target.checked }))}
                       className="h-4 w-4 rounded border-gray-300 text-brand-500"
                     />
-                    <span aria-hidden>{icon}</span>
                     {label}
                   </label>
                 ))}
@@ -234,7 +233,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                     Felszereltség
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {KENNEL_FACILITIES.map(({ key, label, icon }) => {
+                    {KENNEL_FACILITIES.map(({ key, label }) => {
                       const on = k[key];
                       return (
                         <button
@@ -248,8 +247,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                               : "bg-gray-50 text-gray-400 hover:bg-gray-100"
                           }`}
                         >
-                          <span aria-hidden>{icon}</span>
-                          {label}
+                                {label}
                         </button>
                       );
                     })}

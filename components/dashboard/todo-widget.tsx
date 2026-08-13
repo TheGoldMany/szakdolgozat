@@ -33,7 +33,7 @@ export function TodoWidget({ items }: { items: TodoItem[] }) {
       {active.length === 0 ? (
         <div className="flex items-center gap-3 px-5 py-6 text-sm text-gray-500">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />
-          Minden elintézve — jelenleg nincs teendő. 🎉
+          Minden elintézve — jelenleg nincs teendő.
         </div>
       ) : (
         <ul className="divide-y divide-gray-50">
