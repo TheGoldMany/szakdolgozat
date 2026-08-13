@@ -10,6 +10,16 @@ const schema = z.object({
   type:     z.nativeEnum(KennelType).optional(),
   capacity: z.number().int().min(1).max(1000).optional(),
   note:     z.string().max(2000).nullable().optional(),
+  isCovered:   z.boolean().optional(),
+  isFenced:    z.boolean().optional(),
+  hasFeeder:   z.boolean().optional(),
+  hasWaterer:  z.boolean().optional(),
+  hasHouse:    z.boolean().optional(),
+  hasBedding:  z.boolean().optional(),
+  hasHeating:  z.boolean().optional(),
+  hasLighting: z.boolean().optional(),
+  hasDrainage: z.boolean().optional(),
+  hasToys:     z.boolean().optional(),
 });
 
 async function authorize(kennelId: string, userId: string, role: string | undefined) {

@@ -377,6 +377,19 @@ model Kennel {
   type      KennelType @default(KENNEL)
   capacity  Int        @default(1) // maximális férőhely
   note      String?    @db.Text
+
+  // Felszereltség – a menhely ellenőrzőlistája a kifutóhoz
+  isCovered    Boolean @default(false) // fedett
+  hasFeeder    Boolean @default(false) // etető
+  hasWaterer   Boolean @default(false) // itató
+  hasHouse     Boolean @default(false) // kutyaház / búvóhely
+  hasBedding   Boolean @default(false) // fekhely / alom
+  hasHeating   Boolean @default(false) // fűtés
+  hasLighting  Boolean @default(false) // világítás
+  isFenced     Boolean @default(false) // kerített
+  hasDrainage  Boolean @default(false) // vízelvezetés
+  hasToys      Boolean @default(false) // játékok
+
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
