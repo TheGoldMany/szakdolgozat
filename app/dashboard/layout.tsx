@@ -11,6 +11,8 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
+import { ShelterSwitcher } from "@/components/dashboard/shelter-switcher";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 import { DashboardTourLauncher } from "@/components/onboarding/dashboard-tour-launcher";
 import "../globals.css";
 
@@ -52,6 +54,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const messages = await loadMessages(locale);
 
+  // Super admin esetén menhely-váltó a menü fölött
+  const acting = await resolveActingShelter(session.user.id!, role);
+
   return (
     <html lang={locale} className={inter.variable}>
       <body>
@@ -62,6 +67,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
               <div className="mx-auto mt-16 flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:flex-row lg:px-8">
                 <aside className="w-full shrink-0 lg:w-60">
+                  {acting.canSwitch && (
+                    <ShelterSwitcher options={acting.options} shelterId={acting.shelterId} />
+                  )}
                   <SidebarNav role={role} />
                 </aside>
                 <main className="flex-1 min-w-0">{children}</main>
