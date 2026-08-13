@@ -306,8 +306,8 @@ export async function sendEventRegistrationEmail(opts: {
           </p>
           <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:16px 0">
             <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#166534">${opts.eventTitle}</p>
-            <p style="margin:0 0 4px;font-size:14px;color:#374151">📅 ${opts.eventDate}</p>
-            <p style="margin:0;font-size:14px;color:#374151">📍 ${opts.eventLocation}</p>
+            <p style="margin:0 0 4px;font-size:14px;color:#374151">${opts.eventDate}</p>
+            <p style="margin:0;font-size:14px;color:#374151">${opts.eventLocation}</p>
           </div>
           ${guestLine}
           <a href="${opts.eventUrl}"
@@ -340,7 +340,7 @@ export async function sendEventCancelledEmail(opts: {
           </p>
           <div style="background:#fef2f2;border-radius:12px;padding:20px;margin:16px 0;border-left:4px solid #ef4444">
             <p style="margin:0 0 8px;font-size:18px;font-weight:700;color:#991b1b">${opts.eventTitle}</p>
-            <p style="margin:0;font-size:14px;color:#374151">📅 ${opts.eventDate}</p>
+            <p style="margin:0;font-size:14px;color:#374151">${opts.eventDate}</p>
           </div>
           <p style="color:#374151;font-size:14px">
             Köszönjük a megértésedet. Nézd meg más közelgő eseményeinket!
@@ -566,7 +566,7 @@ export async function sendReportMatchEmail(opts: {
     await sendEmail(opts.to, `Lehetséges egyezés a bejelentésedre – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
-            Találtunk egy lehetséges egyezést! 🐾
+            Találtunk egy lehetséges egyezést!
           </h1>
           <p style="color:#374151;font-size:14px;line-height:1.6">
             Kedves ${opts.contactName}!<br/>
@@ -604,7 +604,7 @@ export async function sendNearbyReportEmail(opts: {
     await sendEmail(opts.to, `${title}: ${opts.animalLabel} (${opts.city}) – ÁllatiMenhelyek.hu`, `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px 24px">
           <h1 style="font-size:22px;font-weight:700;color:#166534;margin-bottom:8px">
-            ${title} 🐾
+            ${title}
           </h1>
           <p style="color:#374151;font-size:14px;line-height:1.6">
             Kedves ${opts.adminName}!<br/>
@@ -612,7 +612,7 @@ export async function sendNearbyReportEmail(opts: {
             kb. <strong>${opts.distanceKm} km</strong> távolságra.
           </p>
           <div style="background:#f0fdf4;border-radius:12px;padding:20px;margin:16px 0">
-            <p style="margin:0 0 4px;font-size:14px;color:#374151">📍 ${opts.city}</p>
+            <p style="margin:0 0 4px;font-size:14px;color:#374151">${opts.city}</p>
             <p style="margin:0;font-size:14px;color:#374151;line-height:1.6">${opts.description}</p>
           </div>
           <a href="${opts.reportUrl}"

@@ -82,7 +82,7 @@ export default async function ApprovalsPage() {
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-green-100 bg-green-50 py-14 text-center">
           <CheckCircle2 className="h-10 w-10 text-green-500" />
           <p className="font-medium text-green-800">Nincs jóváhagyásra váró tétel.</p>
-          <p className="text-sm text-green-700/70">Minden kérelmet elbíráltál. 🎉</p>
+          <p className="text-sm text-green-700/70">Minden kérelmet elbíráltál.</p>
         </div>
       )}
 

@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-const LOCALE_LABELS: Record<string, { label: string; flag: string }> = {
-  hu: { label: "Magyar",  flag: "🇭🇺" },
-  en: { label: "English", flag: "🇬🇧" },
-  de: { label: "Deutsch", flag: "🇩🇪" },
-  pl: { label: "Polski",  flag: "🇵🇱" },
+const LOCALE_LABELS: Record<string, { label: string }> = {
+  hu: { label: "Magyar"  },
+  en: { label: "English" },
+  de: { label: "Deutsch" },
+  pl: { label: "Polski"  },
 };
 
 const ROLE_COLOR: Record<string, string> = {
@@ -125,10 +125,11 @@ export function Header() {
           <div className="relative">
             <button
               onClick={() => setLangMenuOpen((v) => !v)}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              aria-label={`${t("language")}: ${currentLocale.label}`}
+              title={`${t("language")}: ${currentLocale.label}`}
+              className="flex items-center rounded-xl p-2 text-gray-600 hover:bg-gray-50 transition-colors"
             >
               <Globe className="h-4 w-4" />
-              <span>{currentLocale.flag} {currentLocale.label}</span>
             </button>
             {langMenuOpen && (
               <div className="absolute right-0 mt-2 w-40 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg z-50">
@@ -141,7 +142,7 @@ export function Header() {
                       loc === locale ? "font-semibold text-brand-600" : "text-gray-700"
                     )}
                   >
-                    {LOCALE_LABELS[loc].flag} {LOCALE_LABELS[loc].label}
+                    {LOCALE_LABELS[loc].label}
                   </button>
                 ))}
               </div>
@@ -156,7 +157,9 @@ export function Header() {
               {/* Messages */}
               <Link
                 href="/messages"
-                className="relative flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-brand-500 transition-colors"
+                aria-label={t("messages")}
+                title={t("messages")}
+                className="relative flex items-center rounded-xl p-2 text-gray-600 hover:bg-gray-50 hover:text-brand-500 transition-colors"
               >
                 <span className="relative">
                   <MessageCircle className="h-4 w-4" />
@@ -166,7 +169,6 @@ export function Header() {
                     </span>
                   )}
                 </span>
-                <span className="hidden lg:inline">{t("messages")}</span>
               </Link>
 
               {/* User dropdown */}
@@ -280,7 +282,7 @@ export function Header() {
                           : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                       )}
                     >
-                      {LOCALE_LABELS[loc].flag} {LOCALE_LABELS[loc].label}
+                      {LOCALE_LABELS[loc].label}
                     </button>
                   ))}
                 </div>

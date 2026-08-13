@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Copy, Check, X, Eye, EyeOff } from "lucide-react";
+import { Copy, Check, X, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 function buildSchema(t: (k: string) => string) {
   return z.object({
@@ -117,7 +117,7 @@ export function AddShelterForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-          ⚠ {t("addShelterPasswordWarning")}
+          <AlertTriangle className="mr-1 inline h-3.5 w-3.5 align-text-bottom" /> {t("addShelterPasswordWarning")}
         </p>
 
         <div className="flex gap-3">

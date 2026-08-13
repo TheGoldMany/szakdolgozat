@@ -102,7 +102,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
                 <p className="text-xl font-bold text-brand-600">
                   {avgReview ? avgReview.toFixed(1) : "–"}
                 </p>
-                <p className="text-xs text-gray-500">Átlag ⭐</p>
+                <p className="text-xs text-gray-500">Átlag</p>
               </div>
             </div>
           </div>

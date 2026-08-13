@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { CheckCircle2 } from "lucide-react";
 
 type FormData = {
   message:     string;
@@ -66,7 +67,7 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
   if (submitted) {
     return (
       <div className="rounded-2xl bg-green-50 border border-green-200 p-6 text-center">
-        <div className="text-4xl mb-3">🎉</div>
+        <div className="mb-3 flex justify-center"><CheckCircle2 className="h-10 w-10 text-green-500" /></div>
         <p className="font-semibold text-green-800">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-green-700">
           {t("successDesc")}

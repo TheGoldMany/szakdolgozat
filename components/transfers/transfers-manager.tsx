@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightLeft, CheckCircle, XCircle, Undo2, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRightLeft, CheckCircle, XCircle, Undo2, Clock, ChevronDown, ChevronUp, PawPrint } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type TransferStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
@@ -152,7 +152,7 @@ function TransferCard({
         {thumb ? (
           <Image src={thumb} alt={t.animal.name} width={48} height={48} className="h-12 w-12 rounded-lg object-cover" />
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-2xl">🐾</div>
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100"><PawPrint className="h-6 w-6 text-gray-300" /></div>
         )}
 
         <div className="flex-1 min-w-0">

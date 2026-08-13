@@ -77,7 +77,7 @@ export default async function ApplicationsPage() {
 
         {applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-            <span className="text-5xl">📋</span>
+            <ClipboardList className="h-14 w-14 text-gray-300" />
             <p className="mt-4 text-lg font-medium text-gray-700">{t("none")}</p>
             <p className="mt-1 text-sm text-gray-400">{t("noneDesc")}</p>
             <Link

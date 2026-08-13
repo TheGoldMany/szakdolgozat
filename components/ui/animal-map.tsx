@@ -54,7 +54,7 @@ const SHELTER_ICON = L.divIcon({
     box-shadow:0 2px 6px rgba(0,0,0,0.35);
     display:flex;align-items:center;justify-content:center;
     font-size:16px;
-  ">🏠</div>`,
+  "></div>`,
   iconSize:   [32, 32],
   iconAnchor: [16, 16],
   popupAnchor:[0, -18],
@@ -112,8 +112,8 @@ export default function AnimalMap({ reports, shelters, showReports, showShelters
             </div>
             <div style="font-weight:700;font-size:14px;color:#111827">${r.name ?? "Ismeretlen"}</div>
             ${r.breed ? `<div style="font-size:12px;color:#6B7280">${r.breed}</div>` : ""}
-            <div style="font-size:12px;color:#374151;margin-top:4px">📍 ${r.city}</div>
-            ${r.contactPhone ? `<div style="font-size:12px;color:#2563EB;margin-top:4px">📞 ${r.contactName}: ${r.contactPhone}</div>` : ""}
+            <div style="font-size:12px;color:#374151;margin-top:4px">${r.city}</div>
+            ${r.contactPhone ? `<div style="font-size:12px;color:#2563EB;margin-top:4px">${r.contactName}: ${r.contactPhone}</div>` : ""}
             <div style="font-size:11px;color:#9CA3AF;margin-top:4px">${new Date(r.createdAt).toLocaleDateString("hu-HU")}</div>
           </div>
         `);
@@ -130,9 +130,9 @@ export default function AnimalMap({ reports, shelters, showReports, showShelters
               <span style="font-weight:700;font-size:14px;color:#111827">${s.name}</span>
               ${s.isVerified ? '<span style="color:#16A34A;font-size:11px">✓</span>' : ""}
             </div>
-            <div style="font-size:12px;color:#6B7280">📍 ${s.city}${s.address ? `, ${s.address}` : ""}</div>
-            <div style="font-size:12px;color:#2563EB;margin-top:2px">🐾 ${s._count.animals} állat örökbefogadható</div>
-            ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">📞 ${s.phone}</div>` : ""}
+            <div style="font-size:12px;color:#6B7280">${s.city}${s.address ? `, ${s.address}` : ""}</div>
+            <div style="font-size:12px;color:#2563EB;margin-top:2px">${s._count.animals} állat örökbefogadható</div>
+            ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${s.phone}</div>` : ""}
             <a href="/shelters/${s.slug}" target="_blank"
               style="display:inline-block;margin-top:6px;font-size:12px;color:#2563EB;text-decoration:underline">
               Menhely oldala →
