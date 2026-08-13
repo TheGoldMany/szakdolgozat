@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 import { prisma } from "@/lib/prisma";
 import { KennelType } from "@prisma/client";
 
@@ -22,15 +23,15 @@ const schema = z.object({
   hasToys:     z.boolean().optional(),
 });
 
-/** A bejelentkezett user menhelyét adja vissza (SHELTER_ADMIN), vagy a query-ben kértet (SUPER_ADMIN). */
+/**
+ * A kérés menhelyét adja vissza: SHELTER_ADMIN-nál a sajátját, SUPER_ADMIN-nál
+ * a query-ben kértet, különben a dashboardon kiválasztottat (süti).
+ * Korábban egy tetszőleges menhelyre esett vissza, ami rossz menhelyre
+ * hozhatott létre férőhelyet.
+ */
 async function resolveShelterId(userId: string, role: string | undefined, requested?: string | null) {
-  if (role === "SUPER_ADMIN") {
-    if (requested) return requested;
-    const first = await prisma.shelter.findFirst({ select: { id: true } });
-    return first?.id;
-  }
-  const admin = await prisma.shelterAdmin.findFirst({ where: { userId }, select: { shelterId: true } });
-  return admin?.shelterId;
+  const acting = await resolveActingShelter(userId, role, requested);
+  return acting.shelterId ?? undefined;
 }
 
 // GET /api/kennels – kennelek listája foglaltsággal

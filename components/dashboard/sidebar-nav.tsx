@@ -29,7 +29,7 @@ const NAV_GROUPS: NavGroup[] = [
     tourKey: "group-animals",
     items: [
       { href: "/dashboard/animals",   icon: PawPrint,        labelKey: "navAnimals",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/kennels",   icon: DoorOpen,        labelKey: "navKennels",   roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/kennels",   icon: DoorOpen,        labelKey: "navKennels",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/feeding",   icon: UtensilsCrossed, labelKey: "navFeeding",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/inventory", icon: Package,         labelKey: "navInventory", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/transfers", icon: ArrowRightLeft,  labelKey: "navTransfers", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
@@ -42,7 +42,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/applications", icon: ClipboardList, labelKey: "navApplications", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/appointments", icon: CalendarDays,  labelKey: "navAppointments", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/followups",    icon: ListChecks,    labelKey: "navFollowups",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/forms",        icon: FileText,      labelKey: "navForms",        roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/forms",        icon: FileText,      labelKey: "navForms",        roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
   {
@@ -80,7 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
     tourKey: "group-settings",
     items: [
       { href: "/profile/admin",      icon: UserCog, labelKey: "navProfileAdmin",    roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
-      { href: "/dashboard/settings", icon: Settings, labelKey: "navShelterSettings", roles: ["SHELTER_ADMIN"] },
+      { href: "/dashboard/settings", icon: Settings, labelKey: "navShelterSettings", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
 ];

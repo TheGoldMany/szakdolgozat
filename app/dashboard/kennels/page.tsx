@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { KennelManager } from "@/components/kennel/kennel-manager";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Férőhelyek" };
 export const dynamic = "force-dynamic";
@@ -15,16 +16,15 @@ export default async function KennelsPage() {
 
   const t = await getTranslations("dashboard");
 
-  const admin = await prisma.shelterAdmin.findFirst({
-    where:  { userId: session.user.id },
-    select: { shelterId: true },
-  });
-  const shelterId = admin?.shelterId;
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
   if (!shelterId) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-        {t("kennelsNoShelter")}
+        {acting.canSwitch
+          ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval a férőhelyek kezeléséhez."
+          : t("kennelsNoShelter")}
       </div>
     );
   }
