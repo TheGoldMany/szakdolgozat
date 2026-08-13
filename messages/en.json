@@ -1275,7 +1275,8 @@
     "addShelterMinChar6": "Min. 6 characters",
     "addShelterUnknownError": "Unknown error",
     "navApprovals": "Approvals",
-    "navAudit": "Audit log"
+    "navAudit": "Audit log",
+    "navVets": "Veterinarians"
   },
   "foster": {
     "title": "My foster applications",

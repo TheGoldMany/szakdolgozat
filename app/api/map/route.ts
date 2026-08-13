@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/map  – jelentések + menhelyek koordinátákkal
+// GET /api/map  – jelentések + menhelyek + állatorvosi rendelők koordinátákkal
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const type   = searchParams.get("type");    // LOST | FOUND | STRAY
   const status = searchParams.get("status") ?? "ACTIVE";
 
   try {
-    const [reports, shelters] = await Promise.all([
+    const [reports, shelters, vets] = await Promise.all([
       prisma.animalReport.findMany({
         where: {
           lat:    { not: null },
@@ -52,9 +52,24 @@ export async function GET(req: NextRequest) {
           _count:     { select: { animals: { where: { status: "AVAILABLE" } } } },
         },
       }),
+      prisma.vetClinic.findMany({
+        where: { isActive: true, lat: { not: null }, lng: { not: null } },
+        select: {
+          id:           true,
+          name:         true,
+          city:         true,
+          address:      true,
+          phone:        true,
+          website:      true,
+          openingHours: true,
+          isEmergency:  true,
+          lat:          true,
+          lng:          true,
+        },
+      }),
     ]);
 
-    return NextResponse.json({ reports, shelters });
+    return NextResponse.json({ reports, shelters, vets });
   } catch (error) {
     console.error('[api/map GET]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

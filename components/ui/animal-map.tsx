@@ -11,6 +11,12 @@ export interface MapReport {
   lat: number; lng: number; status: string;
   createdAt: string; contactPhone: string | null; contactName: string;
 }
+export interface MapVet {
+  id: string; name: string; city: string; address: string;
+  phone: string | null; website: string | null;
+  openingHours: string | null; isEmergency: boolean;
+  lat: number; lng: number;
+}
 export interface MapShelter {
   id: string; name: string; city: string; address: string | null;
   phone: string | null; email: string | null; isVerified: boolean;
@@ -60,15 +66,38 @@ const SHELTER_ICON = L.divIcon({
   popupAnchor:[0, -18],
 });
 
+function makeVetIcon(isEmergency: boolean) {
+  const color = isEmergency ? "#DC2626" : "#7C3AED";
+  // Fehér kereszt: egyértelműen megkülönbözteti a menhely-jelölőtől
+  return L.divIcon({
+    className: "",
+    html: `<div style="
+      width:30px;height:30px;border-radius:50%;
+      background:${color};border:2px solid #fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.35);
+      display:flex;align-items:center;justify-content:center;
+    "><span style="
+      display:block;width:14px;height:3px;background:#fff;position:absolute;border-radius:1px;
+    "></span><span style="
+      display:block;width:3px;height:14px;background:#fff;position:absolute;border-radius:1px;
+    "></span></div>`,
+    iconSize:   [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor:[0, -17],
+  });
+}
+
 interface Props {
   reports:  MapReport[];
   shelters: MapShelter[];
+  vets:     MapVet[];
   showReports:  boolean;
   showShelters: boolean;
+  showVets:     boolean;
   typeFilter: string;
 }
 
-export default function AnimalMap({ reports, shelters, showReports, showShelters, typeFilter }: Props) {
+export default function AnimalMap({ reports, shelters, vets, showReports, showShelters, showVets, typeFilter }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef       = useRef<L.Map | null>(null);
   const layerRef     = useRef<L.LayerGroup | null>(null);
@@ -142,7 +171,31 @@ export default function AnimalMap({ reports, shelters, showReports, showShelters
         marker.addTo(layerRef.current!);
       });
     }
-  }, [reports, shelters, showReports, showShelters, typeFilter]);
+
+    if (showVets) {
+      vets.forEach(v => {
+        const marker = L.marker([v.lat, v.lng], { icon: makeVetIcon(v.isEmergency) });
+        marker.bindPopup(`
+          <div style="min-width:170px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span style="font-weight:700;font-size:14px;color:#111827">${v.name}</span>
+              ${v.isEmergency
+                ? '<span style="font-size:10px;font-weight:700;color:#B91C1C;background:#FEE2E2;padding:1px 6px;border-radius:999px">Ügyelet</span>'
+                : ""}
+            </div>
+            <div style="font-size:12px;color:#6B7280">${v.city}, ${v.address}</div>
+            ${v.openingHours ? `<div style="font-size:12px;color:#374151;margin-top:2px">${v.openingHours}</div>` : ""}
+            ${v.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${v.phone}</div>` : ""}
+            ${v.website
+              ? `<a href="${v.website}" target="_blank" rel="noopener noreferrer"
+                   style="display:inline-block;margin-top:6px;font-size:12px;color:#7C3AED;text-decoration:underline">Weboldal →</a>`
+              : ""}
+          </div>
+        `);
+        marker.addTo(layerRef.current!);
+      });
+    }
+  }, [reports, shelters, vets, showReports, showShelters, showVets, typeFilter]);
 
   return <div ref={containerRef} style={{ height: "100%", width: "100%", zIndex: 0 }} />;
 }

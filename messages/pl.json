@@ -1272,7 +1272,8 @@
     "addShelterMinChar6": "Min. 6 znaków",
     "addShelterUnknownError": "Nieznany błąd",
     "navApprovals": "Zatwierdzenia",
-    "navAudit": "Dziennik audytu"
+    "navAudit": "Dziennik audytu",
+    "navVets": "Weterynarze"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",
