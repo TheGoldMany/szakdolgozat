@@ -8,6 +8,7 @@ import { ExportButton } from "@/components/dashboard/export-button";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionCancelButton } from "@/components/dashboard/subscription-cancel-button";
 import { cn } from "@/lib/utils";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Előfizetők" };
 
@@ -23,13 +24,8 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
-  let shelterId: string | undefined;
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id },
-    });
-    shelterId = admin?.shelterId;
-  }
+  const acting    = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
   const statusFilter = searchParams.status === "ACTIVE" || searchParams.status === "CANCELLED"
     ? searchParams.status
@@ -38,7 +34,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
   const subscriptions = await prisma.subscription.findMany({
     where: {
       ...(statusFilter ? { status: statusFilter } : {}),
-      ...(!isSuperAdmin && shelterId ? { tier: { shelterId } } : {}),
+      ...(shelterId ? { tier: { shelterId } } : {}),
     },
     include: {
       user: { select: { name: true, email: true } },

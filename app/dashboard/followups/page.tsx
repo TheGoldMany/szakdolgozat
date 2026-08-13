@@ -6,6 +6,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ClipboardCheck, Star, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Utánkövetések | Dashboard" };
@@ -36,17 +37,12 @@ export default async function FollowUpsAdminPage() {
   if (!session?.user?.id) redirect("/auth/login");
   const t = await getTranslations("dashboard");
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-  let shelterId: string | null = null;
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where:  { userId: session.user.id },
-      select: { shelterId: true },
-    });
-    if (!admin) redirect("/dashboard");
-    shelterId = admin.shelterId;
-  }
+  // Menhely-admin menhely nélkül nem láthat utánkövetéseket;
+  // super adminnál a "nincs kiválasztott menhely" az összes menhelyet jelenti
+  if (!shelterId && !acting.canSwitch) redirect("/dashboard");
 
   const now = new Date();
 

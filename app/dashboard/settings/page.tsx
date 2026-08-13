@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterSettingsForm } from "@/components/dashboard/shelter-settings-form";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Menhely beállítások" };
 
@@ -16,10 +17,12 @@ export default async function ShelterSettingsPage() {
 
   const t = await getTranslations("dashboard");
 
-  const adminRecord = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    include: {
-      shelter: {
+  const acting    = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
+
+  const shelter = shelterId
+    ? await prisma.shelter.findUnique({
+        where:  { id: shelterId },
         select: {
           id:                      true,
           name:                    true,
@@ -39,19 +42,18 @@ export default async function ShelterSettingsPage() {
           stripeOnboardingComplete: true,
           documents:               { orderBy: { createdAt: "asc" } },
         },
-      },
-    },
-  });
+      })
+    : null;
 
-  if (!adminRecord?.shelter) {
+  if (!shelter) {
     return (
       <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
-        {t("settingsNoShelter")}
+        {acting.canSwitch
+          ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval a beállítások szerkesztéséhez."
+          : t("settingsNoShelter")}
       </div>
     );
   }
-
-  const { shelter } = adminRecord;
 
   return (
     <div className="space-y-6">

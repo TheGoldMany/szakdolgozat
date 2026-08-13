@@ -8,6 +8,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Kérvény sablonok" };
@@ -22,7 +23,9 @@ const STATUS_CLASSES: Record<string, string> = {
 export default async function FormsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/forms");
-  if (session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");
+  if (session.user.role !== "SHELTER_ADMIN" && session.user.role !== "SUPER_ADMIN") {
+    redirect("/dashboard");
+  }
 
   const t = await getTranslations("dashboard");
 
@@ -33,14 +36,21 @@ export default async function FormsPage() {
     REJECTED:         t("formsStatusRejected"),
   };
 
-  const shelterAdmin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    select: { shelterId: true },
-  });
-  if (!shelterAdmin) redirect("/dashboard");
+  const acting    = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
+
+  // A sablonkezelés mindig egy konkrét menhelyhez kötött
+  if (!shelterId) {
+    if (!acting.canSwitch) redirect("/dashboard");
+    return (
+      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+        Válassz menhelyt a bal oldali „Kezelt menhely” választóval a kérvény sablonok kezeléséhez.
+      </div>
+    );
+  }
 
   const forms = await prisma.applicationForm.findMany({
-    where: { shelterId: shelterAdmin.shelterId },
+    where: { shelterId },
     include: { _count: { select: { fields: true } } },
     orderBy: { createdAt: "desc" },
   });

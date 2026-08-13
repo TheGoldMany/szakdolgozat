@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterAppointments } from "@/components/appointments/shelter-appointments";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Időpontok" };
 export const dynamic = "force-dynamic";
@@ -16,19 +17,16 @@ export default async function DashboardAppointmentsPage() {
   if (!session?.user?.id) redirect("/auth/login");
   const t = await getTranslations("appointments");
 
-  let shelterIds: string[];
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
-  if (session.user.role === "SUPER_ADMIN") {
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    shelterIds = all.map(s => s.id);
-  } else {
-    const adminOf = await prisma.shelterAdmin.findMany({
-      where:  { userId: session.user.id },
-      select: { shelterId: true },
-    });
-    shelterIds = adminOf.map(a => a.shelterId);
-    if (shelterIds.length === 0) redirect("/dashboard");
-  }
+  // Menhely-admin menhely nélkül nem kezelhet időpontokat
+  if (!shelterId && !acting.canSwitch) redirect("/dashboard");
+
+  // Super adminnál a "nincs kiválasztott menhely" továbbra is az összes menhelyet jelenti
+  const shelterIds = shelterId
+    ? [shelterId]
+    : (await prisma.shelter.findMany({ select: { id: true } })).map(s => s.id);
 
   const appointments = await prisma.appointment.findMany({
     where:   { shelterId: { in: shelterIds } },

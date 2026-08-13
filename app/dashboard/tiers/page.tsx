@@ -7,6 +7,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { TiersManager } from "@/components/dashboard/tiers-manager";
 import { cn } from "@/lib/utils";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Előfizetési csomagok" };
 
@@ -23,7 +24,11 @@ export default async function TiersPage() {
 
   const t = await getTranslations("dashboard");
 
-  if (isSuperAdmin) {
+  const acting    = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
+
+  // Super admin kiválasztott menhely nélkül → az összes menhely csomagjai
+  if (!shelterId && acting.canSwitch) {
     const tiers = await prisma.donationTier.findMany({
       include: {
         shelter: { select: { name: true, city: true } },
@@ -87,13 +92,8 @@ export default async function TiersPage() {
     );
   }
 
-  // SHELTER_ADMIN path
-  const admin = await prisma.shelterAdmin.findFirst({
-    where: { userId: session.user.id },
-    select: { shelterId: true },
-  });
-
-  if (!admin?.shelterId) {
+  // Egy konkrét menhely csomagjai
+  if (!shelterId) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <p className="text-sm text-gray-500">{t("tiersNoShelter")}</p>
@@ -102,7 +102,7 @@ export default async function TiersPage() {
   }
 
   const tiers = await prisma.donationTier.findMany({
-    where:   { shelterId: admin.shelterId },
+    where:   { shelterId },
     include: { _count: { select: { subscriptions: true } } },
     orderBy: { amount: "asc" },
   });
@@ -113,7 +113,7 @@ export default async function TiersPage() {
         <h1 className="text-2xl font-bold text-gray-900">{t("tiersTitle")}</h1>
         <PageInfo page="tiers" />
       </div>
-      <TiersManager tiers={tiers} shelterId={admin.shelterId} />
+      <TiersManager tiers={tiers} shelterId={shelterId} />
     </div>
   );
 }
