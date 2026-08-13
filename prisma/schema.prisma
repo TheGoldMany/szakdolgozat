@@ -1394,3 +1394,32 @@ enum AuditAction {
   FORM_APPROVED
   FORM_REJECTED
 }
+
+/// Állatorvosi rendelő – a nyilvános térképen jelenik meg.
+/// Platform-szintű adat, super admin kezeli.
+model VetClinic {
+  id           String   @id @default(cuid())
+  name         String
+  address      String
+  city         String
+  zipCode      String?
+  country      String   @default("HU")
+  phone        String?
+  email        String?
+  website      String?
+  openingHours String?  @db.Text
+  note         String?  @db.Text
+
+  /// 24 órás / sürgősségi ügyelet
+  isEmergency  Boolean  @default(false)
+  isActive     Boolean  @default(true)
+
+  lat          Float?
+  lng          Float?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([city])
+  @@index([isActive])
+}

@@ -1275,7 +1275,8 @@
     "addShelterMinChar6": "Min. 6 Zeichen",
     "addShelterUnknownError": "Unbekannter Fehler",
     "navApprovals": "Genehmigungen",
-    "navAudit": "Audit-Protokoll"
+    "navAudit": "Audit-Protokoll",
+    "navVets": "Tierärzte"
   },
   "foster": {
     "title": "Meine Pflegeanträge",

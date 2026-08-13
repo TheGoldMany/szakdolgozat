@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { SlidersHorizontal, X } from "lucide-react";
-import type { MapReport, MapShelter } from "@/components/ui/animal-map";
+import type { MapReport, MapShelter, MapVet } from "@/components/ui/animal-map";
 
 const AnimalMap = dynamic(() => import("@/components/ui/animal-map"), { ssr: false });
 
@@ -20,10 +20,12 @@ export default function MapView() {
 
   const [reports,  setReports]  = useState<MapReport[]>([]);
   const [shelters, setShelters] = useState<MapShelter[]>([]);
+  const [vets,     setVets]     = useState<MapVet[]>([]);
   const [loading,  setLoading]  = useState(true);
 
   const [showReports,  setShowReports]  = useState(true);
   const [showShelters, setShowShelters] = useState(true);
+  const [showVets,     setShowVets]     = useState(true);
   const [typeFilter,   setTypeFilter]   = useState("");
   const [status,       setStatus]       = useState("ACTIVE");
   const [panelOpen,    setPanelOpen]    = useState(false);
@@ -33,7 +35,7 @@ export default function MapView() {
     const qs = new URLSearchParams({ status });
     fetch(`/api/map?${qs}`)
       .then(r => r.json())
-      .then(d => { setReports(d.reports ?? []); setShelters(d.shelters ?? []); })
+      .then(d => { setReports(d.reports ?? []); setShelters(d.shelters ?? []); setVets(d.vets ?? []); })
       .finally(() => setLoading(false));
   }, [status]);
 
@@ -51,7 +53,9 @@ export default function MapView() {
             reports={reports}
             shelters={shelters}
             showReports={showReports}
+            vets={vets}
             showShelters={showShelters}
+            showVets={showVets}
             typeFilter={typeFilter}
           />
         )}
@@ -147,6 +151,13 @@ export default function MapView() {
                 className="h-4 w-4 rounded accent-brand-500" />
               <span className="text-sm text-gray-700">{t("sheltersLayer")}</span>
               <span className="ml-auto text-xs text-gray-400">{shelters.length}</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-50">
+              <input type="checkbox" checked={showVets}
+                onChange={e => setShowVets(e.target.checked)}
+                className="h-4 w-4 rounded accent-brand-500" />
+              <span className="text-sm text-gray-700">Állatorvosok</span>
+              <span className="ml-auto text-xs text-gray-400">{vets.length}</span>
             </label>
           </div>
         </div>
