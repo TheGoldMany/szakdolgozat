@@ -9,6 +9,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { KpiCard } from "@/components/dashboard/stats/kpi-card";
 import { InventoryList } from "@/components/inventory/inventory-list";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Készlet" };
 export const dynamic = "force-dynamic";
@@ -30,25 +31,23 @@ export default async function InventoryPage() {
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";
 
-  let shelterIds: string[];
-  let shelterId: string | null = null;
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId: string | null = acting.shelterId;
 
-  if (isSuperAdmin) {
+  let shelterIds: string[];
+
+  if (shelterId) {
+    shelterIds = [shelterId];
+  } else if (acting.canSwitch) {
+    // Nincs kiválasztott menhely → az összes menhely készlete
     const all = await prisma.shelter.findMany({ select: { id: true } });
     shelterIds = all.map((s) => s.id);
   } else {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id },
-    });
-    if (!admin) {
-      return (
-        <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-          {t("inventoryNoShelter")}
-        </div>
-      );
-    }
-    shelterId  = admin.shelterId;
-    shelterIds = [shelterId];
+    return (
+      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+        {t("inventoryNoShelter")}
+      </div>
+    );
   }
 
   const now   = new Date();

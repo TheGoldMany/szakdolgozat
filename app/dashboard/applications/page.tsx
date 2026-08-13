@@ -12,6 +12,7 @@ import { ApplicationStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { Users, PawPrint, FileText, Clock, ClipboardList } from "lucide-react";
 import { ExportButton } from "@/components/dashboard/export-button";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
@@ -25,8 +26,6 @@ export default async function DashboardApplicationsPage({
 
   const t = await getTranslations("dashboard");
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-
   const STATUS_LABELS: Record<ApplicationStatus, { label: string; color: string }> = {
     INVITED:   { label: t("appsStatusLabelInvited"),   color: "bg-purple-100 text-purple-700" },
     PENDING:   { label: t("appsStatusLabelPending"),   color: "bg-yellow-100 text-yellow-700" },
@@ -36,13 +35,8 @@ export default async function DashboardApplicationsPage({
     WITHDRAWN: { label: t("appsStatusLabelWithdrawn"), color: "bg-gray-100 text-gray-500" },
   };
 
-  let shelterId: string | undefined;
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id },
-    });
-    shelterId = admin?.shelterId;
-  }
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
   const statusFilter = searchParams.status as ApplicationStatus | undefined;
 

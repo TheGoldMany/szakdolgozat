@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FeedingScheduleManager } from "@/components/dashboard/feeding-schedule-manager";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Etetési rend" };
 export const dynamic = "force-dynamic";
@@ -12,31 +13,15 @@ export default async function FeedingPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-
-  let shelterId: string | null = null;
-
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id },
-    });
-    if (!admin) {
-      return (
-        <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-          Nincs menhelyhez rendelve fiókod.
-        </div>
-      );
-    }
-    shelterId = admin.shelterId;
-  } else {
-    const first = await prisma.shelter.findFirst({ select: { id: true } });
-    shelterId = first?.id ?? null;
-  }
+  const acting    = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
   if (!shelterId) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
-        Nem található menhely.
+        {acting.canSwitch
+          ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval az etetési rend kezeléséhez."
+          : "Nincs menhelyhez rendelve fiókod."}
       </div>
     );
   }

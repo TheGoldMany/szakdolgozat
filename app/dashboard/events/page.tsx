@@ -9,6 +9,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { EventsManager } from "@/components/events/events-manager";
 import type { EventEntry } from "@/components/events/events-manager";
 import { ExportButton } from "@/components/dashboard/export-button";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Események" };
 export const dynamic = "force-dynamic";
@@ -18,16 +19,17 @@ export default async function DashboardEventsPage() {
   if (!session?.user?.id) redirect("/auth/login");
   const t = await getTranslations("dashboard");
 
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+
   let shelterIds: string[];
-  if (session.user.role === "SUPER_ADMIN") {
+  if (acting.shelterId) {
+    shelterIds = [acting.shelterId];
+  } else if (acting.canSwitch) {
+    // Nincs kiválasztott menhely → az összes menhely eseményei
     const all = await prisma.shelter.findMany({ select: { id: true } });
     shelterIds = all.map(s => s.id);
   } else {
-    const admins = await prisma.shelterAdmin.findMany({
-      where: { userId: session.user.id }, select: { shelterId: true },
-    });
-    shelterIds = admins.map(a => a.shelterId);
-    if (shelterIds.length === 0) redirect("/dashboard");
+    redirect("/dashboard");
   }
 
   const shelterId = shelterIds[0];

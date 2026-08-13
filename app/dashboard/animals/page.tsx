@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { PawPrint, FileText } from "lucide-react";
 import { ExportButton } from "@/components/dashboard/export-button";
 import { TransferRequestButton } from "@/components/transfers/transfer-request-button";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Állatok" };
 
@@ -34,15 +35,8 @@ export default async function DashboardAnimalsPage({
 
   const t = await getTranslations("dashboard");
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
-
-  let shelterId: string | undefined;
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where: { userId: session.user.id },
-    });
-    shelterId = admin?.shelterId;
-  }
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
   const statusFilter = searchParams.status as AnimalStatus | undefined;
 

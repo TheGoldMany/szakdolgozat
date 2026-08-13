@@ -6,6 +6,12 @@ export const ACTING_SHELTER_COOKIE = "acting_shelter";
 export interface ActingShelter {
   /** A ténylegesen kezelt menhely azonosítója, vagy `null` = minden menhely (super admin). */
   shelterId: string | null;
+  /**
+   * Az összes menhely, amelyhez a felhasználó hozzáfér.
+   * Menhely adminnál a sajátjai (több is lehet), super adminnál üres tömb,
+   * ami azt jelenti: nincs korlátozás.
+   */
+  shelterIds: string[];
   /** Igaz, ha a felhasználó szabadon válthat menhelyet (super admin). */
   canSwitch: boolean;
   /** A választható menhelyek (csak super adminnak töltjük ki). */
@@ -29,15 +35,30 @@ export async function resolveActingShelter(
   requestedShelterId?: string | null,
 ): Promise<ActingShelter> {
   if (role !== "SUPER_ADMIN") {
-    const admin = await prisma.shelterAdmin.findFirst({
+    // Egy admin több menhelyhez is tartozhat – mindet visszaadjuk, hogy az
+    // összesítő oldalak ne szűküljenek le az elsőre.
+    const memberships = await prisma.shelterAdmin.findMany({
       where:  { userId },
-      select: { shelterId: true, shelter: { select: { name: true } } },
+      select: { shelterId: true, shelter: { select: { id: true, name: true } } },
+      orderBy: { shelter: { name: "asc" } },
     });
+    if (memberships.length === 0) {
+      return { shelterId: null, shelterIds: [], canSwitch: false, options: [], shelterName: null };
+    }
+
+    const options = memberships.map((m) => m.shelter);
+    // Több menhely esetén a korábban választott (süti) az aktív, különben az első
+    const cookieStore = await cookies();
+    const fromCookie  = cookieStore.get(ACTING_SHELTER_COOKIE)?.value ?? null;
+    const candidate   = requestedShelterId ?? fromCookie;
+    const selected    = options.find((o) => o.id === candidate) ?? options[0];
+
     return {
-      shelterId:   admin?.shelterId ?? null,
-      canSwitch:   false,
-      options:     [],
-      shelterName: admin?.shelter.name ?? null,
+      shelterId:   selected.id,
+      shelterIds:  options.map((o) => o.id),
+      canSwitch:   options.length > 1,
+      options,
+      shelterName: selected.name,
     };
   }
 
@@ -56,6 +77,7 @@ export async function resolveActingShelter(
 
   return {
     shelterId:   selected?.id ?? null,
+    shelterIds:  [], // super admin: nincs korlátozás
     canSwitch:   true,
     options,
     shelterName: selected?.name ?? null,

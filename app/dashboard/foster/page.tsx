@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { FosterAdmin } from "@/components/foster/foster-admin";
+import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Ideiglenes befogadók" };
 export const dynamic = "force-dynamic";
@@ -14,18 +15,11 @@ export default async function FosterDashboardPage() {
   if (!session?.user?.id) return null;
   const t = await getTranslations("dashboard");
 
-  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  const shelterId = acting.shelterId;
 
-  let shelterId: string | undefined;
-  if (!isSuperAdmin) {
-    const admin = await prisma.shelterAdmin.findFirst({
-      where:  { userId: session.user.id },
-      select: { shelterId: true },
-    });
-    shelterId = admin?.shelterId;
-  }
-
-  if (!isSuperAdmin && !shelterId) {
+  // Super adminnál a "nincs kiválasztott menhely" továbbra is az összes menhelyet jelenti
+  if (!shelterId && !acting.canSwitch) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
         {t("notAssignedToShelter")}
