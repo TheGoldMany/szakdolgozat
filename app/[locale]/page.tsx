@@ -7,6 +7,8 @@ import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
 import { HeroSlideshow } from "@/components/home/hero-slideshow";
 import { HomeSidebar } from "@/components/home/home-sidebar";
+import { CountUp } from "@/components/ui/count-up";
+import { Reveal } from "@/components/ui/reveal";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
@@ -202,7 +204,7 @@ export default async function HomePage() {
             ].map(({ value, label, Icon }) => (
               <div key={label}>
                 <Icon className="mx-auto mb-1 h-5 w-5 text-white/75" />
-                <p className="text-2xl font-bold sm:text-3xl">{value.toLocaleString("hu-HU")}</p>
+                <p className="text-2xl font-bold sm:text-3xl"><CountUp value={value} /></p>
                 <p className="mt-0.5 text-xs text-white/75 sm:text-sm">{label}</p>
               </div>
             ))}
@@ -275,7 +277,7 @@ export default async function HomePage() {
       <section className="bg-white py-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <h2 className="mb-10 text-center text-2xl font-bold text-gray-900">{t("howTitle")}</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <Reveal stagger className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[
               { Icon: Search,        title: t("step1Title"), desc: t("step1Desc"), step: "1" },
               { Icon: ClipboardList, title: t("step2Title"), desc: t("step2Desc"), step: "2" },
@@ -290,7 +292,7 @@ export default async function HomePage() {
                 <p className="mt-1.5 text-sm leading-relaxed text-gray-500">{desc}</p>
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 

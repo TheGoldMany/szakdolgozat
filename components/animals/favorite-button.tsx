@@ -74,7 +74,7 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
         disabled={loading}
         aria-label={label}
         className={cn(
-          "flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-colors disabled:opacity-60",
+          "press flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-colors disabled:opacity-60",
           favorited
             ? "border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100"
             : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
@@ -82,7 +82,10 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
       >
         {loading
           ? <Loader2 className="h-4 w-4 animate-spin" />
-          : <Heart className={cn("h-4 w-4", favorited && "fill-rose-500 text-rose-500")} />}
+          : <Heart
+              key={String(favorited)}
+              className={cn("h-4 w-4", favorited && "animate-pop fill-rose-500 text-rose-500")}
+            />}
         {label}
       </button>
     );
@@ -96,12 +99,17 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
       aria-label={label}
       title={label}
       className={cn(
-        "absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all hover:scale-110 disabled:opacity-70",
+        "press absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all hover:scale-110 disabled:opacity-70",
       )}
     >
       {loading
         ? <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
-        : <Heart className={cn("h-4 w-4 transition-colors", favorited ? "fill-rose-500 text-rose-500" : "text-gray-500")} />}
+        : <Heart
+            key={String(favorited)}
+            className={cn(
+              "h-4 w-4 transition-colors",
+              favorited ? "animate-pop fill-rose-500 text-rose-500" : "text-gray-500",
+            )} />}
     </button>
   );
 }
