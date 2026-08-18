@@ -14,14 +14,14 @@ import {
   User,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { readingMinutes } from "@/lib/articles";
+import { readingMinutes, isPublished } from "@/lib/articles";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
     select: { title: true, excerpt: true, imageUrl: true, publishedAt: true },
   });
-  if (!article || !article.publishedAt) return { title: "Cikk nem található" };
+  if (!article || !isPublished(article.publishedAt)) return { title: "Cikk nem található" };
 
   const title       = article.title;
   const description = article.excerpt?.slice(0, 160) ?? `${article.title} – ÁllatiMenhelyek.hu`;
@@ -95,8 +95,8 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
     },
   });
 
-  // Piszkozat (publishedAt === null) a nyilvános oldalon nem létezik
-  if (!article || !article.publishedAt) notFound();
+  // Piszkozat és időzített (jövőbeli) cikk a nyilvános oldalon nem létezik
+  if (!article || !isPublished(article.publishedAt)) notFound();
 
   const paragraphs = toParagraphs(article.content);
   const minutes    = readingMinutes(article.content);

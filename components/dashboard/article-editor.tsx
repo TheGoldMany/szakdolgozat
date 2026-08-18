@@ -6,8 +6,7 @@ import Link from "next/link";
 import { upload } from "@vercel/blob/client";
 import { toast } from "sonner";
 import {
-  Loader2, ImagePlus, X, Save, Send, EyeOff, Trash2, AlertCircle, FilePlus2,
-} from "lucide-react";
+  Loader2, ImagePlus, X, Save, Send, EyeOff, Trash2, AlertCircle, FilePlus2, CalendarClock } from "lucide-react";
 
 /** Egy szerkesztésre megnyitott cikk kiindulási adatai. */
 export interface EditableArticle {
@@ -18,6 +17,8 @@ export interface EditableArticle {
   imageUrl:  string | null;
   shelterId: string | null;
   published: boolean;
+  /** ISO időpont, ha van megjelenési idő (múltbeli = publikált, jövőbeli = időzített). */
+  publishedAt: string | null;
 }
 
 interface ShelterOption { id: string; name: string }
@@ -26,6 +27,12 @@ const cls =
   "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100";
 
 const EXCERPT_MAX = 400;
+
+/** Date -> a <input type="datetime-local"> által várt helyi idő szerinti szöveg. */
+function toLocalInput(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export function ArticleEditor({ article }: { article?: EditableArticle | null }) {
   const router  = useRouter();
@@ -36,10 +43,14 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
   const [content, setContent]     = useState(article?.content ?? "");
   const [imageUrl, setImageUrl]   = useState(article?.imageUrl ?? "");
   const [shelterId, setShelterId] = useState(article?.shelterId ?? "");
+  // datetime-local formátum: YYYY-MM-DDTHH:mm (helyi idő szerint)
+  const [scheduledAt, setScheduledAt] = useState(
+    article?.publishedAt ? toLocalInput(new Date(article.publishedAt)) : "",
+  );
 
   const [shelters, setShelters]   = useState<ShelterOption[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [saving, setSaving]       = useState<"draft" | "publish" | "save" | "delete" | null>(null);
+  const [saving, setSaving]       = useState<"draft" | "publish" | "schedule" | "save" | "delete" | null>(null);
   const [error, setError]         = useState<string | null>(null);
 
   const isEdit  = Boolean(article);
@@ -84,7 +95,10 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
    * Mentés. A `publish` értéke dönt a státuszról:
    * true = publikálás, false = piszkozat, undefined = a jelenlegi állapot marad.
    */
-  async function save(publish: boolean | undefined, mode: "draft" | "publish" | "save") {
+  async function save(
+    publish: boolean | undefined,
+    mode: "draft" | "publish" | "schedule" | "save",
+  ) {
     const problem = validate();
     if (problem) { setError(problem); return; }
 
@@ -100,6 +114,16 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
       };
       if (publish !== undefined) body.publish = publish;
 
+      // Időzítés: a megadott jövőbeli időpontot küldjük; publikálásnál a mező
+      // ürítése jelenti azt, hogy "most".
+      if (mode === "schedule") {
+        body.publish = true;
+        body.publishedAt = new Date(scheduledAt).toISOString();
+      } else if (mode === "publish") {
+        body.publishedAt = null; // a szerver a jelen időt teszi be
+        body.publish = true;
+      }
+
       const res = await fetch(isEdit ? `/api/posts/${article!.id}` : "/api/posts", {
         method:  isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,14 +137,18 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
 
       if (isEdit) {
         toast.success(
-          publish === true  ? "A cikk publikálva." :
-          publish === false ? "A cikk visszakerült piszkozatba." :
-                              "A cikk mentve.",
+          mode === "schedule" ? "A cikk időzítve." :
+          publish === true    ? "A cikk publikálva." :
+          publish === false   ? "A cikk visszakerült piszkozatba." :
+                                "A cikk mentve.",
         );
         router.refresh();
       } else {
-        toast.success(publish === false ? "Piszkozat mentve." : "A cikk publikálva.");
-        setTitle(""); setExcerpt(""); setContent(""); setImageUrl(""); setShelterId("");
+        toast.success(
+          mode === "schedule" ? "A cikk időzítve." :
+          publish === false   ? "Piszkozat mentve." : "A cikk publikálva.",
+        );
+        setTitle(""); setExcerpt(""); setContent(""); setImageUrl(""); setShelterId(""); setScheduledAt("");
         if (fileRef.current) fileRef.current.value = "";
         router.refresh();
       }
@@ -292,6 +320,24 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
           </p>
         </div>
 
+        {/* Időzítés */}
+        <div>
+          <label htmlFor="article-schedule" className="mb-1 block text-xs font-semibold text-gray-600">
+            Megjelenés időpontja
+          </label>
+          <input
+            id="article-schedule"
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+            className={cls}
+          />
+          <p className="mt-1 text-[11px] text-gray-400">
+            Hagyd üresen az azonnali publikáláshoz. Jövőbeli időpontnál a cikk csak
+            akkor jelenik meg a látogatóknak — addig itt marad, „Időzítve" jelöléssel.
+          </p>
+        </div>
+
         {error && (
           <p className="flex items-start gap-2 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -335,6 +381,18 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
                 </button>
               )}
 
+              {scheduledAt && (
+                <button
+                  type="button"
+                  onClick={() => save(true, "schedule")}
+                  disabled={busy}
+                  className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-60"
+                >
+                  {saving === "schedule" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarClock className="h-4 w-4" />}
+                  Időzítés
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={remove}
@@ -356,6 +414,17 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
                 {saving === "draft" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Mentés piszkozatként
               </button>
+              {scheduledAt && (
+                <button
+                  type="button"
+                  onClick={() => save(true, "schedule")}
+                  disabled={busy}
+                  className="flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-60"
+                >
+                  {saving === "schedule" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarClock className="h-4 w-4" />}
+                  Időzítés
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => save(true, "publish")}

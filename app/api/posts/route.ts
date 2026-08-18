@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
-import { slugifyTitle, uniqueArticleSlug } from "@/lib/articles";
+import { slugifyTitle, uniqueArticleSlug, publishedWhere } from "@/lib/articles";
 
 const createSchema = z.object({
   title:      z.string().min(3, "A cím legalább 3 karakter legyen").max(200),
@@ -13,8 +13,10 @@ const createSchema = z.object({
   animalId:   z.string().optional().nullable(),
   eventId:    z.string().optional().nullable(),
   campaignId: z.string().optional().nullable(),
-  /** Igaz = azonnal publikálva, hamis = piszkozat. */
+  /** Igaz = publikálás, hamis = piszkozat. */
   publish:    z.boolean().optional(),
+  /** Jövőbeli időpont = időzített megjelenés. Csak publish=true mellett értelmes. */
+  publishedAt: z.string().datetime().nullable().optional(),
 });
 
 // Egy cikk listához/előnézethez szükséges mezői + a hivatkozott entitás kivonata.
@@ -35,7 +37,7 @@ export async function GET(req: NextRequest) {
 
   // Piszkozatot csak a szerkesztő lát, a publikus lista mindig szűr.
   const posts = await prisma.post.findMany({
-    where: { publishedAt: { not: null } },
+    where: publishedWhere(),
     take: limit + 1,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     orderBy: { publishedAt: "desc" },
@@ -114,7 +116,13 @@ export async function POST(req: NextRequest) {
         animalId:    d.animalId || null,
         eventId:     d.eventId || null,
         campaignId:  d.campaignId || null,
-        publishedAt: d.publish === false ? null : new Date(),
+        // Piszkozat -> null; időzített -> a megadott (jövőbeli) időpont; egyébként most
+        publishedAt:
+          d.publish === false
+            ? null
+            : d.publishedAt
+              ? new Date(d.publishedAt)
+              : new Date(),
       },
       include: postInclude,
     });
