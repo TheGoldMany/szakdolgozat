@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 
 const patchSchema = z.object({
@@ -76,5 +77,12 @@ export async function DELETE(
   }
 
   await prisma.donationTier.delete({ where: { id: params.tierId } });
+  logAudit({
+    actorId:    session.user.id,
+    action:     "TIER_DELETED",
+    targetType: "DonationTier",
+    targetId:   tier.id,
+    targetName: tier.name,
+  });
   return NextResponse.json({ success: true });
 }

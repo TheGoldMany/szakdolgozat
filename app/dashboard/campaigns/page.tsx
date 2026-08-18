@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
+import { CampaignAdminActions } from "@/components/dashboard/campaign-admin-actions";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import type { CampaignStatus } from "@prisma/client";
@@ -63,6 +64,9 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
     include: {
       user:    { select: { name: true, email: true } },
       shelter: { select: { name: true } },
+      // A szerkesztéshez szükséges mezőket (description, imageUrl, endsAt) az
+      // include már visszaadja; az adományszám dönti el, törölhető-e a gyűjtés.
+      _count:  { select: { donations: true } },
     },
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
   });
@@ -111,6 +115,7 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
                     <th className="px-4 py-3 text-left">Cél / Összegyűlt</th>
                     <th className="px-4 py-3 text-left">Státusz</th>
                     <th className="px-4 py-3 text-left">Létrehozva</th>
+                    {isSuperAdmin && <th className="px-4 py-3 text-left">Műveletek</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -140,6 +145,22 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
                       <td className="px-4 py-3 text-xs text-gray-400">
                         {new Date(c.createdAt).toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" })}
                       </td>
+                      {isSuperAdmin && (
+                        <td className="px-4 py-3">
+                          <CampaignAdminActions
+                            campaign={{
+                              id:           c.id,
+                              title:        c.title,
+                              description:  c.description,
+                              targetAmount: c.targetAmount,
+                              imageUrl:     c.imageUrl,
+                              endsAt:       c.endsAt,
+                              status:       c.status,
+                            }}
+                            hasDonations={c._count.donations > 0}
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

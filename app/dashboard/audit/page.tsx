@@ -21,6 +21,11 @@ const ACTION_META: Record<AuditAction, { label: string; icon: LucideIcon; color:
   SHELTER_UNVERIFIED: { label: "Hitelesítés visszavonva",   icon: BadgeX,     color: "bg-amber-50 text-amber-700" },
   CAMPAIGN_APPROVED:  { label: "Gyűjtés jóváhagyva",        icon: HandHeart,  color: "bg-green-50 text-green-700" },
   CAMPAIGN_REJECTED:  { label: "Gyűjtés elutasítva",        icon: HandHeart,  color: "bg-red-50 text-red-700" },
+  CAMPAIGN_EDITED:    { label: "Gyűjtés szerkesztve",       icon: HandHeart,  color: "bg-blue-50 text-blue-700" },
+  CAMPAIGN_DELETED:   { label: "Gyűjtés törölve",           icon: Trash2,     color: "bg-red-50 text-red-700" },
+  TIER_DELETED:       { label: "Támogatói csomag törölve",  icon: Trash2,     color: "bg-red-50 text-red-700" },
+  SUBSCRIPTION_CANCELLED: { label: "Előfizetés lemondva",   icon: Ban,        color: "bg-amber-50 text-amber-700" },
+  SUBSCRIPTION_DELETED:   { label: "Előfizetés törölve",    icon: Trash2,     color: "bg-red-50 text-red-700" },
   FORM_APPROVED:      { label: "Űrlap jóváhagyva",          icon: FileText,   color: "bg-green-50 text-green-700" },
   FORM_REJECTED:      { label: "Űrlap elutasítva",          icon: FileText,   color: "bg-red-50 text-red-700" },
 };
