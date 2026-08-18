@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { upload } from "@vercel/blob/client";
 import { Send, Paperclip, X, FileText, Image as ImageIcon, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface Sender {
@@ -30,14 +31,14 @@ interface ChatWindowProps {
   initialMessages: Message[];
 }
 
-function formatTime(dateStr: string) {
+function formatTime(dateStr: string, locale: string) {
   const d = new Date(dateStr);
-  return d.toLocaleTimeString("hu-HU", { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 }
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string, locale: string) {
   const d = new Date(dateStr);
-  return d.toLocaleDateString("hu-HU", { month: "long", day: "numeric" });
+  return d.toLocaleDateString(locale, { month: "long", day: "numeric" });
 }
 
 function isSameDay(a: string, b: string) {
@@ -50,6 +51,8 @@ function isImage(name: string | null) {
 }
 
 function InviteMessageBubble({ token, own }: { token: string; own: boolean }) {
+  const t = useTranslations("messages");
+
   return (
     <div
       className={cn(
@@ -61,10 +64,10 @@ function InviteMessageBubble({ token, own }: { token: string; own: boolean }) {
     >
       <div className="flex items-center gap-2 mb-2">
         <ClipboardList className="h-4 w-4 shrink-0" />
-        <span className="font-semibold">Örökbefogadási kérvény meghívó</span>
+        <span className="font-semibold">{t("inviteTitle")}</span>
       </div>
       <p className="text-xs mb-2 opacity-80">
-        Kattints a gombra a kérvény kitöltéséhez.
+        {t("inviteHint")}
       </p>
       <a
         href={`/apply/${token}`}
@@ -76,14 +79,15 @@ function InviteMessageBubble({ token, own }: { token: string; own: boolean }) {
         )}
       >
         <ClipboardList className="h-3.5 w-3.5" />
-        Kérvény kitöltése
+        {t("inviteAction")}
       </a>
     </div>
   );
 }
 
 function AttachmentBubble({ url, name, own }: { url: string; name: string | null; own: boolean }) {
-  const displayName = name ?? "Csatolmány";
+  const t = useTranslations("messages");
+  const displayName = name ?? t("attachment");
   const img = isImage(name);
 
   if (img) {
@@ -118,6 +122,9 @@ function AttachmentBubble({ url, name, own }: { url: string; name: string | null
 }
 
 export function ChatWindow({ conversationId, currentUserId, initialMessages }: ChatWindowProps) {
+  const t       = useTranslations("messages");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
   const [messages, setMessages]         = useState<Message[]>(initialMessages);
   const [input, setInput]               = useState("");
   const [sending, setSending]           = useState(false);
@@ -182,7 +189,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
       });
       setAttachment({ url: blob.url, name: file.name });
     } catch {
-      setUploadError("Feltöltés sikertelen, próbáld újra.");
+      setUploadError(tCommon("uploadFailedRetry"));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -216,12 +223,12 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
         // Restore on failure
         setInput(prev);
         setAttachment(prevAttachment);
-        toast.error("Az üzenet küldése sikertelen, próbáld újra.");
+        toast.error(t("sendFailed"));
       }
     } catch {
       setInput(prev);
       setAttachment(prevAttachment);
-      toast.error("Hálózati hiba, próbáld újra.");
+      toast.error(tCommon("networkError"));
     } finally {
       setSending(false);
       inputRef.current?.focus();
@@ -242,8 +249,8 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
         {messages.length === 0 && (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-gray-400 text-center">
-              Még nincsenek üzenetek.<br />
-              Kezdd el a beszélgetést!
+              {t("emptyThread")}<br />
+              {t("startConversation")}
             </p>
           </div>
         )}
@@ -258,7 +265,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
               {showDate && (
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-gray-100" />
-                  <span className="text-xs text-gray-400">{formatDate(msg.createdAt)}</span>
+                  <span className="text-xs text-gray-400">{formatDate(msg.createdAt, locale)}</span>
                   <div className="flex-1 h-px bg-gray-100" />
                 </div>
               )}
@@ -271,9 +278,9 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                 <div className={cn("max-w-[75%]", isOwn ? "items-end" : "items-start", "flex flex-col gap-0.5")}>
                   {showName && (
                     <span className="text-xs text-gray-400 ml-1">
-                      {msg.sender.name ?? "Ismeretlen"}
+                      {msg.sender.name ?? tCommon("unknown")}
                       {msg.sender.role !== "USER" && (
-                        <span className="ml-1 text-brand-500">(Menhely)</span>
+                        <span className="ml-1 text-brand-500">({t("shelterTag")})</span>
                       )}
                     </span>
                   )}
@@ -298,7 +305,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                       )}
                     </div>
                   ) : null}
-                  <span className="text-[10px] text-gray-400 mx-1">{formatTime(msg.createdAt)}</span>
+                  <span className="text-[10px] text-gray-400 mx-1">{formatTime(msg.createdAt, locale)}</span>
                 </div>
               </div>
             </div>
@@ -315,7 +322,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
             {uploading ? (
               <>
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-                <span className="text-xs text-gray-500">Feltöltés...</span>
+                <span className="text-xs text-gray-500">{tCommon("uploading")}</span>
               </>
             ) : attachment ? (
               <>
@@ -359,7 +366,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Írj üzenetet... (Enter = küld)"
+            placeholder={t("inputPlaceholder")}
             rows={1}
             className="flex-1 resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 max-h-32 overflow-y-auto"
             style={{ minHeight: "42px" }}

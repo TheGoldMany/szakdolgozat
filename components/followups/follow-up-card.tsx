@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Star, CheckCircle, Clock, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface FollowUp {
@@ -28,12 +29,15 @@ interface Props {
 }
 
 const STATUS_CONFIG = {
-  COMPLETED: { label: "Kitöltve",    color: "text-green-600  bg-green-50",  icon: CheckCircle },
-  PENDING:   { label: "Esedékes",    color: "text-blue-600   bg-blue-50",   icon: Clock },
-  OVERDUE:   { label: "Késésben",    color: "text-red-600    bg-red-50",    icon: AlertCircle },
+  COMPLETED: { labelKey: "statusCompleted", color: "text-green-600  bg-green-50",  icon: CheckCircle },
+  PENDING:   { labelKey: "statusPending",   color: "text-blue-600   bg-blue-50",   icon: Clock },
+  OVERDUE:   { labelKey: "statusOverdue",   color: "text-red-600    bg-red-50",    icon: AlertCircle },
 };
 
 export function FollowUpCard({ followUp, onUpdate }: Props) {
+  const t       = useTranslations("followups");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
   const [open,       setOpen]       = useState(false);
   const [wellbeing,  setWellbeing]  = useState(0);
   const [notes,      setNotes]      = useState("");
@@ -43,20 +47,20 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
   const cfg = STATUS_CONFIG[followUp.status];
   const Icon = cfg.icon;
 
-  const scheduledLabel = new Date(followUp.scheduledAt).toLocaleDateString("hu-HU", {
+  const scheduledLabel = new Date(followUp.scheduledAt).toLocaleDateString(locale, {
     year: "numeric", month: "long", day: "numeric",
   });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!wellbeing) { setError("Kérjük adj értékelést!"); return; }
+    if (!wellbeing) { setError(t("ratingRequired")); return; }
     setSubmitting(true);
     setError(null);
     try {
       await onUpdate(followUp.id, { wellbeing, notes: notes || undefined });
       setOpen(false);
     } catch {
-      setError("Hiba történt a küldés során.");
+      setError(t("submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -65,7 +69,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
   return (
     <div className={cn(
       "rounded-2xl border bg-white shadow-sm overflow-hidden",
-      followUp.status === "OVERDUE" ? "border-red-100" : "border-gray-100"
+      followUp.status === "OVERDUE" ? "border-red-200" : "border-gray-200"
     )}>
       {/* Header */}
       <div className="flex items-center gap-4 p-4">
@@ -92,7 +96,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
         <div className="flex items-center gap-2">
           <span className={cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium", cfg.color)}>
             <Icon className="h-3 w-3" />
-            {cfg.label}
+            {t(cfg.labelKey)}
           </span>
 
           {followUp.status !== "COMPLETED" && (
@@ -127,7 +131,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
         <form onSubmit={handleSubmit} className="border-t border-gray-100 p-4 space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
-              Hogyan érzi magát {followUp.application.animal.name}?
+              {t("howIsAnimal", { name: followUp.application.animal.name })}
             </label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
@@ -145,7 +149,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
               ))}
               {wellbeing > 0 && (
                 <span className="ml-2 self-center text-sm text-gray-500">
-                  {["", "Nehezen alkalmazkodik", "Kicsit bizonytalan", "Jól van", "Nagyon jól", "Kiváló!"][wellbeing]}
+                  {t(`rate${wellbeing}`)}
                 </span>
               )}
             </div>
@@ -153,14 +157,14 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Megjegyzés <span className="text-gray-400 font-normal">(opcionális)</span>
+              {t("notes")} <span className="text-gray-400 font-normal">({tCommon("optional")})</span>
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               maxLength={2000}
-              placeholder="Hogyan illeszkedett be az új otthonba? Van-e valami, amiben segítségre lenne szükség?"
+              placeholder={t("notesPlaceholder")}
               className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400 resize-none"
             />
           </div>
@@ -173,14 +177,14 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
               onClick={() => setOpen(false)}
               className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
-              Mégsem
+              {tCommon("cancel")}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600 disabled:opacity-50"
             >
-              {submitting ? "Küldés..." : "Visszajelzés küldése"}
+              {submitting ? tCommon("sending") : t("submit")}
             </button>
           </div>
         </form>

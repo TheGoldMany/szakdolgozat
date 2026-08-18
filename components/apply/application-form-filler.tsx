@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { upload } from "@vercel/blob/client";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { CheckCircle } from "lucide-react";
 
@@ -20,6 +21,8 @@ interface ApplicationFormFillerProps {
 }
 
 export function ApplicationFormFiller({ token, fields, animalSlug }: ApplicationFormFillerProps) {
+  const t       = useTranslations("applications");
+  const tCommon = useTranslations("common");
   const [values, setValues]       = useState<Record<string, string>>({});
   const [fileUrls, setFileUrls]   = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
@@ -44,7 +47,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
       });
       setFileUrls((prev) => ({ ...prev, [fieldId]: blob.url }));
     } catch {
-      setUploadErrors((prev) => ({ ...prev, [fieldId]: "Feltöltés sikertelen, próbáld újra." }));
+      setUploadErrors((prev) => ({ ...prev, [fieldId]: tCommon("uploadFailedRetry") }));
     } finally {
       setUploading((prev) => ({ ...prev, [fieldId]: false }));
     }
@@ -60,7 +63,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
         const hasText = values[field.id]?.trim();
         const hasFile = fileUrls[field.id];
         if (!hasText && !hasFile) {
-          setError(`A "${field.label}" mező kitöltése kötelező.`);
+          setError(t("fillerRequired", { label: field.label }));
           return;
         }
       }
@@ -82,7 +85,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error ?? "Beküldés sikertelen");
+        throw new Error(data.error ?? t("fillerSubmitFailed"));
       }
       setSubmitted(true);
     } catch (e) {
@@ -96,15 +99,15 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
         <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
-        <h2 className="text-xl font-bold text-green-800 mb-2">Kérvény sikeresen beküldve!</h2>
+        <h2 className="text-xl font-bold text-green-800 mb-2">{t("fillerSubmitted")}</h2>
         <p className="text-sm text-green-700 mb-6">
-          A menhely hamarosan felveszi veled a kapcsolatot.
+          {t("fillerSubmittedDesc")}
         </p>
         <a
           href={`/animals/${animalSlug}`}
           className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600 transition-colors"
         >
-          Vissza az állat profiljához
+          {t("fillerBackToAnimal")}
         </a>
       </div>
     );
@@ -151,13 +154,13 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
                 className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
               />
               {uploading[field.id] && (
-                <p className="mt-1 text-xs text-gray-500">Feltöltés folyamatban...</p>
+                <p className="mt-1 text-xs text-gray-500">{t("fillerUploading")}</p>
               )}
               {uploadErrors[field.id] && (
                 <p className="mt-1 text-xs text-red-600">{uploadErrors[field.id]}</p>
               )}
               {fileUrls[field.id] && !uploading[field.id] && (
-                <p className="mt-1 text-xs text-green-600">Fájl feltöltve.</p>
+                <p className="mt-1 text-xs text-green-600">{t("fillerUploaded")}</p>
               )}
             </div>
           )}
@@ -178,7 +181,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
           (submitting || Object.values(uploading).some(Boolean)) && "opacity-50 cursor-not-allowed"
         )}
       >
-        {submitting ? "Beküldés..." : "Kérvény beküldése"}
+        {submitting ? t("fillerSubmitting") : t("fillerSubmit")}
       </button>
     </form>
   );

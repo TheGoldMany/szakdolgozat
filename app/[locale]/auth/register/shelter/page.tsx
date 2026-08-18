@@ -7,8 +7,11 @@ import { Link } from "@/i18n/navigation";
 import { PawPrint, Building2, BadgeCheck, Users, Heart, MailCheck } from "lucide-react";
 import { shelterRegisterSchema, type ShelterRegisterInput } from "@/lib/validations/auth";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function ShelterRegisterPage() {
+  const t       = useTranslations("auth");
+  const tCommon = useTranslations("common");
   const [serverError, setServerError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
@@ -28,7 +31,7 @@ export default function ShelterRegisterPage() {
     });
     if (!res.ok) {
       const json = await res.json();
-      setServerError(json.error ?? "Hiba történt a regisztráció során.");
+      setServerError(json.error ?? t("registerError"));
       return;
     }
     setRegisteredEmail(data.email);
@@ -42,9 +45,9 @@ export default function ShelterRegisterPage() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ email: registeredEmail }),
       });
-      toast.success("Megerősítő emailt újraküldtük.");
+      toast.success(t("resent"));
     } catch {
-      toast.error("Hálózati hiba.");
+      toast.error(tCommon("networkError"));
     }
     setResent(true);
   }
@@ -74,16 +77,16 @@ export default function ShelterRegisterPage() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
             <Building2 className="h-10 w-10 text-white" />
           </div>
-          <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">Regisztráld a menhelyed</h2>
+          <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">{t("shelterBrandTitle")}</h2>
           <p className="mt-3 text-base text-white/80">
-            Csatlakozz a platformhoz és találj gazdit az állataidnak.
+            {t("shelterBrandDesc")}
           </p>
 
           <div className="mt-10 space-y-4 text-left">
             {[
-              { icon: Heart,      title: "Örökbefogadás kezelése", desc: "Tedd közzé állataidat, fogadd a kérelmeket egy helyen." },
-              { icon: Users,      title: "Önkéntesek és adományok", desc: "Kezeld az önkénteseket, gyűjtéseket és előfizetéseket." },
-              { icon: BadgeCheck, title: "Hitelesített jelölés",    desc: "A jóváhagyás után hitelesített jelzést kap a menhelyed." },
+              { icon: Heart,      title: t("shelterPerk1Title"), desc: t("shelterPerk1Desc") },
+              { icon: Users,      title: t("shelterPerk2Title"), desc: t("shelterPerk2Desc") },
+              { icon: BadgeCheck, title: t("shelterPerk3Title"), desc: t("shelterPerk3Desc") },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex items-start gap-3 rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
@@ -113,26 +116,24 @@ export default function ShelterRegisterPage() {
           {registeredEmail ? (
             <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
               <MailCheck className="mx-auto mb-4 h-12 w-12 text-brand-500" />
-              <h2 className="text-xl font-bold text-gray-900">Erősítsd meg az email-címed</h2>
+              <h2 className="text-xl font-bold text-gray-900">{t("shelterVerifyTitle")}</h2>
               <p className="mt-2 text-sm text-gray-500">
-                Küldtünk egy megerősítő emailt a(z) <strong>{registeredEmail}</strong> címre.
-                Kattints a benne lévő linkre a fiók aktiválásához.
+                {t("shelterVerifyDesc", { email: registeredEmail })}
               </p>
               <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-left text-sm text-blue-800">
-                A menhelyed a megerősítés után máris használható lesz, de a{" "}
-                <strong>hitelesített</strong> jelzést csak a moderátorok jóváhagyása után kapja meg.
+                {t("shelterVerifyNote")}
               </div>
               <div className="mt-6 space-y-3">
                 {resent ? (
-                  <p className="text-sm font-medium text-green-600">Megerősítő emailt újraküldtük.</p>
+                  <p className="text-sm font-medium text-green-600">{t("resent")}</p>
                 ) : (
                   <button type="button" onClick={resend} className="text-sm font-semibold text-brand-600 hover:underline">
-                    Nem kaptad meg? Küldd újra
+                    {t("resend")}
                   </button>
                 )}
                 <div>
                   <Link href="/auth/login" className="text-sm text-gray-400 hover:text-brand-600 transition-colors">
-                    Bejelentkezés
+                    {t("loginButton")}
                   </Link>
                 </div>
               </div>
@@ -140,83 +141,83 @@ export default function ShelterRegisterPage() {
           ) : (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Menhely regisztráció</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{t("shelterFormTitle")}</h1>
                 <p className="mt-1.5 text-sm text-gray-500">
-                  Add meg a menhely és az adminisztrátor adatait. A jóváhagyás után hitelesített jelzést kaptok.
+                  {t("shelterFormDesc")}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   {/* Menhely adatok */}
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">A menhely adatai</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t("shelterSection")}</p>
 
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Menhely neve</label>
-                    <input placeholder="pl. Boldog Tappancs Menhely" className={inputCls} {...register("shelterName")} />
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("shelterName")}</label>
+                    <input placeholder={t("shelterNamePlaceholder")} className={inputCls} {...register("shelterName")} />
                     {errors.shelterName && <p className="mt-1 text-xs text-red-500">{errors.shelterName.message}</p>}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Város</label>
-                      <input placeholder="pl. Budapest" className={inputCls} {...register("city")} />
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("city")}</label>
+                      <input placeholder={t("cityPlaceholder")} className={inputCls} {...register("city")} />
                       {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city.message}</p>}
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Irányítószám</label>
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("zipCode")}</label>
                       <input placeholder="1111" className={inputCls} {...register("zipCode")} />
                       {errors.zipCode && <p className="mt-1 text-xs text-red-500">{errors.zipCode.message}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Cím</label>
-                    <input placeholder="pl. Állatvédő utca 12." className={inputCls} {...register("address")} />
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("address")}</label>
+                    <input placeholder={t("addressPlaceholder")} className={inputCls} {...register("address")} />
                     {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address.message}</p>}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Telefonszám <span className="text-gray-400">(opcionális)</span></label>
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("phone")} <span className="text-gray-400">({tCommon("optional")})</span></label>
                       <input placeholder="+36 30 123 4567" className={inputCls} {...register("phone")} />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Menhely email <span className="text-gray-400">(opcionális)</span></label>
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("shelterEmail")} <span className="text-gray-400">({tCommon("optional")})</span></label>
                       <input type="email" placeholder="info@menhely.hu" className={inputCls} {...register("shelterEmail")} />
                       {errors.shelterEmail && <p className="mt-1 text-xs text-red-500">{errors.shelterEmail.message}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Rövid bemutatkozás <span className="text-gray-400">(opcionális)</span></label>
-                    <textarea rows={3} placeholder="Néhány mondat a menhelyről…" className={inputCls} {...register("description")} />
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("shelterDescription")} <span className="text-gray-400">({tCommon("optional")})</span></label>
+                    <textarea rows={3} placeholder={t("shelterDescriptionPlaceholder")} className={inputCls} {...register("description")} />
                     {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
                   </div>
 
                   {/* Admin fiók */}
-                  <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Adminisztrátori fiók</p>
+                  <p className="pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("adminSection")}</p>
 
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Teljes név</label>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("fullName")}</label>
                     <input autoComplete="name" placeholder="Kovács Anna" className={inputCls} {...register("adminName")} />
                     {errors.adminName && <p className="mt-1 text-xs text-red-500">{errors.adminName.message}</p>}
                   </div>
 
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Email cím</label>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("emailLabel")}</label>
                     <input type="email" autoComplete="email" placeholder="anna@menhely.hu" className={inputCls} {...register("email")} />
                     {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Jelszó</label>
-                      <input type="password" autoComplete="new-password" placeholder="Min. 8 karakter" className={inputCls} {...register("password")} />
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("passwordLabel")}</label>
+                      <input type="password" autoComplete="new-password" placeholder={t("passwordPlaceholder")} className={inputCls} {...register("password")} />
                       {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Jelszó újra</label>
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("passwordAgain")}</label>
                       <input type="password" autoComplete="new-password" placeholder="••••••••" className={inputCls} {...register("confirmPassword")} />
                       {errors.confirmPassword && <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>}
                     </div>
@@ -233,13 +234,13 @@ export default function ShelterRegisterPage() {
                     disabled={isSubmitting}
                     className="w-full rounded-xl bg-brand-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
                   >
-                    {isSubmitting ? "Regisztráció…" : "Menhely regisztrálása"}
+                    {isSubmitting ? t("registering") : t("shelterSubmit")}
                   </button>
 
                   <p className="text-center text-sm text-gray-500">
-                    Magánszemélyként regisztrálnál?{" "}
+                    {t("asIndividual")}{" "}
                     <Link href="/auth/register" className="font-semibold text-brand-500 hover:underline">
-                      Sima regisztráció
+                      {t("plainRegister")}
                     </Link>
                   </p>
                 </form>
@@ -249,7 +250,7 @@ export default function ShelterRegisterPage() {
 
           <div className="mt-6 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-brand-500 transition-colors">
-              Vissza a főoldalra
+              {tCommon("backHome")}
             </Link>
           </div>
         </div>

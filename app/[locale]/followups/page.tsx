@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ClipboardCheck, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { FollowUpCard } from "@/components/followups/follow-up-card";
 
 interface FollowUp {
@@ -26,6 +27,7 @@ interface FollowUp {
 }
 
 export default function FollowUpsPage() {
+  const t = useTranslations("followups");
   const { data: session, status } = useSession();
   const router = useRouter();
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
@@ -65,9 +67,9 @@ export default function FollowUpsPage() {
   const completed = followUps.filter((f) => f.status === "COMPLETED");
 
   const stats = [
-    { label: "Teljesített",  value: completed.length, icon: CheckCircle,  color: "text-green-600" },
-    { label: "Esedékes",     value: pending.length,   icon: Clock,        color: "text-blue-600"  },
-    { label: "Lejárt",       value: overdue.length,   icon: AlertCircle,  color: "text-red-600"   },
+    { label: t("statCompleted"), value: completed.length, icon: CheckCircle,  color: "text-green-600" },
+    { label: t("statPending"),   value: pending.length,   icon: Clock,        color: "text-blue-600"  },
+    { label: t("statOverdue"),   value: overdue.length,   icon: AlertCircle,  color: "text-red-600"   },
   ];
 
   return (
@@ -75,8 +77,8 @@ export default function FollowUpsPage() {
       <div className="mb-8 flex items-center gap-3">
         <ClipboardCheck className="h-7 w-7 text-brand-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Utánkövetés</h1>
-          <p className="text-sm text-gray-500">Az örökbefogadás utáni visszajelzések</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-sm text-gray-500">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -102,8 +104,8 @@ export default function FollowUpsPage() {
       ) : followUps.length === 0 ? (
         <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <ClipboardCheck className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-          <p className="font-medium text-gray-500">Nincs utánkövetési feladatod</p>
-          <p className="mt-1 text-sm text-gray-400">Az elfogadott örökbefogadások után automatikusan megjelennek itt.</p>
+          <p className="font-medium text-gray-500">{t("empty")}</p>
+          <p className="mt-1 text-sm text-gray-400">{t("emptyDesc")}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -111,7 +113,7 @@ export default function FollowUpsPage() {
           {overdue.length > 0 && (
             <section>
               <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-600">
-                <AlertCircle className="h-4 w-4" /> Lejárt ({overdue.length})
+                <AlertCircle className="h-4 w-4" /> {t("sectionOverdue")} ({overdue.length})
               </h2>
               <div className="space-y-3">
                 {overdue.map((f) => (
@@ -124,7 +126,7 @@ export default function FollowUpsPage() {
           {pending.length > 0 && (
             <section>
               <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-blue-600">
-                <Clock className="h-4 w-4" /> Esedékes ({pending.length})
+                <Clock className="h-4 w-4" /> {t("sectionPending")} ({pending.length})
               </h2>
               <div className="space-y-3">
                 {pending.map((f) => (
@@ -137,7 +139,7 @@ export default function FollowUpsPage() {
           {completed.length > 0 && (
             <section>
               <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-green-600">
-                <CheckCircle className="h-4 w-4" /> Kitöltött ({completed.length})
+                <CheckCircle className="h-4 w-4" /> {t("sectionCompleted")} ({completed.length})
               </h2>
               <div className="space-y-3">
                 {completed.map((f) => (
