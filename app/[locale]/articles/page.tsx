@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Clock, Newspaper, User } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { readingMinutes } from "@/lib/articles";
+import { readingMinutes, publishedWhere } from "@/lib/articles";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -23,7 +23,7 @@ function formatDate(date: Date) {
 
 export default async function ArticlesListPage() {
   const articles = await prisma.post.findMany({
-    where:   { publishedAt: { not: null } },
+    where:   publishedWhere(),
     orderBy: { publishedAt: "desc" },
     select:  {
       id:          true,

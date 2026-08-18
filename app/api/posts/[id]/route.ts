@@ -15,6 +15,8 @@ const patchSchema = z.object({
   campaignId: z.string().nullable().optional(),
   /** true = publikálás, false = visszavonás piszkozatba. */
   publish:    z.boolean().optional(),
+  /** Megjelenés időpontja; jövőbeli érték = időzítés. */
+  publishedAt: z.string().datetime().nullable().optional(),
 });
 
 // PATCH /api/posts/[id] – cikk szerkesztése (kizárólag SUPER_ADMIN)
@@ -29,7 +31,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Érvénytelen adatok" }, { status: 400 });
   }
-  const { publish, title, ...rest } = parsed.data;
+  const { publish, publishedAt, title, ...rest } = parsed.data;
 
   const existing = await prisma.post.findUnique({
     where:  { id: params.id },
@@ -53,9 +55,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         imageUrl: rest.imageUrl === "" ? null : rest.imageUrl,
         ...(title ? { title: title.trim() } : {}),
         ...(slug ? { slug } : {}),
-        ...(publish === undefined
-          ? {}
-          : { publishedAt: publish ? existing.publishedAt ?? new Date() : null }),
+        // Az explicit időpont erősebb a publish kapcsolónál: így lehet egy már
+        // publikált cikket későbbre időzíteni, vagy időzítettet előrehozni.
+        ...(publishedAt !== undefined
+          ? { publishedAt: publishedAt ? new Date(publishedAt) : null }
+          : publish === undefined
+            ? {}
+            : { publishedAt: publish ? existing.publishedAt ?? new Date() : null }),
       },
     });
     return NextResponse.json(post);

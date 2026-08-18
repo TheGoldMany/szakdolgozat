@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { readingMinutes } from "@/lib/articles";
+import { readingMinutes, isPublished, isScheduled } from "@/lib/articles";
 import { ArticleEditor, type EditableArticle } from "@/components/dashboard/article-editor";
 
 export const metadata: Metadata = { title: "Cikkek" };
@@ -46,12 +46,14 @@ export default async function DashboardArticlesPage({
         content:   source.content,
         imageUrl:  source.imageUrl,
         shelterId: source.shelterId,
-        published: source.publishedAt !== null,
+        published:   isPublished(source.publishedAt),
+        publishedAt: source.publishedAt ? source.publishedAt.toISOString() : null,
       }
     : null;
 
-  const publishedCount = articles.filter((a) => a.publishedAt !== null).length;
-  const draftCount     = articles.length - publishedCount;
+  const publishedCount = articles.filter((a) => isPublished(a.publishedAt)).length;
+  const scheduledCount = articles.filter((a) => isScheduled(a.publishedAt)).length;
+  const draftCount     = articles.length - publishedCount - scheduledCount;
 
   return (
     <div>
@@ -60,7 +62,7 @@ export default async function DashboardArticlesPage({
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Cikkek</h1>
           <p className="text-sm text-gray-500">
-            {articles.length} cikk · {publishedCount} publikált · {draftCount} piszkozat
+            {articles.length} cikk · {publishedCount} publikált · {scheduledCount} időzített · {draftCount} piszkozat
           </p>
         </div>
       </div>
@@ -76,7 +78,8 @@ export default async function DashboardArticlesPage({
         )}
 
         {articles.map((a) => {
-          const published = a.publishedAt !== null;
+          const published = isPublished(a.publishedAt);
+          const scheduled = isScheduled(a.publishedAt);
           const isEditing = a.id === editingId;
 
           return (
@@ -104,11 +107,21 @@ export default async function DashboardArticlesPage({
                     className={
                       published
                         ? "rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700"
-                        : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                        : scheduled
+                          ? "rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700"
+                          : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
                     }
                   >
-                    {published ? "Publikálva" : "Piszkozat"}
+                    {published ? "Publikálva" : scheduled ? "Időzítve" : "Piszkozat"}
                   </span>
+                  {scheduled && a.publishedAt && (
+                    <span className="text-[11px] text-blue-600">
+                      {new Date(a.publishedAt).toLocaleString("hu-HU", {
+                        year: "numeric", month: "short", day: "numeric",
+                        hour: "2-digit", minute: "2-digit",
+                      })}
+                    </span>
+                  )}
                 </div>
 
                 {a.excerpt && (

@@ -12,7 +12,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
-import { readingMinutes } from "@/lib/articles";
+import { readingMinutes, publishedWhere } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,7 @@ export default async function HomePage() {
       prisma.animal.count({ where: { status: AnimalStatus.ADOPTED } }),
       prisma.post.findMany({
         // Csak publikált cikkek – a piszkozat nem kerülhet ki a főoldalra
-        where:   { publishedAt: { not: null } },
+        where:   publishedWhere(),
         take: POSTS_PER_PAGE,
         orderBy: { publishedAt: "desc" },
         include: {

@@ -35,3 +35,31 @@ export function readingMinutes(content: string): number {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+/**
+ * Nyilvánosan látható cikkek szűrője.
+ *
+ * A `publishedAt` háromféle állapotot fed le:
+ *   - `null`            → piszkozat
+ *   - jövőbeli időpont  → időzítve, még nem látszik
+ *   - múltbeli időpont  → publikált
+ *
+ * A `lte` egyszerre zárja ki a piszkozatot és az időzítettet, ezért minden
+ * publikus lekérdezés ezt használja.
+ */
+export function publishedWhere() {
+  return { publishedAt: { lte: new Date() } };
+}
+
+/**
+ * Egy konkrét cikk látható-e a látogatóknak.
+ * Típusőr, hogy az ellenőrzés után a hívó oldalon a dátum már nem `null`.
+ */
+export function isPublished(publishedAt: Date | null): publishedAt is Date {
+  return publishedAt !== null && publishedAt.getTime() <= Date.now();
+}
+
+/** Időzített (jövőbeli publikálású) cikk-e. */
+export function isScheduled(publishedAt: Date | null): boolean {
+  return publishedAt !== null && publishedAt.getTime() > Date.now();
+}
