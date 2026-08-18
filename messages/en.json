@@ -278,7 +278,7 @@
     "messagePlaceholder": "Add a message to your donation…",
     "anonymousDonation": "Donate anonymously",
     "toPayment": "Continue to payment",
-    "minAmountError": "The minimum amount is 100 HUF.",
+    "minAmountError": "The minimum amount is {min} HUF.",
     "checkoutError": "Could not start the payment.",
     "newTitle": "Fundraiser title",
     "newTitlePlaceholder": "e.g. Help us save Bodri!",

@@ -278,7 +278,7 @@
     "messagePlaceholder": "Dodaj wiadomość do swojej darowizny…",
     "anonymousDonation": "Przekaż anonimowo",
     "toPayment": "Przejdź do płatności",
-    "minAmountError": "Minimalna kwota to 100 HUF.",
+    "minAmountError": "Minimalna kwota to {min} HUF.",
     "checkoutError": "Nie udało się rozpocząć płatności.",
     "newTitle": "Tytuł zbiórki",
     "newTitlePlaceholder": "np. Pomóż uratować Bodriego!",
