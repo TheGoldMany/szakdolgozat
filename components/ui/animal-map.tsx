@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { badgeHtml, glyphForAnimal, glyphSvg, pinHtml, type MapGlyph } from "@/components/ui/map-icons";
 
 export interface MapReport {
   id: string; type: string; animalType: string;
@@ -24,67 +25,65 @@ export interface MapShelter {
   _count: { animals: number };
 }
 
-const TYPE_COLOR: Record<string, string> = {
+/** A jelölő buborékok szövegei – a szülő adja át lefordítva. */
+export interface MapLabels {
+  lost: string; found: string; stray: string;
+  animalDog: string; animalCat: string; animalOther: string;
+  unknownAnimal: string;
+  shelterAnimals: (count: number) => string;
+  shelterPage: string;
+  emergency: string;
+  website: string;
+}
+
+export const TYPE_COLOR: Record<string, string> = {
   LOST:  "#EF4444",
   FOUND: "#22C55E",
   STRAY: "#F97316",
 };
-const TYPE_LABEL: Record<string, string> = {
-  LOST: "Elveszett", FOUND: "Megtalált", STRAY: "Kóbor",
-};
-const ANIMAL_LABEL: Record<string, string> = {
-  DOG: "Kutya", CAT: "Macska", OTHER: "Egyéb",
-};
+export const SHELTER_COLOR   = "#2563EB";
+export const VET_COLOR       = "#7C3AED";
+export const VET_EMERGENCY_COLOR = "#DC2626";
 
-function makeReportIcon(type: string) {
+/** A popupokba felhasználói szöveg kerül – HTML-be illesztés előtt escape-elni kell. */
+function esc(value: string | null | undefined): string {
+  return String(value ?? "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
+
+/**
+ * Bejelentés-jelölő: csepp alak a bejelentés típusának színével, benne az
+ * állatfaj ikonja. Így a szín azt mondja meg, ELVESZETT/MEGTALÁLT/KÓBOR-e,
+ * az ikon pedig azt, hogy kutyáról vagy macskáról van szó.
+ */
+function makeReportIcon(type: string, animalType: string) {
   const color = TYPE_COLOR[type] ?? "#6B7280";
   return L.divIcon({
     className: "",
-    html: `<div style="
-      width:28px;height:28px;border-radius:50% 50% 50% 0;
-      background:${color};border:2px solid #fff;
-      box-shadow:0 2px 6px rgba(0,0,0,0.35);
-      transform:rotate(-45deg);
-    "></div>`,
-    iconSize:   [28, 28],
-    iconAnchor: [14, 28],
-    popupAnchor:[0, -30],
+    html: pinHtml(color, glyphForAnimal(animalType), 34),
+    iconSize:   [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor:[0, -34],
   });
 }
 
-const SHELTER_ICON = L.divIcon({
-  className: "",
-  html: `<div style="
-    width:32px;height:32px;border-radius:8px;
-    background:#2563EB;border:2px solid #fff;
-    box-shadow:0 2px 6px rgba(0,0,0,0.35);
-    display:flex;align-items:center;justify-content:center;
-    font-size:16px;
-  "></div>`,
-  iconSize:   [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor:[0, -18],
-});
-
-function makeVetIcon(isEmergency: boolean) {
-  const color = isEmergency ? "#DC2626" : "#7C3AED";
-  // Fehér kereszt: egyértelműen megkülönbözteti a menhely-jelölőtől
+/** Kerek/négyzetes jelölő ikonnal – menhelyhez és állatorvoshoz. */
+function makeBadgeIcon(color: string, glyph: MapGlyph, radius: string, size: number) {
   return L.divIcon({
     className: "",
-    html: `<div style="
-      width:30px;height:30px;border-radius:50%;
-      background:${color};border:2px solid #fff;
-      box-shadow:0 2px 6px rgba(0,0,0,0.35);
-      display:flex;align-items:center;justify-content:center;
-    "><span style="
-      display:block;width:14px;height:3px;background:#fff;position:absolute;border-radius:1px;
-    "></span><span style="
-      display:block;width:3px;height:14px;background:#fff;position:absolute;border-radius:1px;
-    "></span></div>`,
-    iconSize:   [30, 30],
-    iconAnchor: [15, 15],
-    popupAnchor:[0, -17],
+    html: badgeHtml(color, glyph, radius, size),
+    iconSize:   [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor:[0, -(size / 2 + 2)],
   });
+}
+
+const SHELTER_ICON = makeBadgeIcon(SHELTER_COLOR, "SHELTER", "9px", 34);
+
+function makeVetIcon(isEmergency: boolean) {
+  return isEmergency
+    ? makeBadgeIcon(VET_EMERGENCY_COLOR, "VET_EMERGENCY", "50%", 32)
+    : makeBadgeIcon(VET_COLOR, "VET", "50%", 32);
 }
 
 interface Props {
@@ -95,9 +94,13 @@ interface Props {
   showShelters: boolean;
   showVets:     boolean;
   typeFilter: string;
+  labels: MapLabels;
+  locale: string;
 }
 
-export default function AnimalMap({ reports, shelters, vets, showReports, showShelters, showVets, typeFilter }: Props) {
+export default function AnimalMap({
+  reports, shelters, vets, showReports, showShelters, showVets, typeFilter, labels, locale,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef       = useRef<L.Map | null>(null);
   const layerRef     = useRef<L.LayerGroup | null>(null);
@@ -123,27 +126,32 @@ export default function AnimalMap({ reports, shelters, vets, showReports, showSh
     if (!layerRef.current) return;
     layerRef.current.clearLayers();
 
+    const typeLabel   = (t: string) => ({ LOST: labels.lost, FOUND: labels.found, STRAY: labels.stray }[t] ?? t);
+    const animalLabel = (a: string) =>
+      ({ DOG: labels.animalDog, CAT: labels.animalCat, OTHER: labels.animalOther }[a] ?? a);
+
     if (showReports) {
       const filtered = typeFilter ? reports.filter(r => r.type === typeFilter) : reports;
       filtered.forEach(r => {
-        const marker = L.marker([r.lat, r.lng], { icon: makeReportIcon(r.type) });
+        const marker = L.marker([r.lat, r.lng], { icon: makeReportIcon(r.type, r.animalType) });
         const img = r.imageUrl
-          ? `<img src="${r.imageUrl}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px" />`
+          ? `<img src="${esc(r.imageUrl)}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px" />`
           : "";
         marker.bindPopup(`
           ${img}
           <div style="min-width:160px">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-              <span style="background:${TYPE_COLOR[r.type]};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">
-                ${TYPE_LABEL[r.type] ?? r.type}
+              <span style="display:inline-flex;align-items:center;gap:4px;background:${TYPE_COLOR[r.type] ?? "#6B7280"};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">
+                ${glyphSvg(glyphForAnimal(r.animalType), 11)}
+                ${esc(typeLabel(r.type))}
               </span>
-              <span style="font-size:11px;color:#6B7280">${ANIMAL_LABEL[r.animalType] ?? r.animalType}</span>
+              <span style="font-size:11px;color:#6B7280">${esc(animalLabel(r.animalType))}</span>
             </div>
-            <div style="font-weight:700;font-size:14px;color:#111827">${r.name ?? "Ismeretlen"}</div>
-            ${r.breed ? `<div style="font-size:12px;color:#6B7280">${r.breed}</div>` : ""}
-            <div style="font-size:12px;color:#374151;margin-top:4px">${r.city}</div>
-            ${r.contactPhone ? `<div style="font-size:12px;color:#2563EB;margin-top:4px">${r.contactName}: ${r.contactPhone}</div>` : ""}
-            <div style="font-size:11px;color:#9CA3AF;margin-top:4px">${new Date(r.createdAt).toLocaleDateString("hu-HU")}</div>
+            <div style="font-weight:700;font-size:14px;color:#111827">${esc(r.name ?? labels.unknownAnimal)}</div>
+            ${r.breed ? `<div style="font-size:12px;color:#6B7280">${esc(r.breed)}</div>` : ""}
+            <div style="font-size:12px;color:#374151;margin-top:4px">${esc(r.city)}</div>
+            ${r.contactPhone ? `<div style="font-size:12px;color:#2563EB;margin-top:4px">${esc(r.contactName)}: ${esc(r.contactPhone)}</div>` : ""}
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px">${new Date(r.createdAt).toLocaleDateString(locale)}</div>
           </div>
         `);
         marker.addTo(layerRef.current!);
@@ -156,15 +164,15 @@ export default function AnimalMap({ reports, shelters, vets, showReports, showSh
         marker.bindPopup(`
           <div style="min-width:160px">
             <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
-              <span style="font-weight:700;font-size:14px;color:#111827">${s.name}</span>
-              ${s.isVerified ? '<span style="color:#16A34A;font-size:11px">✓</span>' : ""}
+              <span style="font-weight:700;font-size:14px;color:#111827">${esc(s.name)}</span>
+              ${s.isVerified ? '<span style="color:#16A34A;font-size:11px">&#10003;</span>' : ""}
             </div>
-            <div style="font-size:12px;color:#6B7280">${s.city}${s.address ? `, ${s.address}` : ""}</div>
-            <div style="font-size:12px;color:#2563EB;margin-top:2px">${s._count.animals} állat örökbefogadható</div>
-            ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${s.phone}</div>` : ""}
-            <a href="/shelters/${s.slug}" target="_blank"
-              style="display:inline-block;margin-top:6px;font-size:12px;color:#2563EB;text-decoration:underline">
-              Menhely oldala →
+            <div style="font-size:12px;color:#6B7280">${esc(s.city)}${s.address ? `, ${esc(s.address)}` : ""}</div>
+            <div style="font-size:12px;color:${SHELTER_COLOR};margin-top:2px">${esc(labels.shelterAnimals(s._count.animals))}</div>
+            ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(s.phone)}</div>` : ""}
+            <a href="/shelters/${encodeURIComponent(s.slug)}" target="_blank"
+              style="display:inline-block;margin-top:6px;font-size:12px;color:${SHELTER_COLOR};text-decoration:underline">
+              ${esc(labels.shelterPage)} &rarr;
             </a>
           </div>
         `);
@@ -178,24 +186,24 @@ export default function AnimalMap({ reports, shelters, vets, showReports, showSh
         marker.bindPopup(`
           <div style="min-width:170px">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-              <span style="font-weight:700;font-size:14px;color:#111827">${v.name}</span>
+              <span style="font-weight:700;font-size:14px;color:#111827">${esc(v.name)}</span>
               ${v.isEmergency
-                ? '<span style="font-size:10px;font-weight:700;color:#B91C1C;background:#FEE2E2;padding:1px 6px;border-radius:999px">Ügyelet</span>'
+                ? `<span style="font-size:10px;font-weight:700;color:#B91C1C;background:#FEE2E2;padding:1px 6px;border-radius:999px">${esc(labels.emergency)}</span>`
                 : ""}
             </div>
-            <div style="font-size:12px;color:#6B7280">${v.city}, ${v.address}</div>
-            ${v.openingHours ? `<div style="font-size:12px;color:#374151;margin-top:2px">${v.openingHours}</div>` : ""}
-            ${v.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${v.phone}</div>` : ""}
+            <div style="font-size:12px;color:#6B7280">${esc(v.city)}, ${esc(v.address)}</div>
+            ${v.openingHours ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.openingHours)}</div>` : ""}
+            ${v.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.phone)}</div>` : ""}
             ${v.website
-              ? `<a href="${v.website}" target="_blank" rel="noopener noreferrer"
-                   style="display:inline-block;margin-top:6px;font-size:12px;color:#7C3AED;text-decoration:underline">Weboldal →</a>`
+              ? `<a href="${esc(v.website)}" target="_blank" rel="noopener noreferrer"
+                   style="display:inline-block;margin-top:6px;font-size:12px;color:${VET_COLOR};text-decoration:underline">${esc(labels.website)} &rarr;</a>`
               : ""}
           </div>
         `);
         marker.addTo(layerRef.current!);
       });
     }
-  }, [reports, shelters, vets, showReports, showShelters, showVets, typeFilter]);
+  }, [reports, shelters, vets, showReports, showShelters, showVets, typeFilter, labels, locale]);
 
   return <div ref={containerRef} style={{ height: "100%", width: "100%", zIndex: 0 }} />;
 }

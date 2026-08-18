@@ -1417,7 +1417,10 @@
     "addShelterUnknownError": "Nieznany błąd",
     "navApprovals": "Zatwierdzenia",
     "navAudit": "Dziennik audytu",
-    "navVets": "Weterynarze"
+    "navVets": "Weterynarze",
+    "createNewTask": "Utwórz nowe zadanie",
+    "createTask": "Utwórz zadanie",
+    "newTask": "Nowe zadanie"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",
@@ -1538,7 +1541,18 @@
     "found": "Znaleziony",
     "stray": "Bezdomny",
     "shelter": "Schronisko",
-    "newReport": "Nowe zgłoszenie"
+    "newReport": "Nowe zgłoszenie",
+    "vetsLayer": "Weterynarze",
+    "vet": "Weterynarz",
+    "emergency": "Dyżur",
+    "shelterAnimals": "zwierząt do adopcji: {count}",
+    "shelterPage": "Strona schroniska",
+    "website": "Strona internetowa",
+    "animalDog": "Pies",
+    "animalCat": "Kot",
+    "animalOther": "Inne",
+    "unknownAnimal": "Nieznane",
+    "legendHint": "Kolor pinezki to typ zgłoszenia, ikona to gatunek."
   },
   "appointments": {
     "requestFor": "Prośba o wizytę: {name}",
