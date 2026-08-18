@@ -144,12 +144,12 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
         <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
           <AvatarUpload currentImage={user.image} name={user.name} />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{user.name ?? t("title")}</h1>
+            <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{user.name ?? t("title")}</h1>
             <p className="mt-0.5 text-sm text-gray-400">{user.email}</p>
           </div>
         </div>

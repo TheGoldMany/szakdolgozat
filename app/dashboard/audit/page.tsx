@@ -109,7 +109,7 @@ export default async function AuditPage({
       )}
 
       {pages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-gray-500">{page} / {pages} oldal</p>
           <div className="flex gap-2">
             {page > 1 && (

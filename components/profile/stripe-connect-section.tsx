@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CreditCard, CheckCircle, AlertTriangle, Info, ExternalLink, Loader2 } from "lucide-react";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete }: Props) {
+  const t = useTranslations("profile");
   const [connecting, setConnecting] = useState(false);
   const [opening, setOpening]       = useState(false);
   const [error, setError]           = useState("");
@@ -23,10 +25,10 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
         body:    JSON.stringify({ type: "user" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Hiba a csatlakozáskor.");
+      if (!res.ok) throw new Error(data.error ?? t("stripeConnectError"));
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba.");
+      setError(err instanceof Error ? err.message : t("stripeUnknownError"));
       setConnecting(false);
     }
   }
@@ -41,10 +43,10 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
         body:    JSON.stringify({}),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Hiba a megnyitáskor.");
+      if (!res.ok) throw new Error(data.error ?? t("stripeOpenError"));
       window.open(data.url, "_blank");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba.");
+      setError(err instanceof Error ? err.message : t("stripeUnknownError"));
     } finally {
       setOpening(false);
     }
@@ -54,17 +56,17 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-1 flex items-center gap-2">
         <CreditCard className="h-4 w-4 text-gray-500" />
-        <h2 className="text-sm font-semibold text-gray-700">Stripe fiók</h2>
+        <h2 className="text-sm font-semibold text-gray-700">{t("stripeTitle")}</h2>
       </div>
       <p className="mb-4 text-xs text-gray-400">
-        Kösd be a Stripe fiókod, ha saját gyűjtést szeretnél indítani — az adományok közvetlenül ide érkeznek.
+        {t("stripeDesc")}
       </p>
 
       {stripeOnboardingComplete ? (
         <div className="space-y-3">
           <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
             <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
-            <p className="text-sm font-medium text-green-800">A Stripe fiókod aktív, fogadhatsz adományokat.</p>
+            <p className="text-sm font-medium text-green-800">{t("stripeActive")}</p>
           </div>
           <button
             type="button"
@@ -73,14 +75,14 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
             className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60 transition-colors"
           >
             {opening ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
-            Stripe vezérlőpult megnyitása
+            {t("stripeOpenDashboard")}
           </button>
         </div>
       ) : stripeAccountId ? (
         <div className="space-y-3">
           <div className="flex items-center gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
             <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
-            <p className="text-sm font-medium text-yellow-800">A Stripe regisztrációd még nincs befejezve.</p>
+            <p className="text-sm font-medium text-yellow-800">{t("stripeIncomplete")}</p>
           </div>
           <button
             type="button"
@@ -89,7 +91,7 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
             className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
           >
             {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Info className="h-4 w-4" />}
-            Regisztráció befejezése
+            {t("stripeFinish")}
           </button>
         </div>
       ) : (
@@ -100,7 +102,7 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
           className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
         >
           {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-          Stripe fiók csatlakoztatása
+          {t("stripeConnect")}
         </button>
       )}
 

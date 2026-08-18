@@ -27,7 +27,7 @@ export default async function KapcsolatPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
           {/* Email */}

@@ -64,10 +64,10 @@ export default async function ApplicationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t("title")}</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{t("title")}</h1>
           <p className="mt-2 text-gray-500">
             {applications.length === 0
               ? t("noneFirst")

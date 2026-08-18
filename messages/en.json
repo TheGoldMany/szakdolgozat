@@ -81,7 +81,13 @@
     "feedTitle": "For you",
     "feedEmpty": "Nothing to show yet. Check back later!",
     "ctaTitle": "Lost your pet?",
-    "ctaDesc": "Submit a report – the community will help you find them!"
+    "ctaDesc": "Submit a report – the community will help you find them!",
+    "feedNewAnimals": "New arrivals",
+    "feedCampaigns": "Active fundraisers",
+    "feedEvents": "Upcoming events",
+    "feedReports": "Latest reports",
+    "feedArticles": "Articles",
+    "quickReport": "Report"
   },
   "animals": {
     "title": "Animals",
@@ -506,7 +512,11 @@
     "makePrimary": "Set as primary",
     "addImage": "Add image",
     "close": "Close",
-    "multiImageHint": "Max {max} images · Max 5 MB/image · JPEG, PNG, WebP · First image is the main photo (hover → star)"
+    "multiImageHint": "Max {max} images · Max 5 MB/image · JPEG, PNG, WebP · First image is the main photo (hover → star)",
+    "all": "All",
+    "loadMore": "Load more",
+    "view": "View",
+    "menu": "Menu"
   },
   "applications": {
     "title": "My applications",
@@ -539,7 +549,16 @@
     "filledForm": "Submitted form",
     "viewFile": "View file",
     "notFilled": "Not filled in",
-    "formNotSubmitted": "The form has not been submitted yet."
+    "formNotSubmitted": "The form has not been submitted yet.",
+    "timelineTitle": "Application status",
+    "timelineSubmitted": "Application submitted",
+    "timelineInvited": "Invited to apply",
+    "timelineWithdrawn": "Withdrawn",
+    "timelineProcessing": "Under review",
+    "timelineProcessingHint": "The shelter will review your application soon.",
+    "timelineApproved": "Approved",
+    "timelineRejected": "Rejected",
+    "timelineDecision": "Decision"
   },
   "profile": {
     "title": "My profile",
@@ -620,7 +639,26 @@
     "deleteCancel": "Cancel",
     "deleteConfirmButton": "Permanently delete account",
     "deleteInProgress": "Deleting...",
-    "deleteError": "Something went wrong. Please try again."
+    "deleteError": "Something went wrong. Please try again.",
+    "myCampaigns": "My fundraisers",
+    "newCampaign": "New fundraiser",
+    "noCampaigns": "You don't have any fundraisers yet.",
+    "startCampaignNow": "Start one now",
+    "campaignPending": "Awaiting approval",
+    "campaignActive": "Active",
+    "campaignRejected": "Rejected",
+    "campaignCompleted": "Closed",
+    "donationsCount": "{count} donations",
+    "stripeTitle": "Stripe account",
+    "stripeDesc": "Connect your Stripe account if you want to start your own fundraiser — donations arrive here directly.",
+    "stripeActive": "Your Stripe account is active, you can receive donations.",
+    "stripeOpenDashboard": "Open Stripe dashboard",
+    "stripeIncomplete": "Your Stripe registration is not finished yet.",
+    "stripeFinish": "Finish registration",
+    "stripeConnect": "Connect Stripe account",
+    "stripeConnectError": "Error while connecting.",
+    "stripeOpenError": "Error while opening.",
+    "stripeUnknownError": "Unknown error."
   },
   "cookies": {
     "title": "Cookies & Privacy",
@@ -1523,5 +1561,27 @@
     "myDonations": "My Donations",
     "noDonations": "You haven't donated yet.",
     "directDonation": "Direct donation"
+  },
+  "articles": {
+    "title": "Articles",
+    "subtitle": "News, advice and stories about adoption",
+    "metaDescription": "News, advice and stories about pet adoption and animal welfare.",
+    "empty": "No articles published yet. Check back later!",
+    "editorial": "Editorial team",
+    "minutes": "{count} min",
+    "readingTime": "{count} min read",
+    "notFound": "Article not found",
+    "back": "Back to articles",
+    "related": "Related to this article",
+    "relatedShelter": "Shelter",
+    "relatedAnimal": "Animal",
+    "relatedEvent": "Event",
+    "relatedCampaign": "Fundraiser",
+    "moreArticles": "More articles",
+    "waitingAnimals": "Looking for a home",
+    "activeCampaigns": "Active fundraisers",
+    "readMore": "Read the article",
+    "adoptable": "Available for adoption",
+    "siteName": "ÁllatiMenhelyek"
   }
 }

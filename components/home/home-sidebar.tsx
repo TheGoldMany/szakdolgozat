@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { Calendar, HandHeart, Building2, MapPin, FileWarning, PawPrint, Star } from "lucide-react";
 
 export interface SidebarEvent {
@@ -48,17 +49,22 @@ export function HomeSidebar({
   campaigns: SidebarCampaign[];
   shelters: SidebarShelter[];
 }) {
+  const t       = useTranslations("home");
+  const tNav    = useTranslations("nav");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
+
   return (
     <aside className="space-y-4">
 
       {/* Gyorslinkek */}
       <section className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-4 gap-2 lg:grid-cols-2">
           {[
-            { href: "/animals",     Icon: PawPrint,    label: "Állatok"   },
-            { href: "/shelters",    Icon: Building2,   label: "Menhelyek" },
-            { href: "/map",         Icon: MapPin,      label: "Térkép"    },
-            { href: "/reports/new", Icon: FileWarning, label: "Bejelentés" },
+            { href: "/animals",     Icon: PawPrint,    label: tNav("animals")   },
+            { href: "/shelters",    Icon: Building2,   label: tNav("shelters")  },
+            { href: "/map",         Icon: MapPin,      label: tNav("map")       },
+            { href: "/reports/new", Icon: FileWarning, label: t("quickReport")  },
           ].map(({ href, Icon, label }) => (
             <Link
               key={href}
@@ -74,7 +80,7 @@ export function HomeSidebar({
 
       {/* Közelgő események */}
       {events.length > 0 && (
-        <Card icon={Calendar} title="Közelgő események" href="/events" linkLabel="Összes">
+        <Card icon={Calendar} title={t("feedEvents")} href="/events" linkLabel={tCommon("all")}>
           <ul className="space-y-1">
             {events.slice(0, 4).map((e) => {
               const d = new Date(e.startsAt);
@@ -83,10 +89,10 @@ export function HomeSidebar({
                   <Link href={`/events/${e.slug}`} className="flex gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50">
                     <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-purple-50 text-purple-700">
                       <span className="text-[9px] font-semibold uppercase leading-none">
-                        {d.toLocaleDateString("hu-HU", { month: "short" })}
+                        {d.toLocaleDateString(locale, { month: "short" })}
                       </span>
                       <span className="text-base font-black leading-tight">
-                        {d.toLocaleDateString("hu-HU", { day: "numeric" })}
+                        {d.toLocaleDateString(locale, { day: "numeric" })}
                       </span>
                     </div>
                     <div className="min-w-0">
@@ -103,7 +109,7 @@ export function HomeSidebar({
 
       {/* Aktív gyűjtések */}
       {campaigns.length > 0 && (
-        <Card icon={HandHeart} title="Aktív gyűjtések" href="/donate" linkLabel="Összes">
+        <Card icon={HandHeart} title={t("feedCampaigns")} href="/donate" linkLabel={tCommon("all")}>
           <ul className="space-y-3">
             {campaigns.slice(0, 4).map((c) => {
               const pct = Math.min(100, Math.round((c.raisedAmount / c.targetAmount) * 100));
@@ -115,7 +121,7 @@ export function HomeSidebar({
                       <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="mt-1 text-[11px] text-gray-400">
-                      {c.raisedAmount.toLocaleString("hu-HU")} Ft · {pct}%
+                      {c.raisedAmount.toLocaleString(locale)} Ft · {pct}%
                     </p>
                   </Link>
                 </li>
@@ -127,7 +133,7 @@ export function HomeSidebar({
 
       {/* Kiemelt menhelyek */}
       {shelters.length > 0 && (
-        <Card icon={Building2} title="Menhelyek" href="/shelters" linkLabel="Összes">
+        <Card icon={Building2} title={tNav("shelters")} href="/shelters" linkLabel={tCommon("all")}>
           <ul className="space-y-1">
             {shelters.slice(0, 5).map((s) => (
               <li key={s.id}>

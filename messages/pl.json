@@ -81,7 +81,13 @@
     "feedTitle": "Dla Ciebie",
     "feedEmpty": "Brak treści do wyświetlenia. Zajrzyj później!",
     "ctaTitle": "Zgubiłeś swojego pupila?",
-    "ctaDesc": "Złóż zgłoszenie – społeczność pomoże ci go znaleźć!"
+    "ctaDesc": "Złóż zgłoszenie – społeczność pomoże ci go znaleźć!",
+    "feedNewAnimals": "Nowi mieszkańcy",
+    "feedCampaigns": "Aktywne zbiórki",
+    "feedEvents": "Nadchodzące wydarzenia",
+    "feedReports": "Najnowsze zgłoszenia",
+    "feedArticles": "Artykuły",
+    "quickReport": "Zgłoszenie"
   },
   "animals": {
     "title": "Zwierzęta",
@@ -506,7 +512,11 @@
     "makePrimary": "Ustaw jako główne",
     "addImage": "Dodaj zdjęcie",
     "close": "Zamknij",
-    "multiImageHint": "Maks. {max} zdjęć · Maks. 5 MB/zdjęcie · JPEG, PNG, WebP · Pierwsze zdjęcie będzie głównym (hover → gwiazdka)"
+    "multiImageHint": "Maks. {max} zdjęć · Maks. 5 MB/zdjęcie · JPEG, PNG, WebP · Pierwsze zdjęcie będzie głównym (hover → gwiazdka)",
+    "all": "Wszystkie",
+    "loadMore": "Załaduj więcej",
+    "view": "Zobacz",
+    "menu": "Menu"
   },
   "applications": {
     "title": "Moje wnioski",
@@ -539,7 +549,16 @@
     "filledForm": "Wypełniony formularz",
     "viewFile": "Zobacz plik",
     "notFilled": "Nie wypełniono",
-    "formNotSubmitted": "Formularz nie został jeszcze przesłany."
+    "formNotSubmitted": "Formularz nie został jeszcze przesłany.",
+    "timelineTitle": "Status wniosku",
+    "timelineSubmitted": "Wniosek złożony",
+    "timelineInvited": "Zaproszenie do złożenia wniosku",
+    "timelineWithdrawn": "Wycofany",
+    "timelineProcessing": "W trakcie rozpatrywania",
+    "timelineProcessingHint": "Schronisko wkrótce rozpatrzy Twój wniosek.",
+    "timelineApproved": "Zatwierdzony",
+    "timelineRejected": "Odrzucony",
+    "timelineDecision": "Decyzja"
   },
   "profile": {
     "title": "Mój profil",
@@ -620,7 +639,26 @@
     "deleteCancel": "Anuluj",
     "deleteConfirmButton": "Trwale usuń konto",
     "deleteInProgress": "Usuwanie...",
-    "deleteError": "Wystąpił błąd. Spróbuj ponownie."
+    "deleteError": "Wystąpił błąd. Spróbuj ponownie.",
+    "myCampaigns": "Moje zbiórki",
+    "newCampaign": "Nowa zbiórka",
+    "noCampaigns": "Nie masz jeszcze żadnej zbiórki.",
+    "startCampaignNow": "Rozpocznij teraz",
+    "campaignPending": "Oczekuje na zatwierdzenie",
+    "campaignActive": "Aktywna",
+    "campaignRejected": "Odrzucona",
+    "campaignCompleted": "Zakończona",
+    "donationsCount": "darowizny: {count}",
+    "stripeTitle": "Konto Stripe",
+    "stripeDesc": "Podłącz konto Stripe, jeśli chcesz rozpocząć własną zbiórkę — darowizny trafią bezpośrednio tutaj.",
+    "stripeActive": "Twoje konto Stripe jest aktywne, możesz otrzymywać darowizny.",
+    "stripeOpenDashboard": "Otwórz panel Stripe",
+    "stripeIncomplete": "Twoja rejestracja w Stripe nie została jeszcze ukończona.",
+    "stripeFinish": "Zakończ rejestrację",
+    "stripeConnect": "Podłącz konto Stripe",
+    "stripeConnectError": "Błąd podczas łączenia.",
+    "stripeOpenError": "Błąd podczas otwierania.",
+    "stripeUnknownError": "Nieznany błąd."
   },
   "cookies": {
     "title": "Pliki cookie i prywatność",
@@ -1520,5 +1558,27 @@
     "myDonations": "Moje darowizny",
     "noDonations": "Nie przekazałeś jeszcze żadnej darowizny.",
     "directDonation": "Bezpośrednia darowizna"
+  },
+  "articles": {
+    "title": "Artykuły",
+    "subtitle": "Wiadomości, porady i historie o adopcji",
+    "metaDescription": "Wiadomości, porady i historie o adopcji zwierząt i ochronie zwierząt.",
+    "empty": "Nie opublikowano jeszcze żadnych artykułów. Zajrzyj później!",
+    "editorial": "Redakcja",
+    "minutes": "{count} min",
+    "readingTime": "{count} min czytania",
+    "notFound": "Nie znaleziono artykułu",
+    "back": "Powrót do artykułów",
+    "related": "Powiązane z artykułem",
+    "relatedShelter": "Schronisko",
+    "relatedAnimal": "Zwierzę",
+    "relatedEvent": "Wydarzenie",
+    "relatedCampaign": "Zbiórka",
+    "moreArticles": "Więcej artykułów",
+    "waitingAnimals": "Szukają domu",
+    "activeCampaigns": "Aktywne zbiórki",
+    "readMore": "Czytaj artykuł",
+    "adoptable": "Do adopcji",
+    "siteName": "ÁllatiMenhelyek"
   }
 }

@@ -82,7 +82,7 @@ export default async function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
         <div className="mb-6 flex items-center gap-3">
           <MessageCircle className="h-6 w-6 text-brand-500" />
           <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>

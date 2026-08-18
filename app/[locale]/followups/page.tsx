@@ -71,7 +71,7 @@ export default function FollowUpsPage() {
   ];
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
       <div className="mb-8 flex items-center gap-3">
         <ClipboardCheck className="h-7 w-7 text-brand-500" />
         <div>

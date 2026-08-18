@@ -243,7 +243,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             )}
 
             <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
-              <p className="text-center text-3xl font-bold text-brand-600">{shelter._count.animals}</p>
+              <p className="text-center text-2xl font-bold sm:text-3xl text-brand-600">{shelter._count.animals}</p>
               <p className="mt-1 text-center text-sm text-brand-500">{t("animalsWaitingCount", { count: shelter._count.animals })}</p>
             </div>
           </div>

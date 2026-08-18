@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import {
   PawPrint, Calendar, HandHeart, MapPin, Loader2,
   AlertTriangle, Newspaper,
@@ -42,8 +43,8 @@ export interface FeedClientProps {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const REPORT_LABEL: Record<string, string> = { LOST: "Elveszett", FOUND: "Megtalált", STRAY: "Kóbor" };
-const ANIMAL_LABEL: Record<string, string> = { DOG: "Kutya", CAT: "Macska", RABBIT: "Nyúl", BIRD: "Madár", OTHER: "Egyéb" };
+const REPORT_LABEL_KEY: Record<string, string> = { LOST: "lost", FOUND: "found", STRAY: "stray" };
+const ANIMAL_LABEL_KEY: Record<string, string> = { DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "bird", OTHER: "other" };
 
 const REPORT_COLOR: Record<string, string> = {
   LOST:  "bg-red-500",
@@ -109,7 +110,7 @@ function AnimalCard({ a }: { a: AnimalRailItem }) {
 
 // ── Campaign card ─────────────────────────────────────────────────────────────
 
-function CampaignCard({ c }: { c: CampaignRailItem }) {
+function CampaignCard({ c, locale }: { c: CampaignRailItem; locale: string }) {
   const pct    = Math.min(100, Math.round((c.raisedAmount / c.targetAmount) * 100));
   const avatar = c.shelter?.logoUrl ?? c.user?.image ?? null;
   const label  = c.shelter?.name ?? c.user?.name ?? null;
@@ -130,7 +131,7 @@ function CampaignCard({ c }: { c: CampaignRailItem }) {
           <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-gray-100">
             <div className="h-full rounded-full bg-pink-500 transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <p className="mt-1 text-[10px] text-gray-400">{c.raisedAmount.toLocaleString("hu-HU")} Ft</p>
+          <p className="mt-1 text-[10px] text-gray-400">{c.raisedAmount.toLocaleString(locale)} Ft</p>
         </div>
       </Link>
       {label && (
@@ -150,10 +151,10 @@ function CampaignCard({ c }: { c: CampaignRailItem }) {
 
 // ── Event card ────────────────────────────────────────────────────────────────
 
-function EventCard({ e }: { e: EventRailItem }) {
+function EventCard({ e, locale }: { e: EventRailItem; locale: string }) {
   const date = new Date(e.startsAt);
-  const day   = date.toLocaleDateString("hu-HU", { day: "numeric" });
-  const month = date.toLocaleDateString("hu-HU", { month: "short" });
+  const day   = date.toLocaleDateString(locale, { day: "numeric" });
+  const month = date.toLocaleDateString(locale, { month: "short" });
 
   return (
     <div className="flex w-52 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
@@ -179,7 +180,13 @@ function EventCard({ e }: { e: EventRailItem }) {
 
 // ── Report card ───────────────────────────────────────────────────────────────
 
-function ReportCard({ r }: { r: ReportRailItem }) {
+function ReportCard({
+  r, reportLabel, animalLabel,
+}: {
+  r: ReportRailItem;
+  reportLabel: (type: string) => string;
+  animalLabel: (type: string) => string;
+}) {
   return (
     <Link
       href={`/reports/${r.id}`}
@@ -190,11 +197,11 @@ function ReportCard({ r }: { r: ReportRailItem }) {
           ? <Image src={r.imageUrl} alt="" fill className="object-cover" sizes="144px" />
           : <span className="flex h-full items-center justify-center"><AlertTriangle className="h-8 w-8 text-red-200" /></span>}
         <span className={cn("absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white", REPORT_COLOR[r.type] ?? "bg-gray-500")}>
-          {REPORT_LABEL[r.type] ?? r.type}
+          {reportLabel(r.type)}
         </span>
       </div>
       <div className="bg-white px-2.5 py-2">
-        <p className="truncate text-sm font-semibold text-gray-900">{ANIMAL_LABEL[r.animalType] ?? r.animalType}</p>
+        <p className="truncate text-sm font-semibold text-gray-900">{animalLabel(r.animalType)}</p>
         <p className="truncate text-xs text-gray-400">{r.city}</p>
       </div>
     </Link>
@@ -222,6 +229,18 @@ export function FeedClient({
   animals, campaigns, events, reports,
   initialPosts, initialCursor,
 }: FeedClientProps) {
+  const t        = useTranslations("home");
+  const tCommon  = useTranslations("common");
+  const tReports = useTranslations("reports");
+  const tAnimals = useTranslations("animals");
+  const tArt     = useTranslations("articles");
+  const locale   = useLocale();
+
+  const reportLabel = (type: string) =>
+    REPORT_LABEL_KEY[type] ? tReports(REPORT_LABEL_KEY[type]) : type;
+  const animalLabel = (type: string) =>
+    ANIMAL_LABEL_KEY[type] ? tAnimals(ANIMAL_LABEL_KEY[type]) : type;
+
   const [posts, setPosts]   = useState<FeedPost[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [loading, setLoading] = useState(false);
@@ -250,23 +269,23 @@ export function FeedClient({
       {hasContent > 0 && (
         <div className="space-y-4">
           {animals.length > 0 && (
-            <Rail icon={PawPrint} iconColor="bg-brand-50 text-brand-600" title="Új lakók" href="/animals" linkLabel="Összes">
+            <Rail icon={PawPrint} iconColor="bg-brand-50 text-brand-600" title={t("feedNewAnimals")} href="/animals" linkLabel={tCommon("all")}>
               {animals.map((a) => <AnimalCard key={a.id} a={a} />)}
             </Rail>
           )}
           {campaigns.length > 0 && (
-            <Rail icon={HandHeart} iconColor="bg-pink-50 text-pink-600" title="Aktív gyűjtések" href="/donate" linkLabel="Összes">
-              {campaigns.map((c) => <CampaignCard key={c.id} c={c} />)}
+            <Rail icon={HandHeart} iconColor="bg-pink-50 text-pink-600" title={t("feedCampaigns")} href="/donate" linkLabel={tCommon("all")}>
+              {campaigns.map((c) => <CampaignCard key={c.id} c={c} locale={locale} />)}
             </Rail>
           )}
           {events.length > 0 && (
-            <Rail icon={Calendar} iconColor="bg-purple-50 text-purple-600" title="Közelgő események" href="/events" linkLabel="Összes">
-              {events.map((e) => <EventCard key={e.id} e={e} />)}
+            <Rail icon={Calendar} iconColor="bg-purple-50 text-purple-600" title={t("feedEvents")} href="/events" linkLabel={tCommon("all")}>
+              {events.map((e) => <EventCard key={e.id} e={e} locale={locale} />)}
             </Rail>
           )}
           {reports.length > 0 && (
-            <Rail icon={AlertTriangle} iconColor="bg-red-50 text-red-500" title="Friss bejelentések" href="/reports" linkLabel="Összes">
-              {reports.map((r) => <ReportCard key={r.id} r={r} />)}
+            <Rail icon={AlertTriangle} iconColor="bg-red-50 text-red-500" title={t("feedReports")} href="/reports" linkLabel={tCommon("all")}>
+              {reports.map((r) => <ReportCard key={r.id} r={r} reportLabel={reportLabel} animalLabel={animalLabel} />)}
             </Rail>
           )}
         </div>
@@ -275,7 +294,7 @@ export function FeedClient({
       {/* ── Cikkek ─────────────────────────────── */}
       {posts.length > 0 && (
         <>
-          <SectionDivider label="Cikkek" />
+          <SectionDivider label={tArt("title")} />
           <div className="space-y-4">
             {posts.map((post) => <PostCard key={post.id} post={post} />)}
           </div>
@@ -292,7 +311,7 @@ export function FeedClient({
             className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Több betöltése
+            {tCommon("loadMore")}
           </button>
         </div>
       )}

@@ -50,8 +50,13 @@ export default async function LocaleLayout({
             {/* pt-16 = a fix fejléc magassága (h-16), így nincs fehér csík alatta */}
             <main className="min-h-[60vh] pt-16">{children}</main>
             <Footer />
-            {/* Alsó térköz, hogy a fix mobil-navigáció ne takarja a tartalmat */}
-            <div className="h-16 md:hidden" aria-hidden />
+            {/* Alsó térköz, hogy a fix mobil-navigáció ne takarja a tartalmat.
+                A magasság a sáv magassága + a készülék alsó biztonsági sávja. */}
+            <div
+              className="md:hidden"
+              style={{ height: "calc(3.5rem + env(safe-area-inset-bottom))" }}
+              aria-hidden
+            />
             <Suspense><MobileBottomNav /></Suspense>
             <CookieBanner />
           </Providers>

@@ -52,7 +52,7 @@ export default async function ProfileAdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
 
         <h1 className="mb-8 text-2xl font-bold text-gray-900">{t("profileAdmin")}</h1>
 

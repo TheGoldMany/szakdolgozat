@@ -1,3 +1,4 @@
+import { useTranslations, useLocale } from "next-intl";
 import { FileText, Clock, CheckCircle2, XCircle, Flag, Ban, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,9 +25,9 @@ const NODE_BG: Record<TimelineNode["tone"], string> = {
   gray:  "bg-gray-200 text-gray-400",
 };
 
-function fmt(iso: string | null): string | null {
+function fmt(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" });
+  return new Date(iso).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 }
 
 /**
@@ -35,6 +36,9 @@ function fmt(iso: string | null): string | null {
  * Visszavont kérelemnek külön záró állapot.
  */
 export function ApplicationTimeline({ status, createdAt, reviewedAt }: Props) {
+  const t      = useTranslations("applications");
+  const locale = useLocale();
+
   const invited   = status === "INVITED";
   const withdrawn = status === "WITHDRAWN";
   const approved  = status === "APPROVED";
@@ -45,37 +49,37 @@ export function ApplicationTimeline({ status, createdAt, reviewedAt }: Props) {
 
   if (withdrawn) {
     nodes = [
-      { label: "Kérelem beküldve", date: fmt(createdAt),  state: "done",    tone: "brand", icon: FileText },
-      { label: "Visszavonva",      date: fmt(reviewedAt), state: "current", tone: "gray",  icon: Ban },
+      { label: t("timelineSubmitted"), date: fmt(createdAt, locale),  state: "done",    tone: "brand", icon: FileText },
+      { label: t("timelineWithdrawn"), date: fmt(reviewedAt, locale), state: "current", tone: "gray",  icon: Ban },
     ];
   } else {
     nodes = [
       {
-        label: invited ? "Meghívva jelentkezésre" : "Kérelem beküldve",
-        date:  fmt(createdAt),
+        label: invited ? t("timelineInvited") : t("timelineSubmitted"),
+        date:  fmt(createdAt, locale),
         state: "done",
         tone:  "brand",
         icon:  FileText,
       },
       {
-        label: "Feldolgozás alatt",
+        label: t("timelineProcessing"),
         date:  null,
-        hint:  decided ? undefined : "A menhely hamarosan elbírálja a kérelmedet.",
+        hint:  decided ? undefined : t("timelineProcessingHint"),
         state: decided ? "done" : "current",
         tone:  "brand",
         icon:  Clock,
       },
       decided
         ? approved
-          ? { label: "Jóváhagyva", date: fmt(reviewedAt), state: "current", tone: "green", icon: CheckCircle2 }
-          : { label: "Elutasítva", date: fmt(reviewedAt), state: "current", tone: "red",   icon: XCircle }
-        : { label: "Döntés", date: null, state: "upcoming", tone: "gray", icon: Flag },
+          ? { label: t("timelineApproved"), date: fmt(reviewedAt, locale), state: "current", tone: "green", icon: CheckCircle2 }
+          : { label: t("timelineRejected"), date: fmt(reviewedAt, locale), state: "current", tone: "red",   icon: XCircle }
+        : { label: t("timelineDecision"), date: null, state: "upcoming", tone: "gray", icon: Flag },
     ];
   }
 
   return (
     <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-sm font-semibold text-gray-700">A kérelem állapota</h2>
+      <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("timelineTitle")}</h2>
       <ol className="relative border-l border-gray-200 pl-6">
         {nodes.map((n, i) => {
           const Icon = n.icon;

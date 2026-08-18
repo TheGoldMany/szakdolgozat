@@ -81,7 +81,13 @@
     "feedTitle": "Für dich",
     "feedEmpty": "Noch keine Inhalte. Schau später wieder vorbei!",
     "ctaTitle": "Haustier verloren?",
-    "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!"
+    "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!",
+    "feedNewAnimals": "Neue Bewohner",
+    "feedCampaigns": "Aktive Spendenaktionen",
+    "feedEvents": "Bevorstehende Veranstaltungen",
+    "feedReports": "Neueste Meldungen",
+    "feedArticles": "Artikel",
+    "quickReport": "Meldung"
   },
   "animals": {
     "title": "Tiere",
@@ -506,7 +512,11 @@
     "makePrimary": "Als Hauptbild festlegen",
     "addImage": "Bild hinzufügen",
     "close": "Schließen",
-    "multiImageHint": "Max. {max} Bilder · Max. 5 MB/Bild · JPEG, PNG, WebP · Das erste Bild wird das Hauptbild (Hover → Stern)"
+    "multiImageHint": "Max. {max} Bilder · Max. 5 MB/Bild · JPEG, PNG, WebP · Das erste Bild wird das Hauptbild (Hover → Stern)",
+    "all": "Alle",
+    "loadMore": "Mehr laden",
+    "view": "Ansehen",
+    "menu": "Menü"
   },
   "applications": {
     "title": "Meine Anträge",
@@ -539,7 +549,16 @@
     "filledForm": "Ausgefülltes Formular",
     "viewFile": "Datei ansehen",
     "notFilled": "Nicht ausgefüllt",
-    "formNotSubmitted": "Das Formular wurde noch nicht eingereicht."
+    "formNotSubmitted": "Das Formular wurde noch nicht eingereicht.",
+    "timelineTitle": "Status des Antrags",
+    "timelineSubmitted": "Antrag eingereicht",
+    "timelineInvited": "Zur Bewerbung eingeladen",
+    "timelineWithdrawn": "Zurückgezogen",
+    "timelineProcessing": "In Bearbeitung",
+    "timelineProcessingHint": "Das Tierheim prüft deinen Antrag in Kürze.",
+    "timelineApproved": "Genehmigt",
+    "timelineRejected": "Abgelehnt",
+    "timelineDecision": "Entscheidung"
   },
   "profile": {
     "title": "Mein Profil",
@@ -620,7 +639,26 @@
     "deleteCancel": "Abbrechen",
     "deleteConfirmButton": "Konto endgültig löschen",
     "deleteInProgress": "Wird gelöscht...",
-    "deleteError": "Ein Fehler ist aufgetreten. Bitte erneut versuchen."
+    "deleteError": "Ein Fehler ist aufgetreten. Bitte erneut versuchen.",
+    "myCampaigns": "Meine Spendenaktionen",
+    "newCampaign": "Neue Spendenaktion",
+    "noCampaigns": "Du hast noch keine Spendenaktion.",
+    "startCampaignNow": "Starte jetzt eine",
+    "campaignPending": "Wartet auf Genehmigung",
+    "campaignActive": "Aktiv",
+    "campaignRejected": "Abgelehnt",
+    "campaignCompleted": "Abgeschlossen",
+    "donationsCount": "{count} Spenden",
+    "stripeTitle": "Stripe-Konto",
+    "stripeDesc": "Verbinde dein Stripe-Konto, wenn du eine eigene Spendenaktion starten möchtest — die Spenden kommen direkt hier an.",
+    "stripeActive": "Dein Stripe-Konto ist aktiv, du kannst Spenden empfangen.",
+    "stripeOpenDashboard": "Stripe-Dashboard öffnen",
+    "stripeIncomplete": "Deine Stripe-Registrierung ist noch nicht abgeschlossen.",
+    "stripeFinish": "Registrierung abschließen",
+    "stripeConnect": "Stripe-Konto verbinden",
+    "stripeConnectError": "Fehler beim Verbinden.",
+    "stripeOpenError": "Fehler beim Öffnen.",
+    "stripeUnknownError": "Unbekannter Fehler."
   },
   "cookies": {
     "title": "Cookies & Datenschutz",
@@ -1523,5 +1561,27 @@
     "myDonations": "Meine Spenden",
     "noDonations": "Du hast noch nicht gespendet.",
     "directDonation": "Direktspende"
+  },
+  "articles": {
+    "title": "Artikel",
+    "subtitle": "Nachrichten, Ratschläge und Geschichten über die Adoption",
+    "metaDescription": "Nachrichten, Ratschläge und Geschichten über Tieradoption und Tierschutz.",
+    "empty": "Noch keine Artikel veröffentlicht. Schau später wieder vorbei!",
+    "editorial": "Redaktion",
+    "minutes": "{count} Min.",
+    "readingTime": "{count} Min. Lesezeit",
+    "notFound": "Artikel nicht gefunden",
+    "back": "Zurück zu den Artikeln",
+    "related": "Passend zum Artikel",
+    "relatedShelter": "Tierheim",
+    "relatedAnimal": "Tier",
+    "relatedEvent": "Veranstaltung",
+    "relatedCampaign": "Spendenaktion",
+    "moreArticles": "Weitere Artikel",
+    "waitingAnimals": "Suchen ein Zuhause",
+    "activeCampaigns": "Aktive Spendenaktionen",
+    "readMore": "Zum Artikel",
+    "adoptable": "Zur Adoption freigegeben",
+    "siteName": "ÁllatiMenhelyek"
   }
 }

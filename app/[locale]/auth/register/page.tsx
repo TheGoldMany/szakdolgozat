@@ -80,7 +80,7 @@ export default function RegisterPage() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
             <PawPrint className="h-10 w-10 text-white" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">{t("joinTitle")}</h2>
+          <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">{t("joinTitle")}</h2>
           <p className="mt-3 text-base text-white/80">
             {t("joinSubtitle")}
           </p>
