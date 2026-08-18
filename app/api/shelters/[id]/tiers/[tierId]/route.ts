@@ -8,7 +8,9 @@ import { prisma } from "@/lib/prisma";
 const patchSchema = z.object({
   name:        z.string().min(1).max(200).optional(),
   description: z.string().max(2000).optional().nullable(),
-  amount:      z.number().int().min(175, "Az összeg minimum 175 Ft (Stripe limit)").optional(),
+  // Az összeg nem szerkeszthető: a csomagösszegek platformszinten fixek, és a
+  // Stripe-előfizetés a belépéskori árhoz van kötve. A név és a leírás viszont
+  // a menhelyé – a csomag értékét a történet adja, nem a szám.
   isActive:    z.boolean().optional(),
 });
 
@@ -45,34 +47,6 @@ export async function PATCH(
   });
   if (!tier) {
     return NextResponse.json({ error: "A csomag nem található" }, { status: 404 });
-  }
-
-  // Az összeg nem módosítható, amíg élő előfizető van a csomagon.
-  //
-  // A Stripe-előfizetés a létrehozásakori árhoz van kötve (beégetett
-  // `price_data`), ezért az itteni átírás a meglévő előfizetőket NEM érinti:
-  // ők a régi összeget fizetnék tovább, miközben a felület már az újat
-  // mutatná. A visszamenőleges átárazás ráadásul a hátuk mögött emelne díjat.
-  // Változó összeghez új csomag kell; a régi marad a meglévőknek.
-  const amountChanges =
-    parsed.data.amount !== undefined && parsed.data.amount !== tier.amount;
-
-  if (amountChanges) {
-    const liveSubscribers = await prisma.subscription.count({
-      where: { tierId: params.tierId, status: { in: ["ACTIVE", "PAST_DUE"] } },
-    });
-    if (liveSubscribers > 0) {
-      return NextResponse.json(
-        {
-          error:
-            `A csomag összege nem módosítható, mert ${liveSubscribers} élő előfizetés tartozik hozzá. ` +
-            "Ők a Stripe-nál a belépéskori összeget fizetik, így a módosítás nem érné el őket. " +
-            "Hozz létre új csomagot az új összeggel, ezt pedig állítsd inaktívra.",
-          liveSubscribers,
-        },
-        { status: 409 }
-      );
-    }
   }
 
   const updated = await prisma.donationTier.update({

@@ -6,6 +6,7 @@ import { hash } from "bcryptjs";
 import { z } from "zod";
 import { Role } from "@prisma/client";
 import { sendShelterAdminInviteEmail } from "@/lib/email";
+import { ensureShelterDefaults } from "@/lib/shelter-defaults";
 import { geocodeAddress } from "@/lib/geo";
 
 const schema = z.object({
@@ -126,6 +127,9 @@ export async function POST(req: NextRequest) {
 
       return { shelter, adminUser };
     });
+
+    // Fix havi csomagok + állandó „Általános támogatás" gyűjtés
+    await ensureShelterDefaults(result.shelter.id);
 
     // Send invite email (fire-and-forget — don't block response)
     sendShelterAdminInviteEmail({

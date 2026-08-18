@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/lib/auth";
 import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
+import { ALLOWED_TIER_AMOUNTS } from "@/lib/donation-tiers";
 import { TiersManager } from "@/components/dashboard/tiers-manager";
 import { cn } from "@/lib/utils";
 import { resolveActingShelter } from "@/lib/acting-shelter";
@@ -118,7 +119,7 @@ export default async function TiersPage() {
         <h1 className="text-2xl font-bold text-gray-900">{t("tiersTitle")}</h1>
         <PageInfo page="tiers" />
       </div>
-      <TiersManager tiers={tiers} shelterId={shelterId} />
+      <TiersManager tiers={tiers} shelterId={shelterId} allowedAmounts={ALLOWED_TIER_AMOUNTS} />
     </div>
   );
 }

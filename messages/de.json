@@ -238,7 +238,8 @@
     "volunteer": "Ehrenamtlich helfen",
     "volunteerDesc": "Hilf dem Tierheim als Ehrenamtlicher – Gassiführen, Tierpflege und Veranstaltungssupport.",
     "foster": "Pflegeperson werden",
-    "fosterDesc": "Hilf einem Tier, ohne es dauerhaft zu adoptieren – gib ihm vorübergehend ein Zuhause."
+    "fosterDesc": "Hilf einem Tier, ohne es dauerhaft zu adoptieren – gib ihm vorübergehend ein Zuhause.",
+    "supportShelter": "Dieses Tierheim unterstützen"
   },
   "donate": {
     "title": "Unterstützung",
@@ -306,7 +307,8 @@
     "stripeRequired": "Verbinde zuerst dein Stripe-Konto",
     "stripeRequiredDesc": "Eine Spendenaktion kannst du nur mit einem verbundenen Stripe-Konto starten, damit die Spenden direkt bei dir (oder dem gewählten Tierheim) ankommen.",
     "stripeConnectOwn": "Eigenes Stripe-Konto verbinden",
-    "stripeConnectError": "Fehler beim Verbinden mit Stripe."
+    "stripeConnectError": "Fehler beim Verbinden mit Stripe.",
+    "generalOngoing": "Laufende Unterstützung für den Alltag des Tierheims – ohne Frist und Zielbetrag."
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -1193,12 +1195,9 @@
     "settingsPublicPage": "Öffentliche Seite anzeigen",
     "tiersTitle": "Abonnement-Pakete",
     "tiersNoTiers": "Noch keine Abonnement-Pakete.",
-    "tiersNew": "Neues Paket",
     "tiersEdit": "Bearbeiten",
     "tiersSave": "Speichern",
-    "tiersCreate": "Erstellen",
     "tiersCancel": "Abbrechen",
-    "tiersDelete": "Löschen",
     "tiersActive": "Aktiv",
     "tiersInactive": "Inaktiv",
     "tiersActivate": "Aktivieren",
@@ -1206,11 +1205,9 @@
     "tiersPerMonth": "/ Mo.",
     "tiersSubscribersCount": "{count} Abonnent(en)",
     "tiersNameLabel": "Name",
-    "tiersAmountLabel": "Betrag (HUF/Mo.)",
     "tiersDescriptionLabel": "Beschreibung (optional)",
     "tiersDescriptionPlaceholder": "Kurze Beschreibung",
     "tiersValidationError": "Name und ein gültiger Betrag sind erforderlich.",
-    "tiersDeleteFailed": "Löschen fehlgeschlagen.",
     "tiersToggleFailed": "Statusänderung fehlgeschlagen.",
     "tiersUnknownError": "Unbekannter Fehler",
     "tiersNoShelter": "Kein zugewiesenes Tierheim.",
@@ -1421,10 +1418,12 @@
     "navApprovals": "Genehmigungen",
     "navAudit": "Audit-Protokoll",
     "navVets": "Tierärzte",
-    "tiersAmountLockedHint": "Bestehende Abonnenten zahlen den Betrag ihres Beitritts, daher ist er nicht änderbar. Lege für einen neuen Betrag ein neues Paket an.",
     "subsRevenueThisMonth": "Einnahmen diesen Monat",
     "subsRevenueTotal": "Gesamte wiederkehrende Einnahmen",
-    "subsPaymentsCount": "Abbuchungen"
+    "subsPaymentsCount": "Abbuchungen",
+    "tiersFixedAmountsInfo": "Die Paketbeträge sind plattformweit festgelegt ({amounts}) und werden für jedes Tierheim automatisch angelegt. Name und Beschreibung gestaltest du selbst – den Wert eines Pakets macht die Geschichte aus, nicht die Zahl.",
+    "tiersLegacy": "Alter Betrag",
+    "tiersLegacyHint": "Ein Paket aus der Zeit vor den festen Beträgen. Bestehende Abonnenten zahlen bei Stripe weiter ihren Einstiegspreis, daher nicht löschbar – neue können aber nicht mehr beitreten."
   },
   "foster": {
     "title": "Meine Pflegeanträge",

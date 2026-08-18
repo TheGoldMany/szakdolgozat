@@ -238,7 +238,8 @@
     "volunteer": "Zostań wolontariuszem",
     "volunteerDesc": "Pomóż schronisku jako wolontariusz – spacery, opieka nad zwierzętami i wsparcie wydarzeń.",
     "foster": "Zostań opiekunem tymczasowym",
-    "fosterDesc": "Pomóż zwierzęciu bez jego stałej adopcji – daj mu tymczasowy dom."
+    "fosterDesc": "Pomóż zwierzęciu bez jego stałej adopcji – daj mu tymczasowy dom.",
+    "supportShelter": "Wesprzyj to schronisko"
   },
   "donate": {
     "title": "Wsparcie",
@@ -306,7 +307,8 @@
     "stripeRequired": "Najpierw podłącz konto Stripe",
     "stripeRequiredDesc": "Zbiórkę możesz rozpocząć tylko z podłączonym kontem Stripe, aby darowizny trafiały bezpośrednio do Ciebie (lub wybranego schroniska).",
     "stripeConnectOwn": "Podłącz własne konto Stripe",
-    "stripeConnectError": "Błąd podczas łączenia ze Stripe."
+    "stripeConnectError": "Błąd podczas łączenia ze Stripe.",
+    "generalOngoing": "Stałe wsparcie codziennej działalności schroniska — bez terminu i celu."
   },
   "auth": {
     "loginTitle": "Zaloguj się",
@@ -1193,12 +1195,9 @@
     "settingsPublicPage": "Wyświetl stronę publiczną",
     "tiersTitle": "Pakiety subskrypcji",
     "tiersNoTiers": "Brak pakietów subskrypcji.",
-    "tiersNew": "Nowy pakiet",
     "tiersEdit": "Edytuj",
     "tiersSave": "Zapisz",
-    "tiersCreate": "Utwórz",
     "tiersCancel": "Anuluj",
-    "tiersDelete": "Usuń",
     "tiersActive": "Aktywny",
     "tiersInactive": "Nieaktywny",
     "tiersActivate": "Aktywuj",
@@ -1206,11 +1205,9 @@
     "tiersPerMonth": "/ mies.",
     "tiersSubscribersCount": "{count} subskrybent(ów)",
     "tiersNameLabel": "Nazwa",
-    "tiersAmountLabel": "Kwota (HUF/mies.)",
     "tiersDescriptionLabel": "Opis (opcjonalny)",
     "tiersDescriptionPlaceholder": "Krótki opis",
     "tiersValidationError": "Nazwa i prawidłowa kwota są wymagane.",
-    "tiersDeleteFailed": "Usuwanie nie powiodło się.",
     "tiersToggleFailed": "Zmiana statusu nie powiodła się.",
     "tiersUnknownError": "Nieznany błąd",
     "tiersNoShelter": "Brak przypisanego schroniska.",
@@ -1421,10 +1418,12 @@
     "createNewTask": "Utwórz nowe zadanie",
     "createTask": "Utwórz zadanie",
     "newTask": "Nowe zadanie",
-    "tiersAmountLockedHint": "Obecni subskrybenci płacą kwotę z momentu zapisu, więc nie można jej zmienić. Dla nowej kwoty utwórz nowy pakiet.",
     "subsRevenueThisMonth": "Przychód w tym miesiącu",
     "subsRevenueTotal": "Łączny przychód cykliczny",
-    "subsPaymentsCount": "Liczba obciążeń"
+    "subsPaymentsCount": "Liczba obciążeń",
+    "tiersFixedAmountsInfo": "Kwoty pakietów są ustalone na poziomie platformy ({amounts}) i tworzą się automatycznie dla każdego schroniska. Nazwę i opis piszesz sam — o wartości pakietu decyduje historia, nie liczba.",
+    "tiersLegacy": "Stara kwota",
+    "tiersLegacyHint": "Pakiet sprzed ustalenia stałych kwot. Obecni subskrybenci nadal płacą cenę z momentu zapisu w Stripe, więc nie można go usunąć — ale nikt nowy nie może do niego dołączyć."
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",

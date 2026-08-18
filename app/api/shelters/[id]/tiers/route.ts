@@ -3,11 +3,17 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ALLOWED_TIER_AMOUNTS, isAllowedTierAmount } from "@/lib/donation-tiers";
 
 const createSchema = z.object({
   name:        z.string().min(1).max(200),
   description: z.string().max(2000).optional(),
-  amount:      z.number().int().min(175, "Az összeg minimum 175 Ft (Stripe limit)"),
+  // Az összegek platformszinten rögzítettek – lásd lib/donation-tiers.ts.
+  // Szabad összeg esetén a Stripe a belépéskori árat vonná tovább, így a
+  // felület és a tényleges terhelés szétcsúszhatna.
+  amount:      z.number().int().refine(isAllowedTierAmount, {
+    message: `Az összeg csak a következők egyike lehet: ${ALLOWED_TIER_AMOUNTS.join(", ")} Ft`,
+  }),
 });
 
 async function checkShelterAdmin(shelterId: string, userId: string, role: string) {

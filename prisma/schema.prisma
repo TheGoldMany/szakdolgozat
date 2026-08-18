@@ -736,6 +736,14 @@ model Campaign {
   raisedAmount Int            @default(0)
   imageUrl     String?
   status       CampaignStatus @default(PENDING)
+  /// Az „Általános támogatás" gyűjtés: minden menhelyhez automatikusan
+  /// létrejön, sosem zárul le, és nem szerkeszthető/törölhető.
+  ///
+  /// Enélkül az a menhely, amelyiknek épp nincs futó gyűjtése, egyáltalán nem
+  /// tudna egyszeri adományt fogadni – a checkout kötelezően kér campaignId-t.
+  /// A gyűjtés-listákból ki van zárva: nem kampány egy történettel, hanem a
+  /// menhely mindig elérhető támogatás gombja.
+  isGeneral    Boolean        @default(false)
   approvedById String?
   approvedAt   DateTime?
   endsAt       DateTime?

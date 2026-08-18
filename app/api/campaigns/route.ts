@@ -28,7 +28,7 @@ const createSchema = z.object({
 export async function GET(_req: NextRequest) {
   try {
     const campaigns = await prisma.campaign.findMany({
-      where:   { status: "ACTIVE" },
+      where:   { status: "ACTIVE", isGeneral: false },
       orderBy: { createdAt: "desc" },
       include: {
         user:    { select: { name: true } },

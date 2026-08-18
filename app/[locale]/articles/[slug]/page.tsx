@@ -129,7 +129,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
       },
     }),
     prisma.campaign.findMany({
-      where:   { status: "ACTIVE" },
+      where:   { status: "ACTIVE", isGeneral: false },
       orderBy: { createdAt: "desc" },
       take: 3,
       select: { id: true, title: true, targetAmount: true, raisedAmount: true },

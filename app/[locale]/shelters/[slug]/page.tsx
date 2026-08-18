@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, Globe, PawPrint, CheckCircle2, HeartHandshake } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { AnimalCard } from "@/components/animals/animal-card";
 import { TierCard } from "@/components/donate/tier-card";
@@ -91,6 +91,13 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
     existingVolStatus = vol?.status ?? null;
     existingFosterStatus = foster?.status ?? null;
   }
+
+  // Az állandó „Általános támogatás" gyűjtés: ez adja az egyszeri adomány
+  // gombot akkor is, amikor a menhelynek épp nincs futó kampánya.
+  const generalCampaign = await prisma.campaign.findFirst({
+    where:  { shelterId: shelter.id, isGeneral: true, status: "ACTIVE" },
+    select: { id: true },
+  });
 
   // Fetch which tiers the user is already actively subscribed to
   const activeTierIds = new Set<string>();
@@ -230,6 +237,16 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
                 )}
               </ul>
             </div>
+
+            {generalCampaign && (
+              <Link
+                href={`/donate/${generalCampaign.id}`}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
+              >
+                <HeartHandshake className="h-4 w-4" />
+                {t("supportShelter")}
+              </Link>
+            )}
 
             {shelter.tiers.length > 0 && (
               <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

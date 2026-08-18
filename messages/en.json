@@ -238,7 +238,8 @@
     "volunteer": "Volunteer with us",
     "volunteerDesc": "Help the shelter as a volunteer – dog walking, animal care and event support.",
     "foster": "Become a foster carer",
-    "fosterDesc": "Help an animal without permanently adopting them – provide a temporary home."
+    "fosterDesc": "Help an animal without permanently adopting them – provide a temporary home.",
+    "supportShelter": "Support this shelter"
   },
   "donate": {
     "title": "Support",
@@ -306,7 +307,8 @@
     "stripeRequired": "Connect your Stripe account first",
     "stripeRequiredDesc": "You can only start a fundraiser with a connected Stripe account, so donations reach you (or the shelter you choose) directly.",
     "stripeConnectOwn": "Connect my Stripe account",
-    "stripeConnectError": "Error connecting to Stripe."
+    "stripeConnectError": "Error connecting to Stripe.",
+    "generalOngoing": "Ongoing support for the shelter's day-to-day running — no deadline, no target."
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -1193,12 +1195,9 @@
     "settingsPublicPage": "View public page",
     "tiersTitle": "Subscription plans",
     "tiersNoTiers": "No subscription plans yet.",
-    "tiersNew": "New plan",
     "tiersEdit": "Edit",
     "tiersSave": "Save",
-    "tiersCreate": "Create",
     "tiersCancel": "Cancel",
-    "tiersDelete": "Delete",
     "tiersActive": "Active",
     "tiersInactive": "Inactive",
     "tiersActivate": "Activate",
@@ -1206,11 +1205,9 @@
     "tiersPerMonth": "/ mo",
     "tiersSubscribersCount": "{count} subscriber(s)",
     "tiersNameLabel": "Name",
-    "tiersAmountLabel": "Amount (HUF/mo)",
     "tiersDescriptionLabel": "Description (optional)",
     "tiersDescriptionPlaceholder": "Short description",
     "tiersValidationError": "Name and a valid amount are required.",
-    "tiersDeleteFailed": "Delete failed.",
     "tiersToggleFailed": "Status change failed.",
     "tiersUnknownError": "Unknown error",
     "tiersNoShelter": "No assigned shelter.",
@@ -1421,10 +1418,12 @@
     "navApprovals": "Approvals",
     "navAudit": "Audit log",
     "navVets": "Veterinarians",
-    "tiersAmountLockedHint": "Existing subscribers are charged the amount they signed up at, so this cannot be changed. Create a new tier for a new amount.",
     "subsRevenueThisMonth": "Revenue this month",
     "subsRevenueTotal": "Total recurring revenue",
-    "subsPaymentsCount": "Payments"
+    "subsPaymentsCount": "Payments",
+    "tiersFixedAmountsInfo": "Tier amounts are fixed platform-wide ({amounts}) and are created automatically for every shelter. The name and description are yours to write — what makes a tier worth choosing is the story, not the number.",
+    "tiersLegacy": "Legacy amount",
+    "tiersLegacyHint": "A tier from before fixed amounts. Existing subscribers keep paying the price they signed up at in Stripe, so it cannot be deleted — but nobody new can join it."
   },
   "foster": {
     "title": "My foster applications",

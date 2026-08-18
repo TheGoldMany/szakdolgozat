@@ -187,19 +187,28 @@ export default async function CampaignDetailPage({
           {/* Sidebar */}
           <div className="space-y-5">
 
-            {/* Progress card */}
+            {/* Progress card – az állandó gyűjtésnek nincs célösszege, ott csak
+                az eddig összegyűlt összeg jelenik meg, haladásjelző nélkül. */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="mb-1 flex items-end justify-between">
                 <span className="text-2xl font-bold text-brand-600">{formatHUF(campaign.raisedAmount)}</span>
-                <span className="text-sm text-gray-400">/ {formatHUF(campaign.targetAmount)}</span>
+                {!campaign.isGeneral && (
+                  <span className="text-sm text-gray-400">/ {formatHUF(campaign.targetAmount)}</span>
+                )}
               </div>
-              <div className="my-3 h-3 w-full rounded-full bg-gray-100 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-brand-500 transition-all"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              <p className="text-sm font-semibold text-brand-600">{t("percentCollected", { pct })}</p>
+              {campaign.isGeneral ? (
+                <p className="mt-1 text-sm text-gray-500">{t("generalOngoing")}</p>
+              ) : (
+                <>
+                  <div className="my-3 h-3 w-full rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-brand-500 transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="text-sm font-semibold text-brand-600">{t("percentCollected", { pct })}</p>
+                </>
+              )}
               {campaign.donations.length > 0 && (
                 <p className="mt-1 text-xs text-gray-400">{t("donorsPlus", { count: campaign.donations.length })}</p>
               )}
