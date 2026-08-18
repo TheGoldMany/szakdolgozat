@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { sendSubscriptionAdminCancelledEmail } from "@/lib/email";
@@ -56,6 +57,14 @@ export async function POST(
     await prisma.subscription.update({
       where: { id: params.id },
       data: { status: "CANCELLED", cancelledAt: new Date() },
+    });
+
+    logAudit({
+      actorId:    session.user.id,
+      action:     "SUBSCRIPTION_CANCELLED",
+      targetType: "Subscription",
+      targetId:   params.id,
+      targetName: `${subscription.user?.name ?? subscription.user?.email ?? "ismeretlen"} – ${subscription.tier.name}`,
     });
 
     if (subscription.user?.email) {

@@ -7,8 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
 const patchSchema = z.object({
-  action: z.enum(["APPROVE", "REJECT"]),
-});
+  // Jóváhagyás / elutasítás
+  action:       z.enum(["APPROVE", "REJECT"]).optional(),
+  // Vagy a gyűjtés adatainak szerkesztése
+  title:        z.string().min(2).max(200).optional(),
+  description:  z.string().min(2).optional(),
+  targetAmount: z.number().int().positive().optional(),
+  imageUrl:     z.string().url().nullable().optional().or(z.literal("")),
+  endsAt:       z.string().datetime().nullable().optional(),
+  status:       z.enum(["PENDING", "ACTIVE", "COMPLETED", "REJECTED"]).optional(),
+}).refine(
+  (d) => Object.keys(d).length > 0,
+  { message: "Nincs módosítandó adat" },
+);
 
 // PATCH /api/admin/campaigns/[id] – approve or reject a campaign (SUPER_ADMIN only)
 export async function PATCH(
@@ -34,14 +45,40 @@ export async function PATCH(
       return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
     }
 
-    if (campaign.status !== "PENDING") {
+    const { action, ...edits } = parsed.data;
+
+    // A jóváhagyás/elutasítás csak függőben lévő gyűjtésre értelmezhető.
+    // A szerkesztés viszont bármelyik státuszban megengedett, ezért ez a
+    // feltétel kizárólag a jóváhagyási ágra vonatkozik.
+    if (action && campaign.status !== "PENDING") {
       return NextResponse.json(
-        { error: "Csak PENDING státuszú kampány módosítható" },
+        { error: "Csak jóváhagyásra váró gyűjtés bírálható el" },
         { status: 409 }
       );
     }
 
-    const { action } = parsed.data;
+    // Szerkesztés (nem jóváhagyás): a megadott mezőket frissítjük
+    if (!action) {
+      const updated = await prisma.campaign.update({
+        where: { id: params.id },
+        data: {
+          ...(edits.title        !== undefined && { title: edits.title }),
+          ...(edits.description  !== undefined && { description: edits.description }),
+          ...(edits.targetAmount !== undefined && { targetAmount: edits.targetAmount }),
+          ...(edits.status       !== undefined && { status: edits.status }),
+          ...(edits.imageUrl     !== undefined && { imageUrl: edits.imageUrl || null }),
+          ...(edits.endsAt       !== undefined && { endsAt: edits.endsAt ? new Date(edits.endsAt) : null }),
+        },
+      });
+      logAudit({
+        actorId:    session.user.id,
+        action:     "CAMPAIGN_EDITED",
+        targetType: "Campaign",
+        targetId:   updated.id,
+        targetName: updated.title,
+      });
+      return NextResponse.json(updated);
+    }
 
     const updated = await prisma.campaign.update({
       where: { id: params.id },
@@ -92,5 +129,50 @@ export async function PATCH(
   } catch (error) {
     console.error('[api/admin/campaigns/[id] PATCH]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+
+// DELETE /api/admin/campaigns/[id] – gyűjtés végleges törlése (SUPER_ADMIN)
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (session?.user?.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
+  }
+
+  const campaign = await prisma.campaign.findUnique({
+    where:  { id: params.id },
+    select: { id: true, title: true, _count: { select: { donations: true } } },
+  });
+  if (!campaign) {
+    return NextResponse.json({ error: "A gyűjtés nem található" }, { status: 404 });
+  }
+
+  // Beérkezett adomány mellett a törlés pénzügyi nyomot venne el:
+  // ilyenkor lezárás javasolt a törlés helyett.
+  if (campaign._count.donations > 0) {
+    return NextResponse.json(
+      {
+        error:
+          `A gyűjtéshez ${campaign._count.donations} adomány tartozik, ezért nem törölhető. ` +
+          "Állítsd inkább Lezárt vagy Visszautasított státuszra.",
+      },
+      { status: 409 },
+    );
+  }
+
+  try {
+    await prisma.campaign.delete({ where: { id: params.id } });
+    logAudit({
+      actorId:    session.user.id,
+      action:     "CAMPAIGN_DELETED",
+      targetType: "Campaign",
+      targetId:   campaign.id,
+      targetName: campaign.title,
+    });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[api/admin/campaigns/[id] DELETE]", error);
+    return NextResponse.json({ error: "A törlés nem sikerült" }, { status: 500 });
   }
 }

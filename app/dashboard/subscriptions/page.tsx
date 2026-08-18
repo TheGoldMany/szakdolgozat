@@ -7,6 +7,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { ExportButton } from "@/components/dashboard/export-button";
 import { prisma } from "@/lib/prisma";
 import { SubscriptionCancelButton } from "@/components/dashboard/subscription-cancel-button";
+import { SubscriptionDeleteButton } from "@/components/dashboard/subscription-delete-button";
 import { cn } from "@/lib/utils";
 import { resolveActingShelter } from "@/lib/acting-shelter";
 
@@ -142,6 +143,8 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                     <td className="px-4 py-2.5">
                       {sub.status === "ACTIVE" ? (
                         <SubscriptionCancelButton subscriptionId={sub.id} />
+                      ) : isSuperAdmin ? (
+                        <SubscriptionDeleteButton subscriptionId={sub.id} />
                       ) : (
                         <span className="text-gray-300">–</span>
                       )}
