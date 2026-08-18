@@ -128,6 +128,10 @@ export async function POST(req: NextRequest) {
       },
       ...(connectedAccountId && {
         subscription_data: {
+          // A számlán és a Stripe-nyugtán ez azonosítja a támogatást. A
+          // bankkivonat szövegét előfizetésnél a Stripe a FIÓK beállításából
+          // veszi – azt a dashboardon kell beállítani.
+          description: `${tier.name} – ${tier.shelter.name}`,
           application_fee_percent: feePercent,
           transfer_data: { destination: connectedAccountId },
         },

@@ -6,6 +6,7 @@ import { sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail, sendPay
 import { createNotification, createNotifications } from "@/lib/notifications";
 import { fulfillDonation, notifyDonation } from "@/lib/donations";
 import { invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
+import { applyRefund, recordDispute } from "@/lib/refunds";
 
 // Disable body parsing — we need the raw body for signature verification
 export const dynamic = "force-dynamic";
@@ -140,6 +141,29 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Visszatérítés. A `charge.refunded` a TELJES visszatérített összeget adja
+  // meg, nem a mostani részletet – a helper ezért beállítja, nem növeli.
+  if (event.type === "charge.refunded") {
+    await applyRefund(event.data.object as Stripe.Charge);
+  }
+
+  // Vitatott tétel (chargeback). Destination charge-nál a visszaterhelt összeg
+  // és a Stripe vitadíja is a PLATFORM egyenlegéről megy, ezért a super
+  // adminnak azonnal tudnia kell róla.
+  if (event.type === "charge.dispute.created" || event.type === "charge.dispute.updated") {
+    await recordDispute(event.data.object as Stripe.Dispute);
+  }
+
+  // Elhagyott fizetés: a checkout indításakor létrehozott, soha ki nem fizetett
+  // adomány-sort takarítjuk, hogy ne gyűljenek a szellemsorok.
+  if (event.type === "checkout.session.expired") {
+    const expired = event.data.object as Stripe.Checkout.Session;
+    const donationId = expired.metadata?.donationId;
+    if (donationId) {
+      await prisma.donation.deleteMany({ where: { id: donationId, paidAt: null } });
+    }
+  }
+
   if (event.type === "checkout.session.completed") {
     const checkoutSession = event.data.object as Stripe.Checkout.Session;
     const metadata = checkoutSession.metadata ?? {};
@@ -151,7 +175,10 @@ export async function POST(req: NextRequest) {
       // Fizetettre állítás + a gyűjtés összegének növelése, pontosan egyszer.
       // A Stripe újraküldheti ezt az eseményt; ilyenkor firstFulfilment=false,
       // és nem duplázzuk sem az összeget, sem az értesítéseket.
-      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId);
+      const paymentIntentId = typeof checkoutSession.payment_intent === "string"
+        ? checkoutSession.payment_intent
+        : checkoutSession.payment_intent?.id ?? null;
+      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId, paymentIntentId);
       if (donation && firstFulfilment) {
         await notifyDonation(donation);
       }

@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
       },
       ...(connectedAccountId && {
         subscription_data: {
+          description: `Virtuális örökbefogadás – ${animal.name}`,
           application_fee_percent: feePercent,
           transfer_data: { destination: connectedAccountId },
         },

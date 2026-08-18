@@ -27,6 +27,7 @@ export default async function FinancesPage() {
       select: {
         id:        true,
         amount:    true,
+        refundedAmount: true,
         paidAt:    true,
         message:   true,
         isAnonymous: true,
@@ -72,13 +73,14 @@ export default async function FinancesPage() {
           { sponsorship:  { userId: session.user.id } },
         ],
       },
-      _sum:   { totalPaid: true },
+      _sum:   { totalPaid: true, refundedAmount: true },
       _count: true,
     }),
   ]);
 
-  const totalDonated   = donations.reduce((s, d) => s + d.amount, 0);
-  const totalRecurring = recurring._sum.totalPaid ?? 0;
+  // A visszatérített részt nem számítjuk bele – az a pénz visszament.
+  const totalDonated   = donations.reduce((s, d) => s + d.amount - d.refundedAmount, 0);
+  const totalRecurring = (recurring._sum.totalPaid ?? 0) - (recurring._sum.refundedAmount ?? 0);
   const totalAll       = totalDonated + totalRecurring;
   const activeSubs   = subscriptions.filter((s) => s.status === "ACTIVE").length;
   const activeSpons  = sponsorships.filter((s) => s.status === "ACTIVE").length;

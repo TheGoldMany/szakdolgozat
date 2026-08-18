@@ -62,7 +62,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
           ],
         }
       : {},
-    _sum:   { netAmount: true, totalPaid: true },
+    _sum:   { netAmount: true, totalPaid: true, refundedAmount: true },
     _count: true,
   });
 
@@ -80,7 +80,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
           }
         : {}),
     },
-    _sum: { netAmount: true },
+    _sum: { netAmount: true, refundedAmount: true },
   });
 
   const currentStatus = searchParams.status ?? "";
@@ -107,13 +107,13 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="text-xs text-gray-400">{t("subsRevenueThisMonth")}</p>
           <p className="mt-0.5 text-xl font-bold text-gray-900">
-            {(thisMonth._sum.netAmount ?? 0).toLocaleString("hu-HU")} Ft
+            {((thisMonth._sum.netAmount ?? 0) - (thisMonth._sum.refundedAmount ?? 0)).toLocaleString("hu-HU")} Ft
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="text-xs text-gray-400">{t("subsRevenueTotal")}</p>
           <p className="mt-0.5 text-xl font-bold text-gray-900">
-            {(revenue._sum.netAmount ?? 0).toLocaleString("hu-HU")} Ft
+            {((revenue._sum.netAmount ?? 0) - (revenue._sum.refundedAmount ?? 0)).toLocaleString("hu-HU")} Ft
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

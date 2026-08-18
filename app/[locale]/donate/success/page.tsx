@@ -39,7 +39,10 @@ async function fulfillSession(sessionId: string) {
     // Ugyanaz a helper fut, mint a webhookban, így a gyűjtés összege akkor is
     // helyes lesz, ha a webhook egyáltalán nem érkezik meg.
     if (metadata.donationId) {
-      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId);
+      const paymentIntentId = typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id ?? null;
+      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId, paymentIntentId);
       if (donation && firstFulfilment) {
         await notifyDonation(donation);
       }
