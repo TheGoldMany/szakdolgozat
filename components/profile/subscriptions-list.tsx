@@ -47,7 +47,7 @@ export function SubscriptionsList({ subscriptions }: { subscriptions: Subscripti
   return (
     <div className="space-y-3">
       {subscriptions.map((sub) => (
-        <div key={sub.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+        <div key={sub.id} className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
           <div className="text-sm">
             <p className="font-medium text-gray-800">
               {sub.tier.shelter?.name ?? t("unknownShelter")} – {sub.tier.name}

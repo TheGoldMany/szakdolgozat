@@ -183,7 +183,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <FilePlus2 className="h-4 w-4 text-brand-500" />

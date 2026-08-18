@@ -85,7 +85,7 @@ export function ShareButton({ url, title = "ÁllatiMenhelyek.hu", variant = "ico
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
           {targets.map(({ label, Icon, href }) => (
             <a
               key={label}

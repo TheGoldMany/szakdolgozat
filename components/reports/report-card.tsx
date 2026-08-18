@@ -73,7 +73,7 @@ export async function ReportCard({ report }: ReportCardProps) {
 
   return (
     <Link href={`/reports/${report.id}`} className="group block">
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
 
         {/* Optional image */}
         {report.imageUrl && (

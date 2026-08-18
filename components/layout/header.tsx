@@ -137,7 +137,7 @@ export function Header() {
               <>
                 {/* Kattintás bárhová: bezárás */}
                 <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                <div className="absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+                <div className="absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
                   {SECONDARY_LINKS.map((l) => (
                     <Link
                       key={l.href}
@@ -168,7 +168,7 @@ export function Header() {
               <Globe className="h-4 w-4" />
             </button>
             {langMenuOpen && (
-              <div className="absolute right-0 mt-2 w-40 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-40 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
                 {routing.locales.map((loc) => (
                   <button
                     key={loc}
@@ -222,7 +222,7 @@ export function Header() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg z-50">
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
                     <div className="px-4 pb-2 pt-2">
                       <p className="truncate text-sm font-semibold text-gray-800">{session.user?.name}</p>
                       <p className="truncate text-xs text-gray-500">{session.user?.email}</p>

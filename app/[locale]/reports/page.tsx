@@ -107,7 +107,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
         )}
 
         {/* Filters */}
-        <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-3">
             {/* Type filters */}
             <div className="flex flex-wrap gap-2">

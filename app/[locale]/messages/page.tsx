@@ -89,7 +89,7 @@ export default async function MessagesPage() {
         </div>
 
         {conversations.length === 0 ? (
-          <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
             <PawPrint className="mx-auto h-10 w-10 text-gray-300" />
             <p className="mt-3 text-gray-500">{t("empty")}</p>
             <Link

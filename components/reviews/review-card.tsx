@@ -39,7 +39,7 @@ export function ReviewCard({ review, currentUserId }: ReviewCardProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href={`/users/${review.author.id}`}>

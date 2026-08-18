@@ -323,7 +323,7 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <span>
@@ -385,7 +385,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
           </p>
 
           {/* TOC */}
-          <nav className="mt-8 rounded-2xl border border-gray-100 bg-gray-50 px-5 py-4">
+          <nav className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tartalom</p>
             <ol className="space-y-1.5 text-sm text-brand-600">
               {[
@@ -415,7 +415,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
 
           <P>
             Kérjük, olvassa el figyelmesen jelen Általános Szerződési Feltételeket (ÁSZF), mielőtt
@@ -466,7 +466,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
               { Icon: CreditCard, title: "Adományozás",             desc: "Egyszeri adományok és havi előfizetések menhelyek támogatására kampányokon keresztül." },
               { Icon: FileText,   title: "Önkéntesség & befogadás", desc: "Önkéntesi jelentkezés és ideiglenes befogadói profil létrehozása menhelyeknél." },
             ].map(({ Icon, title, desc }) => (
-              <div key={title} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
+              <div key={title} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-100">
                   <Icon className="h-4 w-4 text-brand-600" />
                 </div>
@@ -711,7 +711,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
 
           {/* 12 */}
           <div id="s12"><SectionHeading number="12" title="Irányadó jog és joghatóság" /></div>
-          <div className="mt-4 flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
             <Scale className="mt-0.5 h-5 w-5 shrink-0 text-brand-500" />
             <div className="text-sm text-gray-600">
               <p className="font-semibold text-gray-800">Magyar jog irányadó</p>

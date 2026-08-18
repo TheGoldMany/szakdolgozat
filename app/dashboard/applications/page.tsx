@@ -125,7 +125,7 @@ export default async function DashboardApplicationsPage({
             const formFilled   = app._count.responses > 0;
 
             return (
-              <div key={app.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div key={app.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row">
 
                   {/* Állat kép */}

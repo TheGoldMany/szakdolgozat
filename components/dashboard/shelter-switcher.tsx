@@ -36,7 +36,7 @@ export function ShelterSwitcher({ options, shelterId }: Props) {
   const busy = saving || pending;
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
       <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
         <Building2 className="h-3 w-3" />
         Kezelt menhely

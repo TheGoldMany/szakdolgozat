@@ -89,7 +89,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         {subscriptions.length === 0 ? (
           <p className="px-5 py-8 text-sm text-gray-400">{t("subscriptionsEmpty")}</p>
         ) : (

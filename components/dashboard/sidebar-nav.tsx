@@ -100,7 +100,7 @@ export function SidebarNav({ role }: { role: string }) {
     .filter(g => g.items.length > 0);
 
   return (
-    <nav className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+    <nav className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
       {groups.map((group, gi) => (
         <div key={gi} className={cn(gi > 0 && "mt-4")} data-tour={group.tourKey}>
           {group.titleKey && (

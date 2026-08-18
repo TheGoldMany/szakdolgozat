@@ -128,7 +128,7 @@ export function AnimalDocuments({
           {docs.map((doc) => (
             <div
               key={doc.id}
-              className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
+              className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100">

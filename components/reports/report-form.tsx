@@ -233,7 +233,7 @@ export function ReportForm() {
       </div>
 
       {/* Kapcsolattartó */}
-      <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-4">
+      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-4">
         <p className="text-sm font-semibold text-gray-700">{t("formContactSection")}</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>

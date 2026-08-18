@@ -19,7 +19,7 @@ export function TodoWidget({ items }: { items: TodoItem[] }) {
   const total  = active.reduce((s, i) => s + i.count, 0);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
         <div className="flex items-center gap-2">
           <ListChecks className="h-4 w-4 text-brand-500" />

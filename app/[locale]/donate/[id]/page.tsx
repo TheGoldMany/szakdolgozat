@@ -144,7 +144,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Description */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("aboutCampaign")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
                 {campaign.description}
@@ -152,7 +152,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Recent donations */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-4 text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-400" />
                 {t("recentDonations")}
@@ -188,7 +188,7 @@ export default async function CampaignDetailPage({
           <div className="space-y-5">
 
             {/* Progress card */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="mb-1 flex items-end justify-between">
                 <span className="text-2xl font-bold text-brand-600">{formatHUF(campaign.raisedAmount)}</span>
                 <span className="text-sm text-gray-400">/ {formatHUF(campaign.targetAmount)}</span>
@@ -206,7 +206,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Donate form */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-4 text-base font-semibold text-gray-900">{t("donateNow")}</h2>
               <DonateForm campaignId={campaign.id} />
             </div>

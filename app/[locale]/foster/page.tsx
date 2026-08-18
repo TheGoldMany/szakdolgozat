@@ -46,7 +46,7 @@ export default async function FosterPage() {
       ) : (
         <div className="space-y-4">
           {profiles.map(p => (
-            <div key={p.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div key={p.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link href={`/shelters/${p.shelter.slug}`}
                   className="font-bold text-gray-900 hover:text-brand-600">

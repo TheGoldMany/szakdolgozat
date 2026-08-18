@@ -87,7 +87,7 @@ export default async function FormsPage() {
           {forms.map((form) => (
             <div
               key={form.id}
-              className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm flex items-center justify-between gap-4"
+              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center justify-between gap-4"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

@@ -278,7 +278,7 @@ export default async function HomePage() {
               { Icon: ClipboardList, title: t("step2Title"), desc: t("step2Desc"), step: "2" },
               { Icon: HandHeart,     title: t("step3Title"), desc: t("step3Desc"), step: "3" },
             ].map(({ Icon, title, desc, step }) => (
-              <div key={step} className="relative rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div key={step} className="relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                 <span className="absolute right-4 top-4 text-3xl font-black text-gray-100">{step}</span>
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
                   <Icon className="h-5 w-5 text-brand-500" />

@@ -231,7 +231,7 @@ export default async function DashboardPage() {
         {/* Charts row */}
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Donut chart */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAnimalsByStatusTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartAnimalsByStatusSubtitle")}</p>
             {animalStatusData.length > 0
@@ -241,7 +241,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Applications bar chart */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-3">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-3">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsMonthlyTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <ApplicationsBar data={appsChartData} />
@@ -251,7 +251,7 @@ export default async function DashboardPage() {
         {/* Adoptions trend + donations */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Adoptions line */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAdoptionsTrendTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <AdoptionsLine data={adoptionMonths.map(m => ({ month: m.month, adoptions: m.count }))} />
@@ -259,14 +259,14 @@ export default async function DashboardPage() {
 
           {/* Donations + subs */}
           <div className="space-y-4">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <p className="text-xs font-medium text-gray-500">{t("donationsCollectedLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-emerald-700">
                 {(donationsAgg._sum.amount ?? 0).toLocaleString("hu-HU")}
                 <span className="ml-1 text-sm font-medium text-gray-400">HUF</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <p className="text-xs font-medium text-gray-500">{t("activeSubscribersLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-purple-700">{activeSubsCount}</p>
               <Link href="/dashboard/subscriptions"
@@ -295,7 +295,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent applications */}
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
             <Link href="/dashboard/applications" className="text-xs font-medium text-brand-500 hover:underline">
@@ -459,7 +459,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Platform health */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-sm font-bold text-gray-900">{t("platformHealthTitle")}</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl bg-green-50 p-3.5">
@@ -506,14 +506,14 @@ export default async function DashboardPage() {
       </div>
 
       {/* Applications chart */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsPlatformTitle")}</h2>
         <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
         <ApplicationsBar data={appsChartData} />
       </div>
 
       {/* Recent applications table */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="border-b border-gray-100 px-5 py-4">
           <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
         </div>
@@ -555,7 +555,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent donations */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="border-b border-gray-100 px-5 py-4">
           <h2 className="text-sm font-semibold text-gray-700">{t("recentDonationsTitle")}</h2>
         </div>

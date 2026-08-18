@@ -86,7 +86,7 @@ function VolunteerCard({ vol }: { vol: VolunteerEntry }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-start gap-3 p-5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-500">
           {(vol.user.name ?? vol.user.email)[0].toUpperCase()}
@@ -169,7 +169,7 @@ function VolunteerCard({ vol }: { vol: VolunteerEntry }) {
               </div>
 
               {vol.attendances.length > 0 && (
-                <div className="mt-2 rounded-xl border border-gray-100 divide-y divide-gray-50 overflow-hidden">
+                <div className="mt-2 rounded-xl border border-gray-200 divide-y divide-gray-50 overflow-hidden">
                   {vol.attendances.slice(0, 5).map(a => (
                     <div key={a.id} className="flex items-center justify-between px-3 py-2 text-xs">
                       <span className="text-gray-500">{new Date(a.date).toLocaleDateString("hu-HU", { month: "short", day: "numeric" })}</span>
@@ -201,7 +201,7 @@ function TaskCard({ task }: { task: TaskEntry }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">

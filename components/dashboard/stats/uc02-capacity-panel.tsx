@@ -57,7 +57,7 @@ export function Uc02CapacityPanel({ avgStayBySpecies, stayCategories, shelterUti
   const stayBarData = stayCategories.map((c) => ({ name: c.label, db: c.count }));
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
       <div>
         <h2 className="text-sm font-semibold text-gray-700">UC-02 · Kapacitás és tartózkodási idők</h2>
         <p className="text-xs text-gray-400 mt-0.5">Menhelyi kihasználtság és befogadási átlagok</p>

@@ -183,7 +183,7 @@ function Pagination({
         ← {t("prevPage")}
       </a>
 
-      <span className="rounded-xl border border-gray-100 bg-white px-4 py-2.5 text-sm font-medium text-gray-500 shadow-sm">
+      <span className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-500 shadow-sm">
         {t("page", { current: page, total: totalPages })}
       </span>
 

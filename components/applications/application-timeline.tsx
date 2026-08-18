@@ -74,7 +74,7 @@ export function ApplicationTimeline({ status, createdAt, reviewedAt }: Props) {
   }
 
   return (
-    <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h2 className="mb-4 text-sm font-semibold text-gray-700">A kérelem állapota</h2>
       <ol className="relative border-l border-gray-200 pl-6">
         {nodes.map((n, i) => {

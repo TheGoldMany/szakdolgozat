@@ -117,7 +117,7 @@ export default async function ApplicationDetailPage({
       )}
 
       {/* Header card */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
             <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
@@ -203,7 +203,7 @@ export default async function ApplicationDetailPage({
 
       {/* Form responses */}
       {app.responses.length > 0 && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
           <h2 className="font-semibold text-gray-900">
             {t("appDetailFilledForm")}
             {app.form && (
@@ -228,7 +228,7 @@ export default async function ApplicationDetailPage({
                       <img
                         src={resp.fileUrl}
                         alt={resp.field.label}
-                        className="max-w-sm rounded-xl border border-gray-100 object-cover"
+                        className="max-w-sm rounded-xl border border-gray-200 object-cover"
                       />
                     </a>
                   ) : (
@@ -260,7 +260,7 @@ export default async function ApplicationDetailPage({
       )}
 
       {app.reviewNotes && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="mb-2 font-semibold text-gray-900">{t("appDetailAdminNote")}</h2>
           <p className="text-sm text-gray-600">{app.reviewNotes}</p>
         </div>

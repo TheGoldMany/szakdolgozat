@@ -68,7 +68,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
       {campaigns.map((c) => (
         <div
           key={c.id}
-          className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 space-y-1.5 flex-1">

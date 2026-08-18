@@ -7,7 +7,7 @@ import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-
 
 // A recharts-alapú panelek lazy-load-dal (a ~100KB chart bundle csak igény szerint töltődik)
 const chartFallback = (
-  <div className="h-72 animate-pulse rounded-2xl border border-gray-100 bg-white shadow-sm" />
+  <div className="h-72 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
 );
 const Uc01AdoptionsTrend = dynamic(() => import("./stats/uc01-adoptions-trend").then((m) => m.Uc01AdoptionsTrend), { loading: () => chartFallback });
 const Uc02CapacityPanel  = dynamic(() => import("./stats/uc02-capacity-panel").then((m) => m.Uc02CapacityPanel),   { loading: () => chartFallback });
@@ -186,7 +186,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
 
       {/* Shelter filter panel — super admin only */}
       {isSuperAdmin && filterOpen && (
-        <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <button
               onClick={selectAll}

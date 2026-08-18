@@ -59,7 +59,7 @@ function AdminApptCard({ appt }: { appt: AdminAppointment }) {
   const displayTime = appt.confirmedAt ?? appt.proposedAt;
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-2">

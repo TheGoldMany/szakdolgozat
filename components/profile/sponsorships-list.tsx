@@ -44,7 +44,7 @@ export function SponsorshipsList({ sponsorships }: { sponsorships: Sponsorship[]
     <div className="space-y-3">
       {error && <p className="text-sm text-red-500">{error}</p>}
       {sponsorships.map((s) => (
-        <div key={s.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+        <div key={s.id} className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
           <div className="text-sm">
             <p className="flex items-center gap-1.5 font-medium text-gray-800">
               <Heart className="h-3.5 w-3.5 text-pink-500" />

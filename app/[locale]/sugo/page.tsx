@@ -114,7 +114,7 @@ function Note({ type = "info", children }: { type?: "info" | "warn" | "tip"; chi
 
 function QuickLink({ icon: Icon, label, href }: { icon: React.ElementType; label: string; href: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm hover:border-brand-200 hover:shadow-md transition-all">
+    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm hover:border-brand-200 hover:shadow-md transition-all">
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50">
           <Icon className="h-4 w-4 text-brand-600" />
@@ -196,7 +196,7 @@ function UserContent() {
         <p className="text-sm text-gray-600 leading-relaxed">
           A platform automatikusan értesít az összes fontos eseményről. Az értesítések a fejlécben a csengő ikon mellett jelennek meg.
         </p>
-        <div className="mt-4 space-y-3 rounded-xl border border-gray-100 bg-white p-4">
+        <div className="mt-4 space-y-3 rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Mit vált ki értesítést?</p>
           {[
             { icon: CheckCircle2, color: "text-green-500", label: "Kérelmed jóváhagyták" },
@@ -642,7 +642,7 @@ function AdminContent() {
         <p className="text-sm text-gray-600 leading-relaxed">
           Az admin a saját menhelyére vonatkozó összes fontos eseményről értesítést kap.
         </p>
-        <div className="mt-3 space-y-3 rounded-xl border border-gray-100 bg-white p-4">
+        <div className="mt-3 space-y-3 rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Admin értesítések típusai</p>
           {[
             { icon: FileText,      color: "text-blue-500",   label: "Új örökbefogadási kérelem érkezett" },
@@ -756,7 +756,7 @@ function AdminContent() {
         <p className="text-sm text-gray-600 leading-relaxed">
           A dashboard alján négy analitikai panel segíti a döntéshozatalt:
         </p>
-        <div className="mt-3 space-y-3 rounded-xl border border-gray-100 bg-white p-4 text-sm">
+        <div className="mt-3 space-y-3 rounded-xl border border-gray-200 bg-white p-4 text-sm">
           {[
             { title: "UC-01 Örökbefogadási trend", desc: "Havi lebontásban mutatja, hány állat lett örökbe fogadva, fajonkénti bontásban. Területdiagram + fajta-donut." },
             { title: "UC-02 Kapacitáskihasználtság", desc: "Menhelyenként mutatja az aktuális kihasználtságot a férőhelyek százalékában. Tartózkodási idő-histogram + SVG mérőóra." },
@@ -1145,7 +1145,7 @@ export default function HelpPage() {
 
           {/* Sticky TOC */}
           <aside className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Tartalom</p>
               <nav className="space-y-0.5">
                 {toc.map(({ id, label, icon: Icon }) => (

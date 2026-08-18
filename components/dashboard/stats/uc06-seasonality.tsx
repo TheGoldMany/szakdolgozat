@@ -37,7 +37,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
   const total = byQuarter.reduce((s, r) => s + r.count, 0);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-gray-700">UC-06 &middot; Szezonalitás és adatfrissesség</h2>
@@ -61,7 +61,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
 
       {/* ETL freshness banner */}
       {dwhAvailable && (
-        <div className="flex flex-wrap items-center gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-brand-500" />
             <div>
@@ -140,14 +140,14 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
 
           {/* Kiemelt mutatok */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
               <CalendarDays className="h-5 w-5 text-amber-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{weekendPct != null ? `${weekendPct}%` : "–"}</p>
                 <p className="text-[10px] text-gray-400">hétvégén történt adoptáció</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
               <PartyPopper className="h-5 w-5 text-purple-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{holidayCount}</p>

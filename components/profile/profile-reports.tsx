@@ -73,7 +73,7 @@ export function ProfileReports({ reports }: Props) {
       {reports.map((r) => {
         const Icon = TYPE_ICON[r.type];
         return (
-          <li key={r.id} className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
+          <li key={r.id} className="overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
             <div className="flex gap-3 p-3">
               {/* Photo */}
               <Link

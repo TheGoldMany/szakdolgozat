@@ -240,7 +240,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
   return (
     <>
       {/* ── Desktop: oldalsáv (lg+) ─────────────────────────── */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm lg:block">
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:block">
         <div className="space-y-5 p-5">
           <h2 className="text-sm font-bold text-gray-800">{t("filterLabel")}</h2>
           {controls}

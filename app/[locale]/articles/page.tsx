@@ -65,7 +65,7 @@ export default async function ArticlesListPage() {
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
                   {article.imageUrl ? (

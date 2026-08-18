@@ -77,7 +77,7 @@ export function FosterApplyButton({ shelterId, existingStatus }: Props) {
           {t("applyButton")}
         </button>
       ) : (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-800">{t("formTitle")}</p>
             <button type="button" onClick={() => setOpen(false)}

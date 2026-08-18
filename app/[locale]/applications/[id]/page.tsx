@@ -75,7 +75,7 @@ export default async function UserApplicationDetailPage({
         </Link>
 
         {/* Animal + status */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="flex gap-4 p-5">
             <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
               <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
@@ -132,7 +132,7 @@ export default async function UserApplicationDetailPage({
 
         {/* Submitted form responses */}
         {app.responses.length > 0 ? (
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
             <h2 className="font-semibold text-gray-900">
               {t("filledForm")}
               {app.form && (
@@ -154,7 +154,7 @@ export default async function UserApplicationDetailPage({
                         <img
                           src={resp.fileUrl}
                           alt={resp.field.label}
-                          className="max-w-sm rounded-xl border border-gray-100 object-cover"
+                          className="max-w-sm rounded-xl border border-gray-200 object-cover"
                         />
                       </a>
                     ) : (

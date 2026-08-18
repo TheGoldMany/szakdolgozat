@@ -17,7 +17,7 @@ export function KpiCard({ label, value, icon: Icon, iconBg, iconColor, trend, su
   const trendNeutral  = trend && trend.value === 0;
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-gray-500">{label}</p>

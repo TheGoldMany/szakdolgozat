@@ -47,7 +47,7 @@ export default async function ShelterSettingsPage() {
 
   if (!shelter) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
         {acting.canSwitch
           ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval a beállítások szerkesztéséhez."
           : t("settingsNoShelter")}

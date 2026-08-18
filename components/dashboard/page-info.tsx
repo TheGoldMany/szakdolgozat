@@ -242,7 +242,7 @@ export function PageInfo({ page, className }: { page: string; className?: string
       </button>
 
       {open && (
-        <div className="absolute left-0 top-8 z-50 w-80 rounded-2xl border border-gray-100 bg-white p-5 shadow-xl sm:w-96">
+        <div className="absolute left-0 top-8 z-50 w-80 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl sm:w-96">
           <div className="mb-3 flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50">

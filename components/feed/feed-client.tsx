@@ -61,7 +61,7 @@ function Rail({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-50 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className={cn("flex h-7 w-7 items-center justify-center rounded-lg", iconColor)}>
@@ -84,7 +84,7 @@ function AnimalCard({ a }: { a: AnimalRailItem }) {
   return (
     <Link
       href={`/animals/${a.slug}`}
-      className="flex w-36 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-gray-50 transition-shadow hover:shadow-md"
+      className="flex w-36 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 transition-shadow hover:shadow-md"
     >
       <div className="relative h-32 w-full bg-gray-100">
         {a.imageUrl
@@ -115,7 +115,7 @@ function CampaignCard({ c }: { c: CampaignRailItem }) {
   const label  = c.shelter?.name ?? c.user?.name ?? null;
 
   return (
-    <div className="flex w-48 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-md">
+    <div className="flex w-48 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
       <Link href={`/donate/${c.id}`} className="block">
         <div className="relative h-28 w-full bg-gradient-to-br from-pink-400 to-rose-600">
           {c.imageUrl
@@ -156,7 +156,7 @@ function EventCard({ e }: { e: EventRailItem }) {
   const month = date.toLocaleDateString("hu-HU", { month: "short" });
 
   return (
-    <div className="flex w-52 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white transition-shadow hover:shadow-md">
+    <div className="flex w-52 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
       <Link href={`/events/${e.slug}`} className="flex gap-3 p-3">
         {/* Calendar day block */}
         <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center overflow-hidden rounded-xl bg-purple-50 text-purple-700">
@@ -183,7 +183,7 @@ function ReportCard({ r }: { r: ReportRailItem }) {
   return (
     <Link
       href={`/reports/${r.id}`}
-      className="flex w-36 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-100 transition-shadow hover:shadow-md"
+      className="flex w-36 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 transition-shadow hover:shadow-md"
     >
       <div className="relative h-28 w-full bg-gray-100">
         {r.imageUrl

@@ -99,7 +99,7 @@ export default async function ApplicationsPage() {
               return (
                 <div
                   key={app.id}
-                  className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm"
+                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
                 >
                   <div className="flex gap-4 p-4">
                     <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
