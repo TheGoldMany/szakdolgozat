@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Menu, X, PawPrint, MessageCircle, Globe } from "lucide-react";
+import { Menu, X, PawPrint, MessageCircle, Globe, ChevronDown } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -35,16 +35,21 @@ export function Header() {
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [moreOpen,     setMoreOpen]     = useState(false);
   const [unread,       setUnread]       = useState(0);
 
-  const NAV_LINKS = [
-    { href: "/animals",  label: t("animals")  },
+  // A négy fő belépési pont mindig látszik; a többi a "Továbbiak" alá kerül,
+  // hogy a fejléc ne mossa össze a fontosat a ritkán használttal.
+  const PRIMARY_LINKS = [
+    { href: "/animals", label: t("animals") },
+    { href: "/donate",  label: t("donate")  },
+    { href: "/map",     label: t("map")     },
+    { href: "/reports", label: t("reports") },
+  ];
+  const SECONDARY_LINKS = [
     { href: "/shelters", label: t("shelters") },
     { href: "/events",   label: t("events")   },
     { href: "/articles", label: t("articles") },
-    { href: "/reports",  label: t("reports")  },
-    { href: "/map",      label: t("map")      },
-    { href: "/donate",   label: t("donate")   },
   ];
 
   // Prevent body scroll while mobile menu is open
@@ -108,7 +113,7 @@ export function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 md:flex">
-          {NAV_LINKS.map((l) => (
+          {PRIMARY_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -117,6 +122,36 @@ export function Header() {
               {l.label}
             </Link>
           ))}
+
+          {/* Másodlagos menüpontok */}
+          <div className="relative">
+            <button
+              onClick={() => setMoreOpen((v) => !v)}
+              className="flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-brand-500"
+              aria-expanded={moreOpen}
+            >
+              {t("more")}
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", moreOpen && "rotate-180")} />
+            </button>
+            {moreOpen && (
+              <>
+                {/* Kattintás bárhová: bezárás */}
+                <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+                <div className="absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+                  {SECONDARY_LINKS.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setMoreOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </nav>
 
         {/* Desktop right side */}
@@ -261,9 +296,18 @@ export function Header() {
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-4 py-3">
               <nav className="flex flex-col gap-0.5">
-                {NAV_LINKS.map((l) => (
+                {PRIMARY_LINKS.map((l) => (
                   <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
                     className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                    {l.label}
+                  </Link>
+                ))}
+
+                <hr className="my-3 border-gray-100" />
+                <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("more")}</p>
+                {SECONDARY_LINKS.map((l) => (
+                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2.5 text-sm text-gray-600 hover:bg-gray-50 active:bg-gray-100">
                     {l.label}
                   </Link>
                 ))}
