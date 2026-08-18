@@ -4,6 +4,41 @@ import Stripe from "stripe";
 export { MIN_DONATION_HUF } from "@/lib/donation-limits";
 
 /**
+ * A bankkivonaton megjelenő megnevezés utótagja.
+ *
+ * A „nem ismerem fel ezt a tételt" a visszaterhelések első számú oka, és
+ * destination charge-nál a visszaterhelés a PLATFORM egyenlegét üti – ezért ez
+ * nem kozmetika, hanem kockázatcsökkentés.
+ *
+ * Miért utótag (`statement_descriptor_suffix`) és nem teljes descriptor? Ha a
+ * Stripe-fiókon be van állítva előtag, a teljes `statement_descriptor` átadása
+ * hibát dob. Az utótag mindkét esetben működik: előtaggal összefűződik,
+ * anélkül a fiók alapértelmezettjéhez adódik.
+ *
+ * FONTOS: a fiókszintű előtagot a Stripe Dashboardon kell beállítani
+ * (Settings → Business → Public details). Előfizetéseknél a Stripe kizárólag
+ * azt használja, mert a `subscription_data` nem fogad descriptort.
+ *
+ * Stripe korlátok: rövid, ékezet nélküli, a < > \\ ' " * karakterek tiltottak.
+ */
+export const STATEMENT_SUFFIX = "MENHELY";
+
+/**
+ * Bankkivonatra alkalmas szöveg: ékezetek nélkül, csak betű/szám/szóköz,
+ * a Stripe hosszkorlátjára vágva.
+ */
+export function toStatementSuffix(text: string): string {
+  const clean = text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Za-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 20);
+  return clean.length >= 5 ? clean : STATEMENT_SUFFIX;
+}
+
+/**
  * Platform fee taken from every payment (donations + subscriptions).
  * The remainder is transferred in full to the connected account (shelter /
  * campaign owner). Change this single value to adjust the platform's cut.

@@ -142,6 +142,41 @@ A Stripe Checkout sikeres, az átirányítás a `/hu/donate/success` oldalra meg
 
 ---
 
+
+## Stripe webhook – bekapcsolandó események
+
+A `/api/webhooks/stripe` végpont az alábbi eseményeket dolgozza fel. Ha valamelyik
+nincs bekapcsolva a Stripe Dashboardon (Developers → Webhooks → az endpoint →
+*Select events*), a hozzá tartozó működés csendben elmarad – nem hibát dob, hanem
+egyszerűen nem történik meg.
+
+| Esemény | Mi történik nélküle |
+|---|---|
+| `checkout.session.completed` | Az adomány/előfizetés nem jön létre. A siker-oldal részben pótolja, de csak ha a felhasználó visszatér. |
+| `checkout.session.expired` | Az elkezdett, ki nem fizetett adományok szellemsorként ottmaradnak az adatbázisban. |
+| `invoice.payment_succeeded` | **A havi megújítások nem kerülnek könyvelésre.** A pénz megérkezik, de sem a menhely, sem a platform nem látja. |
+| `invoice.payment_failed` | A lejárt kártyás előfizető nem kerül `PAST_DUE`-ba, és nem kap értesítést. |
+| `customer.subscription.updated` | A Stripe-nál végzett státuszváltás nem tükröződik nálunk. |
+| `customer.subscription.deleted` | A lemondott előfizetés aktívnak látszik tovább. |
+| `charge.refunded` | **A visszatérített adomány bennmarad a gyűjtés összegében.** |
+| `charge.dispute.created` | A visszaterhelésről nem kap értesítést a super admin, így lemaradhat a bizonyítás határidejéről. |
+| `charge.dispute.updated` | A vita állapota nem frissül a naplóban. |
+
+### Miért fontos a `charge.dispute.*`
+
+Destination charge-nál a vitatott összeg **és** a Stripe vitadíja is a platform
+egyenlegét terheli, akkor is, ha a pénz már a gyűjtőnél van. Ez a rendszer
+legdrágább eseménye, ezért a super adminok azonnal értesítést kapnak róla, és a
+vitatott tételek a `/dashboard/audit` tetején is megjelennek.
+
+### Bankkivonaton megjelenő név
+
+Az egyszeri adományoknál a kód `statement_descriptor_suffix`-et állít be a
+gyűjtés címéből. Előfizetéseknél a Stripe kizárólag a **fiókszintű** beállítást
+használja, amit a Stripe Dashboardon kell megadni (Settings → Business →
+Public details). Enélkül a támogató egy ismeretlen nevet lát a kivonatán, ami a
+visszaterhelések leggyakoribb kiváltó oka.
+
 ### TC-07-04: Sikeres fizetés után Stripe webhook feldolgozása
 
 | | |

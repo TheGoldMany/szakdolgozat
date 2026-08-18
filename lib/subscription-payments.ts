@@ -10,6 +10,18 @@ import { subscriptionFeePercent, subscriptionPlatformFee } from "@/lib/stripe";
  * alatt van. A régi, lapos alakot is megnézzük, hogy a korábbi API-verzióval
  * rögzített, újraküldött események se essenek ki.
  */
+/**
+ * A számlához tartozó PaymentIntent azonosítója.
+ * A visszatérítés (`charge.refunded`) ez alapján találja meg a terhelést.
+ */
+export function invoicePaymentIntentId(invoice: Stripe.Invoice): string | null {
+  for (const payment of invoice.payments?.data ?? []) {
+    const pi = payment.payment?.payment_intent;
+    if (pi) return typeof pi === "string" ? pi : pi.id;
+  }
+  return null;
+}
+
 export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   const nested = invoice.parent?.subscription_details?.subscription;
   if (nested) return typeof nested === "string" ? nested : nested.id;
@@ -73,6 +85,7 @@ export async function recordSubscriptionPayment(
     data: [{
       stripeInvoiceId: invoiceId,
       stripeSubId,
+      stripePaymentIntentId: invoicePaymentIntentId(invoice),
       subscriptionId:  subscription?.id ?? null,
       sponsorshipId:   sponsorship?.id ?? null,
       totalPaid,

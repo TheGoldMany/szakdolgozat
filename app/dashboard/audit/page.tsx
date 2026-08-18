@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ScrollText, Ban, RotateCcw, Trash2, UserCog, BadgeCheck, BadgeX, HandHeart, FileText, type LucideIcon } from "lucide-react";
+import { ScrollText, Ban, RotateCcw, Trash2, UserCog, BadgeCheck, BadgeX, HandHeart, FileText, AlertTriangle, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AuditAction } from "@prisma/client";
 
@@ -45,6 +45,13 @@ export default async function AuditPage({
 
   const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
 
+  // Vitatott tételek: ezek a platform egyenlegét terhelik, ezért a napló
+  // tetején, nem a bejegyzések közé keverve jelennek meg.
+  const disputes = await prisma.paymentDispute.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
   const [entries, total] = await Promise.all([
     prisma.auditLog.findMany({
       orderBy: { createdAt: "desc" },
@@ -69,6 +76,36 @@ export default async function AuditPage({
           Ki, mit és mikor módosított a platformon. A bejegyzések nem szerkeszthetők.
         </p>
       </div>
+
+      {disputes.length > 0 && (
+        <section className="rounded-2xl border border-red-200 bg-red-50 p-4">
+          <h2 className="mb-1 flex items-center gap-2 text-sm font-bold text-red-800">
+            <AlertTriangle className="h-4 w-4" />
+            Vitatott fizetések ({disputes.length})
+          </h2>
+          <p className="mb-3 text-xs text-red-700">
+            A vitatott összeg és a Stripe vitadíja is a platform egyenlegét terheli.
+            A Stripe Dashboardon határidőre bizonyítékot kell feltölteni.
+          </p>
+          <ul className="space-y-2">
+            {disputes.map((d) => (
+              <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-white px-3 py-2 text-xs">
+                <span className="font-bold text-gray-900">
+                  {d.amount.toLocaleString("hu-HU")} Ft
+                </span>
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 font-medium text-gray-600">{d.status}</span>
+                <span className="text-gray-500">{d.reason}</span>
+                <span className="ml-auto text-gray-400">
+                  {new Date(d.createdAt).toLocaleString("hu-HU", {
+                    year: "numeric", month: "short", day: "numeric",
+                    hour: "2-digit", minute: "2-digit",
+                  })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {entries.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gray-200 py-16 text-center">

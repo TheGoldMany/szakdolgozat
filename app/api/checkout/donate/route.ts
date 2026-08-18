@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, MIN_DONATION_HUF } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, MIN_DONATION_HUF, toStatementSuffix } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { blockIfSuspended } from "@/lib/account-status";
 
@@ -153,6 +153,9 @@ export async function POST(req: NextRequest) {
       metadata:    { donationId: donation.id },
       ...(connectedAccountId && {
         payment_intent_data: {
+          // A bankkivonaton felismerhető legyen, kire költött a támogató.
+          statement_descriptor_suffix: toStatementSuffix(campaign.title),
+          description: `Adomány – ${campaign.title}`,
           // application_fee_amount must cover both platform fee AND the Stripe
           // processing fee we collected from the donor, so that the shelter
           // receives exactly `amount` and not amount + stripe_fee_line_item.

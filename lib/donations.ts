@@ -20,12 +20,18 @@ import { createNotifications } from "@/lib/notifications";
  * @returns `firstFulfilment` = igaz, ha most ez a hívás zárta le a fizetést.
  */
 export async function fulfillDonation(
-  donationId: string
+  donationId: string,
+  /** A Stripe PaymentIntent azonosítója – enélkül a visszatérítést nem lehetne
+   *  visszavezetni erre az adományra. */
+  paymentIntentId?: string | null
 ): Promise<{ donation: Donation | null; firstFulfilment: boolean }> {
   return prisma.$transaction(async (tx) => {
     const claimed = await tx.donation.updateMany({
       where: { id: donationId, paidAt: null },
-      data:  { paidAt: new Date() },
+      data:  {
+        paidAt: new Date(),
+        ...(paymentIntentId ? { stripePaymentIntentId: paymentIntentId } : {}),
+      },
     });
 
     const donation = await tx.donation.findUnique({ where: { id: donationId } });

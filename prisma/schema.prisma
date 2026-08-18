@@ -770,7 +770,14 @@ model Donation {
   message         String?   @db.Text
   isAnonymous     Boolean   @default(false)
   stripeSessionId String?   @unique
+  /// A Stripe PaymentIntent azonosítója. Enélkül egy `charge.refunded`
+  /// eseményt nem lehetne visszavezetni erre az adományra.
+  stripePaymentIntentId String? @unique
   paidAt          DateTime?
+  /// Visszatérítés esetén: mikor és mennyi (HUF). Részleges visszatérítésnél
+  /// az összeg kevesebb, mint az adomány.
+  refundedAt      DateTime?
+  refundedAmount  Int       @default(0)
   createdAt       DateTime  @default(now())
 
   user     User?     @relation("DonationUser", fields: [userId], references: [id], onDelete: SetNull)
@@ -1046,6 +1053,8 @@ enum NotificationType {
   SUBSCRIPTION_STARTED // User: subscription confirmed
   SUBSCRIPTION_CANCELLED // User: subscription cancelled
   SUBSCRIPTION_PAYMENT_FAILED // User: recurring payment failed
+  DONATION_REFUNDED // Admin: a donation was refunded
+  PAYMENT_DISPUTE // Super admin: a payment was disputed (chargeback)
   // Virtual adoption / sponsorship
   SPONSORSHIP_STARTED // User: virtual adoption confirmed
   SPONSOR_UPDATE // Virtual owner: sponsored animal updated (health/photo/adopted)
@@ -1480,11 +1489,46 @@ model SubscriptionPayment {
   /// Ami a menhelyhez / kedvezményezetthez jut (HUF).
   netAmount   Int
 
+  /// A terhelés PaymentIntent azonosítója – a visszatérítés ez alapján
+  /// találja meg a sort.
+  stripePaymentIntentId String? @unique
+
   paidAt    DateTime
+  /// Visszatérítés esetén: mikor és mennyi (HUF).
+  refundedAt     DateTime?
+  refundedAmount Int       @default(0)
   createdAt DateTime @default(now())
 
   @@index([subscriptionId])
   @@index([sponsorshipId])
   @@index([stripeSubId])
   @@index([paidAt])
+}
+
+/// Vitatott tétel (chargeback).
+///
+/// Destination charge-nál a vita a PLATFORM egyenlegét terheli: a visszaterhelt
+/// összeg és a Stripe vitadíja is onnan megy, akkor is, ha a pénz már rég a
+/// gyűjtőnél van. Ezért ezt nem elég naplózni – a super adminnak azonnal tudnia
+/// kell róla, hogy tudjon bizonyítékot feltölteni a Stripe-on.
+model PaymentDispute {
+  id             String   @id @default(cuid())
+  stripeDisputeId String  @unique
+  stripeChargeId  String
+  stripePaymentIntentId String?
+
+  /// A vitatott összeg (HUF).
+  amount Int
+  reason String
+  status String
+
+  /// Ha sikerült visszavezetni egy adományra vagy havi terhelésre.
+  donationId            String?
+  subscriptionPaymentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
 }
