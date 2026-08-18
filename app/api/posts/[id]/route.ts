@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
-import { slugifyTitle, uniqueArticleSlug } from "@/lib/articles";
+import { slugifyTitle, uniqueArticleSlug, isPublished } from "@/lib/articles";
 
 const patchSchema = z.object({
   title:      z.string().min(3).max(200).optional(),
@@ -61,7 +61,16 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           ? { publishedAt: publishedAt ? new Date(publishedAt) : null }
           : publish === undefined
             ? {}
-            : { publishedAt: publish ? existing.publishedAt ?? new Date() : null }),
+            : {
+                // Publikáláskor a cikknek ténylegesen láthatóvá kell válnia:
+                // a korábbi dátumot csak akkor tartjuk meg, ha az már elmúlt.
+                // Piszkozatnál (null) és időzítettnél (jövőbeli) a jelen idő kell.
+                publishedAt: publish
+                  ? isPublished(existing.publishedAt)
+                    ? existing.publishedAt
+                    : new Date()
+                  : null,
+              }),
       },
     });
     return NextResponse.json(post);
