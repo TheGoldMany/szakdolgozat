@@ -114,14 +114,15 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
       };
       if (publish !== undefined) body.publish = publish;
 
-      // Időzítés: a megadott jövőbeli időpontot küldjük; publikálásnál a mező
-      // ürítése jelenti azt, hogy "most".
+      // A megjelenés időpontját mindig explicit küldjük, mert a szerveren a
+      // `null` azt jelenti: "vissza piszkozatba". Publikálásnál ezért a jelen
+      // időt adjuk meg — így egy időzített cikk is azonnal élővé válik.
       if (mode === "schedule") {
         body.publish = true;
         body.publishedAt = new Date(scheduledAt).toISOString();
       } else if (mode === "publish") {
-        body.publishedAt = null; // a szerver a jelen időt teszi be
         body.publish = true;
+        body.publishedAt = new Date().toISOString();
       }
 
       const res = await fetch(isEdit ? `/api/posts/${article!.id}` : "/api/posts", {
