@@ -41,6 +41,7 @@ export function Header() {
     { href: "/animals",  label: t("animals")  },
     { href: "/shelters", label: t("shelters") },
     { href: "/events",   label: t("events")   },
+    { href: "/articles", label: t("articles") },
     { href: "/reports",  label: t("reports")  },
     { href: "/map",      label: t("map")      },
     { href: "/donate",   label: t("donate")   },

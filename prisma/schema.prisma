@@ -1326,20 +1326,33 @@ model FeedingLog {
 // Community posts (menhelyek közösségi posztjai a "Neked" feedhez)
 // -------------------------------------------------------
 
+/// Cikk (blogbejegyzés). Kizárólag SUPER_ADMIN írhat.
+/// A modell neve történeti okból Post maradt, tartalmilag cikk.
 model Post {
   id         String   @id @default(cuid())
-  shelterId  String
-  authorId   String? // a posztot író menhely-admin (törölt usernél null)
+  /// Opcionális: a cikk egy menhelyhez is köthető, de nem kötelező
+  shelterId  String?
+  authorId   String? // a cikk szerzője (törölt usernél null)
+
+  title      String   @default("")
+  /// URL-barát azonosító a nyilvános cikkoldalhoz
+  slug       String?  @unique
+  /// Rövid bevezető a listákhoz és a megosztásokhoz
+  excerpt    String?  @db.Text
   content    String   @db.Text
   imageUrl   String?
-  // Opcionális hivatkozás egy entitásra, amit a poszt kiemel
+
+  /// Kitöltve = publikált; üresen piszkozat, csak a szerkesztőben látszik
+  publishedAt DateTime?
+
+  // Opcionális hivatkozás egy entitásra, amit a cikk kiemel
   animalId   String?
   eventId    String?
   campaignId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  shelter  Shelter    @relation(fields: [shelterId], references: [id], onDelete: Cascade)
+  shelter  Shelter?   @relation(fields: [shelterId], references: [id], onDelete: SetNull)
   author   User?      @relation("PostAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   animal   Animal?    @relation(fields: [animalId], references: [id], onDelete: SetNull)
   event    Event?     @relation(fields: [eventId], references: [id], onDelete: SetNull)
@@ -1348,6 +1361,7 @@ model Post {
 
   @@index([shelterId])
   @@index([createdAt])
+  @@index([publishedAt])
 }
 
 model PostLike {

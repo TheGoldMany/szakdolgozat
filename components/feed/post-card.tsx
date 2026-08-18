@@ -1,16 +1,21 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import { Building2, Calendar, PawPrint, HandHeart, MapPin } from "lucide-react";
+import { Building2, Calendar, PawPrint, HandHeart, MapPin, Clock, ArrowRight } from "lucide-react";
 import { timeAgo } from "@/lib/utils";
 import { LikeButton } from "@/components/feed/like-button";
 import { ShareButton } from "@/components/ui/share-button";
 
 export interface FeedPost {
   id:        string;
+  title:     string;
+  slug:      string | null;
+  excerpt:   string | null;
   content:   string;
   imageUrl:  string | null;
   createdAt: string;
-  shelter:   { id: string; name: string; slug: string; logoUrl: string | null; city: string };
+  readingMinutes: number;
+  /** A cikk köthető menhelyhez, de nem kötelező. */
+  shelter:   { id: string; name: string; slug: string; logoUrl: string | null; city: string } | null;
   author:    { id: string; name: string | null; image: string | null } | null;
   animal:    { id: string; name: string; slug: string; images: { url: string }[] } | null;
   event:     { id: string; slug: string; title: string; startsAt: string; location: string } | null;
@@ -19,41 +24,80 @@ export interface FeedPost {
   likedByMe: boolean;
 }
 
+/** Cikk-előnézet a hírfolyamban: cím, bevezető és átvezetés a teljes cikkre. */
 export function PostCard({ post }: { post: FeedPost }) {
+  const href = post.slug ? `/articles/${post.slug}` : null;
+  // Bevezető hiányában a szöveg elejét mutatjuk, hogy legyen mit olvasni
+  const lead = post.excerpt ?? (post.content.length > 220 ? `${post.content.slice(0, 220)}…` : post.content);
+
   return (
     <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-      {/* Fejléc: menhely */}
+      {/* Fejléc: szerző, illetve a kapcsolódó menhely, ha van */}
       <div className="flex items-center gap-3 px-4 pt-4">
-        <Link href={`/shelters/${post.shelter.slug}`} className="shrink-0">
-          {post.shelter.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={post.shelter.logoUrl} alt={post.shelter.name} className="h-10 w-10 rounded-full object-cover" />
-          ) : (
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-              <Building2 className="h-5 w-5" />
-            </span>
-          )}
-        </Link>
-        <div className="min-w-0 flex-1">
-          <Link href={`/shelters/${post.shelter.slug}`} className="block truncate text-sm font-semibold text-gray-900 hover:underline">
-            {post.shelter.name}
+        {post.shelter ? (
+          <Link href={`/shelters/${post.shelter.slug}`} className="shrink-0">
+            {post.shelter.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={post.shelter.logoUrl} alt={post.shelter.name} className="h-10 w-10 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+                <Building2 className="h-5 w-5" />
+              </span>
+            )}
           </Link>
-          <p className="truncate text-xs text-gray-500">
-            {post.shelter.city} · {timeAgo(post.createdAt)}
+        ) : (
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+            <PawPrint className="h-5 w-5" />
+          </span>
+        )}
+
+        <div className="min-w-0 flex-1">
+          {post.shelter ? (
+            <Link href={`/shelters/${post.shelter.slug}`} className="block truncate text-sm font-semibold text-gray-900 hover:underline">
+              {post.shelter.name}
+            </Link>
+          ) : (
+            <p className="truncate text-sm font-semibold text-gray-900">
+              {post.author?.name ?? "ÁllatiMenhelyek"}
+            </p>
+          )}
+          <p className="flex items-center gap-1.5 truncate text-xs text-gray-500">
+            {post.shelter ? `${post.shelter.city} · ` : ""}
+            {timeAgo(post.createdAt)}
+            <span className="text-gray-300">·</span>
+            <Clock className="h-3 w-3 shrink-0" />
+            {post.readingMinutes} perc
           </p>
         </div>
       </div>
 
-      {/* Szöveg */}
-      {post.content && (
-        <p className="whitespace-pre-wrap px-4 py-3 text-sm leading-relaxed text-gray-800">{post.content}</p>
-      )}
+      {/* Cím + bevezető */}
+      <div className="px-4 py-3">
+        {href ? (
+          <Link href={href} className="block">
+            <h2 className="text-lg font-bold leading-snug text-gray-900 transition-colors hover:text-brand-600">
+              {post.title}
+            </h2>
+          </Link>
+        ) : (
+          <h2 className="text-lg font-bold leading-snug text-gray-900">{post.title}</h2>
+        )}
+        {lead && <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{lead}</p>}
+      </div>
 
-      {/* Kép */}
+      {/* Borítókép */}
       {post.imageUrl && (
-        <div className="relative aspect-[4/3] w-full bg-gray-50">
-          <Image src={post.imageUrl} alt="" fill className="object-cover" sizes="(max-width:640px) 100vw, 640px" />
-        </div>
+        href ? (
+          <Link href={href} className="block">
+            <div className="relative aspect-[4/3] w-full bg-gray-50">
+              <Image src={post.imageUrl} alt={post.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 640px" />
+            </div>
+          </Link>
+        ) : (
+          <div className="relative aspect-[4/3] w-full bg-gray-50">
+            <Image src={post.imageUrl} alt={post.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 640px" />
+          </div>
+        )
       )}
 
       {/* Hivatkozott entitás kivonata */}
@@ -106,10 +150,22 @@ export function PostCard({ post }: { post: FeedPost }) {
         );
       })()}
 
+      {/* Átvezetés a teljes cikkre */}
+      {href && (
+        <Link href={href}
+          className="mx-4 mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
+          Tovább a cikkre
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+
       {/* Lábléc: kedvelés + megosztás */}
-      <div className="flex items-center justify-between px-2.5 py-2">
+      <div className="mt-2 flex items-center justify-between px-2.5 py-2">
         <LikeButton postId={post.id} initialCount={post._count.likes} initialLiked={post.likedByMe} />
-        <ShareButton url={`/shelters/${post.shelter.slug}`} title={`${post.shelter.name} – ÁllatiMenhelyek.hu`} />
+        <ShareButton
+          url={href ?? "/articles"}
+          title={`${post.title} – ÁllatiMenhelyek.hu`}
+        />
       </div>
     </article>
   );
