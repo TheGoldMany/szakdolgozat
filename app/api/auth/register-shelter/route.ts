@@ -6,6 +6,7 @@ import { shelterRegisterSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { issueVerificationToken } from "@/lib/verification";
 import { createNotifications } from "@/lib/notifications";
+import { ensureShelterDefaults } from "@/lib/shelter-defaults";
 import { geocodeAddress } from "@/lib/geo";
 
 function slugify(text: string) {
@@ -91,6 +92,13 @@ export async function POST(req: NextRequest) {
 
       return { adminUser, shelter };
     });
+
+    // Fix havi csomagok + állandó „Általános támogatás" gyűjtés.
+    // A tranzakción kívül fut: ha elakadna, a menhely regisztrációja akkor is
+    // sikerüljön – a visszatöltő végpont bármikor pótolja.
+    ensureShelterDefaults(shelter.id).catch((err) =>
+      console.error("[shelter register] ensureShelterDefaults:", err)
+    );
 
     // Email-megerősítő token + email (nem blokkoló)
     issueVerificationToken(d.email, d.adminName).catch((err) => {

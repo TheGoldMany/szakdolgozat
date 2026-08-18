@@ -238,7 +238,8 @@
     "volunteer": "Önkénteskedj nálunk",
     "volunteerDesc": "Segíts a menhelyen önkéntesként – sétáltatás, állatgondozás és rendezvényszervezés várja a segítőket.",
     "foster": "Légy ideiglenes befogadó",
-    "fosterDesc": "Segíts egy állaton anélkül, hogy véglegesen örökbe fogadnád – adj otthont ideiglenesen."
+    "fosterDesc": "Segíts egy állaton anélkül, hogy véglegesen örökbe fogadnád – adj otthont ideiglenesen.",
+    "supportShelter": "Támogasd a menhelyet"
   },
   "donate": {
     "title": "Támogatás",
@@ -306,7 +307,8 @@
     "stripeRequired": "Előbb kösd be a Stripe fiókod",
     "stripeRequiredDesc": "Gyűjtést csak csatlakoztatott Stripe fiókkal indíthatsz, hogy az adományok közvetlenül hozzád (vagy a választott menhelyhez) érkezhessenek.",
     "stripeConnectOwn": "Saját Stripe fiók csatlakoztatása",
-    "stripeConnectError": "Hiba a Stripe csatlakozáskor."
+    "stripeConnectError": "Hiba a Stripe csatlakozáskor.",
+    "generalOngoing": "Folyamatos gyűjtés a menhely mindennapi működésére – nincs határidő és célösszeg."
   },
   "auth": {
     "loginTitle": "Bejelentkezés",
@@ -1193,12 +1195,9 @@
     "settingsPublicPage": "Publikus oldal megtekintése",
     "tiersTitle": "Előfizetési csomagok",
     "tiersNoTiers": "Még nincs előfizetési csomag.",
-    "tiersNew": "Új csomag",
     "tiersEdit": "Szerkesztés",
     "tiersSave": "Mentés",
-    "tiersCreate": "Létrehozás",
     "tiersCancel": "Mégse",
-    "tiersDelete": "Törlés",
     "tiersActive": "Aktív",
     "tiersInactive": "Inaktív",
     "tiersActivate": "Aktiválás",
@@ -1206,11 +1205,9 @@
     "tiersPerMonth": "/ hó",
     "tiersSubscribersCount": "{count} előfizető",
     "tiersNameLabel": "Név",
-    "tiersAmountLabel": "Összeg (Ft/hó)",
     "tiersDescriptionLabel": "Leírás (opcionális)",
     "tiersDescriptionPlaceholder": "Rövid leírás",
     "tiersValidationError": "Név és érvényes összeg megadása kötelező.",
-    "tiersDeleteFailed": "Törlés sikertelen.",
     "tiersToggleFailed": "Állapot módosítása sikertelen.",
     "tiersUnknownError": "Ismeretlen hiba",
     "tiersNoShelter": "Nincs hozzárendelt menhely.",
@@ -1421,10 +1418,12 @@
     "navApprovals": "Jóváhagyások",
     "navAudit": "Audit napló",
     "navVets": "Állatorvosok",
-    "tiersAmountLockedHint": "A meglévő előfizetők a belépéskori összeget fizetik, ezért ez nem módosítható. Új összeghez hozz létre új csomagot.",
     "subsRevenueThisMonth": "Havi bevétel (e hónap)",
     "subsRevenueTotal": "Összes visszatérő bevétel",
-    "subsPaymentsCount": "Terhelések száma"
+    "subsPaymentsCount": "Terhelések száma",
+    "tiersFixedAmountsInfo": "A csomagösszegek platformszinten rögzítettek ({amounts}), és minden menhelynél automatikusan létrejönnek. A nevet és a leírást te szabod magadra – a csomag értékét a történet adja, nem a szám.",
+    "tiersLegacy": "Régi összeg",
+    "tiersLegacyHint": "Korábbi, egyedi összegű csomag. A meglévő előfizetők a Stripe-nál a belépéskori árat fizetik tovább, ezért nem törölhető – új előfizető viszont már nem tud belépni rá."
   },
   "foster": {
     "title": "Ideiglenes befogadásaim",

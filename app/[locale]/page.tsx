@@ -55,7 +55,7 @@ export default async function HomePage() {
         select: { id: true, title: true, slug: true, startsAt: true, location: true },
       }),
       prisma.campaign.findMany({
-        where: { status: "ACTIVE" },
+        where: { status: "ACTIVE", isGeneral: false },
         orderBy: { createdAt: "desc" },
         take: 8,
         select: { id: true, title: true, slug: true, targetAmount: true, raisedAmount: true, imageUrl: true, shelter: { select: { name: true, slug: true, logoUrl: true } }, user: { select: { name: true, image: true } } },

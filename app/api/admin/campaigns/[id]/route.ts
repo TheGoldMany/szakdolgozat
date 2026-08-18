@@ -45,6 +45,16 @@ export async function PATCH(
       return NextResponse.json({ error: "A kampány nem található" }, { status: 404 });
     }
 
+    // Az állandó „Általános támogatás" gyűjtés a menhely mindig elérhető
+      // adomány gombja: enélkül futó kampány híján egyáltalán nem tudna egyszeri
+      // adományt fogadni. Rendszer által kezelt, nem szerkeszthető és nem törölhető.
+    if (campaign.isGeneral) {
+      return NextResponse.json(
+        { error: "Az állandó „Általános támogatás” gyűjtés nem szerkeszthető." },
+        { status: 409 },
+      );
+    }
+
     const { action, ...edits } = parsed.data;
 
     // A jóváhagyás/elutasítás csak függőben lévő gyűjtésre értelmezhető.
@@ -142,10 +152,20 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
 
   const campaign = await prisma.campaign.findUnique({
     where:  { id: params.id },
-    select: { id: true, title: true, _count: { select: { donations: true } } },
+    select: { id: true, title: true, isGeneral: true, _count: { select: { donations: true } } },
   });
   if (!campaign) {
     return NextResponse.json({ error: "A gyűjtés nem található" }, { status: 404 });
+  }
+
+  // Az állandó „Általános támogatás" gyűjtés a menhely mindig elérhető
+  // adomány gombja: enélkül futó kampány híján egyáltalán nem tudna egyszeri
+  // adományt fogadni. Rendszer által kezelt, nem szerkeszthető és nem törölhető.
+  if (campaign.isGeneral) {
+    return NextResponse.json(
+      { error: "Az állandó „Általános támogatás” gyűjtés nem törölhető." },
+      { status: 409 },
+    );
   }
 
   // Beérkezett adomány mellett a törlés pénzügyi nyomot venne el:

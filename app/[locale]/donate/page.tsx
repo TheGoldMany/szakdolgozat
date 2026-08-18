@@ -23,7 +23,7 @@ export default async function DonatePage() {
 
   const [campaigns, shelters] = await Promise.all([
     prisma.campaign.findMany({
-      where: { status: "ACTIVE" },
+      where: { status: "ACTIVE", isGeneral: false },
       include: {
         user:    { select: { name: true, image: true } },
         shelter: { select: { name: true, slug: true, logoUrl: true } },
