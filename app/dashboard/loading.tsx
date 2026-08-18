@@ -6,10 +6,10 @@ export default function Loading() {
       <PageHeaderSkeleton />
       <StatCardsSkeleton count={4} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="h-64 animate-pulse rounded-2xl border border-gray-100 bg-white shadow-sm" />
-        <div className="h-64 animate-pulse rounded-2xl border border-gray-100 bg-white shadow-sm" />
+        <div className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+        <div className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
       </div>
-      <div className="h-80 animate-pulse rounded-2xl border border-gray-100 bg-white shadow-sm" />
+      <div className="h-80 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
     </div>
   );
 }

@@ -20,7 +20,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-50 px-4 py-3">
         <h2 className="flex items-center gap-2 text-sm font-bold text-gray-900">
           <Icon className="h-4 w-4 text-brand-500" />
@@ -52,7 +52,7 @@ export function HomeSidebar({
     <aside className="space-y-4">
 
       {/* Gyorslinkek */}
-      <section className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
+      <section className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
         <div className="grid grid-cols-2 gap-2">
           {[
             { href: "/animals",     Icon: PawPrint,    label: "Állatok"   },
@@ -63,7 +63,7 @@ export function HomeSidebar({
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 px-2 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600"
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 px-2 py-3 text-xs font-medium text-gray-600 transition-colors hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600"
             >
               <Icon className="h-4 w-4" />
               {label}

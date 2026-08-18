@@ -169,7 +169,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
           ) : (
             <div
               key={tier.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
+              className="flex items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

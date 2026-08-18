@@ -283,7 +283,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
     <div className="space-y-6">
 
       {/* Stripe Connect */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsStripeDesc")}
@@ -351,7 +351,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Menhely logó */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsShelterProfile")}</h2>
         <p className="mb-5 text-xs text-gray-400">
           {t("settingsShelterProfileDesc")}
@@ -388,7 +388,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Helyszín a térképen */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-1 flex items-center gap-2">
           <MapPin className="h-4 w-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-700">Helyszín a térképen</h2>
@@ -425,7 +425,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Fizetési adatok */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center gap-2">
           <Building2 className="h-4 w-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-700">{t("settingsPaymentInfo")}</h2>
@@ -469,7 +469,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Kapacitás */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsCapacity")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsCapacityDesc")}
@@ -498,7 +498,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Örökbefogadási feltételek */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsAdoptionRequirements")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsAdoptionRequirementsDesc")}
@@ -517,7 +517,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
       </div>
 
       {/* Dokumentumok */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsDocuments")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsDocumentsDesc")}
@@ -526,7 +526,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
         {docs.length > 0 && (
           <ul className="mb-4 space-y-2">
             {docs.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5">
+              <li key={doc.id} className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5">
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="h-4 w-4 shrink-0 text-brand-500" />
                   <a href={doc.url} target="_blank" rel="noopener noreferrer"

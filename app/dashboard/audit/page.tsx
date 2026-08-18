@@ -81,7 +81,7 @@ export default async function AuditPage({
             const meta = ACTION_META[e.action];
             const Icon = meta.icon;
             return (
-              <li key={e.id} className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+              <li key={e.id} className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", meta.color)}>
                   <Icon className="h-4 w-4" />
                 </span>

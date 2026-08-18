@@ -103,7 +103,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
         return (
           <div
             key={schedule.id}
-            className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden"
+            className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
           >
             {/* Main card row */}
             <div className="flex items-start gap-4 p-4">

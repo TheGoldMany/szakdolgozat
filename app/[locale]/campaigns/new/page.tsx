@@ -31,7 +31,7 @@ export default async function NewCampaignPage() {
         <p className="mb-8 text-sm text-gray-500">
           Töltsd ki az alábbi mezőket. A gyűjtésed admin jóváhagyás után kerül nyilvánosságra.
         </p>
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <NewCampaignForm stripeConnected={stripeConnected} />
         </div>
       </div>

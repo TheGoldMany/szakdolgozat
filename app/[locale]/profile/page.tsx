@@ -157,7 +157,7 @@ export default async function ProfilePage() {
         <div className="space-y-6">
 
           {/* Account info */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("accountInfo")}</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -188,14 +188,14 @@ export default async function ProfilePage() {
           </div>
 
           {/* Personal data */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("personalData")}</h2>
             <ProfileForm user={user} />
           </div>
 
           {/* Change password – only for password-based accounts */}
           {user.password && (
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("changePassword")}</h2>
               <ChangePasswordForm />
             </div>
@@ -208,12 +208,12 @@ export default async function ProfilePage() {
           />
 
           {/* Saját gyűjtések */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <MyCampaigns campaigns={myCampaigns} />
           </div>
 
           {/* Subscriptions */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySubscriptions")}</h2>
             <SubscriptionsList
               subscriptions={user.subscriptions.map((s) => ({
@@ -225,7 +225,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Virtual adoptions */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySponsorships")}</h2>
             <SponsorshipsList
               sponsorships={user.sponsorships.map((s) => ({
@@ -237,7 +237,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Adoption history */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("adoptionHistory")}</h2>
             {adoptedApps.length === 0 ? (
               <p className="text-sm text-gray-400">{t("noAdoptions")}</p>
@@ -250,7 +250,7 @@ export default async function ProfilePage() {
                     <li key={app.id}>
                       <Link
                         href={`/animals/${app.animal.slug}`}
-                        className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 transition-colors hover:bg-gray-50"
+                        className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 transition-colors hover:bg-gray-50"
                       >
                         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
                           {img ? (
@@ -279,7 +279,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* My reports */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("myReports")}</h2>
             <ProfileReports
               reports={userReports.map((r) => ({
@@ -297,13 +297,13 @@ export default async function ProfilePage() {
           </div>
 
           {/* Notification preferences */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("notificationSettings")}</h2>
             <EmailNotificationsToggle enabled={user.emailNotifications} />
           </div>
 
           {/* GDPR data portability */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("myData")}</h2>
             <p className="mb-4 text-xs text-gray-500">{t("myDataDesc")}</p>
             <DownloadDataButton />

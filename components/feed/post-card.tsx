@@ -31,7 +31,7 @@ export function PostCard({ post }: { post: FeedPost }) {
   const lead = post.excerpt ?? (post.content.length > 220 ? `${post.content.slice(0, 220)}…` : post.content);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Fejléc: szerző, illetve a kapcsolódó menhely, ha van */}
       <div className="flex items-center gap-3 px-4 pt-4">
         {post.shelter ? (
@@ -103,7 +103,7 @@ export function PostCard({ post }: { post: FeedPost }) {
       {/* Hivatkozott entitás kivonata */}
       {post.animal && (
         <Link href={`/animals/${post.animal.slug}`}
-          className="mx-4 mt-3 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-2.5 transition-colors hover:bg-gray-100">
+          className="mx-4 mt-3 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-2.5 transition-colors hover:bg-gray-100">
           {post.animal.images[0]?.url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.animal.images[0].url} alt={post.animal.name} className="h-12 w-12 rounded-lg object-cover" />
@@ -119,7 +119,7 @@ export function PostCard({ post }: { post: FeedPost }) {
 
       {post.event && (
         <Link href={`/events/${post.event.slug}`}
-          className="mx-4 mt-3 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-2.5 transition-colors hover:bg-gray-100">
+          className="mx-4 mt-3 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-2.5 transition-colors hover:bg-gray-100">
           <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 text-purple-600"><Calendar className="h-5 w-5" /></span>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-gray-900">{post.event.title}</p>
@@ -135,7 +135,7 @@ export function PostCard({ post }: { post: FeedPost }) {
         const pct = Math.min(100, Math.round((post.campaign.raisedAmount / post.campaign.targetAmount) * 100));
         return (
           <Link href={`/donate/${post.campaign.id}`}
-            className="mx-4 mt-3 block rounded-xl border border-gray-100 bg-gray-50 p-3 transition-colors hover:bg-gray-100">
+            className="mx-4 mt-3 block rounded-xl border border-gray-200 bg-gray-50 p-3 transition-colors hover:bg-gray-100">
             <div className="flex items-center gap-2">
               <HandHeart className="h-4 w-4 shrink-0 text-pink-600" />
               <p className="truncate text-sm font-semibold text-gray-900">{post.campaign.title}</p>

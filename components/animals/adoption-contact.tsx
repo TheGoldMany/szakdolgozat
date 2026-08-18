@@ -44,7 +44,7 @@ export function AdoptionContact({ animalId, animalName, shelter }: AdoptionConta
       </p>
 
       {(shelter.phone || shelter.email) && (
-        <div className="rounded-xl bg-gray-50 border border-gray-100 p-4 space-y-2">
+        <div className="rounded-xl bg-gray-50 border border-gray-200 p-4 space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t("shelterContactTitle")}</p>
           {shelter.phone && (
             <a href={`tel:${shelter.phone}`} className="flex items-center gap-2 text-sm text-brand-500 hover:underline">

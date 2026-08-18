@@ -164,7 +164,7 @@ export function CampaignAdminActions({ campaign, hasDonations }: Props) {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-900/40 p-4 sm:items-center">
           <form
             onSubmit={save}
-            className="w-full max-w-lg rounded-2xl border border-gray-100 bg-white p-5 text-sm shadow-sm"
+            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-5 text-sm shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-base font-bold text-gray-900">Gyűjtés szerkesztése</h2>

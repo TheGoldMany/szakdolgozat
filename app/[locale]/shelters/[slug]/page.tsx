@@ -195,13 +195,13 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
           {/* Info column */}
           <div className="space-y-5">
             {shelter.description && (
-              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                 <h2 className="mb-2 text-sm font-semibold text-gray-700">{t("about")}</h2>
                 <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">{shelter.description}</p>
               </div>
             )}
 
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("contact")}</h2>
               <ul className="space-y-2.5 text-sm text-gray-600">
                 <li className="flex items-start gap-2.5">
@@ -232,7 +232,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             </div>
 
             {shelter.tiers.length > 0 && (
-              <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                 <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("monthlySubscriptions")}</h2>
                 <div className="flex flex-col gap-3">
                   {shelter.tiers.map((tier) => (
@@ -252,11 +252,11 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         {/* Önkéntesség */}
         {session && (
           <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-base font-semibold text-gray-800">{t("volunteer")}</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
             </div>
-            <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-1 text-base font-semibold text-gray-800">{t("foster")}</h2>
               <p className="mb-3 text-sm text-gray-500">{t("fosterDesc")}</p>
               <FosterApplyButton shelterId={shelter.id} existingStatus={existingFosterStatus} />

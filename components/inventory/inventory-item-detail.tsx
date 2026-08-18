@@ -84,7 +84,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Info kártya */}
-        <div className="lg:col-span-1 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+        <div className="lg:col-span-1 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-700">Adatok</h2>
             <button
@@ -146,7 +146,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
         </div>
 
         {/* Mozgástörténet */}
-        <div className="lg:col-span-2 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-sm font-semibold text-gray-700">
             Mozgástörténet
             <span className="ml-2 text-xs font-normal text-gray-400">({item.transactions.length} bejegyzés)</span>

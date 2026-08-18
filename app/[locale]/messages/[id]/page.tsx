@@ -101,7 +101,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
         <div className="grid gap-4 lg:grid-cols-3">
 
           {/* Chat panel */}
-          <div className="lg:col-span-2 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden flex flex-col" style={{ height: "70vh" }}>
+          <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col" style={{ height: "70vh" }}>
             <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                 {img ? (
@@ -147,7 +147,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
               />
             )}
             {isShelterAdmin && !canSendInvite && approvedForms.length > 0 && (
-              <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-sm text-gray-500">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-sm text-gray-500">
                 Már létezik aktív kérvény ehhez a felhasználóhoz és állathoz.
               </div>
             )}
@@ -161,7 +161,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                 </p>
               </div>
             )}
-            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link
                 href={`/animals/${conversation.animal.slug}`}
@@ -182,7 +182,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
               </Link>
             </div>
 
-            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterContact")}</h2>
               <Link
                 href={`/shelters/${conversation.shelter.slug}`}

@@ -80,7 +80,7 @@ export default function MapView() {
       </button>
 
       {/* Control panel – top left */}
-      <div className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-100 bg-white shadow-lg transition-transform md:translate-y-0 ${
+      <div className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-200 bg-white shadow-lg transition-transform md:translate-y-0 ${
         panelOpen ? "translate-y-12" : "hidden md:block"
       }`}>
         {/* Header */}
@@ -164,7 +164,7 @@ export default function MapView() {
       </div>
 
       {/* Legend – bottom right */}
-      <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-100 bg-white px-3 py-2.5 shadow-lg">
+      <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
         <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-gray-500">{t("legend")}</p>
         <div className="space-y-1">
           {[

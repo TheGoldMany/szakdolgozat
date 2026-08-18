@@ -73,7 +73,7 @@ export default async function DashboardMessagesPage() {
       </div>
 
       {conversations.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
           <PawPrint className="mx-auto h-10 w-10 text-gray-300" />
           <p className="mt-3 text-gray-500">{t("messagesEmpty")}</p>
           <p className="mt-1 text-sm text-gray-400">
@@ -81,7 +81,7 @@ export default async function DashboardMessagesPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full min-w-[680px] text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
               <tr>

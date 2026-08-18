@@ -31,7 +31,7 @@ export default async function KapcsolatPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
           {/* Email */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <Mail className="h-5 w-5 text-brand-600" />
             </div>
@@ -48,7 +48,7 @@ export default async function KapcsolatPage() {
           </div>
 
           {/* Válaszidő */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <Clock className="h-5 w-5 text-brand-600" />
             </div>
@@ -60,7 +60,7 @@ export default async function KapcsolatPage() {
           </div>
 
           {/* Székhely */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <MapPin className="h-5 w-5 text-brand-600" />
             </div>
@@ -71,7 +71,7 @@ export default async function KapcsolatPage() {
           </div>
 
           {/* Útmutató */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <PawPrint className="h-5 w-5 text-brand-600" />
             </div>

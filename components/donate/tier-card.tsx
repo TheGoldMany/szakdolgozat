@@ -50,7 +50,7 @@ export function TierCard({ tier, isSubscribed = false }: TierCardProps) {
   }
 
   return (
-    <div className="flex flex-col rounded-2xl border border-gray-100 bg-white p-5 shadow-sm gap-4">
+    <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm gap-4">
       <div className="space-y-1">
         <h3 className="font-semibold text-gray-900">{tier.name}</h3>
         <p className="text-2xl font-bold text-brand-600">

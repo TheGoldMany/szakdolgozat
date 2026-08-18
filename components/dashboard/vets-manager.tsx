@@ -250,7 +250,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       </div>
 
       {showImport && (
-        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="h-4 w-4 text-brand-600" />
             <h3 className="text-sm font-bold text-gray-900">Rendelők importálása CSV fájlból</h3>
@@ -284,7 +284,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
           </div>
 
           {preview && (
-            <div className="mt-5 rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
               <p className="text-sm font-semibold text-gray-900">
                 {preview.rows.length} sor található a fájlban
               </p>
@@ -350,7 +350,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
           )}
 
           {result && (
-            <div className="mt-5 rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 <p className="text-sm font-semibold text-gray-900">Az importálás befejeződött</p>
@@ -449,7 +449,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {vets.map((v) => (
-            <div key={v.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div key={v.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">

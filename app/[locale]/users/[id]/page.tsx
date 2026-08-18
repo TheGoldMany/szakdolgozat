@@ -55,7 +55,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
 
         {/* Profil kártya */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           {/* Banner */}
           <div className="h-24 bg-gradient-to-r from-brand-400 to-brand-600" />
 
@@ -89,7 +89,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
             </div>
 
             {/* Statisztikák */}
-            <div className="mt-5 grid grid-cols-3 divide-x divide-gray-100 rounded-xl border border-gray-100 bg-gray-50">
+            <div className="mt-5 grid grid-cols-3 divide-x divide-gray-100 rounded-xl border border-gray-200 bg-gray-50">
               <div className="py-3 text-center">
                 <p className="text-xl font-bold text-brand-600">{user._count.applications}</p>
                 <p className="text-xs text-gray-500">Örökbefogadás</p>

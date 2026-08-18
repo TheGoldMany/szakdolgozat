@@ -40,7 +40,7 @@ export function Uc03ReportsPanel({
   }));
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-sm font-semibold text-gray-700">UC-03 · Területi bejelentések</h2>

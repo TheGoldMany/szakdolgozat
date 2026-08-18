@@ -112,7 +112,7 @@ export default async function FollowUpsAdminPage() {
           { label: t("followupsKpiPending"),   value: stats.pending,   color: "text-blue-600" },
           { label: t("followupsKpiOverdue"),   value: stats.overdue,   color: "text-red-600" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <div key={label} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
             <p className={cn("text-2xl font-bold", color)}>{value}</p>
             <p className="text-xs text-gray-500">{label}</p>
           </div>
@@ -131,13 +131,13 @@ export default async function FollowUpsAdminPage() {
 
       {/* Table */}
       {followUps.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <ClipboardCheck className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">{t("followupsEmpty")}</p>
           <p className="mt-1 text-sm text-gray-400">{t("followupsEmptyDesc")}</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full min-w-[680px] text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">

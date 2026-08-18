@@ -28,7 +28,7 @@ export async function ShelterCard({ shelter }: ShelterCardProps) {
 
   return (
     <Link href={`/shelters/${shelter.slug}`} className="group flex flex-col">
-      <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Gradient top bar */}
         <div className="relative flex h-20 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">

@@ -171,7 +171,7 @@ export function FormBuilder({
   return (
     <div className="space-y-6">
       {/* Title & Description */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
         <h2 className="text-base font-semibold text-gray-900">{t("formBuilderSectionTitle")}</h2>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -200,7 +200,7 @@ export function FormBuilder({
       </div>
 
       {/* Fields */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-900">{t("formBuilderFieldsTitle")}</h2>
           {isDraft && (
@@ -231,7 +231,7 @@ export function FormBuilder({
           {fields.map((field, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4"
+              className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4"
             >
               <div className="flex flex-col gap-1 pt-1">
                 <button

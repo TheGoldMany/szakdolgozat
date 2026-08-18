@@ -84,7 +84,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
   const myTaskIds  = new Set(vol.assignments.map((a) => a.task.id));
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 p-4">
         <div>
@@ -151,7 +151,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Elvállalt feladatok</p>
               <div className="space-y-2">
                 {vol.assignments.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2">
+                  <div key={a.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
                     <CalendarDays className="h-3.5 w-3.5 shrink-0 text-brand-400" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-gray-700">{a.task.title}</p>
@@ -223,7 +223,7 @@ function AvailableTaskCard({ task, userId, onSignup }: {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-800">{task.title}</p>
@@ -300,15 +300,15 @@ export function VolunteerDashboard({ data }: Props) {
       {/* Summary strip */}
       {data.volunteers.length > 0 && (
         <div className="mb-6 grid grid-cols-3 gap-3">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-brand-600">{activeCount}</p>
             <p className="text-xs text-gray-500">Aktív menhely</p>
           </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-gray-700">{totalHours}</p>
             <p className="text-xs text-gray-500">Ledolgozott óra</p>
           </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-gray-700">
               {data.volunteers.reduce((s, v) => s + v.assignments.length, 0)}
             </p>
@@ -319,7 +319,7 @@ export function VolunteerDashboard({ data }: Props) {
 
       {/* No applications yet */}
       {data.volunteers.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <HandHeart className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">Még nem jelentkeztél önkéntesnek</p>
           <p className="mt-1 text-sm text-gray-400">
@@ -366,7 +366,7 @@ export function VolunteerDashboard({ data }: Props) {
           )}
 
           {activeCount > 0 && tasks.length === 0 && (
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
               <CalendarDays className="mx-auto mb-2 h-8 w-8 text-gray-300" />
               <p className="text-sm text-gray-500">Jelenleg nincs nyitott feladat a menhelyeidnél.</p>
             </div>

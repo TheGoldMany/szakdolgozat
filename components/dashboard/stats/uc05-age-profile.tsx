@@ -33,7 +33,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
   const total = ageCategoryDist.reduce((s, r) => s + r.count, 0);
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-gray-700">UC-05 &middot; Adoptált állatok korfája és versenyhelyzet</h2>

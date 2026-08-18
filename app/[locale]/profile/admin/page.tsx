@@ -69,7 +69,7 @@ export default async function ProfileAdminPage() {
               <Link
                 key={href}
                 href={href}
-                className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-brand-200 hover:bg-brand-50/40"
+                className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors hover:border-brand-200 hover:bg-brand-50/40"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-500">
                   <Icon className="h-5 w-5" />

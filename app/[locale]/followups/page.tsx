@@ -84,7 +84,7 @@ export default function FollowUpsPage() {
       {!loading && followUps.length > 0 && (
         <div className="mb-6 grid grid-cols-3 gap-3">
           {stats.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="rounded-2xl border border-gray-100 bg-white p-4 text-center shadow-sm">
+            <div key={label} className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
               <Icon className={`mx-auto mb-1 h-5 w-5 ${color}`} />
               <p className="text-2xl font-bold text-gray-800">{value}</p>
               <p className="text-xs text-gray-500">{label}</p>
@@ -100,7 +100,7 @@ export default function FollowUpsPage() {
           ))}
         </div>
       ) : followUps.length === 0 ? (
-        <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <ClipboardCheck className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">Nincs utánkövetési feladatod</p>
           <p className="mt-1 text-sm text-gray-400">Az elfogadott örökbefogadások után automatikusan megjelennek itt.</p>

@@ -68,7 +68,7 @@ export function MultiDocumentUpload({ value, onChange, max = 8, label = "Hivatal
       {value.length > 0 && (
         <ul className="mb-3 space-y-2">
           {value.map((doc, idx) => (
-            <li key={doc.url} className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3.5 py-2.5">
+            <li key={doc.url} className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5">
               <div className="flex min-w-0 items-center gap-2">
                 <FileText className="h-4 w-4 shrink-0 text-brand-500" />
                 <span className="truncate text-sm font-medium text-gray-700">{doc.name}</span>

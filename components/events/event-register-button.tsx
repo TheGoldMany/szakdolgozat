@@ -91,7 +91,7 @@ export function EventRegisterButton({ eventId, slug, loggedIn, isFull, registere
           <CalendarCheck className="h-4 w-4" /> {t("registerButton")}
         </button>
       ) : (
-        <form onSubmit={handleRegister} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+        <form onSubmit={handleRegister} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-800">{t("registerTitle")}</p>
             <button type="button" onClick={() => setOpen(false)}

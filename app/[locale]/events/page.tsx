@@ -46,7 +46,7 @@ export default async function EventsListPage() {
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {events.map(ev => (
               <Link key={ev.id} href={`/events/${ev.slug}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-md">
+                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                 <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
                   {ev.imageUrl
                     ? <Image src={ev.imageUrl} alt={ev.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width:768px) 100vw, 33vw" />

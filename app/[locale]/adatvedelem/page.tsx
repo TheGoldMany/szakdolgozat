@@ -365,7 +365,7 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <span>
@@ -427,7 +427,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
           </p>
 
           {/* TOC */}
-          <nav className="mt-8 rounded-2xl border border-gray-100 bg-gray-50 px-5 py-4">
+          <nav className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tartalom</p>
             <ol className="space-y-1.5 text-sm text-brand-600">
               {[
@@ -455,7 +455,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-100 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
 
           <P>
             Az <strong>{CONTROLLER_NAME}</strong> (a továbbiakban: „Platform", „mi") elkötelezett a felhasználók
@@ -655,7 +655,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
               { Icon: Download, title: "Adathordozhatóság (20. cikk)",  desc: "Strukturált, géppel olvasható formában kérheti adatai másolatát." },
               { Icon: Mail,     title: "Tiltakozás joga (21. cikk)",    desc: "Tiltakozhat az adatkezelés ellen, ha jogos érdek az alap." },
             ].map(({ Icon, title, desc }) => (
-              <div key={title} className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
+              <div key={title} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-100">
                   <Icon className="h-4 w-4 text-brand-600" />
                 </div>
@@ -685,7 +685,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
             Ha úgy ítéli meg, hogy adatai kezelése sérti a GDPR rendelkezéseit, panaszt nyújthat be a
             Nemzeti Adatvédelmi és Információszabadság Hatóságnál:
           </P>
-          <div className="mt-4 rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
+          <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
             <p className="font-semibold text-gray-800">Nemzeti Adatvédelmi és Információszabadság Hatóság (NAIH)</p>
             <p className="mt-1">Székhely: 1055 Budapest, Falk Miksa utca 9–11.</p>
             <p>Postacím: 1363 Budapest, Pf.: 9.</p>

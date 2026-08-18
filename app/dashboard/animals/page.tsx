@@ -114,7 +114,7 @@ export default async function DashboardAnimalsPage({
           <p className="mt-3 text-sm text-gray-500">{t("animalsEmpty")}</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full min-w-[680px] text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">

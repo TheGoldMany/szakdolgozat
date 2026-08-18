@@ -228,7 +228,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
             {/* Leírás – a képek alatt, hogy a bal oszlop ne maradjon üresen */}
             {animal.description && (
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h2 className="mb-3 text-lg font-semibold text-gray-800">{t("descSection")}</h2>
                 <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{animal.description}</p>
               </div>
@@ -237,7 +237,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
           {/* Details */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">{animal.name}</h1>
@@ -315,10 +315,10 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterSection")}</h2>
               <Link href={`/shelters/${animal.shelter.slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-100 bg-brand-50 flex items-center justify-center">
+                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-brand-50 flex items-center justify-center">
                   {animal.shelter.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={animal.shelter.logoUrl} alt={animal.shelter.name} className="h-full w-full object-cover" />
@@ -359,7 +359,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
         {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
-            <div className="lg:col-span-3 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
               <AdoptionBlock />
             </div>
@@ -374,7 +374,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 </div>
               )}
               {animal.shelter.documents.length > 0 && (
-                <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                   <div className="mb-3 flex items-center gap-2">
                     <FileText className="h-4 w-4 text-gray-500" />
                     <h2 className="text-sm font-semibold text-gray-700">{t("documentsSection")}</h2>
@@ -383,7 +383,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                     {animal.shelter.documents.map((doc) => (
                       <li key={doc.id}>
                         <a href={doc.url} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-xs font-medium text-brand-600 transition-colors hover:bg-brand-50 hover:border-brand-100 hover:text-brand-700">
+                          className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-brand-600 transition-colors hover:bg-brand-50 hover:border-brand-100 hover:text-brand-700">
                           <FileText className="h-3.5 w-3.5 shrink-0" />{doc.name}
                         </a>
                       </li>
@@ -394,7 +394,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
             <AdoptionBlock />
           </div>

@@ -43,7 +43,7 @@ export default async function TiersPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("tiersTitle")}</h1>
           <PageInfo page="tiers" />
         </div>
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           {tiers.length === 0 ? (
             <p className="px-5 py-8 text-sm text-gray-400">Nincs még előfizetési csomag a platformon.</p>
           ) : (

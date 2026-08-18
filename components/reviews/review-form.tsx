@@ -50,7 +50,7 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <h3 className="mb-4 text-sm font-bold text-gray-900">Értékelés írása</h3>
 
       <div className="mb-4">

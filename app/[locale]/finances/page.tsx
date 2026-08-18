@@ -78,15 +78,15 @@ export default async function FinancesPage() {
 
         {/* Summary cards */}
         <div className="mb-8 grid grid-cols-3 gap-4">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-center">
             <p className="text-xs text-gray-400 mb-1">{t("totalDonated")}</p>
             <p className="text-lg font-bold text-gray-900">{totalDonated.toLocaleString("hu-HU")} Ft</p>
           </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-center">
             <p className="text-xs text-gray-400 mb-1">{t("activeSubs")}</p>
             <p className="text-lg font-bold text-gray-900">{activeSubs}</p>
           </div>
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm text-center">
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-center">
             <p className="text-xs text-gray-400 mb-1">{t("activeSpons")}</p>
             <p className="text-lg font-bold text-gray-900">{activeSpons}</p>
           </div>
@@ -95,7 +95,7 @@ export default async function FinancesPage() {
         <div className="space-y-6">
 
           {/* Donations */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700">
               <Receipt className="h-4 w-4 text-brand-500" />
               {t("myDonations")}
@@ -105,7 +105,7 @@ export default async function FinancesPage() {
             ) : (
               <div className="space-y-3">
                 {donations.map((d) => (
-                  <div key={d.id} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
+                  <div key={d.id} className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
                     <div className="text-sm">
                       <p className="font-medium text-gray-800">
                         {d.campaign?.title ?? t("directDonation")}
@@ -130,7 +130,7 @@ export default async function FinancesPage() {
           </div>
 
           {/* Subscriptions */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700">
               <RefreshCcw className="h-4 w-4 text-brand-500" />
               {tp("mySubscriptions")}
@@ -145,7 +145,7 @@ export default async function FinancesPage() {
           </div>
 
           {/* Sponsorships */}
-          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700">
               <Heart className="h-4 w-4 text-pink-500" />
               {tp("mySponsorships")}

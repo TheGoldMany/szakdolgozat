@@ -118,7 +118,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Documents section */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-base font-semibold text-gray-800">{t("animalsDetailDocSection")}</h2>
         <p className="mb-5 text-sm text-gray-500">
           {t("animalsDetailDocDesc")}
@@ -127,7 +127,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Health records */}
-      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <HealthManager
           animalId={animal.id}
           initial={healthRecords.map(r => ({
@@ -159,7 +159,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Foster placement */}
-      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <FosterAssign
           animalId={animal.id}
           currentFosterId={animal.fosterId}
@@ -168,7 +168,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Behavior & rehabilitation */}
-      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <BehaviorManager
           animalId={animal.id}
           initialFlags={animal.flags}

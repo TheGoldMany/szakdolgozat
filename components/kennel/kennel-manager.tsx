@@ -200,7 +200,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
             const pct  = Math.min(100, Math.round((used / k.capacity) * 100));
             const here = animals.filter(a => a.kennelId === k.id);
             return (
-              <div key={k.id} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+              <div key={k.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="font-bold text-gray-900">{k.name}</h3>
@@ -277,7 +277,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
       )}
 
       {/* Férőhely nélküli állatok */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
           <DoorOpen className="h-4 w-4 text-gray-400" />
           <h3 className="font-bold text-gray-900">Férőhely nélküli állatok</h3>
