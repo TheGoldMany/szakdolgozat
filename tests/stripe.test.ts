@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { platformFee, PLATFORM_FEE_PERCENT } from "@/lib/stripe";
+import {
+  platformFee, PLATFORM_FEE_PERCENT, stripeProcessingFee,
+  subscriptionFeePercent, subscriptionPlatformFee,
+} from "@/lib/stripe";
 
 describe("platformFee", () => {
   it("a platform díj 5%", () => {
@@ -24,5 +27,37 @@ describe("platformFee", () => {
 
   it("nulla összegre nulla díj", () => {
     expect(platformFee(0)).toBe(0);
+  });
+});
+
+describe("subscriptionFeePercent", () => {
+  it("olyan százalékot ad, amivel a menhely a csomag árát kapja meg", () => {
+    // A Stripe a százalékot a számla TELJES összegére alkalmazza.
+    for (const amount of [500, 1000, 2000, 5000, 10_000, 50_000]) {
+      const total   = amount + platformFee(amount) + stripeProcessingFee(amount);
+      const pct     = subscriptionFeePercent(amount);
+      const appFee  = subscriptionPlatformFee(total, pct);
+      const shelter = total - appFee;
+
+      // A két tizedes kerekítés miatt van pár forintos csúszás, de nem több.
+      expect(Math.abs(shelter - amount)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("a nagyobb csomagnál arányosan kisebb a százalék (a fix 25 Ft eloszlik)", () => {
+    expect(subscriptionFeePercent(500)).toBeGreaterThan(subscriptionFeePercent(50_000));
+  });
+
+  it("nulla összegre nulla százalék", () => {
+    expect(subscriptionFeePercent(0)).toBe(0);
+  });
+
+  it("egy 5 000 Ft-os csomag 12 hónapja alatt a csúszás pár forint", () => {
+    const amount = 5000;
+    const total  = amount + platformFee(amount) + stripeProcessingFee(amount);
+    const pct    = subscriptionFeePercent(amount);
+    const yearly = 12 * (total - subscriptionPlatformFee(total, pct));
+
+    expect(Math.abs(yearly - amount * 12)).toBeLessThanOrEqual(12);
   });
 });

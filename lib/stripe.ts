@@ -38,6 +38,40 @@ export function stripeProcessingFee(amount: number): number {
   return Math.round(amount * STRIPE_PERCENT_FEE / 100) + STRIPE_FIXED_FEE_HUF;
 }
 
+/**
+ * Az előfizetésekre alkalmazott `application_fee_percent`.
+ *
+ * Egyszeri adománynál fix összeget adunk át (`application_fee_amount`), havi
+ * díjnál viszont a Stripe csak százalékot fogad el, és azt a számla TELJES
+ * összegére alkalmazza. Ezért a százalékot úgy kell megválasztani, hogy
+ *
+ *     (platform díj + feldolgozási díj) / (összeg + mindkét díj)
+ *
+ * legyen — így a menhely pontosan a csomag árát kapja meg. A Stripe két
+ * tizedesig fogadja el, innen a pár filléres csúszás (12 hónap alatt ~3 Ft egy
+ * 5 000 Ft-os csomagnál).
+ *
+ * Ugyanezt használja a checkout és a megújítások könyvelése is, hogy a
+ * kiszámolt és a ténylegesen levont díj ne tudjon szétcsúszni.
+ */
+export function subscriptionFeePercent(amount: number): number {
+  // Nulla vagy negatív alapösszegnél a fix 25 Ft egyedül maradna a számlálóban,
+  // és 100%-ot adna vissza – vagyis a kedvezményezett nem kapna semmit. A
+  // minimumok ezt kizárják, de rossz kimenetel egy díjszámolóban.
+  if (amount <= 0) return 0;
+
+  const fee    = platformFee(amount);
+  const stripe = stripeProcessingFee(amount);
+  const total  = amount + fee + stripe;
+  if (total <= 0 || fee + stripe <= 0) return 0;
+  return Math.round(((fee + stripe) / total) * 10000) / 100;
+}
+
+/** A `subscriptionFeePercent` szerinti platform-rész egy adott számlaösszegből. */
+export function subscriptionPlatformFee(totalPaid: number, feePercent: number): number {
+  return Math.round((totalPaid * feePercent) / 100);
+}
+
 // Lazy singleton – only instantiated on first use, never at build time
 let _stripe: Stripe | null = null;
 

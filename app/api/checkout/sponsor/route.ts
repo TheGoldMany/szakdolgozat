@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, subscriptionFeePercent } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { blockIfSuspended } from "@/lib/account-status";
 
@@ -56,11 +56,8 @@ export async function POST(req: NextRequest) {
 
   const feeForint   = connectedAccountId ? platformFee(amount) : 0;
   const stripeFeeFt = connectedAccountId ? stripeProcessingFee(amount) : 0;
-  const totalForint = amount + feeForint + stripeFeeFt;
   // Cover both platform fee + Stripe processing fee so shelter nets exactly `amount`.
-  const feePercent  = (feeForint + stripeFeeFt) > 0
-    ? Math.round(((feeForint + stripeFeeFt) / totalForint) * 10000) / 100
-    : 0;
+  const feePercent  = connectedAccountId ? subscriptionFeePercent(amount) : 0;
 
   let checkoutSession;
   try {

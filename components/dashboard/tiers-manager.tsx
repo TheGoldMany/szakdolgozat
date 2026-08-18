@@ -80,6 +80,7 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
 
   async function handleEdit(e: React.FormEvent, tierId: string) {
     e.preventDefault();
+    const original = tiers.find((x) => x.id === tierId);
     const amt = parseInt(editForm.amount, 10);
     if (!editForm.name.trim() || isNaN(amt) || amt < 1) {
       setError(t("tiersValidationError"));
@@ -94,7 +95,9 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
         body: JSON.stringify({
           name: editForm.name.trim(),
           description: editForm.description.trim() || null,
-          amount: amt,
+          // Zárolt összegnél a mező disabled, az érték változatlan – de a
+          // biztonság kedvéért csak akkor küldjük, ha tényleg módosult.
+          ...(amt !== original?.amount ? { amount: amt } : {}),
         }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("tiersUnknownError"));
@@ -156,7 +159,12 @@ export function TiersManager({ tiers: initialTiers, shelterId }: TiersManagerPro
               className="rounded-2xl border border-brand-200 bg-brand-50 p-4 space-y-3"
             >
               <p className="text-xs font-semibold text-brand-600 uppercase tracking-wide">{t("tiersEdit")}</p>
-              <TierFormFields form={editForm} onChange={setEditForm} t={t} />
+              <TierFormFields
+                form={editForm}
+                onChange={setEditForm}
+                t={t}
+                lockAmount={tier._count.subscriptions > 0}
+              />
               <div className="flex gap-2">
                 <Button type="submit" loading={saving} size="sm">
                   <Check className="h-3.5 w-3.5" /> {t("tiersSave")}
@@ -261,10 +269,13 @@ function TierFormFields({
   form,
   onChange,
   t,
+  lockAmount = false,
 }: {
   form: TierForm;
   onChange: (f: TierForm) => void;
   t: ReturnType<typeof useTranslations<"dashboard">>;
+  /** Élő előfizetőknél az összeg nem módosítható – a Stripe a belépéskori árat vonja. */
+  lockAmount?: boolean;
 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-3">
@@ -287,9 +298,13 @@ function TierFormFields({
           min={1}
           placeholder="pl. 1000"
           value={form.amount}
+          disabled={lockAmount}
           onChange={(e) => onChange({ ...form, amount: e.target.value })}
-          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
         />
+        {lockAmount && (
+          <p className="mt-1 text-[11px] leading-snug text-gray-400">{t("tiersAmountLockedHint")}</p>
+        )}
       </div>
       <div className="sm:col-span-1">
         <label className="mb-1 block text-xs font-medium text-gray-600">{t("tiersDescriptionLabel")}</label>

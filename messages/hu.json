@@ -1420,7 +1420,11 @@
     "addShelterUnknownError": "Ismeretlen hiba",
     "navApprovals": "Jóváhagyások",
     "navAudit": "Audit napló",
-    "navVets": "Állatorvosok"
+    "navVets": "Állatorvosok",
+    "tiersAmountLockedHint": "A meglévő előfizetők a belépéskori összeget fizetik, ezért ez nem módosítható. Új összeghez hozz létre új csomagot.",
+    "subsRevenueThisMonth": "Havi bevétel (e hónap)",
+    "subsRevenueTotal": "Összes visszatérő bevétel",
+    "subsPaymentsCount": "Terhelések száma"
   },
   "foster": {
     "title": "Ideiglenes befogadásaim",
@@ -1674,7 +1678,8 @@
     "activeSpons": "Aktív szponzorálás",
     "myDonations": "Adományaim",
     "noDonations": "Még nem adományoztál.",
-    "directDonation": "Közvetlen adomány"
+    "directDonation": "Közvetlen adomány",
+    "recurringBreakdown": "ebből {oneOff} Ft egyszeri, {recurring} Ft havi"
   },
   "articles": {
     "title": "Cikkek",

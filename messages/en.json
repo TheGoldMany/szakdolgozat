@@ -1420,7 +1420,11 @@
     "addShelterUnknownError": "Unknown error",
     "navApprovals": "Approvals",
     "navAudit": "Audit log",
-    "navVets": "Veterinarians"
+    "navVets": "Veterinarians",
+    "tiersAmountLockedHint": "Existing subscribers are charged the amount they signed up at, so this cannot be changed. Create a new tier for a new amount.",
+    "subsRevenueThisMonth": "Revenue this month",
+    "subsRevenueTotal": "Total recurring revenue",
+    "subsPaymentsCount": "Payments"
   },
   "foster": {
     "title": "My foster applications",
@@ -1674,7 +1678,8 @@
     "activeSpons": "Active sponsorships",
     "myDonations": "My Donations",
     "noDonations": "You haven't donated yet.",
-    "directDonation": "Direct donation"
+    "directDonation": "Direct donation",
+    "recurringBreakdown": "of which {oneOff} HUF one-off, {recurring} HUF recurring"
   },
   "articles": {
     "title": "Articles",

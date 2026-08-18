@@ -103,7 +103,12 @@ export default async function TiersPage() {
 
   const tiers = await prisma.donationTier.findMany({
     where:   { shelterId },
-    include: { _count: { select: { subscriptions: true } } },
+    include: {
+      // Csak az élő előfizetések: a lemondottak beszámítása azt a látszatot
+      // keltette, hogy több aktív támogató van. Ez a szám zárolja az összeg
+      // szerkesztését is.
+      _count: { select: { subscriptions: { where: { status: { in: ["ACTIVE", "PAST_DUE"] } } } } },
+    },
     orderBy: { amount: "asc" },
   });
 

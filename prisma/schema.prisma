@@ -352,6 +352,8 @@ model Sponsorship {
   createdAt   DateTime           @default(now())
   cancelledAt DateTime?
 
+  payments SubscriptionPayment[]
+
   @@index([animalId, status])
   @@index([userId])
 }
@@ -714,8 +716,9 @@ model Subscription {
   createdAt   DateTime           @default(now())
   cancelledAt DateTime?
 
-  user User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  tier DonationTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  user     User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tier     DonationTier          @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  payments SubscriptionPayment[]
 
   @@index([userId])
   @@index([tierId])
@@ -1441,4 +1444,39 @@ model VetClinic {
 
   @@index([city])
   @@index([isActive])
+}
+
+/// Egy sikeres havi terhelés az előfizetéshez vagy virtuális örökbefogadáshoz.
+///
+/// A Stripe csak az ELSŐ fizetésről küld `checkout.session.completed`-et; a
+/// megújításokról `invoice.payment_succeeded` jön. Enélkül a második hónaptól
+/// kezdve semmi nyoma nem maradt a befolyt pénznek — sem a menhely, sem a
+/// platform nem látta. Ez a tábla a visszatérő bevétel főkönyve.
+///
+/// A `stripeInvoiceId` egyedi: a Stripe legalább egyszer kézbesít, és ez a
+/// megszorítás teszi a webhookot idempotenssé (egy számla = egy sor).
+model SubscriptionPayment {
+  id              String   @id @default(cuid())
+  stripeInvoiceId String   @unique
+  stripeSubId     String
+
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  sponsorshipId  String?
+  sponsorship    Sponsorship?  @relation(fields: [sponsorshipId], references: [id], onDelete: Cascade)
+
+  /// Amit az előfizető ténylegesen fizetett (HUF) – a Stripe számlájáról.
+  totalPaid   Int
+  /// Ebből a platform része (HUF) – az application_fee.
+  platformFee Int
+  /// Ami a menhelyhez / kedvezményezetthez jut (HUF).
+  netAmount   Int
+
+  paidAt    DateTime
+  createdAt DateTime @default(now())
+
+  @@index([subscriptionId])
+  @@index([sponsorshipId])
+  @@index([stripeSubId])
+  @@index([paidAt])
 }
