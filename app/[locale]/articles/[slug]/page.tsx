@@ -14,7 +14,8 @@ import {
   User,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { readingMinutes, isPublished } from "@/lib/articles";
+import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
+import { ArticleSidebar } from "@/components/articles/article-sidebar";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.post.findUnique({
@@ -104,9 +105,54 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
   const hasRelated =
     !!article.shelter || !!article.animal || !!article.event || !!article.campaign;
 
+  // Oldalsáv: ami olvasás után továbbvezeti az olvasót
+  const [moreArticles, animals, campaigns] = await Promise.all([
+    prisma.post.findMany({
+      where:   { ...publishedWhere(), NOT: { id: article.id } },
+      orderBy: { publishedAt: "desc" },
+      take: 4,
+      select: { id: true, slug: true, title: true, imageUrl: true, publishedAt: true, content: true },
+    }),
+    prisma.animal.findMany({
+      where:   { status: "AVAILABLE" },
+      orderBy: { createdAt: "desc" },
+      take: 4,
+      select: {
+        id: true, name: true, slug: true, breed: true,
+        shelter: { select: { city: true } },
+        images:  { where: { isPrimary: true }, take: 1, select: { url: true } },
+      },
+    }),
+    prisma.campaign.findMany({
+      where:   { status: "ACTIVE" },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: { id: true, title: true, targetAmount: true, raisedAmount: true },
+    }),
+  ]);
+
+  const sidebar = (
+    <ArticleSidebar
+      articles={moreArticles.map((a) => ({
+        id: a.id, slug: a.slug, title: a.title, imageUrl: a.imageUrl,
+        publishedAt: a.publishedAt ? a.publishedAt.toISOString() : null,
+        readingMinutes: readingMinutes(a.content),
+      }))}
+      animals={animals.map((a) => ({
+        id: a.id, name: a.name, slug: a.slug, breed: a.breed,
+        city: a.shelter.city, imageUrl: a.images[0]?.url ?? null,
+      }))}
+      campaigns={campaigns}
+    />
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="flex justify-center gap-6">
+
+          {/* Olvasósáv – olvasható szélességen tartva */}
+          <div className="w-full max-w-3xl">
 
         <Link
           href="/articles"
@@ -212,6 +258,15 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
           </section>
         )}
 
+            {/* Mobilon az oldalsáv a cikk alá kerül */}
+            <div className="mt-8 lg:hidden">{sidebar}</div>
+          </div>
+
+          {/* Oldalsáv – nagy képernyőn a cikk mellett, együtt görgetve */}
+          <div className="hidden w-80 shrink-0 lg:block">
+            <div className="sticky top-20">{sidebar}</div>
+          </div>
+        </div>
       </div>
     </div>
   );
