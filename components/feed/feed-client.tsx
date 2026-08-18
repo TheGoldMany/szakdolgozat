@@ -8,7 +8,6 @@ import {
   AlertTriangle, Newspaper,
 } from "lucide-react";
 import { PostCard, type FeedPost } from "@/components/feed/post-card";
-import { PostComposer } from "@/components/feed/post-composer";
 import { ShareButton } from "@/components/ui/share-button";
 import { cn } from "@/lib/utils";
 
@@ -32,13 +31,6 @@ export interface ReportRailItem {
   id: string; type: string; animalType: string; city: string; imageUrl: string | null;
 }
 
-export interface ComposerInfo {
-  userImage:      string | null;
-  userName:       string | null;
-  shelterName:    string | null;
-  shelterLogoUrl: string | null;
-}
-
 export interface FeedClientProps {
   animals:       AnimalRailItem[];
   campaigns:     CampaignRailItem[];
@@ -46,7 +38,6 @@ export interface FeedClientProps {
   reports:       ReportRailItem[];
   initialPosts:  FeedPost[];
   initialCursor: string | null;
-  composer:      ComposerInfo | null;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,7 +221,6 @@ function SectionDivider({ label }: { label: string }) {
 export function FeedClient({
   animals, campaigns, events, reports,
   initialPosts, initialCursor,
-  composer,
 }: FeedClientProps) {
   const [posts, setPosts]   = useState<FeedPost[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
@@ -255,9 +245,6 @@ export function FeedClient({
 
   return (
     <div className="space-y-4">
-
-      {/* ── Poszt composer (csak menhely adminoknak) ─────── */}
-      {composer && <PostComposer {...composer} />}
 
       {/* ── Tartalom railek (mindig legfelül, legújabb) ──── */}
       {hasContent > 0 && (
@@ -285,10 +272,10 @@ export function FeedClient({
         </div>
       )}
 
-      {/* ── Közösségi posztok ─────────────────────────────── */}
+      {/* ── Cikkek ─────────────────────────────── */}
       {posts.length > 0 && (
         <>
-          <SectionDivider label="Közösségi posztok" />
+          <SectionDivider label="Cikkek" />
           <div className="space-y-4">
             {posts.map((post) => <PostCard key={post.id} post={post} />)}
           </div>

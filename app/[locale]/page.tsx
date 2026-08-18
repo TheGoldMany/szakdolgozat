@@ -12,6 +12,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
+import { readingMinutes } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
@@ -22,14 +23,16 @@ export default async function HomePage() {
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters, composerShelter] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
       prisma.animal.count({ where: { status: AnimalStatus.ADOPTED } }),
       prisma.post.findMany({
+        // Csak publikált cikkek – a piszkozat nem kerülhet ki a főoldalra
+        where:   { publishedAt: { not: null } },
         take: POSTS_PER_PAGE,
-        orderBy: { createdAt: "desc" },
+        orderBy: { publishedAt: "desc" },
         include: {
           shelter:  { select: { id: true, name: true, slug: true, logoUrl: true, city: true } },
           author:   { select: { id: true, name: true, image: true } },
@@ -84,13 +87,6 @@ export default async function HomePage() {
           _count: { select: { animals: true } },
         },
       }),
-      // Shelter logo for post composer (SHELTER_ADMIN / SUPER_ADMIN only)
-      session?.user?.id && (session.user.role === "SHELTER_ADMIN" || session.user.role === "SUPER_ADMIN")
-        ? prisma.shelterAdmin.findFirst({
-            where:   { userId: session.user.id },
-            select:  { shelter: { select: { name: true, logoUrl: true } } },
-          })
-        : Promise.resolve(null),
     ]);
 
   // Kedvelt poszt-id-k a bejelentkezett felhasználóhoz.
@@ -105,9 +101,13 @@ export default async function HomePage() {
 
   const feedPosts: FeedPost[] = posts.map((p) => ({
     id:        p.id,
+    title:     p.title,
+    slug:      p.slug,
+    excerpt:   p.excerpt,
     content:   p.content,
     imageUrl:  p.imageUrl,
-    createdAt: p.createdAt.toISOString(),
+    createdAt: (p.publishedAt ?? p.createdAt).toISOString(),
+    readingMinutes: readingMinutes(p.content),
     shelter:   p.shelter,
     author:    p.author,
     animal:    p.animal,
@@ -121,10 +121,6 @@ export default async function HomePage() {
   const feedEvents    = railEvents.map((e) => ({ id: e.id, title: e.title, slug: e.slug, startsAt: e.startsAt.toISOString(), location: e.location }));
   const feedCampaigns = railCampaigns.map((c) => ({ id: c.id, title: c.title, slug: c.slug, targetAmount: c.targetAmount, raisedAmount: c.raisedAmount, imageUrl: c.imageUrl ?? null, shelter: c.shelter ? { name: c.shelter.name, slug: c.shelter.slug, logoUrl: c.shelter.logoUrl ?? null } : null, user: c.user ? { name: c.user.name ?? null, image: c.user.image ?? null } : null }));
   const feedReports   = railReports;
-
-  const composerInfo = (session?.user && composerShelter)
-    ? { userImage: session.user.image ?? null, userName: session.user.name ?? null, shelterName: composerShelter.shelter.name, shelterLogoUrl: composerShelter.shelter.logoUrl ?? null }
-    : null;
 
   const nextCursor = posts.length === POSTS_PER_PAGE ? posts[posts.length - 1].id : null;
   const heroSlides = heroAnimals
@@ -234,7 +230,6 @@ export default async function HomePage() {
                   reports={feedReports}
                   initialPosts={feedPosts}
                   initialCursor={nextCursor}
-                  composer={composerInfo}
                 />
               ) : (
                 <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center">

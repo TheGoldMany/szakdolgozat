@@ -49,7 +49,7 @@ const TOC_ADMIN: TocItem[] = [
   { id: "a-keszlet",      label: "Készletkezelés",           icon: Package        },
   { id: "a-ertesitesek",  label: "Értesítések és riasztások", icon: Bell          },
   { id: "a-utankovetes",  label: "Utánkövetések",            icon: ListChecks     },
-  { id: "a-posztok",      label: "Közösségi posztok",        icon: MessagesSquare },
+  { id: "a-posztok",      label: "Cikkek",                   icon: MessagesSquare },
   { id: "a-adomanyok",    label: "Adományok és kampányok",   icon: Heart          },
   { id: "a-elemzesek",    label: "Elemzések (Analytics)",    icon: BarChart2      },
   { id: "a-beallitasok",  label: "Menhely beállításai",       icon: Settings       },
@@ -695,24 +695,25 @@ function AdminContent() {
         </div>
       </Section>
 
-      {/* Közösségi posztok */}
-      <Section id="a-posztok" icon={MessagesSquare} title="Közösségi posztok" color="bg-fuchsia-50 text-fuchsia-800">
+      {/* Cikkek */}
+      <Section id="a-posztok" icon={MessagesSquare} title="Cikkek" color="bg-fuchsia-50 text-fuchsia-800">
         <p className="text-sm text-gray-600 leading-relaxed">
-          A menhely nevében posztokat tehetsz közzé a platformon. A posztok a látogatók főoldalán
-          megjelenő „Neked" (For You) feedben jelennek meg, és megoszthatók közösségi médiában is.
+          A platformon cikkek jelenhetnek meg. Cikket <strong>kizárólag a platform adminja</strong> írhat;
+          a megjelent cikkek a <strong>Cikkek</strong> oldalon és a főoldali hírfolyamban is olvashatók,
+          és megoszthatók közösségi médiában.
         </p>
         <div className="space-y-4 mt-3">
-          <Step n={1} title="Poszt létrehozása">
-            Dashboard → Posztok → Írd be a szöveget. Csatolhatsz képet, és egy entitást:
-            valamelyik menhelyeden lévő <strong>állatot</strong>, <strong>eseményt</strong> vagy <strong>gyűjtést</strong>.
-            A csatolt kártya a hírfolyamban kattintható.
+          <Step n={1} title="Cikk írása">
+            Dashboard → Cikkek → Adj címet, rövid bevezetőt és szöveget. Feltölthetsz borítóképet,
+            és a cikk köthető egy <strong>menhelyhez</strong>, illetve kiemelhet egy <strong>állatot</strong>,
+            <strong>eseményt</strong> vagy <strong>gyűjtést</strong>. A csatolt kártya a cikk végén kattintható.
           </Step>
-          <Step n={2} title="Közzétesz és törlés">
-            A „Közzétesz" gombra kattintva a poszt azonnal megjelenik a főoldalon.
-            Szerkesztés nem lehetséges — ha hibás, töröld és hozz létre újat.
+          <Step n={2} title="Piszkozat, publikálás, szerkesztés">
+            A cikk elmenthető piszkozatként — az még nem látszik a látogatóknak. Publikálás után
+            bármikor szerkeszthető, visszavonható piszkozatba, vagy törölhető.
           </Step>
           <Step n={3} title="Lájkok és megosztás">
-            A látogatók lájkolhatják a posztot (bejelentkezés szükséges).
+            A látogatók lájkolhatják a cikket (bejelentkezés szükséges).
             A megosztás gombbal Facebook, X (Twitter), WhatsApp vagy vágólapra másolva terjeszthető.
           </Step>
         </div>

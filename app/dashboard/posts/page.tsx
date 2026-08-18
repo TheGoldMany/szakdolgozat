@@ -1,103 +1,150 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { MessagesSquare, Image as ImageIcon } from "lucide-react";
+import { Newspaper, Image as ImageIcon, Clock, Heart, Building2, Pencil } from "lucide-react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { timeAgo } from "@/lib/utils";
-import { PostComposer } from "@/components/dashboard/post-composer";
-import { DeletePostButton } from "@/components/dashboard/delete-post-button";
-import { resolveActingShelter } from "@/lib/acting-shelter";
+import { readingMinutes } from "@/lib/articles";
+import { ArticleEditor, type EditableArticle } from "@/components/dashboard/article-editor";
 
-export const metadata: Metadata = { title: "Posztok" };
+export const metadata: Metadata = { title: "Cikkek" };
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPostsPage() {
+function formatDate(d: Date): string {
+  return d.toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" });
+}
+
+export default async function DashboardArticlesPage({
+  searchParams,
+}: {
+  searchParams: { edit?: string };
+}) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
-  const acting = await resolveActingShelter(session.user.id, session.user.role);
+  // A cikkeket kizárólag a platform adminja kezelheti.
+  if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
 
-  let shelterIds: string[];
-  if (acting.shelterId) {
-    shelterIds = [acting.shelterId];
-  } else if (acting.canSwitch) {
-    // Nincs kiválasztott menhely → az összes menhely posztjai
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    shelterIds = all.map((s) => s.id);
-  } else {
-    redirect("/dashboard");
-  }
+  const articles = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      _count:  { select: { likes: true } },
+      shelter: { select: { name: true } },
+      author:  { select: { name: true } },
+    },
+  });
 
-  const shelterId = shelterIds[0];
+  const editingId = searchParams?.edit;
+  const source    = editingId ? articles.find((a) => a.id === editingId) : undefined;
 
-  const [animals, events, campaigns, posts] = await Promise.all([
-    prisma.animal.findMany({
-      where: { shelterId, status: "AVAILABLE" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, name: true },
-    }),
-    prisma.event.findMany({
-      where: { shelterId, status: "PUBLISHED" },
-      orderBy: { startsAt: "desc" },
-      select: { id: true, title: true },
-    }),
-    prisma.campaign.findMany({
-      where: { shelterId, status: "ACTIVE" },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, title: true },
-    }),
-    prisma.post.findMany({
-      where: { shelterId: { in: shelterIds } },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-      include: { _count: { select: { likes: true } }, shelter: { select: { name: true } } },
-    }),
-  ]);
+  const editing: EditableArticle | null = source
+    ? {
+        id:        source.id,
+        title:     source.title,
+        excerpt:   source.excerpt,
+        content:   source.content,
+        imageUrl:  source.imageUrl,
+        shelterId: source.shelterId,
+        published: source.publishedAt !== null,
+      }
+    : null;
+
+  const publishedCount = articles.filter((a) => a.publishedAt !== null).length;
+  const draftCount     = articles.length - publishedCount;
 
   return (
     <div>
       <div className="mb-6 flex items-center gap-3">
-        <MessagesSquare className="h-6 w-6 text-brand-500" />
+        <Newspaper className="h-6 w-6 text-brand-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Posztok</h1>
-          <p className="text-sm text-gray-500">Oszd meg a híreidet a „Neked" feeden – {posts.length} poszt eddig</p>
+          <h1 className="text-2xl font-bold text-gray-900">Cikkek</h1>
+          <p className="text-sm text-gray-500">
+            {articles.length} cikk · {publishedCount} publikált · {draftCount} piszkozat
+          </p>
         </div>
       </div>
 
-      <PostComposer
-        shelterId={shelterId}
-        animals={animals.map((a) => ({ id: a.id, label: a.name }))}
-        events={events.map((e) => ({ id: e.id, label: e.title }))}
-        campaigns={campaigns.map((c) => ({ id: c.id, label: c.title }))}
-      />
+      {/* A szerkesztő kulcsot kap, hogy váltáskor újratöltse a mezőket. */}
+      <ArticleEditor key={editing?.id ?? "new"} article={editing} />
 
       <div className="mt-6 space-y-3">
-        {posts.length === 0 && (
+        {articles.length === 0 && (
           <p className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-            Még nincs posztod. Írd meg az elsőt fent!
+            Még nincs egyetlen cikk sem. Írd meg az elsőt a fenti szerkesztőben.
           </p>
         )}
-        {posts.map((p) => (
-          <div key={p.id} className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-            {p.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={p.imageUrl} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
-            ) : (
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-300">
-                <ImageIcon className="h-5 w-5" />
-              </span>
-            )}
-            <div className="min-w-0 flex-1">
-              <p className="line-clamp-3 whitespace-pre-wrap text-sm text-gray-800">{p.content}</p>
-              <p className="mt-1 text-xs text-gray-400">
-                {timeAgo(p.createdAt)} · {p._count.likes} kedvelés
-                {session.user.role === "SUPER_ADMIN" && ` · ${p.shelter.name}`}
-              </p>
+
+        {articles.map((a) => {
+          const published = a.publishedAt !== null;
+          const isEditing = a.id === editingId;
+
+          return (
+            <div
+              key={a.id}
+              className={`flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-sm ${
+                isEditing ? "border-brand-200 ring-1 ring-brand-100" : "border-gray-100"
+              }`}
+            >
+              {a.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={a.imageUrl} alt="" className="h-16 w-24 shrink-0 rounded-lg object-cover" />
+              ) : (
+                <span className="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-300">
+                  <ImageIcon className="h-5 w-5" />
+                </span>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="truncate text-sm font-bold text-gray-900">
+                    {a.title || "Cím nélküli cikk"}
+                  </h2>
+                  <span
+                    className={
+                      published
+                        ? "rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700"
+                        : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                    }
+                  >
+                    {published ? "Publikálva" : "Piszkozat"}
+                  </span>
+                </div>
+
+                {a.excerpt && (
+                  <p className="mt-1 line-clamp-2 text-sm text-gray-500">{a.excerpt}</p>
+                )}
+
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
+                  <span>{a.author?.name ?? "Ismeretlen szerző"}</span>
+                  {a.shelter && (
+                    <span className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3 shrink-0" />
+                      {a.shelter.name}
+                    </span>
+                  )}
+                  <span>{formatDate(a.publishedAt ?? a.createdAt)}</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3 shrink-0" />
+                    {readingMinutes(a.content)} perc olvasás
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="h-3 w-3 shrink-0" />
+                    {a._count.likes} kedvelés
+                  </span>
+                </div>
+              </div>
+
+              <Link
+                href={`/dashboard/posts?edit=${a.id}`}
+                className="flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-brand-600"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Szerkesztés
+              </Link>
             </div>
-            <DeletePostButton postId={p.id} />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
