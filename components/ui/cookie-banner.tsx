@@ -28,7 +28,7 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label={t("title")}
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 shadow-2xl backdrop-blur-sm sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-sm sm:rounded-2xl sm:border"
+      className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-50 border-t border-gray-200 bg-white/95 shadow-2xl backdrop-blur-sm sm:left-4 sm:right-auto sm:max-w-sm sm:rounded-2xl sm:border md:bottom-4"
     >
       <div className="p-4 sm:p-5">
         <div className="mb-3 flex items-center gap-2">

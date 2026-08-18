@@ -26,13 +26,13 @@ export default async function EventsListPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50">
             <CalendarHeart className="h-6 w-6 text-brand-500" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t("listTitle")}</h1>
+            <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{t("listTitle")}</h1>
             <p className="mt-0.5 text-sm text-gray-500">{t("listSubtitle")}</p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -7,6 +8,7 @@ import {
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
   ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
   UserCog, Newspaper, Sparkles, ShieldCheck, ScrollText, Stethoscope,
+  Menu, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -93,14 +95,38 @@ function isActive(pathname: string, href: string) {
 
 export function SidebarNav({ role }: { role: string }) {
   const pathname = usePathname();
-  const t = useTranslations("dashboard");
+  const t  = useTranslations("dashboard");
+  const tc = useTranslations("common");
+
+  // Mobilon a menü alapból csukva van, hogy ne toljon le mindent az oldalról.
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [pathname]);
 
   const groups = NAV_GROUPS
     .map(g => ({ ...g, items: g.items.filter(i => i.roles.includes(role)) }))
     .filter(g => g.items.length > 0);
 
+  // A csukott mobilmenü gombján az aktuális oldal neve látszik
+  const current = groups.flatMap(g => g.items).find(i => isActive(pathname, i.href));
+  const CurrentIcon = current?.icon ?? Menu;
+
   return (
-    <nav className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+    <>
+      {/* Mobil: lenyíló menü – a hosszú listát nem tolja a tartalom elé */}
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        className="mb-3 flex w-full items-center gap-2.5 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition-colors hover:bg-gray-50 lg:hidden"
+      >
+        <CurrentIcon className="h-4 w-4 shrink-0 text-brand-500" />
+        <span className="min-w-0 flex-1 truncate text-left">
+          {current ? t(current.labelKey) : tc("menu")}
+        </span>
+        <ChevronDown className={cn("h-4 w-4 shrink-0 text-gray-400 transition-transform", open && "rotate-180")} />
+      </button>
+
+    <nav className={cn("rounded-2xl border border-gray-200 bg-white p-3 shadow-sm lg:block", !open && "hidden")}>
       {groups.map((group, gi) => (
         <div key={gi} className={cn(gi > 0 && "mt-4")} data-tour={group.tourKey}>
           {group.titleKey && (
@@ -143,5 +169,6 @@ export function SidebarNav({ role }: { role: string }) {
         </button>
       </div>
     </nav>
+    </>
   );
 }

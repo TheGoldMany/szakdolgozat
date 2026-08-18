@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { Building2, Calendar, PawPrint, HandHeart, MapPin, Clock, ArrowRight } from "lucide-react";
 import { timeAgo } from "@/lib/utils";
 import { LikeButton } from "@/components/feed/like-button";
@@ -26,6 +27,8 @@ export interface FeedPost {
 
 /** Cikk-előnézet a hírfolyamban: cím, bevezető és átvezetés a teljes cikkre. */
 export function PostCard({ post }: { post: FeedPost }) {
+  const t      = useTranslations("articles");
+  const locale = useLocale();
   const href = post.slug ? `/articles/${post.slug}` : null;
   // Bevezető hiányában a szöveg elejét mutatjuk, hogy legyen mit olvasni
   const lead = post.excerpt ?? (post.content.length > 220 ? `${post.content.slice(0, 220)}…` : post.content);
@@ -58,7 +61,7 @@ export function PostCard({ post }: { post: FeedPost }) {
             </Link>
           ) : (
             <p className="truncate text-sm font-semibold text-gray-900">
-              {post.author?.name ?? "ÁllatiMenhelyek"}
+              {post.author?.name ?? t("siteName")}
             </p>
           )}
           <p className="flex items-center gap-1.5 truncate text-xs text-gray-500">
@@ -66,7 +69,7 @@ export function PostCard({ post }: { post: FeedPost }) {
             {timeAgo(post.createdAt)}
             <span className="text-gray-300">·</span>
             <Clock className="h-3 w-3 shrink-0" />
-            {post.readingMinutes} perc
+            {t("minutes", { count: post.readingMinutes })}
           </p>
         </div>
       </div>
@@ -111,7 +114,7 @@ export function PostCard({ post }: { post: FeedPost }) {
             <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-100 text-brand-700"><PawPrint className="h-5 w-5" /></span>
           )}
           <div className="min-w-0">
-            <p className="text-xs font-medium text-brand-700">Örökbefogadható</p>
+            <p className="text-xs font-medium text-brand-700">{t("adoptable")}</p>
             <p className="truncate text-sm font-semibold text-gray-900">{post.animal.name}</p>
           </div>
         </Link>
@@ -125,7 +128,7 @@ export function PostCard({ post }: { post: FeedPost }) {
             <p className="truncate text-sm font-semibold text-gray-900">{post.event.title}</p>
             <p className="flex items-center gap-1 truncate text-xs text-gray-500">
               <MapPin className="h-3 w-3 shrink-0" />
-              {new Date(post.event.startsAt).toLocaleDateString("hu-HU", { month: "short", day: "numeric" })} · {post.event.location}
+              {new Date(post.event.startsAt).toLocaleDateString(locale, { month: "short", day: "numeric" })} · {post.event.location}
             </p>
           </div>
         </Link>
@@ -144,7 +147,7 @@ export function PostCard({ post }: { post: FeedPost }) {
               <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              {post.campaign.raisedAmount.toLocaleString("hu-HU")} Ft / {post.campaign.targetAmount.toLocaleString("hu-HU")} Ft ({pct}%)
+              {post.campaign.raisedAmount.toLocaleString(locale)} Ft / {post.campaign.targetAmount.toLocaleString(locale)} Ft ({pct}%)
             </p>
           </Link>
         );
@@ -154,7 +157,7 @@ export function PostCard({ post }: { post: FeedPost }) {
       {href && (
         <Link href={href}
           className="mx-4 mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
-          Tovább a cikkre
+          {t("readMore")}
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
@@ -164,7 +167,7 @@ export function PostCard({ post }: { post: FeedPost }) {
         <LikeButton postId={post.id} initialCount={post._count.likes} initialLiked={post.likedByMe} />
         <ShareButton
           url={href ?? "/articles"}
-          title={`${post.title} – ÁllatiMenhelyek.hu`}
+          title={`${post.title} – ${t("siteName")}.hu`}
         />
       </div>
     </article>

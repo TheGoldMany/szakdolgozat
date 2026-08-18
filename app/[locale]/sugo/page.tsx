@@ -1112,11 +1112,11 @@ export default function HelpPage() {
 
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
-        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 text-center">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12 sm:px-6 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600">
             <PawPrint className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Ismerd meg a platformot</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Ismerd meg a platformot</h1>
           <p className="mt-2 text-gray-500">
             Válaszd ki a szerepkörödet, és lépj tovább a vonatkozó útmutatóhoz.
           </p>

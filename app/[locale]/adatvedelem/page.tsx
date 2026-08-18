@@ -355,7 +355,7 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
               <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
                 {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
               </p>
-              <h1 className="text-3xl font-bold text-gray-900">{content.title}</h1>
+              <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{content.title}</h1>
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-500">
@@ -364,7 +364,7 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
@@ -419,7 +419,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">Jogi dokumentum</p>
-              <h1 className="text-3xl font-bold text-gray-900">Adatvédelmi tájékoztató</h1>
+              <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Adatvédelmi tájékoztató</h1>
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-500">
@@ -454,7 +454,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
 
           <P>

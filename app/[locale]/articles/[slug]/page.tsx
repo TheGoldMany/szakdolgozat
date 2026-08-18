@@ -13,6 +13,7 @@ import {
   PawPrint,
   User,
 } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
@@ -22,10 +23,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     where:  { slug: params.slug },
     select: { title: true, excerpt: true, imageUrl: true, publishedAt: true },
   });
-  if (!article || !isPublished(article.publishedAt)) return { title: "Cikk nem található" };
+  const t = await getTranslations("articles");
+  if (!article || !isPublished(article.publishedAt)) return { title: t("notFound") };
 
   const title       = article.title;
-  const description = article.excerpt?.slice(0, 160) ?? `${article.title} – ÁllatiMenhelyek.hu`;
+  const description = article.excerpt?.slice(0, 160) ?? `${article.title} – ${t("siteName")}.hu`;
   const image       = article.imageUrl ?? undefined;
 
   return {
@@ -46,8 +48,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 // ISR: a cikkoldal 5 percenként frissül
 export const revalidate = 300;
 
-function formatDate(date: Date) {
-  return date.toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" });
+function formatDate(date: Date, locale: string) {
+  return date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 }
 
 /** Sima szöveg → bekezdések (üres sorok mentén darabolva). */
@@ -85,6 +87,9 @@ function RelatedCard({
 }
 
 export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
+  const t      = await getTranslations("articles");
+  const locale = await getLocale();
+
   const article = await prisma.post.findUnique({
     where:   { slug: params.slug },
     include: {
@@ -148,7 +153,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex justify-center gap-6">
 
           {/* Olvasósáv – olvasható szélességen tartva */}
@@ -156,14 +161,14 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
 
         <Link
           href="/articles"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-brand-500"
+          className="mb-4 inline-flex sm:mb-6 items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-brand-500"
         >
           <ArrowLeft className="h-4 w-4" />
-          Vissza a cikkekhez
+          {t("back")}
         </Link>
 
         <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300 sm:h-72">
+          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300 sm:h-72">
             {article.imageUrl ? (
               <Image
                 src={article.imageUrl}
@@ -180,28 +185,28 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
             )}
           </div>
 
-          <div className="p-6 sm:p-8">
-            <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
+          <div className="p-5 sm:p-8">
+            <h1 className="text-2xl font-bold leading-tight text-gray-900 sm:text-4xl">
               {article.title}
             </h1>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-gray-100 pb-5 text-sm text-gray-500">
               <span className="flex items-center gap-1.5">
                 <User className="h-4 w-4 text-gray-400" />
-                {article.author?.name ?? "Szerkesztőség"}
+                {article.author?.name ?? t("editorial")}
               </span>
               <span className="flex items-center gap-1.5">
                 <CalendarHeart className="h-4 w-4 text-gray-400" />
-                {formatDate(article.publishedAt)}
+                {formatDate(article.publishedAt, locale)}
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-gray-400" />
-                {minutes} perc olvasás
+                {t("readingTime", { count: minutes })}
               </span>
             </div>
 
             {article.excerpt && (
-              <p className="mt-6 text-lg font-medium leading-relaxed text-gray-700">
+              <p className="mt-5 text-base font-medium leading-relaxed text-gray-700 sm:mt-6 sm:text-lg">
                 {article.excerpt}
               </p>
             )}
@@ -217,15 +222,15 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
         </article>
 
         {hasRelated && (
-          <section className="mt-8">
+          <section className="mt-6 sm:mt-8">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              A cikkhez kapcsolódik
+              {t("related")}
             </h2>
             <div className="space-y-3">
               {article.shelter && (
                 <RelatedCard
                   href={`/shelters/${article.shelter.slug}`}
-                  label="Menhely"
+                  label={t("relatedShelter")}
                   title={article.shelter.name}
                   icon={Building2}
                 />
@@ -233,7 +238,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
               {article.animal && (
                 <RelatedCard
                   href={`/animals/${article.animal.slug}`}
-                  label="Állat"
+                  label={t("relatedAnimal")}
                   title={article.animal.name}
                   icon={PawPrint}
                 />
@@ -241,7 +246,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
               {article.event && (
                 <RelatedCard
                   href={`/events/${article.event.slug}`}
-                  label="Esemény"
+                  label={t("relatedEvent")}
                   title={article.event.title}
                   icon={CalendarHeart}
                 />
@@ -249,7 +254,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
               {article.campaign && (
                 <RelatedCard
                   href={`/donate/${article.campaign.id}`}
-                  label="Adománygyűjtés"
+                  label={t("relatedCampaign")}
                   title={article.campaign.title}
                   icon={HeartHandshake}
                 />
@@ -259,7 +264,7 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
         )}
 
             {/* Mobilon az oldalsáv a cikk alá kerül */}
-            <div className="mt-8 lg:hidden">{sidebar}</div>
+            <div className="mt-6 lg:hidden sm:mt-8">{sidebar}</div>
           </div>
 
           {/* Oldalsáv – nagy képernyőn a cikk mellett, együtt görgetve */}

@@ -71,9 +71,9 @@ export default async function FinancesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">{t("title")}</h1>
+        <h1 className="mb-2 text-2xl font-bold sm:text-3xl text-gray-900">{t("title")}</h1>
         <p className="mb-8 text-sm text-gray-500">{t("subtitle")}</p>
 
         {/* Summary cards */}

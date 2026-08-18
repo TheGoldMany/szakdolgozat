@@ -20,7 +20,7 @@ export default async function NewReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
         <nav className="mb-6 text-sm text-gray-500">
           <Link href="/reports" className="hover:text-brand-500">{t("title")}</Link>
@@ -29,7 +29,7 @@ export default async function NewReportPage() {
         </nav>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t("newTitle")}</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{t("newTitle")}</h1>
           <p className="mt-2 text-gray-500">{t("newDesc")}</p>
         </div>
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useTranslations, useLocale } from "next-intl";
 import { Newspaper, PawPrint, HandHeart, Clock } from "lucide-react";
 
 export interface SidebarArticle {
@@ -51,11 +52,15 @@ export function ArticleSidebar({
   animals:   SidebarAnimal[];
   campaigns: SidebarCampaign[];
 }) {
+  const t       = useTranslations("articles");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
+
   return (
     <aside className="space-y-4">
 
       {articles.length > 0 && (
-        <Card icon={Newspaper} title="További cikkek" href="/articles" linkLabel="Összes">
+        <Card icon={Newspaper} title={t("moreArticles")} href="/articles" linkLabel={tCommon("all")}>
           <ul className="space-y-1">
             {articles.map((a) => (
               <li key={a.id}>
@@ -76,7 +81,7 @@ export function ArticleSidebar({
                     <p className="line-clamp-2 text-xs font-semibold leading-snug text-gray-800">{a.title}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-[11px] text-gray-400">
                       <Clock className="h-3 w-3 shrink-0" />
-                      {a.readingMinutes} perc
+                      {t("minutes", { count: a.readingMinutes })}
                     </p>
                   </div>
                 </Link>
@@ -87,7 +92,7 @@ export function ArticleSidebar({
       )}
 
       {animals.length > 0 && (
-        <Card icon={PawPrint} title="Gazdira várnak" href="/animals" linkLabel="Összes">
+        <Card icon={PawPrint} title={t("waitingAnimals")} href="/animals" linkLabel={tCommon("all")}>
           <ul className="space-y-1">
             {animals.map((a) => (
               <li key={a.id}>
@@ -113,7 +118,7 @@ export function ArticleSidebar({
       )}
 
       {campaigns.length > 0 && (
-        <Card icon={HandHeart} title="Aktív gyűjtések" href="/donate" linkLabel="Összes">
+        <Card icon={HandHeart} title={t("activeCampaigns")} href="/donate" linkLabel={tCommon("all")}>
           <ul className="space-y-3">
             {campaigns.map((c) => {
               const pct = Math.min(100, Math.round((c.raisedAmount / c.targetAmount) * 100));
@@ -125,7 +130,7 @@ export function ArticleSidebar({
                       <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="mt-1 text-[11px] text-gray-400">
-                      {c.raisedAmount.toLocaleString("hu-HU")} Ft · {pct}%
+                      {c.raisedAmount.toLocaleString(locale)} Ft · {pct}%
                     </p>
                   </Link>
                 </li>

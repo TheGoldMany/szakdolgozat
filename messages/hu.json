@@ -81,7 +81,13 @@
     "feedTitle": "Neked",
     "feedEmpty": "Még nincs megjeleníthető tartalom. Nézz vissza később!",
     "ctaTitle": "Elveszett a kedvenced?",
-    "ctaDesc": "Add fel a bejelentést – a közösség segít megtalálni!"
+    "ctaDesc": "Add fel a bejelentést – a közösség segít megtalálni!",
+    "feedNewAnimals": "Új lakók",
+    "feedCampaigns": "Aktív gyűjtések",
+    "feedEvents": "Közelgő események",
+    "feedReports": "Friss bejelentések",
+    "feedArticles": "Cikkek",
+    "quickReport": "Bejelentés"
   },
   "animals": {
     "title": "Állatok",
@@ -506,7 +512,11 @@
     "makePrimary": "Beállítás elsődlegesnek",
     "addImage": "Kép hozzáadása",
     "close": "Bezárás",
-    "multiImageHint": "Max {max} kép · Max 5 MB/kép · JPEG, PNG, WebP · Az első kép lesz a főkép (hover → csillag)"
+    "multiImageHint": "Max {max} kép · Max 5 MB/kép · JPEG, PNG, WebP · Az első kép lesz a főkép (hover → csillag)",
+    "all": "Összes",
+    "loadMore": "Több betöltése",
+    "view": "Megtekintés",
+    "menu": "Menü"
   },
   "applications": {
     "title": "Kérelmeim",
@@ -539,7 +549,16 @@
     "filledForm": "Kitöltött kérvény",
     "viewFile": "Fájl megtekintése",
     "notFilled": "Nem lett kitöltve",
-    "formNotSubmitted": "A kérvény még nem lett beküldve."
+    "formNotSubmitted": "A kérvény még nem lett beküldve.",
+    "timelineTitle": "A kérelem állapota",
+    "timelineSubmitted": "Kérelem beküldve",
+    "timelineInvited": "Meghívva jelentkezésre",
+    "timelineWithdrawn": "Visszavonva",
+    "timelineProcessing": "Feldolgozás alatt",
+    "timelineProcessingHint": "A menhely hamarosan elbírálja a kérelmedet.",
+    "timelineApproved": "Jóváhagyva",
+    "timelineRejected": "Elutasítva",
+    "timelineDecision": "Döntés"
   },
   "profile": {
     "title": "Profilom",
@@ -620,7 +639,26 @@
     "deleteCancel": "Mégsem",
     "deleteConfirmButton": "Fiók végleges törlése",
     "deleteInProgress": "Törlés folyamatban...",
-    "deleteError": "Hiba történt. Próbáld újra."
+    "deleteError": "Hiba történt. Próbáld újra.",
+    "myCampaigns": "Gyűjtéseim",
+    "newCampaign": "Új gyűjtés",
+    "noCampaigns": "Még nincs gyűjtésed.",
+    "startCampaignNow": "Indíts egyet most",
+    "campaignPending": "Jóváhagyásra vár",
+    "campaignActive": "Aktív",
+    "campaignRejected": "Elutasítva",
+    "campaignCompleted": "Lezárt",
+    "donationsCount": "{count} adomány",
+    "stripeTitle": "Stripe fiók",
+    "stripeDesc": "Kösd be a Stripe fiókod, ha saját gyűjtést szeretnél indítani — az adományok közvetlenül ide érkeznek.",
+    "stripeActive": "A Stripe fiókod aktív, fogadhatsz adományokat.",
+    "stripeOpenDashboard": "Stripe vezérlőpult megnyitása",
+    "stripeIncomplete": "A Stripe regisztrációd még nincs befejezve.",
+    "stripeFinish": "Regisztráció befejezése",
+    "stripeConnect": "Stripe fiók csatlakoztatása",
+    "stripeConnectError": "Hiba a csatlakozáskor.",
+    "stripeOpenError": "Hiba a megnyitáskor.",
+    "stripeUnknownError": "Ismeretlen hiba."
   },
   "cookies": {
     "title": "Sütik és adatvédelem",
@@ -1523,5 +1561,27 @@
     "myDonations": "Adományaim",
     "noDonations": "Még nem adományoztál.",
     "directDonation": "Közvetlen adomány"
+  },
+  "articles": {
+    "title": "Cikkek",
+    "subtitle": "Hírek, tanácsok és történetek az örökbefogadásról",
+    "metaDescription": "Hírek, tanácsok és történetek az örökbefogadásról és az állatvédelemről.",
+    "empty": "Még nincs megjelent cikk. Nézz vissza később!",
+    "editorial": "Szerkesztőség",
+    "minutes": "{count} perc",
+    "readingTime": "{count} perc olvasás",
+    "notFound": "Cikk nem található",
+    "back": "Vissza a cikkekhez",
+    "related": "A cikkhez kapcsolódik",
+    "relatedShelter": "Menhely",
+    "relatedAnimal": "Állat",
+    "relatedEvent": "Esemény",
+    "relatedCampaign": "Adománygyűjtés",
+    "moreArticles": "További cikkek",
+    "waitingAnimals": "Gazdira várnak",
+    "activeCampaigns": "Aktív gyűjtések",
+    "readMore": "Tovább a cikkre",
+    "adoptable": "Örökbefogadható",
+    "siteName": "ÁllatiMenhelyek"
   }
 }

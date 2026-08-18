@@ -75,7 +75,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
               </span>
               <ShareButton url={`/events/${event.slug}`} title={`${event.title} – ÁllatiMenhelyek.hu`} />
             </div>
-            <h1 className="mt-3 text-3xl font-bold text-gray-900">{event.title}</h1>
+            <h1 className="mt-3 text-2xl font-bold sm:text-3xl text-gray-900">{event.title}</h1>
 
             {event.status === "CANCELLED" && (
               <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">

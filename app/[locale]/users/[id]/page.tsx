@@ -52,7 +52,7 @@ export default async function PublicUserProfilePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
 
         {/* Profil kártya */}
         <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
