@@ -267,8 +267,23 @@ export function Header() {
           )}
         </div>
 
-        {/* Mobile right side: notifications + hamburger */}
+        {/* Mobile right side: messages + notifications + hamburger */}
         <div className="flex items-center gap-1 md:hidden">
+          {session && (
+            <Link
+              href="/messages"
+              aria-label={t("messages")}
+              title={t("messages")}
+              className="relative rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            >
+              <MessageCircle className="h-5 w-5" />
+              {unread > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              )}
+            </Link>
+          )}
           {session && <NotificationBell />}
           <button
             className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
