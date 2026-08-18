@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendDonationReceivedEmail, sendDonationThankYouEmail, sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail, sendPaymentFailedEmail } from "@/lib/email";
+import { sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail, sendPaymentFailedEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
+import { fulfillDonation, notifyDonation } from "@/lib/donations";
 
 // Disable body parsing — we need the raw body for signature verification
 export const dynamic = "force-dynamic";
@@ -125,92 +126,12 @@ export async function POST(req: NextRequest) {
     // Case 1: One-time donation
     // ----------------------------------------------------------------
     if (metadata.donationId) {
-      const donationId = metadata.donationId;
-
-      // Mark donation as paid
-      const donation = await prisma.donation.update({
-        where: { id: donationId },
-        data:  { paidAt: new Date() },
-      });
-
-      // Increment campaign raisedAmount if linked
-      if (donation.campaignId) {
-        const campaign = await prisma.campaign.findUnique({
-          where:   { id: donation.campaignId },
-          include: {
-            shelter: {
-              include: {
-                admins: { include: { user: { select: { email: true, name: true } } }, take: 1 },
-              },
-            },
-            user: { select: { email: true, name: true } },
-          },
-        });
-
-        if (campaign) {
-          await prisma.campaign.update({
-            where: { id: donation.campaignId },
-            data:  { raisedAmount: { increment: donation.amount } },
-          });
-
-          const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://allatimenhelyek.hu";
-          const recipientEmail = campaign.shelter?.admins[0]?.user.email ?? campaign.user?.email;
-          const recipientName  = campaign.shelter?.admins[0]?.user.name ?? campaign.user?.name ?? "Admin";
-
-          // Notify campaign owner (shelter admin or individual user)
-          const donorName = donation.isAnonymous
-            ? null
-            : (await prisma.user.findUnique({ where: { id: donation.userId ?? "" }, select: { name: true } }))?.name ?? null;
-
-          // In-app notification for shelter admins
-          const shelterAdmins = campaign.shelter
-            ? await prisma.shelterAdmin.findMany({
-                where:  { shelterId: campaign.shelter.id },
-                select: { userId: true },
-              })
-            : [];
-          const ownerUserIds = shelterAdmins.length > 0
-            ? shelterAdmins.map((a) => a.userId)
-            : campaign.userId ? [campaign.userId] : [];
-          const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(donation.amount);
-          if (ownerUserIds.length > 0) {
-            createNotifications(ownerUserIds.map((uid) => ({
-              userId: uid,
-              type:   "DONATION_RECEIVED" as const,
-              title:  "Új adomány érkezett",
-              body:   `${donorName ?? "Névtelen"} – ${amountStr} (${campaign.title})`,
-              href:   `/dashboard`,
-            }))).catch((err) => console.error("Donation notification error:", err));
-          }
-
-          if (recipientEmail) {
-            sendDonationReceivedEmail({
-              to:            recipientEmail,
-              recipientName,
-              campaignTitle: campaign.title,
-              amount:        donation.amount,
-              donorName,
-              campaignUrl:   `${BASE_URL}/donate/${campaign.id}`,
-            }).catch((err) => console.error("Donation email error:", err));
-          }
-
-          // Thank-you email to the donor (skip anonymous or guest donations)
-          if (donation.userId && !donation.isAnonymous) {
-            const donor = await prisma.user.findUnique({
-              where:  { id: donation.userId },
-              select: { email: true, name: true },
-            });
-            if (donor?.email) {
-              sendDonationThankYouEmail({
-                to:            donor.email,
-                name:          donor.name ?? donor.email,
-                campaignTitle: campaign.title,
-                amount:        donation.amount,
-                campaignUrl:   `${BASE_URL}/donate/${campaign.id}`,
-              }).catch((err) => console.error("Donation thank-you email error:", err));
-            }
-          }
-        }
+      // Fizetettre állítás + a gyűjtés összegének növelése, pontosan egyszer.
+      // A Stripe újraküldheti ezt az eseményt; ilyenkor firstFulfilment=false,
+      // és nem duplázzuk sem az összeget, sem az értesítéseket.
+      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId);
+      if (donation && firstFulfilment) {
+        await notifyDonation(donation);
       }
     }
 

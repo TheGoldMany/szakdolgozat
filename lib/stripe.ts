@@ -1,5 +1,8 @@
 import Stripe from "stripe";
 
+// A kliens is használja, ezért külön, függőségmentes fájlban él.
+export { MIN_DONATION_HUF } from "@/lib/donation-limits";
+
 /**
  * Platform fee taken from every payment (donations + subscriptions).
  * The remainder is transferred in full to the connected account (shelter /

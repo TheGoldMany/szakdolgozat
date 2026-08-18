@@ -278,7 +278,7 @@
     "messagePlaceholder": "Schreibe eine Nachricht zu deiner Spende…",
     "anonymousDonation": "Anonym spenden",
     "toPayment": "Weiter zur Zahlung",
-    "minAmountError": "Der Mindestbetrag beträgt 100 HUF.",
+    "minAmountError": "Der Mindestbetrag beträgt {min} HUF.",
     "checkoutError": "Die Zahlung konnte nicht gestartet werden.",
     "newTitle": "Titel der Spendenaktion",
     "newTitlePlaceholder": "z. B. Hilf uns, Bodri zu retten!",

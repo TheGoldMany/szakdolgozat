@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF } from "@/lib/stripe";
+import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, MIN_DONATION_HUF } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { blockIfSuspended } from "@/lib/account-status";
 
@@ -11,7 +11,10 @@ const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 const donateSchema = z.object({
   campaignId:  z.string().min(1),
-  amount:      z.number().int().positive(),
+  // Az űrlap is ezt mutatja, de a határt itt kell kikényszeríteni: az API-ra
+  // közvetlenül is lehet küldeni, és 1 Ft-os adományoknál a fix díj miatt a
+  // támogatóra terhelt összeg abszurd lenne.
+  amount:      z.number().int().min(MIN_DONATION_HUF).max(5_000_000),
   message:     z.string().max(500).optional().nullable(),
   isAnonymous: z.boolean().optional().default(false),
 });

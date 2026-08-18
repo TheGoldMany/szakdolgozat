@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CheckCircle2 } from "lucide-react";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { fulfillDonation, notifyDonation } from "@/lib/donations";
 import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
@@ -34,12 +35,14 @@ async function fulfillSession(sessionId: string) {
       });
     }
 
-    // One-time donation: mark as paid if not yet done
+    // Egyszeri adomány: lezárás, ha a webhook még nem előzött meg minket.
+    // Ugyanaz a helper fut, mint a webhookban, így a gyűjtés összege akkor is
+    // helyes lesz, ha a webhook egyáltalán nem érkezik meg.
     if (metadata.donationId) {
-      await prisma.donation.updateMany({
-        where: { id: metadata.donationId, paidAt: null },
-        data:  { paidAt: new Date() },
-      });
+      const { donation, firstFulfilment } = await fulfillDonation(metadata.donationId);
+      if (donation && firstFulfilment) {
+        await notifyDonation(donation);
+      }
     }
   } catch {
     // Don't crash the page if Stripe call fails

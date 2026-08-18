@@ -278,7 +278,7 @@
     "messagePlaceholder": "Írj egy üzenetet az adományodhoz…",
     "anonymousDonation": "Névtelen adományozás",
     "toPayment": "Tovább a fizetéshez",
-    "minAmountError": "Az összeg minimum 100 Ft lehet.",
+    "minAmountError": "Az összeg minimum {min} Ft lehet.",
     "checkoutError": "Hiba történt a fizetés indításakor.",
     "newTitle": "Gyűjtés címe",
     "newTitlePlaceholder": "pl. Mentsd meg Bodrit!",

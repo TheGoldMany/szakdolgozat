@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { MIN_DONATION_HUF } from "@/lib/donation-limits";
 
 interface DonateFormProps {
   campaignId: string;
@@ -43,8 +44,8 @@ export function DonateForm({ campaignId }: DonateFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!amount || amount < 100) {
-      setError(t("minAmountError"));
+    if (!amount || amount < MIN_DONATION_HUF) {
+      setError(t("minAmountError", { min: MIN_DONATION_HUF }));
       return;
     }
     setLoading(true);
