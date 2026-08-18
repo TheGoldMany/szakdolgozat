@@ -51,6 +51,38 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
     take: 100,
   });
 
+  // Visszatérő bevétel: a ténylegesen befolyt havi terhelések. Eddig sehol nem
+  // látszott, mert a rendszer csak az előfizetés létrejöttét tárolta.
+  const revenue = await prisma.subscriptionPayment.aggregate({
+    where: shelterId
+      ? {
+          OR: [
+            { subscription: { tier: { shelterId } } },
+            { sponsorship:  { animal: { shelterId } } },
+          ],
+        }
+      : {},
+    _sum:   { netAmount: true, totalPaid: true },
+    _count: true,
+  });
+
+  const now        = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonth  = await prisma.subscriptionPayment.aggregate({
+    where: {
+      paidAt: { gte: monthStart },
+      ...(shelterId
+        ? {
+            OR: [
+              { subscription: { tier: { shelterId } } },
+              { sponsorship:  { animal: { shelterId } } },
+            ],
+          }
+        : {}),
+    },
+    _sum: { netAmount: true },
+  });
+
   const currentStatus = searchParams.status ?? "";
 
   const filterOptions = [
@@ -67,6 +99,26 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
         <div className="ml-auto flex gap-2">
           <ExportButton type="subscribers" label={`${t("subscriptionsTitle")} CSV`} />
           <ExportButton type="donations"   label="Adományok CSV" />
+        </div>
+      </div>
+
+      {/* Visszatérő bevétel */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-xs text-gray-400">{t("subsRevenueThisMonth")}</p>
+          <p className="mt-0.5 text-xl font-bold text-gray-900">
+            {(thisMonth._sum.netAmount ?? 0).toLocaleString("hu-HU")} Ft
+          </p>
+        </div>
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-xs text-gray-400">{t("subsRevenueTotal")}</p>
+          <p className="mt-0.5 text-xl font-bold text-gray-900">
+            {(revenue._sum.netAmount ?? 0).toLocaleString("hu-HU")} Ft
+          </p>
+        </div>
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-xs text-gray-400">{t("subsPaymentsCount")}</p>
+          <p className="mt-0.5 text-xl font-bold text-gray-900">{revenue._count}</p>
         </div>
       </div>
 

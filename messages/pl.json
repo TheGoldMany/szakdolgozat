@@ -1420,7 +1420,11 @@
     "navVets": "Weterynarze",
     "createNewTask": "Utwórz nowe zadanie",
     "createTask": "Utwórz zadanie",
-    "newTask": "Nowe zadanie"
+    "newTask": "Nowe zadanie",
+    "tiersAmountLockedHint": "Obecni subskrybenci płacą kwotę z momentu zapisu, więc nie można jej zmienić. Dla nowej kwoty utwórz nowy pakiet.",
+    "subsRevenueThisMonth": "Przychód w tym miesiącu",
+    "subsRevenueTotal": "Łączny przychód cykliczny",
+    "subsPaymentsCount": "Liczba obciążeń"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",
@@ -1674,7 +1678,8 @@
     "activeSpons": "Aktywne patronaty",
     "myDonations": "Moje darowizny",
     "noDonations": "Nie przekazałeś jeszcze żadnej darowizny.",
-    "directDonation": "Bezpośrednia darowizna"
+    "directDonation": "Bezpośrednia darowizna",
+    "recurringBreakdown": "w tym {oneOff} HUF jednorazowo, {recurring} HUF miesięcznie"
   },
   "articles": {
     "title": "Artykuły",

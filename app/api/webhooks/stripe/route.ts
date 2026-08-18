@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { sendSubscriptionConfirmationEmail, sendSponsorshipStartedEmail, sendPaymentFailedEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
 import { fulfillDonation, notifyDonation } from "@/lib/donations";
+import { invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
 
 // Disable body parsing — we need the raw body for signature verification
 export const dynamic = "force-dynamic";
@@ -74,11 +75,10 @@ export async function POST(req: NextRequest) {
 
   // Recurring payment failed — mark PAST_DUE and notify the subscriber
   if (event.type === "invoice.payment_failed") {
-    const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
-    const rawSub = invoice.subscription;
-    const stripeSubId = rawSub
-      ? (typeof rawSub === "string" ? rawSub : rawSub.id)
-      : null;
+    const invoice = event.data.object as Stripe.Invoice;
+    // A használt API-verzióban a számlán nincs lapos `subscription` mező –
+    // korábban ezért mindig null volt, és ez az ág sosem futott le.
+    const stripeSubId = invoiceSubscriptionId(invoice);
     if (stripeSubId) {
       const sub = await prisma.subscription.findUnique({
         where:   { stripeSubId },
@@ -115,6 +115,28 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+    }
+  }
+
+  // Sikeres havi terhelés (megújítás). A Stripe csak az ELSŐ fizetésről küld
+  // checkout.session.completed-et; enélkül a második hónaptól kezdve semmi
+  // nyoma nem maradt a befolyt pénznek.
+  if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object as Stripe.Invoice;
+    await recordSubscriptionPayment(invoice);
+
+    // Egy korábban sikertelen terhelés után a Stripe újrapróbálkozik; ha most
+    // átment, az előfizetés visszakerül aktívba.
+    const stripeSubId = invoiceSubscriptionId(invoice);
+    if (stripeSubId) {
+      await prisma.subscription.updateMany({
+        where: { stripeSubId, status: "PAST_DUE" },
+        data:  { status: "ACTIVE" },
+      });
+      await prisma.sponsorship.updateMany({
+        where: { stripeSubId, status: "PAST_DUE" },
+        data:  { status: "ACTIVE" },
+      });
     }
   }
 

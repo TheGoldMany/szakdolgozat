@@ -1420,7 +1420,11 @@
     "addShelterUnknownError": "Unbekannter Fehler",
     "navApprovals": "Genehmigungen",
     "navAudit": "Audit-Protokoll",
-    "navVets": "Tierärzte"
+    "navVets": "Tierärzte",
+    "tiersAmountLockedHint": "Bestehende Abonnenten zahlen den Betrag ihres Beitritts, daher ist er nicht änderbar. Lege für einen neuen Betrag ein neues Paket an.",
+    "subsRevenueThisMonth": "Einnahmen diesen Monat",
+    "subsRevenueTotal": "Gesamte wiederkehrende Einnahmen",
+    "subsPaymentsCount": "Abbuchungen"
   },
   "foster": {
     "title": "Meine Pflegeanträge",
@@ -1674,7 +1678,8 @@
     "activeSpons": "Aktive Patenschaften",
     "myDonations": "Meine Spenden",
     "noDonations": "Du hast noch nicht gespendet.",
-    "directDonation": "Direktspende"
+    "directDonation": "Direktspende",
+    "recurringBreakdown": "davon {oneOff} HUF einmalig, {recurring} HUF monatlich"
   },
   "articles": {
     "title": "Artikel",

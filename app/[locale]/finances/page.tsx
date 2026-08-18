@@ -20,7 +20,7 @@ export default async function FinancesPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/finances");
 
-  const [donations, subscriptions, sponsorships] = await Promise.all([
+  const [donations, subscriptions, sponsorships, recurring] = await Promise.all([
     prisma.donation.findMany({
       where:   { userId: session.user.id, paidAt: { not: null } },
       orderBy: { paidAt: "desc" },
@@ -63,9 +63,23 @@ export default async function FinancesPage() {
         animal:      { select: { name: true, slug: true } },
       },
     }),
+    // A havi terhelések: eddig sehol nem jelentek meg, mert a rendszer csak az
+    // előfizetés LÉTREJÖTTÉT tárolta, a megújításokat nem.
+    prisma.subscriptionPayment.aggregate({
+      where:  {
+        OR: [
+          { subscription: { userId: session.user.id } },
+          { sponsorship:  { userId: session.user.id } },
+        ],
+      },
+      _sum:   { totalPaid: true },
+      _count: true,
+    }),
   ]);
 
-  const totalDonated = donations.reduce((s, d) => s + d.amount, 0);
+  const totalDonated   = donations.reduce((s, d) => s + d.amount, 0);
+  const totalRecurring = recurring._sum.totalPaid ?? 0;
+  const totalAll       = totalDonated + totalRecurring;
   const activeSubs   = subscriptions.filter((s) => s.status === "ACTIVE").length;
   const activeSpons  = sponsorships.filter((s) => s.status === "ACTIVE").length;
 
@@ -80,7 +94,15 @@ export default async function FinancesPage() {
         <div className="mb-8 grid grid-cols-3 gap-4">
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-center">
             <p className="text-xs text-gray-400 mb-1">{t("totalDonated")}</p>
-            <p className="text-lg font-bold text-gray-900">{totalDonated.toLocaleString("hu-HU")} Ft</p>
+            <p className="text-lg font-bold text-gray-900">{totalAll.toLocaleString("hu-HU")} Ft</p>
+            {totalRecurring > 0 && (
+              <p className="mt-0.5 text-[11px] leading-snug text-gray-400">
+                {t("recurringBreakdown", {
+                  oneOff:    totalDonated.toLocaleString("hu-HU"),
+                  recurring: totalRecurring.toLocaleString("hu-HU"),
+                })}
+              </p>
+            )}
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-center">
             <p className="text-xs text-gray-400 mb-1">{t("activeSubs")}</p>
