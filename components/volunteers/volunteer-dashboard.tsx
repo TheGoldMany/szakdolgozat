@@ -6,6 +6,7 @@ import {
   HandHeart, CheckCircle, Clock, XCircle, AlertCircle,
   CalendarDays, Star, ChevronDown, ChevronUp, Plus,
 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -66,16 +67,18 @@ interface Props {
 
 // ── Status config ──────────────────────────────────────────────────────────────
 
-const STATUS_CFG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-  PENDING:  { label: "Elbírálás alatt", color: "bg-amber-50  text-amber-700  border-amber-200",  icon: Clock },
-  ACTIVE:   { label: "Aktív önkéntes",  color: "bg-green-50  text-green-700  border-green-200",  icon: CheckCircle },
-  INACTIVE: { label: "Inaktív",         color: "bg-gray-100  text-gray-500   border-gray-200",   icon: AlertCircle },
-  REJECTED: { label: "Elutasítva",      color: "bg-red-50    text-red-600    border-red-200",    icon: XCircle },
+const STATUS_CFG: Record<string, { labelKey: string; color: string; icon: typeof Clock }> = {
+  PENDING:  { labelKey: "cardPending",  color: "bg-amber-50  text-amber-700  border-amber-200",  icon: Clock },
+  ACTIVE:   { labelKey: "cardActive",   color: "bg-green-50  text-green-700  border-green-200",  icon: CheckCircle },
+  INACTIVE: { labelKey: "cardInactive", color: "bg-gray-100  text-gray-500   border-gray-200",   icon: AlertCircle },
+  REJECTED: { labelKey: "cardRejected", color: "bg-red-50    text-red-600    border-red-200",    icon: XCircle },
 };
 
 // ── Volunteer card ─────────────────────────────────────────────────────────────
 
 function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
+  const t      = useTranslations("volunteers");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const cfg = STATUS_CFG[vol.status] ?? STATUS_CFG.PENDING;
   const Icon = cfg.icon;
@@ -94,7 +97,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
         <div className="flex items-center gap-2">
           <span className={cn("flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium", cfg.color)}>
             <Icon className="h-3 w-3" />
-            {cfg.label}
+            {t(cfg.labelKey)}
           </span>
           <button
             onClick={() => setOpen((v) => !v)}
@@ -114,11 +117,11 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
             <div className="flex gap-6 px-4 py-3">
               <div className="text-center">
                 <p className="text-xl font-bold text-brand-600">{totalHours}</p>
-                <p className="text-xs text-gray-400">ledolgozott óra</p>
+                <p className="text-xs text-gray-400">{t("hoursWorked")}</p>
               </div>
               <div className="text-center">
                 <p className="text-xl font-bold text-gray-700">{vol.assignments.length}</p>
-                <p className="text-xs text-gray-400">elvállalt feladat</p>
+                <p className="text-xs text-gray-400">{t("tasksTaken")}</p>
               </div>
             </div>
           )}
@@ -127,13 +130,13 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
           {(vol.motivation || vol.skills || vol.availability) && (
             <div className="px-4 py-3 space-y-1.5">
               {vol.motivation && (
-                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">Motiváció:</span> {vol.motivation}</p>
+                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">{t("motivationLabel")}</span> {vol.motivation}</p>
               )}
               {vol.skills && (
-                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">Készségek:</span> {vol.skills}</p>
+                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">{t("skillsLabel")}</span> {vol.skills}</p>
               )}
               {vol.availability && (
-                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">Elérhetőség:</span> {vol.availability}</p>
+                <p className="text-xs text-gray-500"><span className="font-medium text-gray-700">{t("availabilityLabel")}</span> {vol.availability}</p>
               )}
             </div>
           )}
@@ -141,14 +144,14 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
           {/* Admin note */}
           {vol.adminNote && (
             <div className="px-4 py-3">
-              <p className="text-xs text-gray-500 italic">Menhely megjegyzése: {vol.adminNote}</p>
+              <p className="text-xs text-gray-500 italic">{t("adminNote", { note: vol.adminNote })}</p>
             </div>
           )}
 
           {/* Assigned tasks */}
           {vol.assignments.length > 0 && (
             <div className="px-4 py-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Elvállalt feladatok</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("assignedTasks")}</p>
               <div className="space-y-2">
                 {vol.assignments.map((a) => (
                   <div key={a.id} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
@@ -156,7 +159,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-gray-700">{a.task.title}</p>
                       <p className="text-xs text-gray-400">
-                        {new Date(a.task.scheduledAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {new Date(a.task.scheduledAt).toLocaleString(locale, { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                     <span className={cn(
@@ -165,7 +168,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
                       a.task.status === "ASSIGNED"  ? "bg-blue-100  text-blue-700"  :
                                                       "bg-gray-100  text-gray-600"
                     )}>
-                      {a.task.status === "COMPLETED" ? "Kész" : a.task.status === "ASSIGNED" ? "Elvállalt" : "Nyitott"}
+                      {a.task.status === "COMPLETED" ? t("taskDone") : a.task.status === "ASSIGNED" ? t("taskAssigned") : t("taskOpen")}
                     </span>
                   </div>
                 ))}
@@ -176,14 +179,14 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
           {/* Recent attendance */}
           {vol.attendances.length > 0 && (
             <div className="px-4 py-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Jelenléti napló</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">{t("attendanceLog")}</p>
               <div className="space-y-1.5">
                 {vol.attendances.slice(0, 5).map((att) => (
                   <div key={att.id} className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">
-                      {new Date(att.date).toLocaleDateString("hu-HU", { month: "short", day: "numeric" })}
+                      {new Date(att.date).toLocaleDateString(locale, { month: "short", day: "numeric" })}
                     </span>
-                    <span className="font-medium text-gray-700">{att.hours} óra</span>
+                    <span className="font-medium text-gray-700">{t("hoursShort", { hours: att.hours })}</span>
                     {att.note && <span className="max-w-[160px] truncate text-gray-400">{att.note}</span>}
                   </div>
                 ))}
@@ -203,6 +206,9 @@ function AvailableTaskCard({ task, userId, onSignup }: {
   userId:   string;
   onSignup: (taskId: string) => Promise<void>;
 }) {
+  const t       = useTranslations("volunteers");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
   const [loading, setLoading] = useState(false);
   const [done,    setDone]    = useState(false);
   const [error,   setError]   = useState<string | null>(null);
@@ -216,7 +222,7 @@ function AvailableTaskCard({ task, userId, onSignup }: {
       await onSignup(task.id);
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Hiba");
+      setError(err instanceof Error ? err.message : tCommon("error"));
     } finally {
       setLoading(false);
     }
@@ -234,15 +240,15 @@ function AvailableTaskCard({ task, userId, onSignup }: {
           <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
             <span className="flex items-center gap-1">
               <CalendarDays className="h-3 w-3" />
-              {new Date(task.scheduledAt).toLocaleString("hu-HU", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+              {new Date(task.scheduledAt).toLocaleString(locale, { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
             </span>
-            <span>{spots} hely szabad</span>
+            <span>{t("spotsFree", { count: spots })}</span>
           </div>
         </div>
 
         {done || alreadySigned ? (
           <span className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700">
-            <CheckCircle className="h-3.5 w-3.5" /> Elvállalt
+            <CheckCircle className="h-3.5 w-3.5" /> {t("taken")}
           </span>
         ) : (
           <button
@@ -250,7 +256,7 @@ function AvailableTaskCard({ task, userId, onSignup }: {
             disabled={loading || spots <= 0}
             className="shrink-0 rounded-xl bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 disabled:opacity-50"
           >
-            {loading ? "..." : spots <= 0 ? "Betelt" : "Elvállalom"}
+            {loading ? "…" : spots <= 0 ? t("full") : t("takeTask")}
           </button>
         )}
       </div>
@@ -262,14 +268,16 @@ function AvailableTaskCard({ task, userId, onSignup }: {
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
 export function VolunteerDashboard({ data }: Props) {
-  const router = useRouter();
+  const t       = useTranslations("volunteers");
+  const tCommon = useTranslations("common");
+  const router  = useRouter();
   const [tasks, setTasks] = useState(data.availableTasks);
 
   async function handleSignup(taskId: string) {
     const res = await fetch(`/api/volunteer-tasks/${taskId}/assign`, { method: "POST" });
     if (!res.ok) {
       const d = await res.json();
-      throw new Error(d.error ?? "Hiba");
+      throw new Error(d.error ?? tCommon("error"));
     }
     setTasks((prev) =>
       prev.map((t) =>
@@ -288,12 +296,12 @@ export function VolunteerDashboard({ data }: Props) {
   const activeCount = data.volunteers.filter((v) => v.status === "ACTIVE").length;
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
       <div className="mb-8 flex items-center gap-3">
         <HandHeart className="h-7 w-7 text-brand-500" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Önkéntességem</h1>
-          <p className="text-sm text-gray-500">Önkéntes tevékenységeid és feladataid</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("dashTitle")}</h1>
+          <p className="text-sm text-gray-500">{t("dashSubtitle")}</p>
         </div>
       </div>
 
@@ -302,17 +310,17 @@ export function VolunteerDashboard({ data }: Props) {
         <div className="mb-6 grid grid-cols-3 gap-3">
           <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-brand-600">{activeCount}</p>
-            <p className="text-xs text-gray-500">Aktív menhely</p>
+            <p className="text-xs text-gray-500">{t("statActiveShelters")}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-gray-700">{totalHours}</p>
-            <p className="text-xs text-gray-500">Ledolgozott óra</p>
+            <p className="text-xs text-gray-500">{t("statHours")}</p>
           </div>
           <div className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-gray-700">
               {data.volunteers.reduce((s, v) => s + v.assignments.length, 0)}
             </p>
-            <p className="text-xs text-gray-500">Elvállalt feladat</p>
+            <p className="text-xs text-gray-500">{t("statTasks")}</p>
           </div>
         </div>
       )}
@@ -321,15 +329,15 @@ export function VolunteerDashboard({ data }: Props) {
       {data.volunteers.length === 0 ? (
         <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
           <HandHeart className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-          <p className="font-medium text-gray-500">Még nem jelentkeztél önkéntesnek</p>
+          <p className="font-medium text-gray-500">{t("noneYet")}</p>
           <p className="mt-1 text-sm text-gray-400">
-            Böngéssz a menhelyek között és kattints az "Önkéntesnek jelentkezem" gombra.
+            {t("noneYetDesc")}
           </p>
           <a
             href="/shelters"
             className="mt-4 inline-block rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
           >
-            Menhelyek böngészése
+            {t("browseShelters")}
           </a>
         </div>
       ) : (
@@ -337,7 +345,7 @@ export function VolunteerDashboard({ data }: Props) {
           {/* Volunteer applications */}
           <section>
             <h2 className="mb-3 text-sm font-semibold text-gray-500 uppercase tracking-wide">
-              Menhelyek ({data.volunteers.length})
+              {t("sectionShelters")} ({data.volunteers.length})
             </h2>
             <div className="space-y-3">
               {data.volunteers.map((v) => (
@@ -350,7 +358,7 @@ export function VolunteerDashboard({ data }: Props) {
           {tasks.length > 0 && (
             <section>
               <h2 className="mb-3 text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                Elérhető feladatok ({tasks.length})
+                {t("sectionTasks")} ({tasks.length})
               </h2>
               <div className="space-y-3">
                 {tasks.map((t) => (
@@ -368,7 +376,7 @@ export function VolunteerDashboard({ data }: Props) {
           {activeCount > 0 && tasks.length === 0 && (
             <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm">
               <CalendarDays className="mx-auto mb-2 h-8 w-8 text-gray-300" />
-              <p className="text-sm text-gray-500">Jelenleg nincs nyitott feladat a menhelyeidnél.</p>
+              <p className="text-sm text-gray-500">{t("noOpenTasks")}</p>
             </div>
           )}
         </div>

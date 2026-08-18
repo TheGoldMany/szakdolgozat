@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface DonateFormProps {
@@ -10,11 +11,14 @@ interface DonateFormProps {
 
 const PRESET_AMOUNTS = [1000, 2000, 5000, 10000];
 
-function formatHUF(amount: number) {
-  return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
+function formatHUF(amount: number, locale: string) {
+  return new Intl.NumberFormat(locale).format(amount) + " Ft";
 }
 
 export function DonateForm({ campaignId }: DonateFormProps) {
+  const t       = useTranslations("donate");
+  const tCommon = useTranslations("common");
+  const locale  = useLocale();
   const [amount, setAmount]             = useState<number>(2000);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [isCustom, setIsCustom]         = useState(false);
@@ -40,7 +44,7 @@ export function DonateForm({ campaignId }: DonateFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!amount || amount < 100) {
-      setError("Az összeg minimum 100 Ft lehet.");
+      setError(t("minAmountError"));
       return;
     }
     setLoading(true);
@@ -53,12 +57,12 @@ export function DonateForm({ campaignId }: DonateFormProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Hiba történt a fizetés indításakor.");
+        throw new Error(data.error ?? t("checkoutError"));
       }
       const { url } = await res.json();
       if (url) window.location.href = url;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Ismeretlen hiba történt.";
+      const msg = err instanceof Error ? err.message : tCommon("unknownError");
       setError(msg);
       toast.error(msg);
     } finally {
@@ -70,7 +74,7 @@ export function DonateForm({ campaignId }: DonateFormProps) {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Preset amount buttons */}
       <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">Összeg kiválasztása</p>
+        <p className="mb-2 text-sm font-medium text-gray-700">{t("amountSelect")}</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {PRESET_AMOUNTS.map((val) => (
             <button key={val} type="button" onClick={() => handlePreset(val)}
@@ -81,7 +85,7 @@ export function DonateForm({ campaignId }: DonateFormProps) {
                   : "border-gray-200 bg-white text-gray-700 hover:border-brand-400 hover:text-brand-600",
               ].join(" ")}
             >
-              {formatHUF(val)}
+              {formatHUF(val, locale)}
             </button>
           ))}
         </div>
@@ -90,9 +94,9 @@ export function DonateForm({ campaignId }: DonateFormProps) {
       {/* Custom amount */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Egyedi összeg (Ft)
+          {t("customAmount")}
         </label>
-        <input type="text" inputMode="numeric" placeholder="pl. 3000"
+        <input type="text" inputMode="numeric" placeholder={t("customAmountPlaceholder")}
           value={customAmount} onChange={handleCustomChange} onFocus={() => setIsCustom(true)}
           className={[
             "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-colors",
@@ -106,9 +110,9 @@ export function DonateForm({ campaignId }: DonateFormProps) {
       {/* Message */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Üzenet (opcionális)
+          {t("messageOptional")}
         </label>
-        <textarea rows={3} placeholder="Írj egy üzenetet az adományodhoz…"
+        <textarea rows={3} placeholder={t("messagePlaceholder")}
           value={message} onChange={(e) => setMessage(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition-colors focus:border-brand-400 resize-none"
         />
@@ -120,7 +124,7 @@ export function DonateForm({ campaignId }: DonateFormProps) {
           onChange={(e) => setIsAnonymous(e.target.checked)}
           className="h-4 w-4 rounded border-gray-300 text-brand-500 accent-brand-500"
         />
-        <span className="text-sm text-gray-600">Névtelen adományozás</span>
+        <span className="text-sm text-gray-600">{t("anonymousDonation")}</span>
       </label>
 
       {error && (
@@ -128,7 +132,7 @@ export function DonateForm({ campaignId }: DonateFormProps) {
       )}
 
       <Button type="submit" loading={loading} className="w-full" size="lg">
-        Tovább a fizetéshez
+        {t("toPayment")}
       </Button>
     </form>
   );

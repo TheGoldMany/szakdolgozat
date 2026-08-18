@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { upload } from "@vercel/blob/client";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 
@@ -9,6 +10,8 @@ interface Shelter { id: string; name: string }
 interface Animal  { id: string; name: string; breed: string | null }
 
 export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean }) {
+  const t       = useTranslations("donate");
+  const tCommon = useTranslations("common");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -57,10 +60,10 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
         body:    JSON.stringify({ type: "user" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Hiba a Stripe csatlakozáskor.");
+      if (!res.ok) throw new Error(data.error ?? t("stripeConnectError"));
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba.");
+      setError(err instanceof Error ? err.message : tCommon("unknownError"));
       setStripeLoading(false);
     }
   }
@@ -78,7 +81,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       });
       setImageUrl(blob.url);
     } catch {
-      setError("A kép feltöltése sikertelen volt.");
+      setError(t("newCoverFailed"));
       if (fileRef.current) fileRef.current.value = "";
     } finally {
       setImageUploading(false);
@@ -88,9 +91,9 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = parseInt(targetAmount, 10);
-    if (!title.trim()) { setError("A cím megadása kötelező."); return; }
-    if (!description.trim()) { setError("A leírás megadása kötelező."); return; }
-    if (isNaN(parsed) || parsed < 1000) { setError("A célösszeg minimum 1 000 Ft legyen."); return; }
+    if (!title.trim()) { setError(t("newTitleRequired")); return; }
+    if (!description.trim()) { setError(t("newDescRequired")); return; }
+    if (isNaN(parsed) || parsed < 1000) { setError(t("newTargetMin")); return; }
 
     setLoading(true);
     setError(null);
@@ -112,11 +115,11 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Hiba a beküldés közben.");
+        throw new Error(data.error ?? t("newSubmitError"));
       }
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba.");
+      setError(err instanceof Error ? err.message : tCommon("unknownError"));
     } finally {
       setLoading(false);
     }
@@ -126,9 +129,9 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-brand-100 bg-brand-50 p-10 text-center">
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h2 className="text-xl font-bold text-gray-900">Gyűjtésed beküldve!</h2>
+        <h2 className="text-xl font-bold text-gray-900">{t("newSubmitted")}</h2>
         <p className="text-sm text-gray-600">
-          Gyűjtésed admin jóváhagyásra vár. Értesítünk, amint elfogadják.
+          {t("newSubmittedDesc")}
         </p>
       </div>
     );
@@ -141,10 +144,9 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100">
           <CreditCard className="h-6 w-6 text-amber-600" />
         </div>
-        <h2 className="text-lg font-bold text-gray-900">Előbb kösd be a Stripe fiókod</h2>
+        <h2 className="text-lg font-bold text-gray-900">{t("stripeRequired")}</h2>
         <p className="text-sm text-gray-600">
-          Gyűjtést csak csatlakoztatott Stripe fiókkal indíthatsz, hogy az adományok
-          közvetlenül hozzád (vagy a választott menhelyhez) érkezhessenek.
+          {t("stripeRequiredDesc")}
         </p>
         <button
           type="button"
@@ -153,7 +155,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
           className="mt-2 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600 disabled:opacity-60"
         >
           {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-          Saját Stripe fiók csatlakoztatása
+          {t("stripeConnectOwn")}
         </button>
         <p className="text-xs text-gray-500">
           Menhely adminként a menhelyed Stripe fiókját a{" "}
@@ -170,12 +172,12 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       {/* Title */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Gyűjtés címe <span className="text-red-500">*</span>
+          {t("newTitle")} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           required
-          placeholder="pl. Mentsd meg Bodrit!"
+          placeholder={t("newTitlePlaceholder")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400"
@@ -185,12 +187,12 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       {/* Description */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Leírás <span className="text-red-500">*</span>
+          {t("newDescription")} <span className="text-red-500">*</span>
         </label>
         <textarea
           rows={5}
           required
-          placeholder="Miért indítod a gyűjtést? Mire fordítod az összeget?"
+          placeholder={t("newDescriptionPlaceholder")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 resize-none"
@@ -200,14 +202,14 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       {/* Target amount */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Célösszeg (Ft) <span className="text-red-500">*</span>
+          {t("newTarget")} <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
           required
           min={1000}
           step={500}
-          placeholder="pl. 50000"
+          placeholder={t("newTargetPlaceholder")}
           value={targetAmount}
           onChange={(e) => setTargetAmount(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400"
@@ -216,7 +218,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
 
       {/* Image upload */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Borítókép (opcionális)</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("newCover")}</label>
         <input
           ref={fileRef}
           type="file"
@@ -225,16 +227,16 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
           onChange={handleImageChange}
           className="block w-full text-sm text-gray-500 file:mr-3 file:rounded-xl file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-600 hover:file:bg-brand-100 disabled:opacity-50"
         />
-        {imageUploading && <p className="mt-1 text-xs text-gray-400">Feltöltés…</p>}
+        {imageUploading && <p className="mt-1 text-xs text-gray-400">{tCommon("uploading")}</p>}
         {imageUrl && !imageUploading && (
-          <p className="mt-1 text-xs text-brand-600">Kép sikeresen feltöltve.</p>
+          <p className="mt-1 text-xs text-brand-600">{t("newCoverUploaded")}</p>
         )}
       </div>
 
       {/* End date */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Gyűjtés vége (opcionális)
+          {t("newEndsAt")}
         </label>
         <input
           type="date"
@@ -248,14 +250,14 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       {/* Shelter select – OPTIONAL */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Melyik menhelyért gyűjtesz? <span className="text-gray-400">(opcionális)</span>
+          {t("newShelter")} <span className="text-gray-400">({tCommon("optional")})</span>
         </label>
         <select
           value={shelterId}
           onChange={(e) => setShelterId(e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white"
         >
-          <option value="">– Nincs menhelyhez kötve –</option>
+          <option value="">{t("newShelterNone")}</option>
           {shelters.map((s) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
@@ -266,7 +268,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       {shelterId && (
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">
-            Konkrét állathoz kötöd? <span className="text-gray-400">(opcionális)</span>
+            {t("newAnimal")} <span className="text-gray-400">({tCommon("optional")})</span>
           </label>
           <select
             value={animalId}
@@ -274,16 +276,16 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
             disabled={animalsLoading}
             className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 bg-white disabled:opacity-60"
           >
-            <option value="">– Nincs konkrét állat –</option>
+            <option value="">{t("newAnimalNone")}</option>
             {animals.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}{a.breed ? ` – ${a.breed}` : ""}
               </option>
             ))}
           </select>
-          {animalsLoading && <p className="mt-1 text-xs text-gray-400">Állatok betöltése…</p>}
+          {animalsLoading && <p className="mt-1 text-xs text-gray-400">{t("newAnimalsLoading")}</p>}
           {!animalsLoading && animals.length === 0 && (
-            <p className="mt-1 text-xs text-gray-400">Ennek a menhelynek nincs elérhető állata.</p>
+            <p className="mt-1 text-xs text-gray-400">{t("newAnimalsEmpty")}</p>
           )}
         </div>
       )}
@@ -293,7 +295,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
       )}
 
       <Button type="submit" loading={loading} className="w-full" size="lg">
-        Gyűjtés beküldése
+        {t("newSubmit")}
       </Button>
     </form>
   );
