@@ -3,18 +3,39 @@
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { glyphForAnimal, pinHtml } from "@/components/ui/map-icons";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl:       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+/**
+ * Egy pontot mutató, nem mozgatható térkép (pl. a bejelentés oldalán).
+ *
+ * A jelölő ugyanaz a csepp, mint a nagy térképen: a szín a bejelentés típusa,
+ * az ikon az állatfaj. Így nem kell a Leaflet alapértelmezett jelölő-képeit
+ * CDN-ről betölteni, és a két térkép jelölése egységes marad.
+ */
 
-interface Props { lat: number; lng: number }
+const TYPE_COLOR: Record<string, string> = {
+  LOST:  "#EF4444",
+  FOUND: "#22C55E",
+  STRAY: "#F97316",
+};
 
-export default function StaticLeafletMap({ lat, lng }: Props) {
+interface Props {
+  lat: number;
+  lng: number;
+  /** Bejelentés típusa (LOST/FOUND/STRAY) – a jelölő színét adja. */
+  type?: string;
+  /** Állatfaj (DOG/CAT/…) – a jelölőbe kerülő ikont adja. */
+  animalType?: string;
+}
+
+export default function StaticLeafletMap({ lat, lng, type, animalType }: Props) {
+  const icon = L.divIcon({
+    className: "",
+    html: pinHtml(TYPE_COLOR[type ?? ""] ?? "#6B7280", glyphForAnimal(animalType ?? ""), 34),
+    iconSize:   [34, 34],
+    iconAnchor: [17, 34],
+  });
+
   return (
     <MapContainer
       center={[lat, lng]}
@@ -29,7 +50,7 @@ export default function StaticLeafletMap({ lat, lng }: Props) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[lat, lng]} />
+      <Marker position={[lat, lng]} icon={icon} />
     </MapContainer>
   );
 }

@@ -1541,7 +1541,18 @@
     "found": "Megtalált",
     "stray": "Kóbor",
     "shelter": "Menhely",
-    "newReport": "Új bejelentés"
+    "newReport": "Új bejelentés",
+    "vetsLayer": "Állatorvosok",
+    "vet": "Állatorvos",
+    "emergency": "Ügyelet",
+    "shelterAnimals": "{count} állat örökbefogadható",
+    "shelterPage": "Menhely oldala",
+    "website": "Weboldal",
+    "animalDog": "Kutya",
+    "animalCat": "Macska",
+    "animalOther": "Egyéb",
+    "unknownAnimal": "Ismeretlen",
+    "legendHint": "A csepp színe a bejelentés típusa, az ikon az állatfaj."
   },
   "appointments": {
     "requestFor": "Időpontfoglalás: {name}",

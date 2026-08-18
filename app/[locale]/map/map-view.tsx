@@ -1,21 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { SlidersHorizontal, X } from "lucide-react";
-import type { MapReport, MapShelter, MapVet } from "@/components/ui/animal-map";
+import type { MapLabels, MapReport, MapShelter, MapVet } from "@/components/ui/animal-map";
+import {
+  SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
+} from "@/components/ui/animal-map";
+import { glyphSvg, type MapGlyph } from "@/components/ui/map-icons";
 
 const AnimalMap = dynamic(() => import("@/components/ui/animal-map"), { ssr: false });
 
+/** Jelmagyarázat-korong: pontosan az az ikon, ami a térképen is látszik. */
+function LegendDot({ color, glyph }: { color: string; glyph: MapGlyph }) {
+  return (
+    <span
+      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+      style={{ background: color }}
+      dangerouslySetInnerHTML={{ __html: glyphSvg(glyph, 12) }}
+    />
+  );
+}
+
 export default function MapView() {
-  const t = useTranslations("map");
+  const t       = useTranslations("map");
+  const locale  = useLocale();
 
   const TYPE_OPTIONS = [
-    { value: "",      label: t("allTypes"),  color: "#6B7280" },
-    { value: "LOST",  label: t("lost"),      color: "#EF4444" },
-    { value: "FOUND", label: t("found"),     color: "#22C55E" },
-    { value: "STRAY", label: t("stray"),     color: "#F97316" },
+    { value: "",      label: t("allTypes"), color: "#6B7280"         },
+    { value: "LOST",  label: t("lost"),     color: TYPE_COLOR.LOST   },
+    { value: "FOUND", label: t("found"),    color: TYPE_COLOR.FOUND  },
+    { value: "STRAY", label: t("stray"),    color: TYPE_COLOR.STRAY  },
   ];
 
   const [reports,  setReports]  = useState<MapReport[]>([]);
@@ -39,6 +55,21 @@ export default function MapView() {
       .finally(() => setLoading(false));
   }, [status]);
 
+  // A jelölő-buborékok szövegei; memoizálva, hogy ne rajzoljuk újra minden rendernél.
+  const labels: MapLabels = useMemo(() => ({
+    lost:        t("lost"),
+    found:       t("found"),
+    stray:       t("stray"),
+    animalDog:   t("animalDog"),
+    animalCat:   t("animalCat"),
+    animalOther: t("animalOther"),
+    unknownAnimal: t("unknownAnimal"),
+    shelterAnimals: (count: number) => t("shelterAnimals", { count }),
+    shelterPage: t("shelterPage"),
+    emergency:   t("emergency"),
+    website:     t("website"),
+  }), [t]);
+
   const visibleReports  = typeFilter ? reports.filter(r => r.type === typeFilter) : reports;
   const lostCount  = reports.filter(r => r.type === "LOST").length;
   const foundCount = reports.filter(r => r.type === "FOUND").length;
@@ -57,6 +88,8 @@ export default function MapView() {
             showShelters={showShelters}
             showVets={showVets}
             typeFilter={typeFilter}
+            labels={labels}
+            locale={locale}
           />
         )}
         {loading && (
@@ -156,7 +189,7 @@ export default function MapView() {
               <input type="checkbox" checked={showVets}
                 onChange={e => setShowVets(e.target.checked)}
                 className="h-4 w-4 rounded accent-brand-500" />
-              <span className="text-sm text-gray-700">Állatorvosok</span>
+              <span className="text-sm text-gray-700">{t("vetsLayer")}</span>
               <span className="ml-auto text-xs text-gray-400">{vets.length}</span>
             </label>
           </div>
@@ -166,20 +199,24 @@ export default function MapView() {
       {/* Legend – bottom right */}
       <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
         <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-gray-500">{t("legend")}</p>
-        <div className="space-y-1">
-          {[
-            { color: "#EF4444", label: t("lost")    },
-            { color: "#22C55E", label: t("found")   },
-            { color: "#F97316", label: t("stray")   },
-            { color: "#2563EB", label: t("shelter") },
-          ].map(item => (
+        <div className="space-y-1.5">
+          {([
+            { color: TYPE_COLOR.LOST,        glyph: "DOG",           label: t("lost")      },
+            { color: TYPE_COLOR.FOUND,       glyph: "CAT",           label: t("found")     },
+            { color: TYPE_COLOR.STRAY,       glyph: "PAW",           label: t("stray")     },
+            { color: SHELTER_COLOR,          glyph: "SHELTER",       label: t("shelter")   },
+            { color: VET_COLOR,              glyph: "VET",           label: t("vet")       },
+            { color: VET_EMERGENCY_COLOR,    glyph: "VET_EMERGENCY", label: t("emergency") },
+          ] as { color: string; glyph: MapGlyph; label: string }[]).map(item => (
             <div key={item.label} className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-sm flex-shrink-0"
-                style={{ background: item.color }} />
+              <LegendDot color={item.color} glyph={item.glyph} />
               <span className="text-xs text-gray-600">{item.label}</span>
             </div>
           ))}
         </div>
+        <p className="mt-2 max-w-[9rem] border-t border-gray-100 pt-1.5 text-[10px] leading-snug text-gray-400">
+          {t("legendHint")}
+        </p>
       </div>
 
       {/* New report button */}

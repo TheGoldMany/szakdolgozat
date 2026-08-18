@@ -214,7 +214,9 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
                 <span>{report.city}{report.address ? `, ${report.address}` : ""}</span>
               </div>
-              {report.lat && report.lng && <StaticMap lat={report.lat} lng={report.lng} />}
+              {report.lat && report.lng && (
+                <StaticMap lat={report.lat} lng={report.lng} type={report.type} animalType={report.animalType} />
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-sm text-gray-400">

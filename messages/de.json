@@ -1541,7 +1541,18 @@
     "found": "Gefunden",
     "stray": "Streunend",
     "shelter": "Tierheim",
-    "newReport": "Neue Meldung"
+    "newReport": "Neue Meldung",
+    "vetsLayer": "Tierärzte",
+    "vet": "Tierarzt",
+    "emergency": "Notdienst",
+    "shelterAnimals": "{count} Tiere zur Adoption",
+    "shelterPage": "Seite des Tierheims",
+    "website": "Webseite",
+    "animalDog": "Hund",
+    "animalCat": "Katze",
+    "animalOther": "Sonstige",
+    "unknownAnimal": "Unbekannt",
+    "legendHint": "Die Farbe zeigt die Meldungsart, das Symbol die Tierart."
   },
   "appointments": {
     "requestFor": "Terminanfrage: {name}",

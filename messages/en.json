@@ -1541,7 +1541,18 @@
     "found": "Found",
     "stray": "Stray",
     "shelter": "Shelter",
-    "newReport": "New report"
+    "newReport": "New report",
+    "vetsLayer": "Vets",
+    "vet": "Vet",
+    "emergency": "Emergency",
+    "shelterAnimals": "{count} animals up for adoption",
+    "shelterPage": "Shelter page",
+    "website": "Website",
+    "animalDog": "Dog",
+    "animalCat": "Cat",
+    "animalOther": "Other",
+    "unknownAnimal": "Unknown",
+    "legendHint": "The pin colour is the report type, the icon is the species."
   },
   "appointments": {
     "requestFor": "Appointment request: {name}",

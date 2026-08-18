@@ -9,8 +9,14 @@ const StaticLeafletMap = dynamic(() => import("./static-leaflet-map"), {
   ),
 });
 
-interface Props { lat: number; lng: number }
+interface Props {
+  lat: number;
+  lng: number;
+  /** Bejelentés típusa és állatfaja – ettől lesz a jelölő ugyanaz, mint a térképen. */
+  type?: string;
+  animalType?: string;
+}
 
-export function StaticMap({ lat, lng }: Props) {
-  return <StaticLeafletMap lat={lat} lng={lng} />;
+export function StaticMap({ lat, lng, type, animalType }: Props) {
+  return <StaticLeafletMap lat={lat} lng={lng} type={type} animalType={animalType} />;
 }
