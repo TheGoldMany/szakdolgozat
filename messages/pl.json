@@ -308,7 +308,8 @@
     "stripeRequiredDesc": "Zbiórkę możesz rozpocząć tylko z podłączonym kontem Stripe, aby darowizny trafiały bezpośrednio do Ciebie (lub wybranego schroniska).",
     "stripeConnectOwn": "Podłącz własne konto Stripe",
     "stripeConnectError": "Błąd podczas łączenia ze Stripe.",
-    "generalOngoing": "Stałe wsparcie codziennej działalności schroniska — bez terminu i celu."
+    "generalOngoing": "Stałe wsparcie codziennej działalności schroniska — bez terminu i celu.",
+    "startedByShelter": "Rozpoczęte przez"
   },
   "auth": {
     "loginTitle": "Zaloguj się",
@@ -1423,7 +1424,8 @@
     "subsPaymentsCount": "Liczba obciążeń",
     "tiersFixedAmountsInfo": "Kwoty pakietów są ustalone na poziomie platformy ({amounts}) i tworzą się automatycznie dla każdego schroniska. Nazwę i opis piszesz sam — o wartości pakietu decyduje historia, nie liczba.",
     "tiersLegacy": "Stara kwota",
-    "tiersLegacyHint": "Pakiet sprzed ustalenia stałych kwot. Obecni subskrybenci nadal płacą cenę z momentu zapisu w Stripe, więc nie można go usunąć — ale nikt nowy nie może do niego dołączyć."
+    "tiersLegacyHint": "Pakiet sprzed ustalenia stałych kwot. Obecni subskrybenci nadal płacą cenę z momentu zapisu w Stripe, więc nie można go usunąć — ale nikt nowy nie może do niego dołączyć.",
+    "tiersCreateDefaults": "Utwórz pakiety"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",

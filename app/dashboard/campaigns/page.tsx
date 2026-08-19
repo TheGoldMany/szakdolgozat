@@ -7,6 +7,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { CampaignAdminActions } from "@/components/dashboard/campaign-admin-actions";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { PlusCircle } from "lucide-react";
 import type { CampaignStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -73,9 +74,20 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <h1 className="text-2xl font-bold text-gray-900">Gyűjtések</h1>
         <PageInfo page="campaigns" />
+        {/* Eddig innen nem vezetett út a gyűjtés indításához: a menhely
+            adminnak a nyilvános /campaigns/new oldalt kellett kitalálnia.
+            A menhely előre ki van választva, hogy a pénz a menhely Stripe
+            fiókjára fusson, ne az adminéra. */}
+        <Link
+          href={shelterId ? `/campaigns/new?shelter=${shelterId}` : "/campaigns/new"}
+          className="ml-auto flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Új gyűjtés
+        </Link>
       </div>
 
       {/* Status filter */}

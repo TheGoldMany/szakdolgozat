@@ -308,7 +308,8 @@
     "stripeRequiredDesc": "Gyűjtést csak csatlakoztatott Stripe fiókkal indíthatsz, hogy az adományok közvetlenül hozzád (vagy a választott menhelyhez) érkezhessenek.",
     "stripeConnectOwn": "Saját Stripe fiók csatlakoztatása",
     "stripeConnectError": "Hiba a Stripe csatlakozáskor.",
-    "generalOngoing": "Folyamatos gyűjtés a menhely mindennapi működésére – nincs határidő és célösszeg."
+    "generalOngoing": "Folyamatos gyűjtés a menhely mindennapi működésére – nincs határidő és célösszeg.",
+    "startedByShelter": "Indította:"
   },
   "auth": {
     "loginTitle": "Bejelentkezés",
@@ -1423,7 +1424,8 @@
     "subsPaymentsCount": "Terhelések száma",
     "tiersFixedAmountsInfo": "A csomagösszegek platformszinten rögzítettek ({amounts}), és minden menhelynél automatikusan létrejönnek. A nevet és a leírást te szabod magadra – a csomag értékét a történet adja, nem a szám.",
     "tiersLegacy": "Régi összeg",
-    "tiersLegacyHint": "Korábbi, egyedi összegű csomag. A meglévő előfizetők a Stripe-nál a belépéskori árat fizetik tovább, ezért nem törölhető – új előfizető viszont már nem tud belépni rá."
+    "tiersLegacyHint": "Korábbi, egyedi összegű csomag. A meglévő előfizetők a Stripe-nál a belépéskori árat fizetik tovább, ezért nem törölhető – új előfizető viszont már nem tud belépni rá.",
+    "tiersCreateDefaults": "Csomagok létrehozása"
   },
   "foster": {
     "title": "Ideiglenes befogadásaim",

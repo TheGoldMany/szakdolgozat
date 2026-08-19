@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Pencil, X, Check, Info } from "lucide-react";
@@ -44,12 +45,33 @@ const emptyForm: TierForm = { name: "", description: "" };
  * előfizetők a Stripe-nál a belépéskori árat fizetik tovább.
  */
 export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }: TiersManagerProps) {
-  const t = useTranslations("dashboard");
+  const t      = useTranslations("dashboard");
+  const router = useRouter();
   const [tiers, setTiers]         = useState<Tier[]>(initialTiers);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm]   = useState<TierForm>(emptyForm);
   const [saving, setSaving]       = useState(false);
+  const [creating, setCreating]   = useState(false);
   const [error, setError]         = useState<string | null>(null);
+
+  /**
+   * A fix csomagok új menhelynél a létrehozáskor automatikusan elkészülnek.
+   * A korábban létrejött menhelyeknél viszont üres ez az oldal, és onnan nem
+   * vezetett tovább út – ez a gomb pótolja őket.
+   */
+  async function createDefaults() {
+    setCreating(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/shelters/${shelterId}/defaults`, { method: "POST" });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("tiersUnknownError"));
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("tiersUnknownError"));
+    } finally {
+      setCreating(false);
+    }
+  }
 
   function startEdit(tier: Tier) {
     setEditingId(tier.id);
@@ -116,7 +138,18 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
       )}
 
       {tiers.length === 0 && (
-        <p className="text-sm text-gray-500">{t("tiersNoTiers")}</p>
+        <div className="rounded-2xl border border-dashed border-gray-200 px-5 py-8 text-center">
+          <p className="text-sm text-gray-500">{t("tiersNoTiers")}</p>
+          <Button
+            type="button"
+            size="sm"
+            loading={creating}
+            onClick={createDefaults}
+            className="mt-3"
+          >
+            <Check className="h-3.5 w-3.5" /> {t("tiersCreateDefaults")}
+          </Button>
+        </div>
       )}
 
       <div className="space-y-3">
