@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site-url";
 
-const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
+const BASE = siteUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {
