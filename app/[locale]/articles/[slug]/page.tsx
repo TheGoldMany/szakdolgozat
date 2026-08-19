@@ -14,6 +14,9 @@ import {
   User,
 } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
+import { effectiveTitle, effectiveDescription, tagSlug } from "@/lib/seo";
+
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://allatimenhelyek.hu";
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
@@ -21,20 +24,31 @@ import { ArticleSidebar } from "@/components/articles/article-sidebar";
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
-    select: { title: true, excerpt: true, imageUrl: true, publishedAt: true },
+    select: {
+      title: true, excerpt: true, content: true, imageUrl: true, publishedAt: true,
+      updatedAt: true, seoTitle: true, metaDescription: true, keywords: true, tags: true,
+    },
   });
   const t = await getTranslations("articles");
   if (!article || !isPublished(article.publishedAt)) return { title: t("notFound") };
 
-  const title       = article.title;
-  const description = article.excerpt?.slice(0, 160) ?? `${article.title} – ${t("siteName")}.hu`;
+  const title       = effectiveTitle(article);
+  const description = effectiveDescription(article).slice(0, 200);
   const image       = article.imageUrl ?? undefined;
+  const url         = `${SITE_URL}/articles/${params.slug}`;
 
   return {
     title,
     description,
+    // A kanonikus URL megelőzi, hogy a nyelvi változatok duplikált tartalomnak
+    // számítsanak – ez a leggyakoribb oka az indexelés elmaradásának.
+    alternates: { canonical: url },
+    keywords: [...article.keywords, ...article.tags],
     openGraph: {
-      title, description, type: "article",
+      title, description, type: "article", url,
+      publishedTime: article.publishedAt.toISOString(),
+      modifiedTime:  article.updatedAt.toISOString(),
+      tags:          article.tags,
       ...(image ? { images: [{ url: image, alt: title }] } : {}),
     },
     twitter: {
@@ -151,8 +165,35 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
     />
   );
 
+  // Strukturált adat: ettől érti a kereső, hogy ez cikk, ki írta és mikor –
+  // ez a rich resulthoz és a gyorsabb indexeléshez is kell.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type":    "Article",
+    headline:    article.seoTitle?.trim() || article.title,
+    description: effectiveDescription(article),
+    datePublished: article.publishedAt.toISOString(),
+    dateModified:  article.updatedAt.toISOString(),
+    author: { "@type": "Person", name: article.author?.name ?? t("editorial") },
+    publisher: {
+      "@type": "Organization",
+      name: `${t("siteName")}.hu`,
+      url:  SITE_URL,
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/articles/${params.slug}` },
+    ...(article.imageUrl ? { image: [article.imageUrl] } : {}),
+    ...(article.keywords.length || article.tags.length
+      ? { keywords: [...article.keywords, ...article.tags].join(", ") }
+      : {}),
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        // Saját, gépelt objektumból származó JSON – nem felhasználói HTML.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex justify-center gap-6">
 
@@ -220,6 +261,20 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
             </div>
           </div>
         </article>
+
+        {article.tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {article.tags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/articles/cimke/${tagSlug(tag)}`}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:border-brand-300 hover:text-brand-600"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
+        )}
 
         {hasRelated && (
           <section className="mt-6 sm:mt-8">

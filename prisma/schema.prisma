@@ -1365,6 +1365,22 @@ model Post {
   /// Kitöltve = publikált; üresen piszkozat, csak a szerkesztőben látszik
   publishedAt DateTime?
 
+  // ── Keresőoptimalizálás ────────────────────────────────────────────────
+  /// A keresőben megjelenő cím. Üresen a `title` szolgál helyette – azért
+  /// külön mező, mert a jó olvasói cím és a jó keresőcím ritkán ugyanaz.
+  seoTitle        String?
+  /// A találat alatti leírás. Üresen az `excerpt` a tartalék.
+  metaDescription String? @db.Text
+  /// A cikk fő kulcsszava. A szerkesztő ez alapján ad visszajelzést arról,
+  /// hogy a kulcsszó szerepel-e a címben, a leírásban és a szövegben.
+  focusKeyword    String?
+  /// További kulcsszavak. Google ezeket metaadatként figyelmen kívül hagyja –
+  /// nálunk a kapcsolódó tartalom és a szerkesztői visszajelzés használja.
+  keywords        String[] @default([])
+  /// Címszavak: nyilvánosan látszanak és böngészhető gyűjtőoldaluk van,
+  /// ezért valódi belső hivatkozásokat adnak a keresőnek.
+  tags            String[] @default([])
+
   // Opcionális hivatkozás egy entitásra, amit a cikk kiemel
   animalId   String?
   eventId    String?
@@ -1382,6 +1398,7 @@ model Post {
   @@index([shelterId])
   @@index([createdAt])
   @@index([publishedAt])
+  @@index([tags])
 }
 
 model PostLike {

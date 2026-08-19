@@ -48,6 +48,12 @@ export default async function DashboardArticlesPage({
         shelterId: source.shelterId,
         published:   isPublished(source.publishedAt),
         publishedAt: source.publishedAt ? source.publishedAt.toISOString() : null,
+        slug:            source.slug,
+        seoTitle:        source.seoTitle,
+        metaDescription: source.metaDescription,
+        focusKeyword:    source.focusKeyword,
+        keywords:        source.keywords,
+        tags:            source.tags,
       }
     : null;
 

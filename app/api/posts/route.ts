@@ -3,12 +3,20 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 import { slugifyTitle, uniqueArticleSlug, publishedWhere } from "@/lib/articles";
+import { cleanTermList } from "@/lib/seo";
 
 const createSchema = z.object({
   title:      z.string().min(3, "A cím legalább 3 karakter legyen").max(200),
   excerpt:    z.string().max(400).optional().or(z.literal("")),
   content:    z.string().min(1, "Írd meg a cikk szövegét"),
   imageUrl:   z.string().url().optional().or(z.literal("")),
+  /** Keresőoptimalizálás – mind opcionális, üresen értelmes tartalékot használunk. */
+  seoTitle:        z.string().max(120).nullable().optional(),
+  metaDescription: z.string().max(320).nullable().optional(),
+  focusKeyword:    z.string().max(80).nullable().optional(),
+  keywords:        z.array(z.string()).max(30).optional(),
+  tags:            z.array(z.string()).max(30).optional(),
+
   shelterId:  z.string().optional().nullable(),
   animalId:   z.string().optional().nullable(),
   eventId:    z.string().optional().nullable(),
@@ -111,6 +119,11 @@ export async function POST(req: NextRequest) {
         excerpt:     d.excerpt?.trim() || null,
         content:     d.content,
         imageUrl:    d.imageUrl || null,
+        seoTitle:        d.seoTitle?.trim() || null,
+        metaDescription: d.metaDescription?.trim() || null,
+        focusKeyword:    d.focusKeyword?.trim() || null,
+        keywords:        cleanTermList(d.keywords),
+        tags:            cleanTermList(d.tags),
         shelterId:   d.shelterId || null,
         authorId:    user!.id,
         animalId:    d.animalId || null,

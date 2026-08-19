@@ -1700,7 +1700,9 @@
     "activeCampaigns": "Aktive Spendenaktionen",
     "readMore": "Zum Artikel",
     "adoptable": "Zur Adoption freigegeben",
-    "siteName": "ÁllatiMenhelyek"
+    "siteName": "ÁllatiMenhelyek",
+    "tagCount": "{count} Artikel mit diesem Schlagwort",
+    "tagMetaDescription": "Artikel zum Schlagwort „{tag}” – {count} Beiträge über Adoption und Tierschutz."
   },
   "volunteers": {
     "apply": "Als Freiwillige:r bewerben",

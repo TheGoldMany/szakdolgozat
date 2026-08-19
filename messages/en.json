@@ -1700,7 +1700,9 @@
     "activeCampaigns": "Active fundraisers",
     "readMore": "Read the article",
     "adoptable": "Available for adoption",
-    "siteName": "ÁllatiMenhelyek"
+    "siteName": "ÁllatiMenhelyek",
+    "tagCount": "{count} articles with this tag",
+    "tagMetaDescription": "Articles tagged “{tag}” – {count} pieces on adoption and animal welfare."
   },
   "volunteers": {
     "apply": "Apply as a volunteer",
