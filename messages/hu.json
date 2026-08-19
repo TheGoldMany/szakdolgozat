@@ -1700,7 +1700,9 @@
     "activeCampaigns": "Aktív gyűjtések",
     "readMore": "Tovább a cikkre",
     "adoptable": "Örökbefogadható",
-    "siteName": "ÁllatiMenhelyek"
+    "siteName": "ÁllatiMenhelyek",
+    "tagCount": "{count} cikk ezzel a címszóval",
+    "tagMetaDescription": "„{tag}” témájú cikkek – {count} írás az örökbefogadásról és az állatvédelemről."
   },
   "volunteers": {
     "apply": "Önkéntesnek jelentkezem",

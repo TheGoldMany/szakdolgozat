@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArticleSeoPanel, type SeoFields } from "@/components/dashboard/article-seo-panel";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { upload } from "@vercel/blob/client";
@@ -19,6 +20,12 @@ export interface EditableArticle {
   published: boolean;
   /** ISO időpont, ha van megjelenési idő (múltbeli = publikált, jövőbeli = időzített). */
   publishedAt: string | null;
+  slug:            string | null;
+  seoTitle:        string | null;
+  metaDescription: string | null;
+  focusKeyword:    string | null;
+  keywords:        string[];
+  tags:            string[];
 }
 
 interface ShelterOption { id: string; name: string }
@@ -48,6 +55,13 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
     article?.publishedAt ? toLocalInput(new Date(article.publishedAt)) : "",
   );
 
+  const [seo, setSeo] = useState<SeoFields>({
+    seoTitle:        article?.seoTitle ?? "",
+    metaDescription: article?.metaDescription ?? "",
+    focusKeyword:    article?.focusKeyword ?? "",
+    keywords:        article?.keywords ?? [],
+    tags:            article?.tags ?? [],
+  });
   const [shelters, setShelters]   = useState<ShelterOption[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving]       = useState<"draft" | "publish" | "schedule" | "save" | "delete" | null>(null);
@@ -111,6 +125,11 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
         content:   content,
         imageUrl:  imageUrl || (isEdit ? null : undefined),
         shelterId: shelterId || null,
+        seoTitle:        seo.seoTitle.trim() || null,
+        metaDescription: seo.metaDescription.trim() || null,
+        focusKeyword:    seo.focusKeyword.trim() || null,
+        keywords:        seo.keywords,
+        tags:            seo.tags,
       };
       if (publish !== undefined) body.publish = publish;
 
@@ -320,6 +339,16 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
             Csak akkor válassz menhelyet, ha a cikk kifejezetten róla szól.
           </p>
         </div>
+
+        <ArticleSeoPanel
+          value={seo}
+          onChange={setSeo}
+          title={title}
+          excerpt={excerpt}
+          content={content}
+          imageUrl={imageUrl}
+          slug={article?.slug ?? null}
+        />
 
         {/* Időzítés */}
         <div>

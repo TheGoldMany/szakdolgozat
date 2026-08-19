@@ -3,12 +3,20 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
 import { slugifyTitle, uniqueArticleSlug, isPublished } from "@/lib/articles";
+import { cleanTermList } from "@/lib/seo";
 
 const patchSchema = z.object({
   title:      z.string().min(3).max(200).optional(),
   excerpt:    z.string().max(400).nullable().optional(),
   content:    z.string().min(1).optional(),
   imageUrl:   z.string().url().nullable().optional().or(z.literal("")),
+  /** Keresőoptimalizálás – mind opcionális, üresen értelmes tartalékot használunk. */
+  seoTitle:        z.string().max(120).nullable().optional(),
+  metaDescription: z.string().max(320).nullable().optional(),
+  focusKeyword:    z.string().max(80).nullable().optional(),
+  keywords:        z.array(z.string()).max(30).optional(),
+  tags:            z.array(z.string()).max(30).optional(),
+
   shelterId:  z.string().nullable().optional(),
   animalId:   z.string().nullable().optional(),
   eventId:    z.string().nullable().optional(),
@@ -55,6 +63,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         imageUrl: rest.imageUrl === "" ? null : rest.imageUrl,
         ...(title ? { title: title.trim() } : {}),
         ...(slug ? { slug } : {}),
+        // A kulcsszó- és címszólisták nem mehetnek nyersen az adatbázisba:
+        // a duplikátumok és a whitespace elrontanák a gyűjtőoldalakat.
+        ...(rest.keywords !== undefined ? { keywords: cleanTermList(rest.keywords) } : {}),
+        ...(rest.tags     !== undefined ? { tags:     cleanTermList(rest.tags)     } : {}),
+        ...(rest.seoTitle        !== undefined ? { seoTitle:        rest.seoTitle?.trim()        || null } : {}),
+        ...(rest.metaDescription !== undefined ? { metaDescription: rest.metaDescription?.trim() || null } : {}),
+        ...(rest.focusKeyword    !== undefined ? { focusKeyword:    rest.focusKeyword?.trim()    || null } : {}),
         // Az explicit időpont erősebb a publish kapcsolónál: így lehet egy már
         // publikált cikket későbbre időzíteni, vagy időzítettet előrehozni.
         ...(publishedAt !== undefined

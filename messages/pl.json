@@ -1700,7 +1700,9 @@
     "activeCampaigns": "Aktywne zbiórki",
     "readMore": "Czytaj artykuł",
     "adoptable": "Do adopcji",
-    "siteName": "ÁllatiMenhelyek"
+    "siteName": "ÁllatiMenhelyek",
+    "tagCount": "artykułów z tym tagiem: {count}",
+    "tagMetaDescription": "Artykuły z tagiem „{tag}” – {count} tekstów o adopcji i ochronie zwierząt."
   },
   "volunteers": {
     "apply": "Zgłoś się na wolontariusza",
