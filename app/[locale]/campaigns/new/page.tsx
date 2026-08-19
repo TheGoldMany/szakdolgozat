@@ -7,7 +7,9 @@ import { NewCampaignForm } from "@/components/donate/new-campaign-form";
 
 export const metadata: Metadata = { title: "Új gyűjtés indítása" };
 
-export default async function NewCampaignPage() {
+export default async function NewCampaignPage(
+  { searchParams }: { searchParams: { shelter?: string } }
+) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/campaigns/new");
 
@@ -32,7 +34,10 @@ export default async function NewCampaignPage() {
           Töltsd ki az alábbi mezőket. A gyűjtésed admin jóváhagyás után kerül nyilvánosságra.
         </p>
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <NewCampaignForm stripeConnected={stripeConnected} />
+          <NewCampaignForm
+            stripeConnected={stripeConnected}
+            defaultShelterId={searchParams.shelter ?? ""}
+          />
         </div>
       </div>
     </div>

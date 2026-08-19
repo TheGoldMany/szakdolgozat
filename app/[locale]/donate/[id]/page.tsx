@@ -118,18 +118,23 @@ export default async function CampaignDetailPage({
               </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                <span>{t("startedBy", { name: campaign.user?.name ?? t("anonymous") })}</span>
-                {campaign.shelter && (
-                  <>
-                    <span className="text-gray-300">·</span>
+                {/* Menhelyhez kötött gyűjtésnél a MENHELY az indító, nem az az
+                    admin, aki véletlenül létrehozta – az adomány is a menhely
+                    Stripe fiókjára fut. A létrehozó személy megmarad az
+                    adatbázisban, de nyilvánosan félrevezető lenne. */}
+                {campaign.shelter ? (
+                  <span className="flex items-center gap-1">
+                    {t("startedByShelter")}
                     <Link
                       href={`/shelters/${campaign.shelter.slug}`}
-                      className="flex items-center gap-1 text-brand-600 hover:underline"
+                      className="flex items-center gap-1 font-medium text-brand-600 hover:underline"
                     >
                       <MapPin className="h-3.5 w-3.5" />
                       {campaign.shelter.name}
                     </Link>
-                  </>
+                  </span>
+                ) : (
+                  <span>{t("startedBy", { name: campaign.user?.name ?? t("anonymous") })}</span>
                 )}
                 {endsAt && (
                   <>

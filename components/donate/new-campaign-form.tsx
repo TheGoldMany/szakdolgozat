@@ -9,7 +9,15 @@ import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 interface Shelter { id: string; name: string }
 interface Animal  { id: string; name: string; breed: string | null }
 
-export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean }) {
+export function NewCampaignForm({
+  stripeConnected,
+  /** A menhely dashboardról indítva a menhely előre ki van választva – így a
+   *  pénz a menhely Stripe fiókjára fut, nem az adminéra. */
+  defaultShelterId = "",
+}: {
+  stripeConnected: boolean;
+  defaultShelterId?: string;
+}) {
   const t       = useTranslations("donate");
   const tCommon = useTranslations("common");
   const [title, setTitle] = useState("");
@@ -18,7 +26,7 @@ export function NewCampaignForm({ stripeConnected }: { stripeConnected: boolean 
   const [imageUrl, setImageUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
   const [endsAt, setEndsAt] = useState("");
-  const [shelterId, setShelterId] = useState("");
+  const [shelterId, setShelterId] = useState(defaultShelterId);
   const [animalId, setAnimalId] = useState("");
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [animals, setAnimals] = useState<Animal[]>([]);

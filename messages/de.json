@@ -308,7 +308,8 @@
     "stripeRequiredDesc": "Eine Spendenaktion kannst du nur mit einem verbundenen Stripe-Konto starten, damit die Spenden direkt bei dir (oder dem gewählten Tierheim) ankommen.",
     "stripeConnectOwn": "Eigenes Stripe-Konto verbinden",
     "stripeConnectError": "Fehler beim Verbinden mit Stripe.",
-    "generalOngoing": "Laufende Unterstützung für den Alltag des Tierheims – ohne Frist und Zielbetrag."
+    "generalOngoing": "Laufende Unterstützung für den Alltag des Tierheims – ohne Frist und Zielbetrag.",
+    "startedByShelter": "Gestartet von"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -1423,7 +1424,8 @@
     "subsPaymentsCount": "Abbuchungen",
     "tiersFixedAmountsInfo": "Die Paketbeträge sind plattformweit festgelegt ({amounts}) und werden für jedes Tierheim automatisch angelegt. Name und Beschreibung gestaltest du selbst – den Wert eines Pakets macht die Geschichte aus, nicht die Zahl.",
     "tiersLegacy": "Alter Betrag",
-    "tiersLegacyHint": "Ein Paket aus der Zeit vor den festen Beträgen. Bestehende Abonnenten zahlen bei Stripe weiter ihren Einstiegspreis, daher nicht löschbar – neue können aber nicht mehr beitreten."
+    "tiersLegacyHint": "Ein Paket aus der Zeit vor den festen Beträgen. Bestehende Abonnenten zahlen bei Stripe weiter ihren Einstiegspreis, daher nicht löschbar – neue können aber nicht mehr beitreten.",
+    "tiersCreateDefaults": "Pakete anlegen"
   },
   "foster": {
     "title": "Meine Pflegeanträge",

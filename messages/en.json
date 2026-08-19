@@ -308,7 +308,8 @@
     "stripeRequiredDesc": "You can only start a fundraiser with a connected Stripe account, so donations reach you (or the shelter you choose) directly.",
     "stripeConnectOwn": "Connect my Stripe account",
     "stripeConnectError": "Error connecting to Stripe.",
-    "generalOngoing": "Ongoing support for the shelter's day-to-day running — no deadline, no target."
+    "generalOngoing": "Ongoing support for the shelter's day-to-day running — no deadline, no target.",
+    "startedByShelter": "Started by"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -1423,7 +1424,8 @@
     "subsPaymentsCount": "Payments",
     "tiersFixedAmountsInfo": "Tier amounts are fixed platform-wide ({amounts}) and are created automatically for every shelter. The name and description are yours to write — what makes a tier worth choosing is the story, not the number.",
     "tiersLegacy": "Legacy amount",
-    "tiersLegacyHint": "A tier from before fixed amounts. Existing subscribers keep paying the price they signed up at in Stripe, so it cannot be deleted — but nobody new can join it."
+    "tiersLegacyHint": "A tier from before fixed amounts. Existing subscribers keep paying the price they signed up at in Stripe, so it cannot be deleted — but nobody new can join it.",
+    "tiersCreateDefaults": "Create the tiers"
   },
   "foster": {
     "title": "My foster applications",
