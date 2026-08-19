@@ -26,8 +26,9 @@
 | [15-events.md](./15-events.md) | Események (publikus + admin) | TC-15-01 – TC-15-07 |
 | [16-forms-kennels-transfers.md](./16-forms-kennels-transfers.md) | Kérvénysablonok, kennelek, áthelyezések | TC-16-01 – TC-16-09 |
 | [17-settings-tiers.md](./17-settings-tiers.md) | Menhely beállítások, Stripe Connect, térképes helyszín, támogatói szintek | TC-17-01 – TC-17-08 |
+| [18-fizetesi-teszt-jegyzokonyv.md](./18-fizetesi-teszt-jegyzokonyv.md) | **Fizetési teszt jegyzőkönyv**: a három fizetési útvonal, visszatérítés, chargeback, pénzügyi egyeztetés | TC-18-01 – TC-18-35 |
 
-**Összesen: ~127 teszteset**
+**Összesen: ~162 teszteset**
 
 > Rendszer-architektúra áttekintés új fejlesztőknek: [ARCHITECTURE.md](./ARCHITECTURE.md)
 
