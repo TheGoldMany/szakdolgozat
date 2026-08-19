@@ -3,14 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { subscriptionFeePercent, subscriptionPlatformFee } from "@/lib/stripe";
 
 /**
- * Egy számlához tartozó Stripe-előfizetés azonosítója.
- *
- * A használt API-verzióban (2026-03-25.dahlia) az `Invoice`-on már NINCS
- * `subscription` mező — az adat a `parent.subscription_details.subscription`
- * alatt van. A régi, lapos alakot is megnézzük, hogy a korábbi API-verzióval
- * rögzített, újraküldött események se essenek ki.
- */
-/**
  * A számlához tartozó PaymentIntent azonosítója.
  * A visszatérítés (`charge.refunded`) ez alapján találja meg a terhelést.
  */
@@ -22,6 +14,14 @@ export function invoicePaymentIntentId(invoice: Stripe.Invoice): string | null {
   return null;
 }
 
+/**
+ * Egy számlához tartozó Stripe-előfizetés azonosítója.
+ *
+ * A használt API-verzióban (2026-03-25.dahlia) az `Invoice`-on már NINCS
+ * `subscription` mező — az adat a `parent.subscription_details.subscription`
+ * alatt van. A régi, lapos alakot is megnézzük, hogy a korábbi API-verzióval
+ * rögzített, újraküldött események se essenek ki.
+ */
 export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   const nested = invoice.parent?.subscription_details?.subscription;
   if (nested) return typeof nested === "string" ? nested : nested.id;

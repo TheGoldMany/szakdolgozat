@@ -157,7 +157,7 @@ export async function recordDispute(dispute: Stripe.Dispute): Promise<void> {
       userId: s.id,
       type:   "PAYMENT_DISPUTE" as const,
       title:  "Vitatott fizetés érkezett",
-      body:   `${amountStr} – indok: ${dispute.reason}. A Stripe-on határidőre bizonyítékot kell feltölteni, különben a összeg és a vitadíj is a platformot terheli.`,
+      body:   `${amountStr} – indok: ${dispute.reason}. A Stripe-on határidőre bizonyítékot kell feltölteni, különben az összeg és a vitadíj is a platformot terheli.`,
       href:   "/dashboard/audit",
     }))
   ).catch((err) => console.error("dispute notification error:", err));
