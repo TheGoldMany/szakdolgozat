@@ -15,8 +15,9 @@ import {
 } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { effectiveTitle, effectiveDescription, tagSlug } from "@/lib/seo";
+import { siteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://allatimenhelyek.hu";
+const SITE_URL = siteUrl();
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";

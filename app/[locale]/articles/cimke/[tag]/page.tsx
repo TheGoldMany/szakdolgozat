@@ -7,8 +7,9 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { publishedWhere, readingMinutes } from "@/lib/articles";
 import { tagSlug } from "@/lib/seo";
+import { siteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://allatimenhelyek.hu";
+const SITE_URL = siteUrl();
 
 // ISR: a gyűjtőoldal 5 percenként frissül
 export const revalidate = 300;
