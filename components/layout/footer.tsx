@@ -8,19 +8,27 @@ export function Footer() {
   const t    = useTranslations("footer");
   const tNav = useTranslations("nav");
 
+  // A lábléc a teljes nyilvános felületet listázza – a kereső innen is
+  // felderíti az aloldalakat, és a látogatónak sem tűnik el semmi.
   const NAV = [
     { label: tNav("animals"),  href: "/animals"  },
-    { label: tNav("shelters"), href: "/shelters"  },
-    { label: tNav("reports"),  href: "/reports"   },
-    { label: tNav("donate"),   href: "/donate"    },
+    { label: tNav("shelters"), href: "/shelters" },
+    { label: tNav("map"),      href: "/map"      },
+    { label: tNav("reports"),  href: "/reports"  },
+    { label: tNav("donate"),   href: "/donate"   },
+    { label: tNav("events"),   href: "/events"   },
+    { label: tNav("articles"), href: "/articles" },
   ];
 
+  // A horgonyok a súgó tényleges szakasz-azonosítóira mutatnak (u- előtag),
+  // korábban olyan id-kre hivatkoztak, amik nem léteznek.
   const HELP = [
-    { label: t("guide"),           href: "/sugo"               },
-    { label: t("adoptionProcess"), href: "/sugo#orokbefogadas"  },
-    { label: t("donating"),        href: "/sugo#adomanyozas"   },
-    { label: t("reporting"),       href: "/sugo#bejelentes"    },
-    { label: t("contact"),         href: "/kapcsolat"          },
+    { label: t("guide"),           href: "/sugo"                 },
+    { label: t("adoptionProcess"), href: "/sugo#u-orokbefogadas" },
+    { label: t("donating"),        href: "/sugo#u-adomanyozas"   },
+    { label: t("reporting"),       href: "/sugo#u-bejelentes"    },
+    { label: t("map"),             href: "/sugo#u-terkep"        },
+    { label: t("contact"),         href: "/kapcsolat"            },
   ];
 
   const LEGAL = [
@@ -30,7 +38,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-gray-100 bg-white">
+    <footer className="border-t border-gray-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
 
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
@@ -112,6 +120,11 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/auth/register/shelter" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                    {t("registerShelter")}
+                  </Link>
+                </li>
+                <li>
                   <Link href="/auth/register" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
                     {tNav("register")}
                   </Link>
@@ -128,7 +141,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-gray-100 pt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
+        <div className="mt-10 border-t border-gray-200 pt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} ÁllatiMenhelyek.hu – {t("copyright")}
           </p>
