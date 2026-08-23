@@ -52,7 +52,9 @@
     "forShelters": "Dla schronisk",
     "dashboard": "Panel admina",
     "copyright": "Wszelkie prawa zastrzeżone.",
-    "madeWith": "dla zwierząt"
+    "madeWith": "dla zwierząt",
+    "map": "Mapa",
+    "registerShelter": "Zarejestruj schronisko"
   },
   "home": {
     "badge": "{count} zwierząt czeka na dom",

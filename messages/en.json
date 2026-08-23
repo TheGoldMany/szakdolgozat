@@ -52,7 +52,9 @@
     "forShelters": "For shelters",
     "dashboard": "Admin panel",
     "copyright": "All rights reserved.",
-    "madeWith": "for animals"
+    "madeWith": "for animals",
+    "map": "Map",
+    "registerShelter": "Register a shelter"
   },
   "home": {
     "badge": "{count} animals waiting for a home",

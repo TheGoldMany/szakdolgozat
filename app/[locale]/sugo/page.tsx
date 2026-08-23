@@ -64,6 +64,7 @@ const TOC_SUPER: TocItem[] = [
   { id: "s-gyujtesek",      label: "Gyűjtések kezelése",        icon: Heart          },
   { id: "s-csomagok",       label: "Előfizetési csomagok",      icon: CheckCircle2   },
   { id: "s-elofizetesek",   label: "Előfizetések",              icon: Users          },
+  { id: "s-penzugy",        label: "Visszatérítés és vita",     icon: ShieldCheck    },
   { id: "s-menhelyek",      label: "Menhelyek kezelése",        icon: Building2      },
   { id: "s-elemzesek",      label: "Teljes analitika",          icon: BarChart2      },
 ];
@@ -151,7 +152,7 @@ function UserContent() {
             A kérelem beadásához fiók szükséges. A regisztráció ingyenes, e-mailben visszaigazolják.
           </Step>
           <Step n={4} title="Küldj örökbefogadási kérelmet">
-            Az állat oldalán kattints az <strong>„Örökbefogadási kérelem"</strong> gombra.
+            Az állat oldalán kattints az <strong>„Örökbefogadási kérelem”</strong> gombra.
             Töltsd ki az adatlapot (lakókörülmények, tapasztalat, háztartás). Minél részletesebb, annál jobb.
           </Step>
           <Step n={5} title="Kövesd a kérelem állapotát">
@@ -218,7 +219,7 @@ function UserContent() {
             Egy értesítésre kattintva az érintett oldalra navigál.
           </Step>
           <Step n={2} title="Értesítések olvasottnak jelölése">
-            Az összes értesítés olvasottnak jelölhető egyszerre a „Mind olvasva" gombbal, vagy egyenként.
+            Az összes értesítés olvasottnak jelölhető egyszerre a „Mind olvasva” gombbal, vagy egyenként.
           </Step>
         </div>
         <Note type="info">E-mail értesítők is küldésre kerülnek a fontos eseményekről (jóváhagyás, elutasítás, üzenet). Az e-mail küldés a menhely e-mail beállításaitól függ.</Note>
@@ -231,8 +232,8 @@ function UserContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Időpont kérése">
-            A menhely profiloldalán vagy egy állat részleteknél kattints az <strong>„Időpontfoglalás"</strong> gombra.
-            Add meg a kívánt dátumot és időpontot, írd le a célod (pl. „Bodrit szeretném megismerni").
+            A menhely profiloldalán vagy egy állat részleteknél kattints az <strong>„Időpontfoglalás”</strong> gombra.
+            Add meg a kívánt dátumot és időpontot, írd le a célod (pl. „Bodrit szeretném megismerni”).
           </Step>
           <Step n={2} title="Visszaigazolás várása">
             A menhely adminisztrátor megerősíti, módosítja vagy visszautasítja az időpontot.
@@ -261,7 +262,7 @@ function UserContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Jelentkezés">
-            A menhely profiloldalán kattints az <strong>„Önkéntesnek jelentkezem"</strong> gombra.
+            A menhely profiloldalán kattints az <strong>„Önkéntesnek jelentkezem”</strong> gombra.
             Add meg a motivációdat, képességeidet és mikor érsz rá. Minél részletesebb, annál jobb.
           </Step>
           <Step n={2} title="Jóváhagyás">
@@ -306,19 +307,55 @@ function UserContent() {
       {/* Adományozás */}
       <Section id="u-adomanyozas" icon={Heart} title="Adományozás és előfizetés" color="bg-rose-50 text-rose-800">
         <div className="space-y-4">
-          <Step n={1} title="Egyszeri adomány – Kampányok">
-            A <strong>Támogatás</strong> oldalon böngészheted az aktív kampányokat. Válassz egyet, add meg
-            az összeget (minimum 175 Ft) és fizess bankkártyával Stripe-on keresztül.
+          <Step n={1} title="Egyszeri adomány – gyűjtések">
+            A <strong>Támogatás</strong> oldalon böngészheted az aktív gyűjtéseket. Válassz egyet, add meg
+            az összeget (minimum <strong>500 Ft</strong>) és fizess bankkártyával Stripe-on keresztül.
           </Step>
-          <Step n={2} title="Havi előfizetés">
-            A menhely profilján válaszd ki az előfizetési csomagot (pl. Barát: 2 500 Ft/hó).
-            Az összeg havonta automatikusan levonódik. Bármikor lemondható a Profilodban.
+          <Step n={2} title="Támogatás konkrét gyűjtés nélkül">
+            Minden menhely oldalán van egy <strong>„Támogasd a menhelyet”</strong> gomb. Ez az állandó
+            gyűjtéshez vezet, ami a menhely mindennapi működését fedezi – akkor is elérhető, ha épp
+            nincs futó kampány.
           </Step>
-          <Step n={3} title="Előfizetés lemondása">
-            Profil → Előfizetéseim → Lemondás. A már kifizetett hónap végéig aktív marad.
+          <Step n={3} title="Havi támogatói csomag">
+            A menhely profilján négy csomag közül választhatsz:
+            <strong> 1 000 · 2 000 · 5 000 · 10 000 Ft/hó</strong>. Az összegek minden menhelynél
+            azonosak; a csomag neve és leírása menhelyenként változik, mert az mondja el, mire megy a pénz.
+            Az összeg havonta automatikusan levonódik.
+          </Step>
+          <Step n={4} title="Virtuális örökbefogadás">
+            Ha egy konkrét állatot szeretnél támogatni, az állat oldalán indíthatsz virtuális
+            örökbefogadást <strong>szabadon megadott havi összeggel</strong> (500 Ft-tól).
+            Választhatod, hogy virtuális gazdiként nyilvánosan megjelenj-e az állat oldalán.
+          </Step>
+          <Step n={5} title="Lemondás">
+            Profil → Előfizetéseim, illetve Virtuális örökbefogadásaim → Lemondás.
+            A már kifizetett időszak végéig aktív marad, utána nem terhelünk többet.
           </Step>
         </div>
-        <Note type="info">Minden fizetés biztonságos Stripe-on keresztül zajlik. Kártyaadataidat soha nem tároljuk.</Note>
+
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h3 className="mb-2 text-sm font-semibold text-gray-800">Mennyi jut el a menhelyhez?</h3>
+          <p className="text-sm leading-relaxed text-gray-600">
+            <strong>A teljes szánt összeg.</strong> A platform díja és a bankkártyás feldolgozás
+            költsége nem a menhely pénzéből megy: a fizetésnél külön tételként jelenik meg, és a
+            támogató fizeti. Egy 10 000 Ft-os adománynál ez így néz ki:
+          </p>
+          <ul className="mt-2 space-y-1 text-sm text-gray-600">
+            <li>Adomány a menhelynek — <strong>10 000 Ft</strong></li>
+            <li>Platform díj (5%) — 500 Ft</li>
+            <li>Feldolgozási díj — a bankkártyás tranzakció költsége</li>
+          </ul>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            A menhely mindebből pontosan a <strong>10 000 Ft-ot</strong> kapja meg. A díjakat a
+            fizetés előtt tételesen látod, semmi nincs elrejtve.
+          </p>
+        </div>
+
+        <Note type="info">
+          Minden fizetés Stripe-on keresztül zajlik, kártyaadataidat sem mi, sem a menhely nem
+          látja és nem tárolja. Visszatérítés esetén a gyűjtés összege is csökken, hogy a
+          haladásjelző valós maradjon.
+        </Note>
       </Section>
 
       {/* Kedvencek */}
@@ -352,7 +389,7 @@ function UserContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Befogadói profil létrehozása">
-            Egy menhely profiloldalán kattints az <strong>„Ideiglenes befogadónak jelentkezem"</strong> gombra.
+            Egy menhely profiloldalán kattints az <strong>„Ideiglenes befogadónak jelentkezem”</strong> gombra.
             Add meg a lakhatási körülményeidet, tapasztalataidat és elérhetőségedet.
           </Step>
           <Step n={2} title="Jóváhagyás">
@@ -384,7 +421,7 @@ function UserContent() {
             helyszín, típus és dátum szerint.
           </Step>
           <Step n={2} title="Regisztráció eseményre">
-            Az esemény részletes oldalán kattints a <strong>„Részt veszek"</strong> gombra.
+            Az esemény részletes oldalán kattints a <strong>„Részt veszek”</strong> gombra.
             Visszaigazolást kapsz e-mailben és az <strong>Értesítések</strong> között.
           </Step>
           <Step n={3} title="Regisztrációm megtekintése">
@@ -404,13 +441,28 @@ function UserContent() {
       {/* Térkép */}
       <Section id="u-terkep" icon={Map} title="Interaktív térkép" color="bg-sky-50 text-sky-800">
         <p className="text-sm text-gray-600 leading-relaxed">
-          A <strong>Térkép</strong> oldalon vizuálisan böngészheted az elveszett, megtalált és kóbor állatok
-          bejelentéseit, valamint a menhelyek elhelyezkedését.
+          A <strong>Térkép</strong> oldalon egyszerre látod az elveszett, megtalált és kóbor állatok
+          bejelentéseit, a menhelyeket és az <strong>állatorvosi rendelőket</strong> – köztük a
+          24 órás ügyeleteket.
         </p>
+        <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h3 className="mb-2 text-sm font-semibold text-gray-800">Hogyan olvasd a jelölőket?</h3>
+          <p className="text-sm leading-relaxed text-gray-600">
+            Minden jelölő két dolgot mond el egyszerre: a <strong>szín</strong> a kategóriát,
+            a benne lévő <strong>ikon</strong> a tartalmat.
+          </p>
+          <ul className="mt-2 space-y-1 text-sm text-gray-600">
+            <li><strong>Piros / zöld / narancs csepp</strong> — elveszett, megtalált, kóbor bejelentés;
+                az ikon a fajt mutatja (kutya, macska, mancs)</li>
+            <li><strong>Kék ház szívvel</strong> — menhely</li>
+            <li><strong>Lila kereszt</strong> — állatorvosi rendelő</li>
+            <li><strong>Piros EKG-jel</strong> — 24 órás ügyelet</li>
+          </ul>
+        </div>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Rétegek kapcsolása">
-            A bal felső szűrőpanelen be- és kikapcsolhatod a Bejelentések és Menhelyek réteget.
-            Mobilon a szűrő ikon megnyitja a panel.
+            A bal felső szűrőpanelen be- és kikapcsolhatod a Bejelentések, Menhelyek és
+            Állatorvosok réteget. Mobilon a szűrő ikon nyitja meg a panelt.
           </Step>
           <Step n={2} title="Szűrés típus és státusz szerint">
             A panelen szűrhetsz bejelentéstípusra (Elveszett / Megtalált / Kóbor) és státuszra
@@ -421,7 +473,7 @@ function UserContent() {
             A részletes oldalra az összefoglalóból navigálhatsz.
           </Step>
           <Step n={4} title="Új bejelentés indítása">
-            A térkép alján a <strong>„+ Új bejelentés"</strong> gomb megnyitja az új bejelentés űrlapot.
+            A térkép alján a <strong>„+ Új bejelentés”</strong> gomb megnyitja az új bejelentés űrlapot.
           </Step>
         </div>
         <QuickLink icon={Map} label="Térkép" href="/map" />
@@ -431,7 +483,7 @@ function UserContent() {
       <Section id="u-bejelentes" icon={Bell} title="Kóbor állat bejelentése" color="bg-orange-50 text-orange-800">
         <div className="space-y-4">
           <Step n={1} title="Bejelentés indítása">
-            A <strong>Bejelentések</strong> menüpontban kattints az „Új bejelentés" gombra.
+            A <strong>Bejelentések</strong> menüpontban kattints az „Új bejelentés” gombra.
             Válaszd ki a típust: Elveszett / Megtalált / Kóbor.
           </Step>
           <Step n={2} title="Adatok megadása">
@@ -449,7 +501,7 @@ function UserContent() {
       <Section id="u-uzenetek" icon={MessageCircle} title="Üzenetváltás" color="bg-purple-50 text-purple-800">
         <div className="space-y-4">
           <Step n={1} title="Üzenet küldése">
-            Egy állat profiloldalán kattints az <strong>„Üzenet a menhelynek"</strong> gombra.
+            Egy állat profiloldalán kattints az <strong>„Üzenet a menhelynek”</strong> gombra.
             A beszélgetés megjelenik az Üzeneteim oldalon.
           </Step>
           <Step n={2} title="Olvasatlan üzenetek">
@@ -497,7 +549,7 @@ function AdminContent() {
       <Section id="a-allatok" icon={PawPrint} title="Állatok kezelése" color="bg-brand-50 text-brand-800">
         <div className="space-y-4">
           <Step n={1} title="Új állat hozzáadása">
-            Dashboard → Állatok → <strong>„Állat hozzáadása"</strong>. Töltsd ki az adatokat (faj, fajta, kor, súly, leírás),
+            Dashboard → Állatok → <strong>„Állat hozzáadása”</strong>. Töltsd ki az adatokat (faj, fajta, kor, súly, leírás),
             töltsd fel a fotókat (min. 1, max. 6), jelöld az egészségügyi adatokat. Az állat azonnal megjelenik a listán.
           </Step>
           <Step n={2} title="Státusz frissítése">
@@ -509,14 +561,14 @@ function AdminContent() {
             <Badge label="Állatorvosi megfigyelés" color="bg-red-100 text-red-700 mx-1" />.
           </Step>
           <Step n={3} title="Egészségügyi bejegyzések">
-            Az állat részletes oldalán az „Egészségügyi napló" szekciónál adhatod hozzá a bejegyzéseket:
+            Az állat részletes oldalán az „Egészségügyi napló” szekciónál adhatod hozzá a bejegyzéseket:
             oltás, féregtelenítés, kezelés, állatorvosi vizit. Minden bejegyzéshez megadható az állatorvos neve és a következő esedékesség dátuma.
           </Step>
           <Step n={4} title="Dokumentumok feltöltése">
             Az állat profiljánál az Iratok fülön feltölthetsz PDF dokumentumokat (oltási könyv, ivartalanítási igazolás, stb.).
           </Step>
           <Step n={5} title="Szerkesztés és törlés">
-            Bármely adat (leírás, fotók, egészségügyi adatok) szerkeszthető az állat részletoldalán a <strong>„Szerkesztés"</strong> gombbal.
+            Bármely adat (leírás, fotók, egészségügyi adatok) szerkeszthető az állat részletoldalán a <strong>„Szerkesztés”</strong> gombbal.
             Törléskor az állat eltűnik a publikus listáról és a kapcsolódó kérelmek is törlődnek —
             örökbe fogadott állatnál inkább archivált státuszt alkalmazz.
           </Step>
@@ -560,7 +612,7 @@ function AdminContent() {
           </Step>
           <Step n={2} title="Visszaigazolás / Módosítás">
             Kattints a kérésre, és erősítsd vissza az időpontot (esetleg módosítsd a dátumot),
-            adj admin megjegyzést (pl. „Szombaton 10:00 rendben"). A felhasználó értesítést kap.
+            adj admin megjegyzést (pl. „Szombaton 10:00 rendben”). A felhasználó értesítést kap.
           </Step>
           <Step n={3} title="Lemondás és lezárás">
             Ha az időpont megtörtént, jelöld <Badge label="Teljesítve" color="bg-blue-100 text-blue-700" /> státuszba.
@@ -578,12 +630,12 @@ function AdminContent() {
             majd fogadd el vagy utasítsd el a kérelmet. A felhasználó értesítést kap.
           </Step>
           <Step n={2} title="Feladatok meghirdetése">
-            Önkéntesek → <strong>„Új feladat"</strong>. Add meg a feladat nevét, leírását,
+            Önkéntesek → <strong>„Új feladat”</strong>. Add meg a feladat nevét, leírását,
             időpontját és a max. létszámot. Az aktív önkéntesek látják és feljelentkezhetnek.
           </Step>
           <Step n={3} title="Jelenléti napló rögzítése">
             Az önkéntes sorában kattints a + Jelenlét gombra. Add meg a dátumot,
-            az eltöltött órákat és egy rövid megjegyzést (pl. „Sétáltatás, takarítás").
+            az eltöltött órákat és egy rövid megjegyzést (pl. „Sétáltatás, takarítás”).
           </Step>
           <Step n={4} title="Inaktívvá tétel">
             Ha egy önkéntes már nem aktív, módosítsd az állapotát
@@ -605,12 +657,12 @@ function AdminContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Új tétel felvétele">
-            Dashboard → Készlet → <strong>„Tétel hozzáadása"</strong>.
+            Dashboard → Készlet → <strong>„Tétel hozzáadása”</strong>.
             Add meg a nevet, kategóriát (Takarmány / Gyógyszer / Kellékek / Tisztítószer / Eszköz / Egyéb),
             mértékegységet (kg, liter, db, tabletta stb.), nyitókészletet és opcionálisan a minimum szintet és a lejárati dátumot.
           </Step>
           <Step n={2} title="Mozgás rögzítése (IN / OUT / ADJUST)">
-            A tétel sorában kattints a <strong>„Mozgás"</strong> gombra, vagy nyisd meg a részleteket:
+            A tétel sorában kattints a <strong>„Mozgás”</strong> gombra, vagy nyisd meg a részleteket:
             <ul className="mt-2 ml-3 space-y-1 text-xs text-gray-500 list-disc">
               <li><span className="flex items-center gap-1 inline-flex"><ArrowDownCircle className="h-3.5 w-3.5 text-green-500" /> <strong>Bevételezés (IN)</strong></span> — készletre vett mennyiség (pl. szállítmány érkezett)</li>
               <li><span className="flex items-center gap-1 inline-flex"><ArrowUpCircle className="h-3.5 w-3.5 text-red-500" /> <strong>Felhasználás (OUT)</strong></span> — kivett mennyiség (pl. heti adagolás); ha kevesebb a készlet, mint a kivét, a rendszer hibaüzenetet ad</li>
@@ -712,42 +764,83 @@ function AdminContent() {
             A cikk elmenthető piszkozatként — az még nem látszik a látogatóknak. Publikálás után
             bármikor szerkeszthető, visszavonható piszkozatba, vagy törölhető.
           </Step>
-          <Step n={3} title="Lájkok és megosztás">
+          <Step n={3} title="Időzítés">
+            A megjelenés időpontja megadható előre. Jövőbeli időpontnál a cikk „Időzítve” jelöléssel
+            a szerkesztőben marad, és magától válik nyilvánossá.
+          </Step>
+          <Step n={4} title="Keresőoptimalizálás">
+            A szerkesztő alján külön panel: <strong>keresőcím</strong>, <strong>meta leírás</strong>,
+            <strong>fő kulcsszó</strong>, kulcsszavak és <strong>címszavak</strong>. Előnézetben látod,
+            hogyan fog kinézni a találat a Google-ben, és egy ellenőrzőlista jelzi, min érdemes még
+            javítani (szerepel-e a kulcsszó a címben, a leírásban, a bevezetőben; elég hosszú-e a szöveg).
+          </Step>
+          <Step n={5} title="Címszavak">
+            A címszavak a cikk alján nyilvánosan is megjelennek, és saját gyűjtőoldalt kapnak
+            (<code>/articles/cimke/…</code>). Ez belső hivatkozásokat ad a cikkeidnek, ami a
+            keresőben ténylegesen számít.
+          </Step>
+          <Step n={6} title="Lájkok és megosztás">
             A látogatók lájkolhatják a cikket (bejelentkezés szükséges).
             A megosztás gombbal Facebook, X (Twitter), WhatsApp vagy vágólapra másolva terjeszthető.
           </Step>
         </div>
-        <Note type="tip">Az állat-kártyás posztok a leghatékonyabbak — közvetlen link az örökbefogadási oldalra.</Note>
+        <Note type="tip">
+          A kulcsszómezők önmagukban nem javítanak a helyezésen – a Google a
+          <code> meta keywords</code> címkét 2009 óta figyelmen kívül hagyja. Az ellenőrzőlista
+          viszont jobb szöveget eredményez, és a címszavak, a sitemap meg a strukturált adat
+          tényleg gyorsítják az indexelést.
+        </Note>
         <QuickLink icon={MessagesSquare} label="Posztjaim" href="/dashboard/posts" />
       </Section>
 
       {/* Adományok */}
       <Section id="a-adomanyok" icon={Heart} title="Adományok és kampányok" color="bg-rose-50 text-rose-800">
         <div className="space-y-4">
-          <Step n={1} title="Előfizetési csomagok létrehozása">
-            Dashboard → Előfizetési csomagok → Csomag hozzáadása.
-            Add meg a csomag nevét, leírását és összegét (minimum 175 Ft/hó).
-            Az aktív csomagok megjelennek a menhely publikus profilján.
-          </Step>
-          <Step n={2} title="Kampány indítása">
-            Dashboard → (Kampányok menü a navigációban). Új kampány célja, leírása, célosszege és
-            határideje adható meg. A kampány Super Admin jóváhagyás után válik aktívvá és publikusan elérhetővé.
-          </Step>
-          <Step n={3} title="Előfizetések listája">
-            Dashboard → Előfizetések. Látod az aktív és lemondott előfizetőket, a csomag típusát és az előfizetés kezdetét.
-            Szükség esetén adminisztrátori lemondás is lehetséges a sorban lévő gombbal.
-          </Step>
-          <Step n={4} title="Stripe Connect beállítása">
+          <Step n={1} title="Stripe fiók bekötése – ezzel kezdd">
             Dashboard → Menhely beállítások → Stripe fiók csatlakoztatása.
-            Ez szükséges az adományok fogadásához. Az összeg automatikusan a menhely bankszámlájára kerül
-            (4% platform kezelési díj levonásával).
+            Enélkül a menhely egyáltalán nem tud pénzt fogadni: a fizetés elutasításra kerül,
+            hogy ne fogadjunk el olyan adományt, amit nem tudunk kifizetni.
           </Step>
-          <Step n={5} title="Csomagok és kampányok szerkesztése és törlése">
-            Az előfizetési csomagok neve, leírása és összege szerkeszthető. Aktív előfizetőkkel rendelkező
-            csomag törlésekor az előfizetések az aktuális időszak végéig aktívak maradnak.
-            Kampányok PENDING vagy REJECTED állapotban szerkeszthetők és törölhetők; ACTIVE kampány szerkesztése
-            Super Admin jóváhagyást igényelhet.
+          <Step n={2} title="Havi támogatói csomagok">
+            A négy csomag (<strong>1 000 · 2 000 · 5 000 · 10 000 Ft/hó</strong>) minden menhelynél
+            automatikusan létrejön – nem kell létrehoznod őket, és az összeget sem lehet átírni.
+            Amit szerkesztesz: a <strong>név és a leírás</strong>. Ez mondja el a támogatónak, mire megy
+            a pénz („2 000 Ft = egy hét kutyatáp”), és ettől lesz vonzó a csomag, nem a számtól.
           </Step>
+          <Step n={3} title="Gyűjtés indítása a menhely nevében">
+            Dashboard → Gyűjtések → <strong>Új gyűjtés</strong>. A menhely előre ki van választva,
+            így az adomány a menhely Stripe fiókjára fut. A gyűjtés Super Admin jóváhagyás után
+            válik nyilvánossá.
+          </Step>
+          <Step n={4} title="Állandó „Általános támogatás” gyűjtés">
+            Minden menhely kap egy határidő nélküli gyűjtést, ami a mindennapi működést fedezi.
+            Ez adja a menhely oldalán a „Támogasd a menhelyet” gombot, és akkor is elérhető,
+            amikor épp nincs futó kampányod. Nem szerkeszthető és nem törölhető.
+          </Step>
+          <Step n={5} title="Bevételek követése">
+            Dashboard → Előfizetések. Itt látod a <strong>ténylegesen befolyt</strong> havi bevételt
+            – nem az elvi havidíjat –, a terhelések számát, és az élő előfizetőket. A lemondott
+            előfizetők nem számítanak bele.
+          </Step>
+          <Step n={6} title="Szerkesztés és lezárás">
+            A csomag neve és leírása bármikor módosítható. A gyűjtés címe, leírása és célösszege
+            szerkeszthető, amíg nem érkezett rá adomány; utána lezárás javasolt a törlés helyett,
+            hogy a pénzügyi nyom megmaradjon.
+          </Step>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <h3 className="mb-2 text-sm font-semibold text-gray-800">Mit kap meg a menhely?</h3>
+          <p className="text-sm leading-relaxed text-gray-600">
+            <strong>A támogató által szánt teljes összeget.</strong> A platform 5%-os díja és a
+            bankkártyás feldolgozás költsége nem a menhely bevételéből megy: ezeket a fizetésnél
+            külön tételként a támogató fizeti. Ha valaki 10 000 Ft-ot ad, a menhelyhez
+            <strong> 10 000 Ft</strong> érkezik.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-gray-600">
+            A pénz a menhely saját Stripe fiókjára fut, onnan a Stripe kifizetési ütem szerint megy
+            a bankszámlára. Új fióknál az első kifizetés jellemzően 7–14 nap.
+          </p>
         </div>
       </Section>
 
@@ -829,7 +922,7 @@ function AdminContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Kennel felvétele">
-            Dashboard → Kennelek → <strong>„Kennel hozzáadása"</strong>.
+            Dashboard → Kennelek → <strong>„Kennel hozzáadása”</strong>.
             Add meg a kennel nevét, típusát (beltéri / kültéri / karantén) és kapacitását.
           </Step>
           <Step n={2} title="Állat hozzárendelése">
@@ -857,7 +950,7 @@ function AdminContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Áthelyezés indítása">
-            Dashboard → Áthelyezések → <strong>„Új áthelyezés"</strong>. Válaszd ki az állatot,
+            Dashboard → Áthelyezések → <strong>„Új áthelyezés”</strong>. Válaszd ki az állatot,
             a cél menhelyt, add meg a tervezett dátumot és az indokot.
           </Step>
           <Step n={2} title="Státusz követése">
@@ -888,7 +981,7 @@ function AdminContent() {
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Esemény létrehozása">
-            Dashboard → Események → <strong>„Új esemény"</strong>.
+            Dashboard → Események → <strong>„Új esemény”</strong>.
             Add meg a nevet, leírást, típust (OPEN_DAY, ADOPTION_DAY, VOLUNTEER_DAY, FUNDRAISER, OTHER),
             a helyszínt, dátumot és a maximális létszámot.
           </Step>
@@ -897,7 +990,7 @@ function AdminContent() {
             Minden regisztrációt manuálisan is visszaigazolhatsz vagy elutasíthatsz.
           </Step>
           <Step n={3} title="Értesítések résztvevőknek">
-            Az esemény szerkesztésénél az „Értesítés küldése" gombbal értesítheted az összes
+            Az esemény szerkesztésénél az „Értesítés küldése” gombbal értesítheted az összes
             regisztrált résztvevőt (pl. helyszínváltozás esetén).
           </Step>
           <Step n={4} title="Esemény lezárása">
@@ -969,19 +1062,25 @@ function SuperAdminContent() {
           </Step>
           <Step n={2} title="Kampány jóváhagyása">
             Ha van PENDING kampány, az oldal alján megjelenik a jóváhagyás panel.
-            Olvasd el a leírást és a célösszeget. Kattints az <strong>„Elfogad"</strong> gombra —
+            Olvasd el a leírást és a célösszeget. Kattints az <strong>„Elfogad”</strong> gombra —
             a kampány ACTIVE státuszba kerül és azonnal megjelenik a nyilvános Támogatás oldalon.
             A menhely adminisztrátor értesítést kap.
           </Step>
           <Step n={3} title="Kampány elutasítása">
-            A <strong>„Elutasít"</strong> gombra kattintva a kampány REJECTED státuszba kerül és nem
+            A <strong>„Elutasít”</strong> gombra kattintva a kampány REJECTED státuszba kerül és nem
             jelenik meg nyilvánosan. A menhely adminisztrátor értesítést kap az elutasításról.
           </Step>
           <Step n={4} title="Kérvény sablonok jóváhagyása">
             Az oldal alján a PENDING_APPROVAL státuszú örökbefogadási kérdőív-sablonok is megjelennek.
             Ellenőrizd a mezőket (nincs-e szenzitív vagy jogellenesen gyűjtött adat), majd fogadd el vagy utasítsd el.
           </Step>
-          <Step n={5} title="Értesítések a várakozókról">
+          <Step n={5} title="Az állandó „Általános támogatás” gyűjtés">
+            Minden menhelynek van egy rendszer által kezelt, határidő nélküli gyűjtése.
+            Ez <strong>nem szerkeszthető és nem törölhető</strong> – ez adja a menhely oldalán
+            a „Támogasd a menhelyet” gombot, enélkül egy kampány nélküli menhely egyáltalán nem
+            tudna egyszeri adományt fogadni. A gyűjtés-listákban szándékosan nem jelenik meg.
+          </Step>
+          <Step n={6} title="Értesítések a várakozókról">
             Ha új jóváhagyásra váró elem érkezik, a Super Admin push-értesítést kap
             <Badge label="Kampány jóváhagyásra vár" color="bg-yellow-100 text-yellow-700 mx-1" /> és
             <Badge label="Sablon jóváhagyásra vár" color="bg-yellow-100 text-yellow-700" /> típussal.
@@ -999,12 +1098,20 @@ function SuperAdminContent() {
         <div className="space-y-4 mt-3">
           <Step n={1} title="Csomagok áttekintése">
             Dashboard → Adományozás → Előfizetési csomagok. A táblázatban látható:
-            csomag neve, menhely neve + városа, összeg (Ft/hó), aktív előfizetők száma, aktív/inaktív állapot.
+            csomag neve, menhely neve + városa, összeg (Ft/hó), aktív előfizetők száma, aktív/inaktív állapot.
             A sorok menhelyek szerint ABC-sorrendben, azon belül összeg szerint növekvően jelennek meg.
           </Step>
-          <Step n={2} title="Kire vonatkozik?">
-            Hasznos a platform bevételi struktúrájának áttekintésekor: melyik menhely mennyi előfizetővel rendelkezik,
-            és milyen csomagokat kínál. Szerkesztéshez a menhely adminisztrátorát kell kérni.
+          <Step n={2} title="Az összegek platformszinten rögzítettek">
+            Minden menhely ugyanazt a négy csomagot kínálja:
+            <strong> 1 000 · 2 000 · 5 000 · 10 000 Ft/hó</strong>. Ezek automatikusan létrejönnek,
+            és az összeg sehol nem szerkeszthető – a Stripe-előfizetés a belépéskori árhoz van kötve,
+            így egy utólag átírt összeg a meglévő előfizetőket úgysem érné el.
+            Amit a menhely alakít: a csomag neve és leírása.
+          </Step>
+          <Step n={3} title="Régi, egyedi összegű csomagok">
+            A fix összegek bevezetése előtt létrejött csomagok „Régi összeg” jelöléssel,
+            inaktívan megmaradnak. Nem törölhetők, mert a rájuk előfizetők a Stripe-nál
+            a belépéskori árat fizetik tovább – új előfizető viszont már nem tud belépni rájuk.
           </Step>
         </div>
         <QuickLink icon={CheckCircle2} label="Előfizetési csomagok" href="/dashboard/tiers" />
@@ -1029,7 +1136,7 @@ function SuperAdminContent() {
             <Badge label="Lemondott" color="bg-red-100 text-red-600 mx-1" />.
           </Step>
           <Step n={3} title="Adminisztrátori lemondás">
-            Aktív előfizetésnél a sor végén megjelenik a „Lemondás" gomb.
+            Aktív előfizetésnél a sor végén megjelenik a „Lemondás” gomb.
             Megerősítés után az előfizetés CANCELLED státuszba kerül.
             Ezt csak kivételes esetben alkalmazd (pl. felhasználói kérésre, visszaéléskor).
           </Step>
@@ -1042,6 +1149,39 @@ function SuperAdminContent() {
       </Section>
 
       {/* Menhelyek kezelése */}
+      {/* Visszatérítés és vitatott tétel */}
+      <Section id="s-penzugy" icon={ShieldCheck} title="Visszatérítés és vitatott tétel" color="bg-red-50 text-red-800">
+        <p className="text-sm leading-relaxed text-gray-600">
+          A visszafelé mozgó pénz külön figyelmet igényel, mert a modellünkben ez a
+          <strong> platform egyenlegét</strong> érinti.
+        </p>
+        <div className="mt-3 space-y-4">
+          <Step n={1} title="Visszatérítés">
+            A visszatérítést a Stripe dashboardon indítod. A platform automatikusan lekönyveli:
+            az adomány visszatérítettként jelölődik, és a <strong>gyűjtés összege is csökken</strong>,
+            hogy a haladásjelző valós maradjon. Részleges visszatérítésnél csak a visszatérített rész.
+            A gyűjtés tulajdonosa értesítést kap, hogy tudja, miért csökkent az összeg.
+          </Step>
+          <Step n={2} title="Vitatott tétel (chargeback)">
+            Ha egy támogató megtámadja a terhelést a bankjánál, a vitatott összeg
+            <strong> és a Stripe vitadíja is a platform egyenlegét terheli</strong> – akkor is,
+            ha a pénz már a menhelynél van. Ezért minden super admin azonnal értesítést kap róla,
+            és a nyitott viták a <strong>Napló</strong> oldal tetején is megjelennek.
+          </Step>
+          <Step n={3} title="Mit tegyél vitatott tételnél?">
+            A bizonyítás <strong>határidős</strong>. Nyisd meg a Stripe dashboardon a vitát, és tölts fel
+            bizonyítékot: a fizetés visszaigazolását, a gyűjtés leírását, a kapcsolatfelvételt.
+            Ha nem reagálsz a határidőig, a vita automatikusan elveszik.
+          </Step>
+          <Step n={4} title="Megelőzés">
+            A visszaterhelések leggyakoribb oka, hogy a támogató nem ismeri fel a tételt a
+            bankkivonatán. Ezért a fizetés a gyűjtés nevét viszi magával, és a Stripe-fiókon is
+            beállított névvel jelenik meg.
+          </Step>
+        </div>
+        <QuickLink icon={ShieldCheck} label="Napló" href="/dashboard/audit" />
+      </Section>
+
       <Section id="s-menhelyek" icon={Building2} title="Menhelyek kezelése" color="bg-emerald-50 text-emerald-800">
         <div className="space-y-4">
           <Step n={1} title="Menhely profil szerkesztése">

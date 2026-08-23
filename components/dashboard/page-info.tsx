@@ -123,11 +123,12 @@ const PAGE_INFO: Record<string, InfoContent> = {
   },
   tiers: {
     title: "Előfizetési csomagok",
-    intro: "A havi támogatási csomagok létrehozása és kezelése.",
+    intro: "A havi támogatói csomagok szövegének kezelése.",
     points: [
-      { label: "Csomag létrehozása", desc: "Add meg a csomag nevét, leírását és összegét (minimum 175 Ft/hó)." },
+      { label: "Fix összegek", desc: "A négy csomag (1 000 · 2 000 · 5 000 · 10 000 Ft/hó) automatikusan létrejön, és az összeg nem módosítható." },
+      { label: "Amit te írsz", desc: "A csomag neve és leírása – ez mondja el, mire megy a pénz. A csomag értékét a történet adja, nem a szám." },
       { label: "Aktiválás", desc: "Az aktív csomagok megjelennek a menhely publikus profilján, ahol a látogatók előfizethetnek." },
-      { label: "Stripe szükséges", desc: "Az adományok fogadásához a menhely beállításoknál csatlakoztatni kell a Stripe fiókot." },
+      { label: "Stripe szükséges", desc: "Előfizetés fogadásához a menhely beállításoknál be kell kötni a Stripe fiókot." },
     ],
   },
   forms: {
@@ -170,12 +171,13 @@ const PAGE_INFO: Record<string, InfoContent> = {
     ],
   },
   campaigns: {
-    title: "Jóváhagyások",
-    intro: "Super Admin nézet: a menhelyek kampányainak és kérvény sablonjainak jóváhagyása.",
+    title: "Gyűjtések",
+    intro: "A menhely gyűjtéseinek indítása és kezelése; super adminként a jóváhagyás is innen megy.",
     points: [
-      { label: "Kampányok", desc: "A jóváhagyásra váró kampányok leírása és célja alapján fogadd el (Aktív) vagy utasítsd el." },
-      { label: "Kérvény sablonok", desc: "Ellenőrizd a kérdőív-mezőket, majd hagyd jóvá vagy utasítsd el." },
-      { label: "Értesítés", desc: "A menhely adminisztrátora minden döntésről értesítést kap." },
+      { label: "Új gyűjtés", desc: "Az „Új gyűjtés” gombbal a menhely nevében indíthatsz kampányt – a menhely előre ki van választva, így az adomány a menhely Stripe fiókjára fut." },
+      { label: "Jóváhagyás", desc: "A beküldött gyűjtés a platform adminjának jóváhagyása után válik nyilvánossá. Minden döntésről értesítés megy." },
+      { label: "Állandó gyűjtés", desc: "Az „Általános támogatás” rendszer által kezelt: nem szerkeszthető és nem törölhető, és a listákban sem jelenik meg." },
+      { label: "Lezárás törlés helyett", desc: "Amelyik gyűjtésre már érkezett adomány, azt zárd le – a törlés a pénzügyi nyomot venné el." },
     ],
   },
   overview: {

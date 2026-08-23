@@ -52,7 +52,9 @@
     "forShelters": "Für Tierheime",
     "dashboard": "Admin-Bereich",
     "copyright": "Alle Rechte vorbehalten.",
-    "madeWith": "für Tiere"
+    "madeWith": "für Tiere",
+    "map": "Karte",
+    "registerShelter": "Tierheim registrieren"
   },
   "home": {
     "badge": "{count} Tiere warten auf ein Zuhause",

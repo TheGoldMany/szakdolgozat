@@ -52,7 +52,9 @@
     "forShelters": "Menhelyeknek",
     "dashboard": "Admin felület",
     "copyright": "Minden jog fenntartva.",
-    "madeWith": "az állatokért"
+    "madeWith": "az állatokért",
+    "map": "Térkép",
+    "registerShelter": "Menhely regisztrálása"
   },
   "home": {
     "badge": "{count} állat vár új gazdára",
