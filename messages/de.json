@@ -217,7 +217,10 @@
       "submitting": "Wird gesendet...",
       "submitButton": "Antrag einreichen"
     },
-    "showResults": "Ergebnisse anzeigen"
+    "showResults": "Ergebnisse anzeigen",
+    "alreadyApplied": "Du hast für dieses Tier bereits einen Antrag gestellt.",
+    "viewApplication": "Antrag ansehen",
+    "orAskFirst": "Oder möchtest du zuerst etwas fragen?"
   },
   "shelters": {
     "title": "Tierheime",
@@ -757,7 +760,23 @@
     "stripeConnect": "Stripe-Konto verbinden",
     "stripeConnectError": "Fehler beim Verbinden.",
     "stripeOpenError": "Fehler beim Öffnen.",
-    "stripeUnknownError": "Unbekannter Fehler."
+    "stripeUnknownError": "Unbekannter Fehler.",
+    "adopterTitle": "Vorstellung als Adoptierende:r",
+    "adopterIntro": "Einmal ausfüllen – es wird jeder Adoptionsanfrage beigefügt. Das Tierheim sieht dann einen Menschen, nicht nur einen Namen.",
+    "adopterBio": "Über dich",
+    "adopterBioPlaceholder": "Wer bist du, wie lebst du, und warum möchtest du adoptieren? Ein paar ehrliche Sätze sagen mehr als eine lange Liste.",
+    "adopterHomeType": "In welcher Wohnform lebst du?",
+    "adopterHomeChoose": "Auswählen…",
+    "adopterHomeHouse": "Haus",
+    "adopterHomeApartment": "Wohnung",
+    "adopterHomeOther": "Sonstiges",
+    "adopterHasGarden": "Ich habe einen Garten",
+    "adopterHasChildren": "Bei mir leben Kinder",
+    "adopterHasPets": "Ich habe schon Tiere",
+    "adopterExperience": "Erfahrung mit Tieren",
+    "adopterExperiencePlaceholder": "Hattest du schon Tiere? Welche, wie lange? Falls nicht, ist das in Ordnung – beschreibe, wie du dich vorbereitest.",
+    "adopterSave": "Vorstellung speichern",
+    "adopterSaved": "Gespeichert"
   },
   "cookies": {
     "title": "Cookies & Datenschutz",
@@ -1427,7 +1446,8 @@
     "tiersFixedAmountsInfo": "Die Paketbeträge sind plattformweit festgelegt ({amounts}) und werden für jedes Tierheim automatisch angelegt. Name und Beschreibung gestaltest du selbst – den Wert eines Pakets macht die Geschichte aus, nicht die Zahl.",
     "tiersLegacy": "Alter Betrag",
     "tiersLegacyHint": "Ein Paket aus der Zeit vor den festen Beträgen. Bestehende Abonnenten zahlen bei Stripe weiter ihren Einstiegspreis, daher nicht löschbar – neue können aber nicht mehr beitreten.",
-    "tiersCreateDefaults": "Pakete anlegen"
+    "tiersCreateDefaults": "Pakete anlegen",
+    "appDetailAboutApplicant": "Über die antragstellende Person"
   },
   "foster": {
     "title": "Meine Pflegeanträge",

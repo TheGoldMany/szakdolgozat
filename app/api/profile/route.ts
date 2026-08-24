@@ -9,6 +9,14 @@ const updateSchema = z.object({
   address:            z.string().max(200).optional().nullable(),
   city:               z.string().max(100).optional().nullable(),
   emailNotifications: z.boolean().optional(),
+  // Örökbefogadói bemutatkozás – az emberre vonatkozik, nem egy állatra,
+  // ezért a profilon él, és minden kérelembe onnan kerül át.
+  bio:                z.string().max(2000).optional().nullable(),
+  homeType:           z.enum(["HOUSE", "APARTMENT", "OTHER"]).optional().nullable(),
+  hasGarden:          z.boolean().optional().nullable(),
+  hasChildren:        z.boolean().optional().nullable(),
+  hasPets:            z.boolean().optional().nullable(),
+  adoptionExperience: z.string().max(2000).optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest) {

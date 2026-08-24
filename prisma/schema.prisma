@@ -103,6 +103,21 @@ model User {
   phone                    String?
   address                  String?
   city                     String?
+
+  // ── Örökbefogadói bemutatkozás ──────────────────────────────────────────
+  // A menhely a kérelemnél nemcsak egy nevet lát, hanem egy embert. Ezek a
+  // válaszok az emberre vonatkoznak, nem egy konkrét állatra, ezért itt a
+  // helyük és nem a kérelmen: egyszer kell megírni, és minden kérelembe
+  // automatikusan bekerül.
+  /// Rövid bemutatkozás: ki vagy, miért szeretnél örökbe fogadni.
+  bio                      String?   @db.Text
+  /// "HOUSE" | "APARTMENT" | "OTHER"
+  homeType                 String?
+  hasGarden                Boolean?
+  hasChildren              Boolean?
+  hasPets                  Boolean?
+  /// Korábbi állattartási tapasztalat.
+  adoptionExperience       String?   @db.Text
   country                  String    @default("HU")
   stripeAccountId          String?
   stripeOnboardingComplete Boolean   @default(false)

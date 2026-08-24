@@ -51,7 +51,7 @@ export default async function ApplicationDetailPage({
   const app = await prisma.adoptionApplication.findUnique({
     where: { id: params.id },
     include: {
-      user:   { select: { name: true, email: true, phone: true } },
+      user:   { select: { name: true, email: true, phone: true, bio: true, city: true } },
       animal: {
         include: {
           images:  { where: { isPrimary: true }, take: 1 },
@@ -140,6 +140,19 @@ export default async function ApplicationDetailPage({
                 {status.label}
               </span>
             </div>
+
+            {/* A jelentkező bemutatkozása a profiljáról – ez az emberről szól,
+                nem erről az állatról, ezért külön, kiemelve jelenik meg. */}
+            {app.user.bio && (
+              <div className="rounded-xl border border-brand-100 bg-brand-50 p-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
+                  {t("appDetailAboutApplicant")}
+                </p>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-brand-900">
+                  {app.user.bio}
+                </p>
+              </div>
+            )}
 
             {/* Applicant info */}
             <div className="rounded-xl bg-gray-50 p-3 text-xs text-gray-600 space-y-0.5">

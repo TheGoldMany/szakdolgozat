@@ -21,9 +21,21 @@ type FormData = {
 interface AdoptionFormProps {
   animalId:   string;
   animalName: string;
+  /**
+   * A profilon megadott örökbefogadói bemutatkozás. A háztartásra vonatkozó
+   * válaszok nem állatfüggők, ezért előre kitöltjük belőle – a kérelmező
+   * felülírhatja, ha erre az állatra más a helyzet.
+   */
+  profile?: {
+    homeType:           string | null;
+    hasGarden:          boolean | null;
+    hasChildren:        boolean | null;
+    hasPets:            boolean | null;
+    adoptionExperience: string | null;
+  } | null;
 }
 
-export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
+export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProps) {
   const t = useTranslations("animals.adoptionForm");
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
@@ -44,7 +56,13 @@ export function AdoptionForm({ animalId, animalName }: AdoptionFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { hasGarden: false, hasChildren: false, hasPets: false },
+    defaultValues: {
+      homeType:    (profile?.homeType as FormData["homeType"]) || undefined,
+      hasGarden:   profile?.hasGarden   ?? false,
+      hasChildren: profile?.hasChildren ?? false,
+      hasPets:     profile?.hasPets     ?? false,
+      experience:  profile?.adoptionExperience ?? "",
+    },
   });
 
   async function onSubmit(data: FormData) {

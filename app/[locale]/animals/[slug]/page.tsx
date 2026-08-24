@@ -7,6 +7,7 @@ import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, 
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
+import { AdoptionForm } from "@/components/animals/adoption-form";
 import { ShareButton } from "@/components/ui/share-button";
 import { RatingBadge } from "@/components/reviews/rating-stat";
 import { HealthTimeline } from "@/components/health/health-timeline";
@@ -112,12 +113,34 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
   const statusColor = STATUS_COLOR[animal.status];
 
   let existingConvId: string | null = null;
+  // Van-e már beadott kérelme erre az állatra, és mit adott meg a profilján?
+  let existingApplication: { id: string; status: string } | null = null;
+  let adopterProfile: {
+    homeType: string | null; hasGarden: boolean | null; hasChildren: boolean | null;
+    hasPets: boolean | null; adoptionExperience: string | null;
+  } | null = null;
+
   if (session?.user?.id) {
-    const conv = await prisma.conversation.findUnique({
-      where: { animalId_userId: { animalId: animal.id, userId: session.user.id } },
-      select: { id: true },
-    });
-    existingConvId = conv?.id ?? null;
+    const [conv, application, profile] = await Promise.all([
+      prisma.conversation.findUnique({
+        where:  { animalId_userId: { animalId: animal.id, userId: session.user.id } },
+        select: { id: true },
+      }),
+      prisma.adoptionApplication.findUnique({
+        where:  { userId_animalId: { userId: session.user.id, animalId: animal.id } },
+        select: { id: true, status: true },
+      }),
+      prisma.user.findUnique({
+        where:  { id: session.user.id },
+        select: {
+          homeType: true, hasGarden: true, hasChildren: true,
+          hasPets: true, adoptionExperience: true,
+        },
+      }),
+    ]);
+    existingConvId      = conv?.id ?? null;
+    existingApplication = application;
+    adopterProfile      = profile;
   }
 
   // Virtuális gazdik (szponzorok)
@@ -148,23 +171,50 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
         </div>
       );
     }
-    if (existingConvId) {
+    // Már beadott kérelem: ne lehessen másodszor beküldeni, inkább vezessük
+    // a kérelme állapotához.
+    if (existingApplication) {
       return (
-        <div className="rounded-xl bg-brand-50 border border-brand-200 p-5">
-          <p className="font-medium text-brand-800">{t("alreadyConversation")}</p>
-          <Link href={`/messages/${existingConvId}`}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 transition-colors">
-            {t("continueConversation")}
+        <div className="rounded-xl border border-brand-200 bg-brand-50 p-5">
+          <p className="font-medium text-brand-800">{t("alreadyApplied")}</p>
+          <Link
+            href={`/applications/${existingApplication.id}`}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+          >
+            {t("viewApplication")}
           </Link>
         </div>
       );
     }
+
+    // Az örökbefogadási kérelem az elsődleges út. Az üzenetváltás mellette
+    // marad, ha valaki előbb kérdezni szeretne.
     return (
-      <AdoptionContact
-        animalId={animal.id}
-        animalName={animal.name}
-        shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
-      />
+      <div className="space-y-5">
+        <AdoptionForm
+          animalId={animal.id}
+          animalName={animal.name}
+          profile={adopterProfile}
+        />
+
+        <div className="border-t border-gray-200 pt-5">
+          <p className="mb-3 text-sm text-gray-500">{t("orAskFirst")}</p>
+          {existingConvId ? (
+            <Link
+              href={`/messages/${existingConvId}`}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50"
+            >
+              {t("continueConversation")}
+            </Link>
+          ) : (
+            <AdoptionContact
+              animalId={animal.id}
+              animalName={animal.name}
+              shelter={{ phone: animal.shelter.phone ?? null, email: animal.shelter.email ?? null }}
+            />
+          )}
+        </div>
+      </div>
     );
   };
 
