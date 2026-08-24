@@ -151,23 +151,34 @@ function UserContent() {
           <Step n={3} title="Regisztrálj / Jelentkezz be">
             A kérelem beadásához fiók szükséges. A regisztráció ingyenes, e-mailben visszaigazolják.
           </Step>
-          <Step n={4} title="Küldj örökbefogadási kérelmet">
-            Az állat oldalán kattints az <strong>„Örökbefogadási kérelem”</strong> gombra.
-            Töltsd ki az adatlapot (lakókörülmények, tapasztalat, háztartás). Minél részletesebb, annál jobb.
+          <Step n={4} title="Töltsd ki a bemutatkozásod – egyszer">
+            Profil → <strong>Örökbefogadói bemutatkozás</strong>. Írd le, ki vagy, hogyan élsz,
+            és miért szeretnél örökbe fogadni; add meg a lakókörülményeidet és a korábbi
+            tapasztalatod. Ezt <strong>egyszer kell megírni</strong>: minden kérelmedbe
+            automatikusan bekerül, és a menhely így nemcsak egy nevet lát, hanem téged.
           </Step>
-          <Step n={5} title="Kövesd a kérelem állapotát">
+          <Step n={5} title="Küldj örökbefogadási kérelmet">
+            Az állat oldalán töltsd ki az <strong>örökbefogadási kérelmet</strong>. A háztartásra
+            vonatkozó mezők a profilodból előre ki vannak töltve – csak azt írd át, ami ennél az
+            állatnál más. Amit érdemes végiggondolni: miért épp ő, és hogyan illene bele az életedbe.
+          </Step>
+          <Step n={6} title="Kövesd a kérelem állapotát">
             A <strong>Kérelmeim</strong> oldalon követheted a folyamatot: <Badge label="Folyamatban" color="bg-yellow-100 text-yellow-700" />,
             {" "}<Badge label="Értékelés alatt" color="bg-blue-100 text-blue-700" />,
             {" "}<Badge label="Jóváhagyva" color="bg-green-100 text-green-700" />,
             {" "}<Badge label="Elutasítva" color="bg-red-100 text-red-700" />.
             Minden változásról értesítést kapsz.
           </Step>
-          <Step n={6} title="Személyes látogatás és átvétel">
+          <Step n={7} title="Személyes látogatás és átvétel">
             Jóváhagyás után a menhely időpontot egyeztet veled az állat személyes megtekintésére,
             majd az átvételre. Az időpontot a platformon is le lehet foglalni.
           </Step>
         </div>
-        <Note type="tip">Üzenj a menhelynek az üzenetrendszeren keresztül, ha kérdésed van az állat kapcsán — még a kérelem beadása előtt.</Note>
+        <Note type="tip">
+          Ha előbb kérdeznél valamit, az állat oldalán a kérelem alatt üzenetet is írhatsz a
+          menhelynek. A menhely maga is meghívhat egyedi kérdőív kitöltésére – ilyenkor
+          üzenetben kapsz egy linket.
+        </Note>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <QuickLink icon={PawPrint} label="Állatok böngészése" href="/animals" />
           <QuickLink icon={FileText} label="Kérelmeim" href="/applications" />

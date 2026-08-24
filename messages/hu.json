@@ -217,7 +217,10 @@
       "submitting": "Küldés...",
       "submitButton": "Kérelem beküldése"
     },
-    "showResults": "Mutasd az eredményeket"
+    "showResults": "Mutasd az eredményeket",
+    "alreadyApplied": "Már beadtál kérelmet erre az állatra.",
+    "viewApplication": "Kérelem megtekintése",
+    "orAskFirst": "Vagy kérdeznél előbb valamit?"
   },
   "shelters": {
     "title": "Menhelyek",
@@ -757,7 +760,23 @@
     "stripeConnect": "Stripe fiók csatlakoztatása",
     "stripeConnectError": "Hiba a csatlakozáskor.",
     "stripeOpenError": "Hiba a megnyitáskor.",
-    "stripeUnknownError": "Ismeretlen hiba."
+    "stripeUnknownError": "Ismeretlen hiba.",
+    "adopterTitle": "Örökbefogadói bemutatkozás",
+    "adopterIntro": "Ezt egyszer kell megírnod, és onnantól minden örökbefogadási kérelmedbe automatikusan bekerül. A menhely így nemcsak egy nevet lát, hanem téged.",
+    "adopterBio": "Bemutatkozás",
+    "adopterBioPlaceholder": "Ki vagy, hogyan élsz, és miért szeretnél örökbe fogadni? Néhány őszinte mondat többet ér a hosszú listánál.",
+    "adopterHomeType": "Milyen otthonban élsz?",
+    "adopterHomeChoose": "Válassz…",
+    "adopterHomeHouse": "Ház",
+    "adopterHomeApartment": "Lakás",
+    "adopterHomeOther": "Egyéb",
+    "adopterHasGarden": "Van kertem",
+    "adopterHasChildren": "Gyerekek élnek velem",
+    "adopterHasPets": "Van már állatom",
+    "adopterExperience": "Állattartási tapasztalat",
+    "adopterExperiencePlaceholder": "Volt már állatod? Milyen fajta, mennyi ideig? Ha még nem, az sem baj – írd le, hogyan készülsz.",
+    "adopterSave": "Bemutatkozás mentése",
+    "adopterSaved": "Elmentve"
   },
   "cookies": {
     "title": "Sütik és adatvédelem",
@@ -1427,7 +1446,8 @@
     "tiersFixedAmountsInfo": "A csomagösszegek platformszinten rögzítettek ({amounts}), és minden menhelynél automatikusan létrejönnek. A nevet és a leírást te szabod magadra – a csomag értékét a történet adja, nem a szám.",
     "tiersLegacy": "Régi összeg",
     "tiersLegacyHint": "Korábbi, egyedi összegű csomag. A meglévő előfizetők a Stripe-nál a belépéskori árat fizetik tovább, ezért nem törölhető – új előfizető viszont már nem tud belépni rá.",
-    "tiersCreateDefaults": "Csomagok létrehozása"
+    "tiersCreateDefaults": "Csomagok létrehozása",
+    "appDetailAboutApplicant": "A jelentkező bemutatkozása"
   },
   "foster": {
     "title": "Ideiglenes befogadásaim",

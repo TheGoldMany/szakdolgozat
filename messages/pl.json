@@ -217,7 +217,10 @@
       "submitting": "Wysyłanie...",
       "submitButton": "Złóż wniosek"
     },
-    "showResults": "Pokaż wyniki"
+    "showResults": "Pokaż wyniki",
+    "alreadyApplied": "Złożyłeś już wniosek na to zwierzę.",
+    "viewApplication": "Zobacz wniosek",
+    "orAskFirst": "A może najpierw chcesz o coś zapytać?"
   },
   "shelters": {
     "title": "Schroniska",
@@ -757,7 +760,23 @@
     "stripeConnect": "Podłącz konto Stripe",
     "stripeConnectError": "Błąd podczas łączenia.",
     "stripeOpenError": "Błąd podczas otwierania.",
-    "stripeUnknownError": "Nieznany błąd."
+    "stripeUnknownError": "Nieznany błąd.",
+    "adopterTitle": "Profil adoptującego",
+    "adopterIntro": "Wypełnij raz, a zostanie dołączone do każdego wniosku adopcyjnego. Schronisko zobaczy człowieka, nie tylko imię.",
+    "adopterBio": "O Tobie",
+    "adopterBioPlaceholder": "Kim jesteś, jak żyjesz i dlaczego chcesz adoptować? Kilka szczerych zdań znaczy więcej niż długa lista.",
+    "adopterHomeType": "W jakim domu mieszkasz?",
+    "adopterHomeChoose": "Wybierz…",
+    "adopterHomeHouse": "Dom",
+    "adopterHomeApartment": "Mieszkanie",
+    "adopterHomeOther": "Inne",
+    "adopterHasGarden": "Mam ogród",
+    "adopterHasChildren": "Mieszkam z dziećmi",
+    "adopterHasPets": "Mam już zwierzęta",
+    "adopterExperience": "Doświadczenie ze zwierzętami",
+    "adopterExperiencePlaceholder": "Miałeś już zwierzęta? Jakie i jak długo? Jeśli nie – w porządku, opisz, jak się przygotowujesz.",
+    "adopterSave": "Zapisz profil",
+    "adopterSaved": "Zapisano"
   },
   "cookies": {
     "title": "Pliki cookie i prywatność",
@@ -1427,7 +1446,8 @@
     "tiersFixedAmountsInfo": "Kwoty pakietów są ustalone na poziomie platformy ({amounts}) i tworzą się automatycznie dla każdego schroniska. Nazwę i opis piszesz sam — o wartości pakietu decyduje historia, nie liczba.",
     "tiersLegacy": "Stara kwota",
     "tiersLegacyHint": "Pakiet sprzed ustalenia stałych kwot. Obecni subskrybenci nadal płacą cenę z momentu zapisu w Stripe, więc nie można go usunąć — ale nikt nowy nie może do niego dołączyć.",
-    "tiersCreateDefaults": "Utwórz pakiety"
+    "tiersCreateDefaults": "Utwórz pakiety",
+    "appDetailAboutApplicant": "O wnioskodawcy"
   },
   "foster": {
     "title": "Moje wnioski o opiekę tymczasową",

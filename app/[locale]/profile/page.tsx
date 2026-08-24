@@ -14,6 +14,7 @@ import { DeleteAccountButton } from "@/components/profile/delete-account-button"
 import { EmailNotificationsToggle } from "@/components/profile/email-notifications-toggle";
 import { DownloadDataButton } from "@/components/profile/download-data-button";
 import { StripeConnectSection } from "@/components/profile/stripe-connect-section";
+import { AdopterProfileForm } from "@/components/profile/adopter-profile-form";
 import { MyCampaigns } from "@/components/profile/my-campaigns";
 import { PawPrint } from "lucide-react";
 import { Role } from "@prisma/client";
@@ -46,6 +47,12 @@ export default async function ProfilePage() {
       role:               true,
       password:           true,
       emailNotifications: true,
+      bio:                true,
+      homeType:           true,
+      hasGarden:          true,
+      hasChildren:        true,
+      hasPets:            true,
+      adoptionExperience: true,
       stripeAccountId:          true,
       stripeOnboardingComplete: true,
       createdAt:          true,
@@ -202,6 +209,17 @@ export default async function ProfilePage() {
           )}
 
           {/* Stripe fiók kezelése */}
+          <AdopterProfileForm
+            initial={{
+              bio:                user.bio ?? "",
+              homeType:           user.homeType ?? "",
+              hasGarden:          user.hasGarden,
+              hasChildren:        user.hasChildren,
+              hasPets:            user.hasPets,
+              adoptionExperience: user.adoptionExperience ?? "",
+            }}
+          />
+
           <StripeConnectSection
             stripeAccountId={user.stripeAccountId}
             stripeOnboardingComplete={user.stripeOnboardingComplete}

@@ -217,7 +217,10 @@
       "submitting": "Submitting...",
       "submitButton": "Submit application"
     },
-    "showResults": "Show results"
+    "showResults": "Show results",
+    "alreadyApplied": "You have already applied for this animal.",
+    "viewApplication": "View application",
+    "orAskFirst": "Or would you like to ask something first?"
   },
   "shelters": {
     "title": "Shelters",
@@ -757,7 +760,23 @@
     "stripeConnect": "Connect Stripe account",
     "stripeConnectError": "Error while connecting.",
     "stripeOpenError": "Error while opening.",
-    "stripeUnknownError": "Unknown error."
+    "stripeUnknownError": "Unknown error.",
+    "adopterTitle": "Adopter profile",
+    "adopterIntro": "Write this once and it is included in every adoption application you send. The shelter then sees a person, not just a name.",
+    "adopterBio": "About you",
+    "adopterBioPlaceholder": "Who are you, how do you live, and why do you want to adopt? A few honest sentences beat a long list.",
+    "adopterHomeType": "What kind of home do you live in?",
+    "adopterHomeChoose": "Choose…",
+    "adopterHomeHouse": "House",
+    "adopterHomeApartment": "Apartment",
+    "adopterHomeOther": "Other",
+    "adopterHasGarden": "I have a garden",
+    "adopterHasChildren": "Children live with me",
+    "adopterHasPets": "I already have pets",
+    "adopterExperience": "Experience with animals",
+    "adopterExperiencePlaceholder": "Have you had animals before? What kind, for how long? If not, that is fine — say how you are preparing.",
+    "adopterSave": "Save profile",
+    "adopterSaved": "Saved"
   },
   "cookies": {
     "title": "Cookies & Privacy",
@@ -1427,7 +1446,8 @@
     "tiersFixedAmountsInfo": "Tier amounts are fixed platform-wide ({amounts}) and are created automatically for every shelter. The name and description are yours to write — what makes a tier worth choosing is the story, not the number.",
     "tiersLegacy": "Legacy amount",
     "tiersLegacyHint": "A tier from before fixed amounts. Existing subscribers keep paying the price they signed up at in Stripe, so it cannot be deleted — but nobody new can join it.",
-    "tiersCreateDefaults": "Create the tiers"
+    "tiersCreateDefaults": "Create the tiers",
+    "appDetailAboutApplicant": "About the applicant"
   },
   "foster": {
     "title": "My foster applications",
