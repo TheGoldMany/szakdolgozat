@@ -1,7 +1,8 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { PawPrint, Mail, Heart } from "lucide-react";
+import Image from "next/image";
+import { Mail, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function Footer() {
@@ -45,11 +46,21 @@ export function Footer() {
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
-                <PawPrint className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-gray-900">ÁllatiMenhelyek</span>
+            <Link href="/" className="flex items-center gap-2" aria-label="ÁllatiMenhelyek.hu">
+              <Image
+                src="/logo-mark.png"
+                alt=""
+                width={32}
+                height={32}
+                className="h-8 w-8 shrink-0"
+              />
+              <Image
+                src="/logo-wordmark.png"
+                alt="ÁllatiMenhelyek.hu"
+                width={509}
+                height={43}
+                className="h-[17px] w-auto"
+              />
             </Link>
             <p className="mt-3 text-sm text-gray-500 leading-relaxed">
               {t("description")}

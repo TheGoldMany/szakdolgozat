@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Menu, X, PawPrint, MessageCircle, Globe, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { Menu, X, MessageCircle, Globe, ChevronDown } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -105,10 +106,25 @@ export function Header() {
 
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-brand-700">
-          <PawPrint className="h-6 w-6" />
-          <span className="text-lg">ÁllatiMenhelyek</span>
+        {/* Logo – mobilon is kiírjuk a nevet: ott a fejlécben csak a logó és a
+            menügomb van, tehát bőven elfér, és a látogató tudja, hol jár. */}
+        <Link href="/" className="flex items-center gap-2" aria-label="ÁllatiMenhelyek.hu">
+          <Image
+            src="/logo-mark.png"
+            alt=""
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-8 shrink-0"
+          />
+          <Image
+            src="/logo-wordmark.png"
+            alt="ÁllatiMenhelyek.hu"
+            width={509}
+            height={43}
+            priority
+            className="h-4 w-auto sm:h-[18px]"
+          />
         </Link>
 
         {/* Desktop nav */}
