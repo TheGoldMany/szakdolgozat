@@ -102,9 +102,54 @@ main .min-h-screen {
 .stagger > *:nth-child(8)  { animation-delay: 280ms; }
 .stagger > *:nth-child(n+9) { animation-delay: 320ms; }
 
-/* Kattintás-visszajelzés: a gomb "engedjen" a nyomásra */
-.press { transition: transform 0.1s ease-out; }
-.press:active { transform: scale(0.97); }
+/* ─── Kattintás-visszajelzés ───────────────────────────────
+   Mobilon nincs hover, ezért a nyomás visszajelzése az EGYETLEN jel arról,
+   hogy a koppintás célba ért. A böngésző natív villanását lecseréljük egy
+   rövid összenyomásra: ugyanazt közli, csak nem üt el a felülettől.
+
+   Miért `animation` és nem `transition`? A gombokon Tailwind `transition-colors`
+   van. Ha itt a `transition` tulajdonságot állítanánk, felülírnánk azt (ez a
+   szelektor specifikusabb), és a szín-átmenetek némán megszűnnének az egész
+   oldalon. Az `animation` nem ütközik velük. */
+
+@keyframes pressDown {
+  to { transform: scale(var(--press-scale, 0.97)); }
+}
+@keyframes checkPop {
+  0%   { transform: scale(0.8); }
+  55%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* A natív koppintás-kiemelés helyett a sajátunk megy */
+a, button, [role="button"], label, summary, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Minden kattintható vezérlő "enged" a nyomásra – a letiltottak nem, mert
+   azoknál épp az a lényeg, hogy nem történik semmi. */
+.press:not(:disabled):not([aria-disabled="true"]):active,
+button:not(:disabled):not([aria-disabled="true"]):active,
+[role="button"]:not([aria-disabled="true"]):active,
+summary:active {
+  animation: pressDown 0.09s ease-out forwards;
+}
+
+/* Kártya-felület: nagyobb doboz, ezért kisebb elmozdulás adja ugyanazt az
+   érzetet. A :active a lenyomott linkről az ősre is átterjed, így elég a
+   kártya külső elemére tenni – a képet lefedő "stretched link" is ezt hozza. */
+.press-card { --press-scale: 0.985; }
+.press-card:active { animation: pressDown 0.12s ease-out forwards; }
+
+/* Sima szöveges linkeknél a zsugorítás fura lenne (a szöveg ugrálna),
+   ott a rövid halványítás a visszajelzés. */
+a:not(.press):not(.press-card):active { opacity: 0.65; }
+
+/* Jelölőnégyzet/rádiógomb: a pipa pattanjon be, hogy látszódjon, mi változott */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  animation: checkPop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
 /* Csillanó betöltés-jelző (skeleton) */
 .skeleton {
@@ -128,10 +173,18 @@ main .min-h-screen {
   .animate-pop,
   .animate-sheet-up,
   .stagger > *,
-  .skeleton::after {
+  .skeleton::after,
+  .press:active,
+  .press-card:active,
+  button:active,
+  [role="button"]:active,
+  summary:active,
+  input[type="checkbox"]:checked,
+  input[type="radio"]:checked {
     animation: none !important;
   }
-  .press:active { transform: none; }
+  /* A halványítás nem mozgás, ezért marad: enélkül a koppintásnak semmilyen
+     visszajelzése nem lenne. */
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

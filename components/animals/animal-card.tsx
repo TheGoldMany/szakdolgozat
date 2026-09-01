@@ -68,7 +68,7 @@ export async function AnimalCard({ animal, isFavorited = false }: AnimalCardProp
   const gender = animal.gender ? (GENDER_LABEL[animal.gender] ?? null) : null;
 
   return (
-    <div className="group relative flex flex-col">
+    <div className="press-card group relative flex flex-col">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Image */}
