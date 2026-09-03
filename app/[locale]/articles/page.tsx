@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -59,7 +60,7 @@ export default async function ArticlesListPage() {
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <Link
                 key={article.id}
@@ -109,7 +110,7 @@ export default async function ArticlesListPage() {
                 </div>
               </Link>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </div>

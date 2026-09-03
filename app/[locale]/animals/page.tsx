@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/ui/reveal";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
@@ -129,11 +130,11 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
               </div>
             ) : (
               <>
-                <div className="stagger grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <Reveal stagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {animals.map((animal) => (
                     <AnimalCard key={animal.id} animal={animal} isFavorited={favoriteIds.has(animal.id)} />
                   ))}
-                </div>
+                </Reveal>
 
                 {totalPages > 1 && (
                   <Pagination page={page} totalPages={totalPages} searchParams={searchParams} basePath={basePath} t={t} />

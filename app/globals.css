@@ -10,6 +10,9 @@
 
   html {
     overflow-x: hidden;
+    /* Horgonyra ugrásnál gördüljön, és a célcím ne csússzon a fix fejléc alá */
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
 
   body {
@@ -151,6 +154,72 @@ input[type="radio"]:checked {
   animation: checkPop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ─── Lenyíló menük és fiókok ──────────────────────────────
+   Ha egy panel csak "ott terem", a szem nem tudja, honnan jött, és keresni
+   kezdi a kapcsolatot a gombbal. A rövid felúszás a fogantyú felől ezt a
+   kérdést válaszolja meg. */
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes drawerInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.animate-dropdown {
+  transform-origin: top;
+  animation: dropdownIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Jobbról nyíló panel (mobil menü) */
+.animate-drawer { animation: drawerInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ─── Fejléc ───────────────────────────────────────────────
+   Görgetés közben a fejléc "leválik" a tartalomról: tömörebb háttér és
+   árnyék jelzi, hogy már réteg van alatta. A magassága NEM változik, mert
+   a főtartalom fix 4rem-mel indul – a zsugorodás hézagot nyitna. */
+
+.site-header {
+  transition: box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+.site-header--scrolled {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+}
+/* A logó egy hajszálnyit összébb húzódik – érezhető, de nem tolja el a sort */
+.site-header .header-logo { transition: transform 0.25s ease; transform-origin: left center; }
+.site-header--scrolled .header-logo { transform: scale(0.94); }
+
+/* Görgetés-jelző csík a fejléc alján: a --scroll-progress változót a
+   fejléc JS-e írja 0 és 1 között. */
+.scroll-progress {
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  transition: transform 0.1s linear;
+}
+
+/* Navigációs link aláhúzása: hoverre kinő, az aktuális oldalon végig látszik */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+
+/* Görgetésre megjelenő blokk a megjelenés előtt: átlátszó, de a helyét már
+   elfoglalja, hogy ne ugráljon a szerkezet. Lásd a Reveal komponenst. */
+.reveal-pending { opacity: 0; }
+
 /* Csillanó betöltés-jelző (skeleton) */
 .skeleton {
   position: relative;
@@ -174,6 +243,8 @@ input[type="radio"]:checked {
   .animate-sheet-up,
   .stagger > *,
   .skeleton::after,
+  .animate-dropdown,
+  .animate-drawer,
   .press:active,
   .press-card:active,
   button:active,

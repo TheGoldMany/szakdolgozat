@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -103,7 +104,7 @@ export default async function DonatePage() {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {campaigns.map((c) => (
                 <CampaignCard
                   key={c.id}
@@ -113,7 +114,7 @@ export default async function DonatePage() {
                   }}
                 />
               ))}
-            </div>
+            </Reveal>
           )}
         </section>
 
