@@ -60,7 +60,19 @@ export function MobileBottomNav() {
                   active ? "text-brand-600" : "text-gray-400 hover:text-gray-600",
                 )}
               >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 2} />
+                {/* A pont fölötte + az ikon pattanása jelzi, melyik fülre
+                    értünk át – színnel egyedül nehezebb elkapni menet közben. */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "block h-1 w-1 rounded-full bg-brand-500 transition-opacity duration-200",
+                    active ? "animate-pop opacity-100" : "opacity-0",
+                  )}
+                />
+                <Icon
+                  className={cn("h-5 w-5", active && "animate-pop")}
+                  strokeWidth={active ? 2.4 : 2}
+                />
                 <span className="max-w-full truncate px-0.5">{label}</span>
               </Link>
             </li>

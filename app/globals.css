@@ -216,6 +216,34 @@ input[type="radio"]:checked {
 .nav-link:hover::after,
 .nav-link[aria-current="page"]::after { transform: scaleX(1); }
 
+/* ─── Oldalváltás ──────────────────────────────────────────
+   Telefonon a lapozás iránya információ: előre jobbról jön az új oldal,
+   vissza balról. Asztali gépen ez túl sok volna, ott csak finoman felúszik.
+
+   FONTOS: nincs `fill-mode`. A `both`/`forwards` a végállapotot rajta hagyná
+   az elemen, és a megmaradó `transform` pozicionálási kerete lenne minden
+   `position: fixed` gyerekének – onnantól a lapon belüli felugró ablakok nem
+   a képernyőhöz igazodnának, hanem ehhez a dobozhoz. */
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--page-enter-x, 0), var(--page-enter-y, 10px), 0);
+  }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.page-enter,
+.page-enter-back {
+  animation: pageEnter 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Telefonon oldalirányú csúszás – itt a lapozás iránya számít */
+@media (max-width: 767px) {
+  .page-enter      { --page-enter-x: 7%;  --page-enter-y: 0; }
+  .page-enter-back { --page-enter-x: -7%; --page-enter-y: 0; }
+}
+
 /* Görgetésre megjelenő blokk a megjelenés előtt: átlátszó, de a helyét már
    elfoglalja, hogy ne ugráljon a szerkezet. Lásd a Reveal komponenst. */
 .reveal-pending { opacity: 0; }
@@ -245,6 +273,8 @@ input[type="radio"]:checked {
   .skeleton::after,
   .animate-dropdown,
   .animate-drawer,
+  .page-enter,
+  .page-enter-back,
   .press:active,
   .press-card:active,
   button:active,
