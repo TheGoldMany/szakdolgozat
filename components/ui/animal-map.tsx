@@ -36,14 +36,13 @@ export interface MapLabels {
   website: string;
 }
 
-export const TYPE_COLOR: Record<string, string> = {
-  LOST:  "#EF4444",
-  FOUND: "#22C55E",
-  STRAY: "#F97316",
-};
-export const SHELTER_COLOR   = "#2563EB";
-export const VET_COLOR       = "#7C3AED";
-export const VET_EMERGENCY_COLOR = "#DC2626";
+import {
+  SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
+} from "@/components/ui/map-colors";
+
+// Külön modulból jönnek, hogy a jelmagyarázat ne ezen a fájlon keresztül
+// férjen hozzájuk – lásd a map-colors.ts fejlécét.
+export { SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR };
 
 /** A popupokba felhasználói szöveg kerül – HTML-be illesztés előtt escape-elni kell. */
 function esc(value: string | null | undefined): string {
