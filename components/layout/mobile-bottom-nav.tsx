@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { PawPrint, HandHeart, MapPin, FileWarning, User, LogIn, type LucideIcon } from "lucide-react";
@@ -41,12 +42,33 @@ export function MobileBottomNav() {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
+  // A jelölő csík ehhez a fülhöz csúszik. -1, ha egyik fülön sem vagyunk
+  // (pl. kezdőlap): ilyenkor eltűnik, de a helyét megjegyzi, így a
+  // visszatéréskor onnan indul, nem a bal szélről.
+  const activeIndex = tabs.findIndex((tab) => isActive(tab.href));
+  const lastIndex   = useRef(0);
+  if (activeIndex >= 0) lastIndex.current = activeIndex;
+
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-sm md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-sm md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label={t("openMenu")}
     >
+      {/* Csúszó jelölő: átvándorol a megnyitott fülhöz, így a szem követni
+          tudja, honnan hová került a kijelölés. Öt egyenlő fül van, ezért
+          a szélessége 20%, és fülnyi lépésekben tolódik el. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 block w-1/5 transition-[transform,opacity] duration-300 ease-out"
+        style={{
+          transform: `translateX(${lastIndex.current * 100}%)`,
+          opacity:   activeIndex >= 0 ? 1 : 0,
+        }}
+      >
+        <span className="mx-auto block h-0.5 w-8 rounded-full bg-brand-500" />
+      </span>
+
       <ul className="grid grid-cols-5">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = isActive(href);
@@ -56,11 +78,14 @@ export function MobileBottomNav() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
+                  "press flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
                   active ? "text-brand-600" : "text-gray-400 hover:text-gray-600",
                 )}
               >
-                <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 2} />
+                <Icon
+                  className={cn("h-5 w-5", active && "animate-pop")}
+                  strokeWidth={active ? 2.4 : 2}
+                />
                 <span className="max-w-full truncate px-0.5">{label}</span>
               </Link>
             </li>

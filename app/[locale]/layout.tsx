@@ -6,6 +6,7 @@ import { getMessages } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageTransition } from "@/components/layout/page-transition";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { routing } from "@/i18n/routing";
@@ -44,11 +45,18 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={inter.variable}>
       <body>
+        {/* JavaScript nélkül a görgetésre megjelenő blokkok sosem kapnának
+            jelzést, hogy láthatóvá váljanak – ilyenkor egyszerűen látszanak. */}
+        <noscript>
+          <style>{".reveal-pending{opacity:1!important}"}</style>
+        </noscript>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Suspense><Header /></Suspense>
             {/* pt-16 = a fix fejléc magassága (h-16), így nincs fehér csík alatta */}
-            <main className="min-h-[60vh] pt-16">{children}</main>
+            <main className="min-h-[60vh] pt-16">
+              <PageTransition>{children}</PageTransition>
+            </main>
             <Footer />
             {/* Alsó térköz, hogy a fix mobil-navigáció ne takarja a tartalmat.
                 A magasság a sáv magassága + a készülék alsó biztonsági sávja. */}

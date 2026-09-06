@@ -60,7 +60,7 @@ export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonPro
         liked ? "text-rose-600 hover:bg-rose-50" : "text-gray-500 hover:bg-gray-100 hover:text-rose-600"
       )}
     >
-      <Heart className={cn("h-4 w-4", liked && "fill-rose-600")} />
+      <Heart className={cn("h-4 w-4", liked && "animate-pop fill-rose-600")} />
       {count > 0 && <span>{count}</span>}
     </button>
   );

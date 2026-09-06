@@ -87,7 +87,7 @@ function RelatedCard({
   return (
     <Link
       href={href}
-      className="group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="press-card group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50">
         <Icon className="h-5 w-5 text-brand-500" />

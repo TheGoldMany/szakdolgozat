@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -43,10 +44,10 @@ export default async function EventsListPage() {
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {events.map(ev => (
               <Link key={ev.id} href={`/events/${ev.slug}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                className="press-card group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
                 <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
                   {ev.imageUrl
                     ? <Image src={ev.imageUrl} alt={ev.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width:768px) 100vw, 33vw" />
@@ -73,7 +74,7 @@ export default async function EventsListPage() {
                 </div>
               </Link>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </div>

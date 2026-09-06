@@ -72,7 +72,7 @@ export async function ReportCard({ report }: ReportCardProps) {
   const Icon = TYPE_ICON[report.type];
 
   return (
-    <Link href={`/reports/${report.id}`} className="group block">
+    <Link href={`/reports/${report.id}`} className="press-card group block">
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
 
         {/* Optional image */}

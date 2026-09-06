@@ -18,6 +18,11 @@ interface Props {
  * Csak egyszer fut le, és `IntersectionObserver` nélküli környezetben
  * (vagy ha az nem támogatott) azonnal láthatóvá teszi a tartalmat, hogy
  * semmiképp ne maradjon rejtve.
+ *
+ * A megjelenés előtti rejtés a `reveal-pending` osztállyal történik, nem
+ * `opacity-0`-val: kikapcsolt JavaScript mellett az `app/layout.tsx`-ben lévő
+ * `<noscript>` szabály visszakapcsolja a láthatóságot. Enélkül a tartalom
+ * örökre rejtve maradna azoknál, akiknél a megfigyelő sosem indul el.
  */
 export function Reveal({ children, className, delay = 0, stagger = false }: Props) {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,7 +44,11 @@ export function Reveal({ children, className, delay = 0, stagger = false }: Prop
           observer.disconnect();
         }
       },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
+      // threshold 0: elég, ha a blokk BELELÓG a nézetbe. Aránnyal (pl. 0.05)
+      // nem működne: egy hosszú kártyarács 5%-a több képernyőnyi is lehet,
+      // amit soha nem lehet egyszerre látni – a tartalom örökre rejtve maradna.
+      // A -10% alsó margó tolja el a pillanatot, amíg tényleg beér a képbe.
+      { rootMargin: "0px 0px -10% 0px", threshold: 0 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -51,7 +60,7 @@ export function Reveal({ children, className, delay = 0, stagger = false }: Prop
       style={shown && delay ? { animationDelay: `${delay}ms` } : undefined}
       className={cn(
         // Megjelenés előtt átlátszó, de a helyét már elfoglalja (nincs ugrálás)
-        shown ? (stagger ? "stagger" : "animate-fade-in-up") : "opacity-0",
+        shown ? (stagger ? "stagger" : "animate-fade-in-up") : "reveal-pending",
         className,
       )}
     >

@@ -84,8 +84,8 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
 
   if (submitted) {
     return (
-      <div className="rounded-2xl bg-green-50 border border-green-200 p-6 text-center">
-        <div className="mb-3 flex justify-center"><CheckCircle2 className="h-10 w-10 text-green-500" /></div>
+      <div className="animate-fade-in rounded-2xl bg-green-50 border border-green-200 p-6 text-center">
+        <div className="mb-3 flex justify-center"><CheckCircle2 className="animate-pop h-10 w-10 text-green-500" /></div>
         <p className="font-semibold text-green-800">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-green-700">
           {t("successDesc")}
@@ -145,7 +145,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
           { name: "hasChildren" as const, label: t("hasChildrenLabel") },
           { name: "hasPets"     as const, label: t("hasPetsLabel") },
         ].map(({ name, label }) => (
-          <label key={name} className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50">
+          <label key={name} className="press flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50">
             <input
               type="checkbox"
               {...register(name)}
