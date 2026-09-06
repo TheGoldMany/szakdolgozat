@@ -7,7 +7,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 import type { MapLabels, MapReport, MapShelter, MapVet } from "@/components/ui/animal-map";
 import {
   SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
-} from "@/components/ui/animal-map";
+} from "@/components/ui/map-colors";
 import { glyphSvg, type MapGlyph } from "@/components/ui/map-icons";
 
 const AnimalMap = dynamic(() => import("@/components/ui/animal-map"), { ssr: false });

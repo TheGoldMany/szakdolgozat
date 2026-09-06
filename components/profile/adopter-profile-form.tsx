@@ -114,7 +114,7 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
           {HOUSEHOLD.map(({ key, label }) => (
             <label
               key={key}
-              className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 transition-colors hover:bg-gray-50"
+              className="press flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 transition-colors hover:bg-gray-50"
             >
               <input
                 type="checkbox"
@@ -155,8 +155,8 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
           {saving ? t("saving") : t("adopterSave")}
         </button>
         {saved && (
-          <span className="flex items-center gap-1 text-xs font-medium text-green-600">
-            <Check className="h-3.5 w-3.5" />
+          <span className="animate-fade-in flex items-center gap-1 text-xs font-medium text-green-600">
+            <Check className="animate-pop h-3.5 w-3.5" />
             {t("adopterSaved")}
           </span>
         )}

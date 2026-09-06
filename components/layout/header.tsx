@@ -38,6 +38,9 @@ export function Header() {
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [moreOpen,     setMoreOpen]     = useState(false);
   const [unread,       setUnread]       = useState(0);
+  /** 0–1: hol tartunk az oldal görgetésében (a fejléc alatti csík ebből él). */
+  const [progress,     setProgress]     = useState(0);
+  const [scrolled,     setScrolled]     = useState(false);
 
   // A négy fő belépési pont mindig látszik; a többi a "Továbbiak" alá kerül,
   // hogy a fejléc ne mossa össze a fontosat a ritkán használttal.
@@ -52,6 +55,42 @@ export function Header() {
     { href: "/events",   label: t("events")   },
     { href: "/articles", label: t("articles") },
   ];
+
+  /**
+   * Görgetés-figyelés a fejléchez.
+   *
+   * Két dolgot ad: a fejléc árnyékot kap, amint elvált a lap tetejétől (ettől
+   * látszik, hogy réteg van alatta), és a fejléc alján egy vékony csík mutatja,
+   * hol tartunk az oldalon. A számolás requestAnimationFrame-be van kötve, így
+   * képkockánként legfeljebb egyszer fut, nem minden görgetési eseménynél.
+   */
+  useEffect(() => {
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(y > 8);
+      setProgress(scrollable > 0 ? Math.min(1, Math.max(0, y / scrollable)) : 0);
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  // Oldalváltáskor a görgetés nullázódik – a csík is induljon elölről
+  useEffect(() => { setProgress(0); setScrolled(false); }, [pathname]);
 
   // Prevent body scroll while mobile menu is open
   useEffect(() => {
@@ -101,14 +140,21 @@ export function Header() {
 
   const currentLocale = LOCALE_LABELS[locale] ?? LOCALE_LABELS.hu;
 
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
+    <header
+      className={cn(
+        "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-100 backdrop-blur-sm",
+        scrolled ? "site-header--scrolled bg-white/95" : "bg-white/90",
+      )}
+    >
 
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo – mobilon is kiírjuk a nevet: ott a fejlécben csak a logó és a
             menügomb van, tehát bőven elfér, és a látogató tudja, hol jár. */}
-        <Link href="/" className="flex items-center gap-2" aria-label="ÁllatiMenhelyek.hu">
+        <Link href="/" className="press header-logo flex items-center gap-2" aria-label="ÁllatiMenhelyek.hu">
           <Image
             src="/logo-mark.png"
             alt=""
@@ -133,7 +179,11 @@ export function Header() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm font-medium text-gray-600 transition-colors hover:text-brand-500"
+              aria-current={isActive(l.href) ? "page" : undefined}
+              className={cn(
+                "nav-link text-sm font-medium transition-colors hover:text-brand-500",
+                isActive(l.href) ? "text-brand-600" : "text-gray-600",
+              )}
             >
               {l.label}
             </Link>
@@ -143,17 +193,21 @@ export function Header() {
           <div className="relative">
             <button
               onClick={() => setMoreOpen((v) => !v)}
-              className="flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-brand-500"
+              className={cn(
+                "nav-link flex items-center gap-1 text-sm font-medium transition-colors hover:text-brand-500",
+                SECONDARY_LINKS.some((l) => isActive(l.href)) ? "text-brand-600" : "text-gray-600",
+              )}
+              aria-current={SECONDARY_LINKS.some((l) => isActive(l.href)) ? "page" : undefined}
               aria-expanded={moreOpen}
             >
               {t("more")}
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", moreOpen && "rotate-180")} />
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
             </button>
             {moreOpen && (
               <>
                 {/* Kattintás bárhová: bezárás */}
                 <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                <div className="absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
+                <div className="animate-dropdown absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
                   {SECONDARY_LINKS.map((l) => (
                     <Link
                       key={l.href}
@@ -184,7 +238,7 @@ export function Header() {
               <Globe className="h-4 w-4" />
             </button>
             {langMenuOpen && (
-              <div className="absolute right-0 mt-2 w-40 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
+              <div className="animate-dropdown absolute right-0 mt-2 w-40 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
                 {routing.locales.map((loc) => (
                   <button
                     key={loc}
@@ -216,7 +270,7 @@ export function Header() {
                 <span className="relative">
                   <MessageCircle className="h-4 w-4" />
                   {unread > 0 && (
-                    <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                    <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
                       {unread > 9 ? "9+" : unread}
                     </span>
                   )}
@@ -227,7 +281,7 @@ export function Header() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen((v) => !v)}
-                  className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-brand-100 text-sm font-semibold text-brand-600 hover:border-brand-400 focus:outline-none"
+                  className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-brand-100 text-sm font-semibold text-brand-600 transition-colors hover:border-brand-400 focus:outline-none"
                 >
                   {session.user?.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -238,7 +292,7 @@ export function Header() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
+                  <div className="animate-dropdown absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg z-50">
                     <div className="px-4 pb-2 pt-2">
                       <p className="truncate text-sm font-semibold text-gray-800">{session.user?.name}</p>
                       <p className="truncate text-xs text-gray-500">{session.user?.email}</p>
@@ -294,7 +348,7 @@ export function Header() {
             >
               <MessageCircle className="h-5 w-5" />
               {unread > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                <span className="animate-pop absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
                   {unread > 9 ? "9+" : unread}
                 </span>
               )}
@@ -307,22 +361,43 @@ export function Header() {
             aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
             aria-expanded={mobileOpen}
           >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <span className="relative block h-5 w-5">
+              <Menu
+                className={cn(
+                  "absolute inset-0 h-5 w-5 transition-all duration-200",
+                  mobileOpen ? "rotate-90 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100",
+                )}
+              />
+              <X
+                className={cn(
+                  "absolute inset-0 h-5 w-5 transition-all duration-200",
+                  mobileOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-75 opacity-0",
+                )}
+              />
+            </span>
           </button>
         </div>
       </div>
+
+      {/* Görgetés-jelző: a fejléc alsó szélén futó vékony csík. Csak jelzés,
+          nem vezérlő – a képernyőolvasóknak nincs mit mondania. */}
+      <div
+        aria-hidden="true"
+        className="scroll-progress absolute inset-x-0 bottom-0 h-0.5 bg-brand-500"
+        style={{ "--scroll-progress": progress } as React.CSSProperties}
+      />
 
       {/* Mobile menu – rendered via portal so backdrop-filter on header doesn't trap it */}
       {mobileOpen && createPortal(
         <div className="fixed inset-x-0 bottom-0 z-[9999] md:hidden" style={{ top: "64px" }}>
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/30"
+            className="animate-fade-in absolute inset-0 bg-black/30"
             onClick={() => setMobileOpen(false)}
           />
 
           {/* Drawer panel */}
-          <div className="absolute right-0 top-0 flex h-full w-4/5 max-w-sm flex-col bg-white shadow-xl">
+          <div className="animate-drawer absolute right-0 top-0 flex h-full w-4/5 max-w-sm flex-col bg-white shadow-xl">
 
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-4 py-3">

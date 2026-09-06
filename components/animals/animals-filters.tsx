@@ -267,7 +267,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
       {/* ── Mobil: alulról felcsúszó szűrő-lap ───────────────── */}
       {open && createPortal(
         <div className="fixed inset-0 z-[9999] lg:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="animate-fade-in absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <div className="animate-sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-3xl bg-white shadow-2xl">
             {/* Fejléc */}
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
