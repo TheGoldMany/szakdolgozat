@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendPaymentFailedEmail } from "@/lib/email";
+import { sendPaymentFailedEmail, sendSponsorshipPaymentFailedEmail } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
 import { fulfillDonation, notifyDonation } from "@/lib/donations";
 import { invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
@@ -149,6 +149,45 @@ export async function POST(req: NextRequest) {
               amount:      sub.tier.amount,
             }).catch((err) => console.error("Payment-failed email error:", err));
           }
+        }
+        return;
+      }
+
+      // A virtuális örökbefogadás ugyanúgy havi Stripe-előfizetés, de korábban
+      // csak a sikeres terhelés ága ismerte: PAST_DUE-ból vissza tudott állni
+      // ACTIVE-ba, oda kerülni viszont sosem tudott. A virtuális gazdi így nem
+      // értesült róla, hogy a kártyája elutasította a levonást.
+      const spon = await prisma.sponsorship.findUnique({
+        where:   { stripeSubId },
+        include: {
+          user:   { select: { id: true, email: true, name: true } },
+          animal: { select: { name: true, slug: true } },
+        },
+      });
+      if (!spon) return;
+
+      await prisma.sponsorship.update({
+        where: { id: spon.id },
+        data:  { status: "PAST_DUE" },
+      });
+
+      if (spon.user) {
+        const amountStr = new Intl.NumberFormat("hu-HU", { style: "currency", currency: "HUF", maximumFractionDigits: 0 }).format(spon.amount);
+        createNotification({
+          userId: spon.user.id,
+          type:   "SUBSCRIPTION_PAYMENT_FAILED",
+          title:  "Sikertelen havi fizetés",
+          body:   `${spon.animal.name} virtuális örökbefogadása – ${amountStr}/hó. Kérjük ellenőrizd a kártyádat.`,
+          href:   "/profile",
+        }).catch((err) => console.error("Sponsorship payment-failed notification error:", err));
+
+        if (spon.user.email) {
+          sendSponsorshipPaymentFailedEmail({
+            to:         spon.user.email,
+            name:       spon.user.name ?? "Felhasználó",
+            animalName: spon.animal.name,
+            amount:     spon.amount,
+          }).catch((err) => console.error("Sponsorship payment-failed email error:", err));
         }
       }
     });
