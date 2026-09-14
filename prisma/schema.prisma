@@ -1564,3 +1564,24 @@ model PaymentDispute {
   @@index([status])
   @@index([createdAt])
 }
+
+/// Már feldolgozott Stripe-webhook események.
+///
+/// A Stripe *legalább egyszer* kézbesít: minden nem-2xx válasz után
+/// újrapróbálkozik, és sikeres kézbesítés után is küldhet duplikátumot. Az
+/// egyes ágak külön-külön idempotensek, ez a tábla a fölöttük lévő gyors
+/// kilépés — a már végigfutott eseményt meg se próbáljuk újra feldolgozni.
+///
+/// A sor SZÁNDÉKOSAN csak a teljes, hibátlan feldolgozás UTÁN jön létre. Ha az
+/// elején foglalnánk le az eseményt, egy közben történő összeomlás örökre
+/// „feldolgozottnak" jelölné azt, amit valójában senki nem végzett el, és a
+/// Stripe újraküldése sem segítene rajta.
+model ProcessedWebhookEvent {
+  /// A Stripe `event.id`-je – ez maga a kulcs, nincs szükség külön azonosítóra.
+  id   String @id
+  type String
+
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}
