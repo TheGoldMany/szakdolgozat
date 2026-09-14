@@ -16,23 +16,31 @@ const db = {
   donation:  null as Donation | null,
   payment:   null as { id: string; refundedAmount: number; refundedAt: Date | null } | null,
   raised:    10_000,
-  disputes:  [] as { stripeDisputeId: string; amount: number; status: string }[],
-  notifications: [] as { type: string }[],
+  disputes:  [] as {
+    stripeDisputeId: string; amount: number; status: string;
+    stripePaymentIntentId?: string | null;
+    donationId?: string | null; subscriptionPaymentId?: string | null;
+  }[],
+  notifications: [] as { type: string; title?: string; body?: string }[],
 };
 
 const prismaMock = {
   $transaction: async (fn: (tx: unknown) => unknown) => fn(prismaMock),
   donation: {
-    findUnique: async ({ where }: { where: { stripePaymentIntentId: string } }) =>
-      where.stripePaymentIntentId === "pi_donation" ? db.donation : null,
+    findUnique: async ({ where }: { where: { stripePaymentIntentId?: string; id?: string } }) => {
+      if (where.id) return db.donation?.id === where.id ? db.donation : null;
+      return where.stripePaymentIntentId === "pi_donation" ? db.donation : null;
+    },
     update: async ({ data }: { data: { refundedAmount: number; refundedAt: Date } }) => {
       if (db.donation) { db.donation.refundedAmount = data.refundedAmount; db.donation.refundedAt = data.refundedAt; }
       return db.donation;
     },
   },
   subscriptionPayment: {
-    findUnique: async ({ where }: { where: { stripePaymentIntentId: string } }) =>
-      where.stripePaymentIntentId === "pi_sub" ? db.payment : null,
+    findUnique: async ({ where }: { where: { stripePaymentIntentId?: string; id?: string } }) => {
+      if (where.id) return db.payment?.id === where.id ? db.payment : null;
+      return where.stripePaymentIntentId === "pi_sub" ? db.payment : null;
+    },
     update: async ({ data }: { data: { refundedAmount: number } }) => {
       if (db.payment) db.payment.refundedAmount = data.refundedAmount;
       return db.payment;
@@ -61,7 +69,7 @@ const prismaMock = {
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/notifications", () => ({
-  createNotifications: async (rows: { type: string }[]) => { db.notifications.push(...rows); },
+  createNotifications: async (rows: { type: string; title?: string; body?: string }[]) => { db.notifications.push(...rows); },
 }));
 
 const { applyRefund, recordDispute } = await import("@/lib/refunds");
@@ -137,25 +145,81 @@ describe("applyRefund", () => {
 });
 
 describe("recordDispute", () => {
-  function dispute(id = "dp_1", status = "warning_needs_response"): Stripe.Dispute {
-    return { id, charge: "ch_1", amount: 20_000 * 100, reason: "fraudulent", status } as unknown as Stripe.Dispute;
+  function dispute(
+    id = "dp_1",
+    status = "warning_needs_response",
+    paymentIntent: string | null = null,
+  ): Stripe.Dispute {
+    return {
+      id, charge: "ch_1", amount: 20_000 * 100, reason: "fraudulent", status,
+      payment_intent: paymentIntent,
+    } as unknown as Stripe.Dispute;
   }
+
+  const disputeNotifications = () => db.notifications.filter((n) => n.type === "PAYMENT_DISPUTE");
 
   it("rögzíti a vitát és értesíti a super admint", async () => {
     await recordDispute(dispute());
 
     expect(db.disputes).toHaveLength(1);
     expect(db.disputes[0].amount).toBe(20_000);
-    expect(db.notifications.filter((n) => n.type === "PAYMENT_DISPUTE")).toHaveLength(1);
+    expect(disputeNotifications()).toHaveLength(1);
   });
 
-  it("státuszváltásnál frissít, de nem értesít újra", async () => {
+  it("köztes státuszváltásnál frissít, de nem értesít újra", async () => {
     await recordDispute(dispute("dp_1", "warning_needs_response"));
-    await recordDispute(dispute("dp_1", "lost"));
+    await recordDispute(dispute("dp_1", "needs_response"));
 
     expect(db.disputes).toHaveLength(1);
+    expect(db.disputes[0].status).toBe("needs_response");
+    expect(disputeNotifications()).toHaveLength(1);
+  });
+
+  it("elveszített vitánál MÉGIS szól – ez a legdrágább esemény a rendszerben", async () => {
+    await recordDispute(dispute("dp_1", "needs_response"));
+    await recordDispute(dispute("dp_1", "lost"));
+
     expect(db.disputes[0].status).toBe("lost");
-    // a második eseménynél nem jön újabb értesítés
-    expect(db.notifications.filter((n) => n.type === "PAYMENT_DISPUTE")).toHaveLength(1);
+    expect(disputeNotifications()).toHaveLength(2);
+    expect(disputeNotifications()[1].title).toContain("elveszítve");
+  });
+
+  it("megnyert vitáról is szól, de más szöveggel", async () => {
+    await recordDispute(dispute("dp_1", "needs_response"));
+    await recordDispute(dispute("dp_1", "won"));
+
+    expect(disputeNotifications()).toHaveLength(2);
+    expect(disputeNotifications()[1].title).toContain("megnyerve");
+  });
+
+  it("a lezáró esemény újraküldése nem szól harmadszor", async () => {
+    await recordDispute(dispute("dp_1", "needs_response"));
+    await recordDispute(dispute("dp_1", "lost"));
+    await recordDispute(dispute("dp_1", "lost"));
+
+    expect(disputeNotifications()).toHaveLength(2);
+  });
+
+  it("visszavezeti az adományra, amit érint", async () => {
+    await recordDispute(dispute("dp_1", "needs_response", "pi_donation"));
+
+    expect(db.disputes[0].stripePaymentIntentId).toBe("pi_donation");
+    expect(db.disputes[0].donationId).toBe("d1");
+    expect(db.disputes[0].subscriptionPaymentId).toBeNull();
+  });
+
+  it("havi terhelésre is visszavezet", async () => {
+    await recordDispute(dispute("dp_1", "needs_response", "pi_sub"));
+
+    expect(db.disputes[0].subscriptionPaymentId).toBe("sp1");
+    expect(db.disputes[0].donationId).toBeNull();
+  });
+
+  it("ismeretlen PaymentIntentnél üresen hagyja a visszavezetést, de rögzít", async () => {
+    await recordDispute(dispute("dp_1", "needs_response", "pi_ismeretlen"));
+
+    expect(db.disputes).toHaveLength(1);
+    expect(db.disputes[0].donationId).toBeNull();
+    expect(db.disputes[0].subscriptionPaymentId).toBeNull();
   });
 });

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { sendPaymentFailedEmail, sendSponsorshipPaymentFailedEmail } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
 import { fulfillDonation, notifyDonation } from "@/lib/donations";
-import { invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
+import { backfillSubscriptionPayments, invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
 import { applyRefund, recordDispute } from "@/lib/refunds";
 import { alreadyProcessed, markProcessed } from "@/lib/webhook-events";
 import {
@@ -228,7 +228,11 @@ export async function POST(req: NextRequest) {
   // Vitatott tétel (chargeback). Destination charge-nál a visszaterhelt összeg
   // és a Stripe vitadíja is a PLATFORM egyenlegéről megy, ezért a super
   // adminnak azonnal tudnia kell róla.
-  if (event.type === "charge.dispute.created" || event.type === "charge.dispute.updated") {
+  // A `closed` is kell: az hordozza a végkimenetelt (won/lost). Enélkül a
+  // PaymentDispute.status sosem érte el a végállapotot.
+  if (event.type === "charge.dispute.created"
+   || event.type === "charge.dispute.updated"
+   || event.type === "charge.dispute.closed") {
     await branch("charge.dispute", async () => {
       await recordDispute(event.data.object as Stripe.Dispute);
     });
@@ -295,6 +299,13 @@ export async function POST(req: NextRequest) {
         if (created) {
           await notifySubscriptionStarted(metadata.userId!, metadata.tierId!);
         }
+
+        // Az első havi terhelés könyvelése. A Stripe nem garantálja az
+        // események sorrendjét: ha az `invoice.payment_succeeded` ide ért
+        // előbb, akkor az a sor még nem létezett, és a fizetés némán kiesett.
+        // Szándékosan `created`-től függetlenül fut: ha korábban épp ez a
+        // lépés hibázott, az újraküldésnek javítania kell rajta.
+        await backfillSubscriptionPayments(stripeSubId);
       });
     }
 
@@ -320,6 +331,9 @@ export async function POST(req: NextRequest) {
         if (created) {
           await notifySponsorshipStarted(metadata.userId!, metadata.sponsorAnimalId!, amount);
         }
+
+        // Ugyanaz a sorrend-kockázat, mint az előfizetésnél.
+        await backfillSubscriptionPayments(stripeSubId);
       });
     }
   }
