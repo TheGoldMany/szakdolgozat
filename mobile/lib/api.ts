@@ -1,9 +1,85 @@
 import * as SecureStore from "expo-secure-store";
 
-export const BASE_URL = "https://www.allatimenhelyek.hu";
+/**
+ * A backend címe.
+ *
+ * Build időben behelyettesített környezeti változóból jön (Expo SDK 56:
+ * `EXPO_PUBLIC_` előtagú változók a `process.env`-ből érhetők el), így lokális
+ * fejlesztéshez nem kell a fájlt átírni — elég egy `.env` a mobile/ mappában.
+ *
+ * FIGYELEM: a tartalék érték szándékosan a `www`-s változat, mert eddig is az
+ * volt. A projektben nyitott ügy, hogy a webes `NEXT_PUBLIC_APP_URL`, a Stripe
+ * webhook-végpont és ez a konstans ugyanarra a gazdagépre mutat-e. Ezt NEM
+ * döntöm el itt: egy éles URL csendben átírása rosszabb, mint a jelenlegi
+ * állapot megtartása. Amikor kiderül, melyik a helyes, itt és a Vercel
+ * környezeti változóiban EGYSZERRE kell javítani.
+ */
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "https://www.allatimenhelyek.hu";
+
+/** Mi történt? Ebből tud a felület értelmes üzenetet írni. */
+export type ApiErrorKind =
+  | "offline"       // a kérés el sem ért a szerverig
+  | "unauthorized"  // lejárt vagy érvénytelen munkamenet
+  | "notFound"      // nincs ilyen tartalom
+  | "client"        // a kérés hibás volt (egyéb 4xx)
+  | "server";       // a szerver hibázott (5xx vagy értelmezhetetlen válasz)
+
+/**
+ * Hálózati hiba a hívó számára felismerhető formában.
+ *
+ * Korábban minden hiba `new Error("HTTP 500")`-ként jött, a `fetch` dobása
+ * pedig ugyanúgy `Error`-ként — tehát a felület nem tudta megkülönböztetni a
+ * „nincs net"-et a szerverhibától, és a felhasználó minden esetre ugyanazt az
+ * üzenetet kapta (vagy semmit).
+ */
+export class ApiError extends Error {
+  constructor(
+    public readonly kind: ApiErrorKind,
+    /** A HTTP állapotkód, ha eljutottunk odáig. */
+    public readonly status: number | null,
+    message: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+
+  /** Magyar üzenet, amit ki lehet írni a felhasználónak. */
+  get userMessage(): string {
+    switch (this.kind) {
+      case "offline":      return "Nincs internetkapcsolat. Ellenőrizd a hálózatot.";
+      case "unauthorized": return "A munkamenet lejárt, jelentkezz be újra.";
+      case "notFound":     return "A keresett tartalom nem található.";
+      case "server":       return "A szerver most nem elérhető. Próbáld újra később.";
+      case "client":       return this.message || "A kérés nem sikerült.";
+    }
+  }
+}
+
+/**
+ * Lejárt munkamenet kezelése.
+ *
+ * Az `AuthProvider` regisztrálja ide a kijelentkeztetést. Így nem kell a
+ * React-kontextust importálni ebbe a fájlba (az körkörös import lenne), a
+ * 401-es válasz mégis ki tudja jelentkeztetni a felhasználót.
+ */
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(fn: (() => void) | null): void {
+  onUnauthorized = fn;
+}
 
 async function getToken(): Promise<string | null> {
   return SecureStore.getItemAsync("session_token");
+}
+
+/** A hibaválasz törzsében lévő magyar üzenet, ha van. */
+async function errorMessage(res: Response): Promise<string> {
+  try {
+    const body = await res.json();
+    if (body && typeof body.error === "string") return body.error;
+  } catch {
+    // Nem JSON a válasz (pl. proxy hibalapja) – marad az általános üzenet.
+  }
+  return `HTTP ${res.status}`;
 }
 
 async function request<T>(
@@ -11,16 +87,48 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = await getToken();
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+  } catch {
+    // A `fetch` csak akkor dob, ha a kérés el sem ért a szerverig.
+    throw new ApiError("offline", null, "Nincs internetkapcsolat.");
+  }
+
+  if (res.status === 401 || res.status === 403) {
+    // A tárolt token érvénytelen – ne maradjon a felhasználó félig
+    // bejelentkezett állapotban, ahol minden hívása elhasal.
+    onUnauthorized?.();
+    throw new ApiError("unauthorized", res.status, await errorMessage(res));
+  }
+  if (res.status === 404) {
+    throw new ApiError("notFound", 404, await errorMessage(res));
+  }
+  if (res.status >= 500) {
+    throw new ApiError("server", res.status, await errorMessage(res));
+  }
+  if (!res.ok) {
+    throw new ApiError("client", res.status, await errorMessage(res));
+  }
+
+  // Üres törzs (204, vagy DELETE tartalom nélkül): a `res.json()` ilyenkor
+  // dobna, pedig a művelet sikerült.
+  if (res.status === 204) return undefined as T;
+  const text = await res.text();
+  if (!text) return undefined as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError("server", res.status, "A szerver válasza értelmezhetetlen.");
+  }
 }
 
 // ── Animals ────────────────────────────────────────────
@@ -262,14 +370,46 @@ export async function apiLogin(
   email: string,
   password: string
 ): Promise<{ token: string; user: AuthUser }> {
-  const res = await fetch(`${BASE_URL}/api/auth/mobile`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) throw new Error("Hibás e-mail vagy jelszó");
+  // Szándékosan nem a `request()`-en megy: itt még nincs token, és a 401 NEM
+  // lejárt munkamenetet jelent, hanem rossz jelszót — kijelentkeztetni sem kell.
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}/api/auth/mobile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    throw new ApiError("offline", null, "Nincs internetkapcsolat.");
+  }
+
+  if (res.status === 401 || res.status === 400) {
+    throw new ApiError("client", res.status, "Hibás e-mail vagy jelszó.");
+  }
+  if (!res.ok) {
+    throw new ApiError(res.status >= 500 ? "server" : "client", res.status, await errorMessage(res));
+  }
   return res.json();
 }
+
+// ── Fiók törlése ───────────────────────────────────────
+
+/**
+ * A saját fiók törlése.
+ *
+ * Az Apple minden olyan appnál megköveteli, ahol fiókot lehet létrehozni.
+ * Visszafordíthatatlan: a szerver azonnal anonimizálja a személyes adatokat,
+ * lemondja az aktív Stripe-előfizetéseket, és érvényteleníti a munkameneteket —
+ * ezért a felület KÖTELEZŐEN kér megerősítést, mielőtt ide eljut.
+ */
+export function deleteAccount(): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>("/api/auth/delete-account", { method: "DELETE" });
+}
+
+/** A webes adatvédelmi tájékoztató címe – mindkét store kéri, hogy elérhető legyen. */
+export const PRIVACY_URL = `${BASE_URL}/adatvedelem`;
+/** Általános szerződési feltételek. */
+export const TERMS_URL = `${BASE_URL}/aszf`;
 
 // ── Menhely admin áttekintő ────────────────────────────
 export interface AdminApplication {

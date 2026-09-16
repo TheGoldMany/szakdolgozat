@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { apiLogin, type AuthUser } from "./api";
+import { apiLogin, setUnauthorizedHandler, type AuthUser } from "./api";
 
 interface AuthCtx {
   user: AuthUser | null;
@@ -33,6 +33,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await SecureStore.deleteItemAsync("session_user");
     setUser(null);
   }
+
+  /**
+   * Ha a szerver 401-et ad, a tárolt token érvénytelen. Enélkül a felhasználó
+   * félig bejelentkezett állapotban maradna: látná a saját nevét, de minden
+   * hívása elhasalna, és nem derülne ki, miért.
+   *
+   * Az API-réteg nem importálhatja ezt a kontextust (körkörös import lenne),
+   * ezért itt regisztráljuk be neki a kijelentkeztetést.
+   */
+  useEffect(() => {
+    setUnauthorizedHandler(() => { void logout(); });
+    return () => setUnauthorizedHandler(null);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
