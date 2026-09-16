@@ -392,6 +392,25 @@ export async function apiLogin(
   return res.json();
 }
 
+// ── Fiók törlése ───────────────────────────────────────
+
+/**
+ * A saját fiók törlése.
+ *
+ * Az Apple minden olyan appnál megköveteli, ahol fiókot lehet létrehozni.
+ * Visszafordíthatatlan: a szerver azonnal anonimizálja a személyes adatokat,
+ * lemondja az aktív Stripe-előfizetéseket, és érvényteleníti a munkameneteket —
+ * ezért a felület KÖTELEZŐEN kér megerősítést, mielőtt ide eljut.
+ */
+export function deleteAccount(): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>("/api/auth/delete-account", { method: "DELETE" });
+}
+
+/** A webes adatvédelmi tájékoztató címe – mindkét store kéri, hogy elérhető legyen. */
+export const PRIVACY_URL = `${BASE_URL}/adatvedelem`;
+/** Általános szerződési feltételek. */
+export const TERMS_URL = `${BASE_URL}/aszf`;
+
 // ── Menhely admin áttekintő ────────────────────────────
 export interface AdminApplication {
   id: string; status: string; createdAt: string;
