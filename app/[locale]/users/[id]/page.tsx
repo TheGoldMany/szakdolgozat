@@ -2,8 +2,12 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { MapPin, CalendarDays, PawPrint } from "lucide-react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { connectionState } from "@/lib/connections";
 import { UserReviews } from "@/components/reviews/user-reviews";
+import { ConnectButton } from "@/components/connections/connect-button";
 
 interface Props { params: { id: string } }
 
@@ -36,6 +40,15 @@ export default async function PublicUserProfilePage({ params }: Props) {
   });
 
   if (!user) notFound();
+
+  const session = await getServerSession(authOptions);
+  const viewerId = session?.user?.id ?? null;
+  const isSelf   = viewerId === user.id;
+  // Szerveroldalon kérdezzük le, hogy a gomb ne rossz állapotban villanjon fel,
+  // amíg a kliens utánakérdez.
+  const connection = viewerId && !isSelf
+    ? await connectionState(viewerId, user.id)
+    : null;
 
   const avgReview = user._count.reviewsReceived > 0
     ? await prisma.review.aggregate({
@@ -105,6 +118,17 @@ export default async function PublicUserProfilePage({ params }: Props) {
                 <p className="text-xs text-gray-500">Átlag</p>
               </div>
             </div>
+
+            {/* Ismerős-jelölés – saját profilon és kijelentkezve nincs értelme */}
+            {connection && (
+              <div className="mt-5 flex justify-center">
+                <ConnectButton
+                  userId={user.id}
+                  initialState={connection.state}
+                  initialConnectionId={"id" in connection ? connection.id : null}
+                />
+              </div>
+            )}
           </div>
         </div>
 
