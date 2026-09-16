@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
-import { subscriptionFeePercent, subscriptionPlatformFee } from "@/lib/stripe";
+import { getStripe, subscriptionFeePercent, subscriptionPlatformFee } from "@/lib/stripe";
 
 /**
  * A számlához tartozó PaymentIntent azonosítója.
@@ -97,4 +97,38 @@ export async function recordSubscriptionPayment(
   });
 
   return { recorded: result.count > 0 };
+}
+
+/**
+ * A már kiállított számlák utólagos lekönyvelése egy előfizetéshez.
+ *
+ * MIÉRT KELL: a Stripe nem garantálja az események sorrendjét. Az
+ * `invoice.payment_succeeded` megelőzheti a `checkout.session.completed`-et,
+ * és ilyenkor a `recordSubscriptionPayment` még nem találja az előfizetést a
+ * saját adatbázisunkban — csendben kilép, a route 200-at ad, és a Stripe soha
+ * nem próbálja újra. Így pont az ELSŐ havi terhelés maradt könyveletlenül.
+ *
+ * A megoldás nem az újrapróbálás kikényszerítése (egy tőlünk független, kézzel
+ * létrehozott előfizetés végtelen retryt okozna), hanem a visszatöltés: abban a
+ * pillanatban, amikor a sor létrejön, megkérdezzük a Stripe-tól, milyen
+ * számlák tartoznak hozzá, és lekönyveljük a kimaradtakat.
+ *
+ * Biztonsággal hívható mindig: a `recordSubscriptionPayment` a `stripeInvoiceId`
+ * egyedisége miatt idempotens, tehát a már lekönyvelt számlát kihagyja.
+ *
+ * @returns hány számla került be MOST.
+ */
+export async function backfillSubscriptionPayments(
+  stripeSubId: string
+): Promise<{ recorded: number }> {
+  // Tíz számla bőven elég: ez a sor most jött létre, legfeljebb az első
+  // néhány terhelés csúszhatott ki a sorrendiség miatt.
+  const invoices = await getStripe().invoices.list({ subscription: stripeSubId, limit: 10 });
+
+  let recorded = 0;
+  for (const invoice of invoices.data) {
+    const { recorded: justNow } = await recordSubscriptionPayment(invoice);
+    if (justNow) recorded++;
+  }
+  return { recorded };
 }

@@ -243,12 +243,20 @@ export async function sendSubscriptionConfirmationEmail(opts: {
   });
 }
 
-export async function sendPaymentFailedEmail(opts: {
-  to:           string;
-  name:         string;
-  shelterName:  string;
-  tierName:     string;
-  amount:       number;
+/**
+ * A sikertelen havi fizetés levelének közös váza.
+ *
+ * Két helyről hívjuk: havi előfizetésnél a menhely és a csomag neve a lényeg,
+ * virtuális örökbefogadásnál az állaté. Csak ez a mondat tér el, a többi
+ * (fejléc, összeg, mit tegyen a támogató, gomb) azonos — ezért nem másoljuk,
+ * hanem paraméterezzük.
+ */
+async function sendPaymentFailedTemplate(opts: {
+  to:      string;
+  name:    string;
+  /** A konkrét tétel megnevezése, már HTML-ben – pl. „a Tappancs csomag". */
+  whatHtml: string;
+  amount:  number;
 }) {
   await sendNotificationEmail(opts.to, async () => {
     await sendEmail(opts.to, `Sikertelen fizetés – ÁllatiMenhelyek.hu`, `
@@ -258,8 +266,7 @@ export async function sendPaymentFailedEmail(opts: {
           </h1>
           <p style="color:#374151;font-size:14px;line-height:1.6">
             Kedves ${opts.name}!<br/>
-            A(z) <strong>${opts.shelterName}</strong> menhely <strong>${opts.tierName}</strong>
-            csomagjának havi díját nem sikerült levonni a kártyádról.
+            ${opts.whatHtml} havi díját nem sikerült levonni a kártyádról.
           </p>
           <div style="background:#fef2f2;border-radius:12px;padding:20px;text-align:center;margin:20px 0">
             <span style="font-size:24px;font-weight:700;color:#b91c1c">
@@ -278,6 +285,42 @@ export async function sendPaymentFailedEmail(opts: {
           ${emailFooter(opts.to)}
         </div>
       `);
+  });
+}
+
+/** Havi előfizetés sikertelen terhelése. */
+export async function sendPaymentFailedEmail(opts: {
+  to:           string;
+  name:         string;
+  shelterName:  string;
+  tierName:     string;
+  amount:       number;
+}) {
+  await sendPaymentFailedTemplate({
+    to:       opts.to,
+    name:     opts.name,
+    whatHtml: `A(z) <strong>${opts.shelterName}</strong> menhely <strong>${opts.tierName}</strong> csomagjának`,
+    amount:   opts.amount,
+  });
+}
+
+/**
+ * Virtuális örökbefogadás sikertelen terhelése.
+ *
+ * Külön szöveg kell: itt nincs menhely-csomag, a támogató egy konkrét állatot
+ * támogat, és a levél akkor érthető, ha az állat nevét látja benne.
+ */
+export async function sendSponsorshipPaymentFailedEmail(opts: {
+  to:         string;
+  name:       string;
+  animalName: string;
+  amount:     number;
+}) {
+  await sendPaymentFailedTemplate({
+    to:       opts.to,
+    name:     opts.name,
+    whatHtml: `<strong>${opts.animalName}</strong> virtuális örökbefogadásának`,
+    amount:   opts.amount,
   });
 }
 

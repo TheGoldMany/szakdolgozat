@@ -34,7 +34,8 @@
     "myCampaigns": "Gyűjtéseim",
     "openMenu": "Menü megnyitása",
     "closeMenu": "Menü bezárása",
-    "more": "Továbbiak"
+    "more": "Továbbiak",
+    "connections": "Ismerősök"
   },
   "footer": {
     "description": "Összekapcsoljuk a menhelyeket és az örökbefogadásra váró állatokat azokkal, akik szerető otthont tudnak adni nekik.",
@@ -1802,5 +1803,33 @@
     "ratingRequired": "Kérjük adj értékelést!",
     "submitError": "Hiba történt a küldés során.",
     "submit": "Visszajelzés küldése"
+  },
+  "connections": {
+    "title": "Ismerősök",
+    "intro": "Keresd meg a többi örökbefogadót, és jelöld be, akit ismersz. A kapcsolat akkor jön létre, ha mindketten bejelölitek egymást.",
+    "searchLabel": "Keresés név szerint",
+    "searchPlaceholder": "Írd be a nevét…",
+    "searchHint": "Legalább két karakter kell a kereséshez.",
+    "searching": "Keresés…",
+    "noResults": "Nincs találat erre a névre.",
+    "searchResults": "Találatok",
+    "tabAccepted": "Ismerősök",
+    "tabIncoming": "Rád vár",
+    "tabOutgoing": "Elküldve",
+    "connect": "Bejelölés",
+    "pending": "Jelölés elküldve",
+    "connected": "Ismerős",
+    "accept": "Elfogadom",
+    "decline": "Elutasítom",
+    "remove": "Törlés",
+    "cancelRequest": "Visszavonás",
+    "emptyAccepted": "Még nincs ismerősöd. Keress rá valakire fentebb.",
+    "emptyIncoming": "Nincs megválaszolandó jelölés.",
+    "emptyOutgoing": "Nincs elküldött jelölésed.",
+    "networkError": "Nem sikerült a művelet. Próbáld újra.",
+    "confirmRemove": "Biztosan törlöd az ismerősök közül?",
+    "mutualHint": "Ő is bejelölt téged – ezzel ismerősök lettetek.",
+    "loginRequired": "Az ismerősök kezeléséhez be kell jelentkezned.",
+    "viewProfile": "Profil megnyitása"
   }
 }

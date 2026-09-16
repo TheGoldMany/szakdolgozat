@@ -34,7 +34,8 @@
     "myCampaigns": "My campaigns",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "more": "More"
+    "more": "More",
+    "connections": "Connections"
   },
   "footer": {
     "description": "Connecting animal shelters and adoptable pets with people who can give them a loving home.",
@@ -1802,5 +1803,33 @@
     "ratingRequired": "Please give a rating.",
     "submitError": "Something went wrong while sending.",
     "submit": "Send feedback"
+  },
+  "connections": {
+    "title": "Connections",
+    "intro": "Find other adopters and connect with the ones you know. You become connected once you have both marked each other.",
+    "searchLabel": "Search by name",
+    "searchPlaceholder": "Type a name…",
+    "searchHint": "Enter at least two characters to search.",
+    "searching": "Searching…",
+    "noResults": "No one found with that name.",
+    "searchResults": "Results",
+    "tabAccepted": "Connections",
+    "tabIncoming": "Waiting for you",
+    "tabOutgoing": "Sent",
+    "connect": "Connect",
+    "pending": "Request sent",
+    "connected": "Connected",
+    "accept": "Accept",
+    "decline": "Decline",
+    "remove": "Remove",
+    "cancelRequest": "Cancel",
+    "emptyAccepted": "No connections yet. Search for someone above.",
+    "emptyIncoming": "No requests waiting for your answer.",
+    "emptyOutgoing": "You haven't sent any requests.",
+    "networkError": "Something went wrong. Please try again.",
+    "confirmRemove": "Remove this person from your connections?",
+    "mutualHint": "They had already connected with you — you are connected now.",
+    "loginRequired": "Sign in to manage your connections.",
+    "viewProfile": "Open profile"
   }
 }

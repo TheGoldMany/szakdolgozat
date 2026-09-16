@@ -8,6 +8,33 @@ function toForint(minor: number): number {
 }
 
 /**
+ * Egy Stripe-terhelés visszavezetése arra a tételre, amit érint.
+ *
+ * Ez a rendszer egyetlen szabálya arra, hogy egy PaymentIntent mihez tartozik:
+ * előbb az egyszeri adományok között keresünk, aztán a havi terhelések között.
+ * Szándékosan közös, mert két helyről kell — a visszatérítésnél és a vitatott
+ * tételnél —, és ha külön írnánk meg őket, előbb-utóbb szétcsúsznának.
+ */
+export async function resolvePaymentIntent(paymentIntentId: string): Promise<{
+  donationId:            string | null;
+  subscriptionPaymentId: string | null;
+}> {
+  const donation = await prisma.donation.findUnique({
+    where:  { stripePaymentIntentId: paymentIntentId },
+    select: { id: true },
+  });
+  if (donation) return { donationId: donation.id, subscriptionPaymentId: null };
+
+  const payment = await prisma.subscriptionPayment.findUnique({
+    where:  { stripePaymentIntentId: paymentIntentId },
+    select: { id: true },
+  });
+  if (payment) return { donationId: null, subscriptionPaymentId: payment.id };
+
+  return { donationId: null, subscriptionPaymentId: null };
+}
+
+/**
  * Visszatérítés feldolgozása.
  *
  * A `charge.refunded` esemény a teljes visszatérített összeget adja meg
@@ -28,11 +55,16 @@ export async function applyRefund(charge: Stripe.Charge): Promise<{ matched: boo
   const refundedTotal = toForint(charge.amount_refunded ?? 0);
   if (refundedTotal <= 0) return { matched: false };
 
+  // Melyik tételről van szó? A szabály közös a vitatott tétellel.
+  const linked = await resolvePaymentIntent(paymentIntentId);
+
   // ── Egyszeri adomány ──────────────────────────────────────────────────────
-  const donation = await prisma.donation.findUnique({
-    where:  { stripePaymentIntentId: paymentIntentId },
-    select: { id: true, campaignId: true, refundedAmount: true, amount: true },
-  });
+  const donation = linked.donationId
+    ? await prisma.donation.findUnique({
+        where:  { id: linked.donationId },
+        select: { id: true, campaignId: true, refundedAmount: true, amount: true },
+      })
+    : null;
 
   if (donation) {
     const delta = refundedTotal - donation.refundedAmount;
@@ -59,10 +91,12 @@ export async function applyRefund(charge: Stripe.Charge): Promise<{ matched: boo
   }
 
   // ── Havi terhelés ─────────────────────────────────────────────────────────
-  const payment = await prisma.subscriptionPayment.findUnique({
-    where:  { stripePaymentIntentId: paymentIntentId },
-    select: { id: true, refundedAmount: true },
-  });
+  const payment = linked.subscriptionPaymentId
+    ? await prisma.subscriptionPayment.findUnique({
+        where:  { id: linked.subscriptionPaymentId },
+        select: { id: true, refundedAmount: true },
+      })
+    : null;
 
   if (payment) {
     if (refundedTotal <= payment.refundedAmount) return { matched: true };
@@ -118,29 +152,65 @@ async function notifyRefund(campaignId: string | null, amount: number): Promise<
  * esemény a rendszerben, ezért nem elég naplózni: szólni kell, mert a Stripe-on
  * határidőre bizonyítékot kell feltölteni.
  */
+/** A vita végállapotai: innen már nincs visszaút, eldőlt a pénz sorsa. */
+const CLOSED_DISPUTE_STATUSES = new Set(["won", "lost"]);
+
 export async function recordDispute(dispute: Stripe.Dispute): Promise<void> {
   const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id ?? "";
   const amount   = toForint(dispute.amount ?? 0);
 
+  const paymentIntentId = typeof dispute.payment_intent === "string"
+    ? dispute.payment_intent
+    : dispute.payment_intent?.id ?? null;
+
+  // Visszavezetés az érintett tételre. Enélkül a vitát nem lehetett összekötni
+  // azzal az adománnyal vagy havi terheléssel, amiről szól — pedig a séma
+  // pontosan erre tartja fenn ezeket a mezőket.
+  const linked = paymentIntentId
+    ? await resolvePaymentIntent(paymentIntentId)
+    : { donationId: null, subscriptionPaymentId: null };
+
   const existing = await prisma.paymentDispute.findUnique({
     where:  { stripeDisputeId: dispute.id },
-    select: { id: true },
+    select: { id: true, status: true },
   });
+  // Az előző státuszt még az írás ELŐTT kimentjük. Olvasni abból az objektumból,
+  // aminek a sorát közben felülírtuk, kérdezés a válasz után: könnyen a friss
+  // értéket kapnánk vissza, és a lezárás észrevétlen maradna.
+  const previousStatus = existing?.status ?? null;
 
   await prisma.paymentDispute.upsert({
     where:  { stripeDisputeId: dispute.id },
-    update: { status: dispute.status, amount, reason: dispute.reason },
+    update: {
+      status: dispute.status,
+      amount,
+      reason: dispute.reason,
+      stripePaymentIntentId: paymentIntentId,
+      donationId:            linked.donationId,
+      subscriptionPaymentId: linked.subscriptionPaymentId,
+    },
     create: {
       stripeDisputeId: dispute.id,
       stripeChargeId:  chargeId,
       amount,
       reason: dispute.reason,
       status: dispute.status,
+      stripePaymentIntentId: paymentIntentId,
+      donationId:            linked.donationId,
+      subscriptionPaymentId: linked.subscriptionPaymentId,
     },
   });
 
-  // Csak az első alkalommal értesítünk – a Stripe a státuszváltásokat is küldi.
-  if (existing) return;
+  const justOpened = !existing;
+  // Lezárás: akkor szólunk, amikor a vita MOST került végállapotba. A köztes
+  // státuszváltások (pl. bizonyíték beérkezett) nem érdemelnek értesítést, a
+  // kimenetel viszont igen — egy elvesztett vitánál a pénz és a vitadíj is a
+  // platformot terheli, és ezt könyvelni kell.
+  const justClosed = previousStatus !== null
+    && CLOSED_DISPUTE_STATUSES.has(dispute.status)
+    && !CLOSED_DISPUTE_STATUSES.has(previousStatus);
+
+  if (!justOpened && !justClosed) return;
 
   const supers = await prisma.user.findMany({
     where:  { role: "SUPER_ADMIN" },
@@ -152,12 +222,27 @@ export async function recordDispute(dispute: Stripe.Dispute): Promise<void> {
     style: "currency", currency: "HUF", maximumFractionDigits: 0,
   }).format(amount);
 
+  const { title, body } = justOpened
+    ? {
+        title: "Vitatott fizetés érkezett",
+        body:  `${amountStr} – indok: ${dispute.reason}. A Stripe-on határidőre bizonyítékot kell feltölteni, különben az összeg és a vitadíj is a platformot terheli.`,
+      }
+    : dispute.status === "won"
+    ? {
+        title: "Vitatott fizetés: megnyerve",
+        body:  `${amountStr} – a vita a javunkra dőlt el, az összeg marad. A vitadíjat a Stripe ilyenkor jóváírja.`,
+      }
+    : {
+        title: "Vitatott fizetés: elveszítve",
+        body:  `${amountStr} – a vita elveszett. Az összeg és a Stripe vitadíja is a platform egyenlegét terheli.`,
+      };
+
   await createNotifications(
     supers.map((s) => ({
       userId: s.id,
       type:   "PAYMENT_DISPUTE" as const,
-      title:  "Vitatott fizetés érkezett",
-      body:   `${amountStr} – indok: ${dispute.reason}. A Stripe-on határidőre bizonyítékot kell feltölteni, különben az összeg és a vitadíj is a platformot terheli.`,
+      title,
+      body,
       href:   "/dashboard/audit",
     }))
   ).catch((err) => console.error("dispute notification error:", err));
