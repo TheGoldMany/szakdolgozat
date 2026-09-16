@@ -309,6 +309,9 @@ export function Header() {
                     <Link href="/profile/ismerosok" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("connections")}
                     </Link>
+                    <Link href="/profile/napi" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      {t("daily")}
+                    </Link>
                     <Link href="/settings" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       {t("settings")}
                     </Link>
@@ -463,6 +466,10 @@ export function Header() {
                     <Link href="/profile/ismerosok" onClick={() => setMobileOpen(false)}
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
                       {t("connections")}
+                    </Link>
+                    <Link href="/profile/napi" onClick={() => setMobileOpen(false)}
+                      className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                      {t("daily")}
                     </Link>
                     <Link href="/settings" onClick={() => setMobileOpen(false)}
                       className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">

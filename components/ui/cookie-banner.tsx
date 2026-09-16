@@ -22,6 +22,20 @@ export function CookieBanner() {
     setVisible(false);
   }
 
+  /**
+   * Amíg a süti-sáv áll, mobilon letakarná a jobb alsó lebegő gombot: a sáv
+   * teljes szélességű és fölötte van, tehát a gomb elérhetetlen lenne — pont
+   * az első látogatáskor. Ezt a jelzést a CSS használja (lásd `.daily-fab`).
+   *
+   * Asztali nézetben a sáv egy kis kártya a bal alsó sarokban, ott nincs
+   * ütközés, ezért a jelzés csak kis képernyőn rejt el bármit.
+   */
+  useEffect(() => {
+    if (!visible) return;
+    document.body.dataset.cookieBanner = "1";
+    return () => { delete document.body.dataset.cookieBanner; };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
