@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator, Image, ScrollView, StyleSheet,
+  ActivityIndicator, Alert, Image, Linking, ScrollView, StyleSheet,
   Text, TouchableOpacity, View,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/lib/auth";
-import { getMyApplications, type MyApplication } from "@/lib/api";
+import {
+  ApiError, deleteAccount, getMyApplications, PRIVACY_URL, TERMS_URL,
+  type MyApplication,
+} from "@/lib/api";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING:   "Függőben",
@@ -25,12 +28,70 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [apps, setApps]   = useState<MyApplication[]>([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     setLoading(true);
-    getMyApplications().then(setApps).finally(() => setLoading(false));
+    getMyApplications()
+      .then(setApps)
+      // Az üres lista és a hiba nem ugyanaz: ha nem sikerült betölteni, azt
+      // meg kell mondani, nem úgy mutatni, mintha nem lenne kérelme.
+      .catch((err) => Alert.alert(
+        "Nem sikerült betölteni",
+        err instanceof ApiError ? err.userMessage : "Ismeretlen hiba.",
+      ))
+      .finally(() => setLoading(false));
   }, [user]);
+
+  /**
+   * Fiók törlése.
+   *
+   * Az Apple minden olyan appnál megköveteli, ahol fiókot lehet létrehozni.
+   * Két lépés: figyelmeztetés, majd külön megerősítés — a művelet
+   * visszafordíthatatlan, a szerver azonnal anonimizálja az adatokat és
+   * lemondja az aktív előfizetéseket.
+   */
+  function confirmDelete() {
+    Alert.alert(
+      "Fiók törlése",
+      "Ez visszafordíthatatlan. Töröljük a személyes adataidat, és lemondjuk az "
+      + "aktív támogatásaidat. Az örökbefogadási előzményed névtelenítve marad meg.",
+      [
+        { text: "Mégsem", style: "cancel" },
+        {
+          text: "Törlés", style: "destructive",
+          onPress: () => Alert.alert(
+            "Biztosan törlöd?",
+            "Utána nem tudod visszaállítani a fiókot.",
+            [
+              { text: "Mégsem", style: "cancel" },
+              { text: "Igen, töröljük", style: "destructive", onPress: runDelete },
+            ],
+          ),
+        },
+      ],
+    );
+  }
+
+  async function runDelete() {
+    setDeleting(true);
+    try {
+      await deleteAccount();
+      // A szerver a munkameneteket is érvényteleníti, tehát a tárolt tokent is
+      // el kell dobni, különben az app félig bejelentkezett állapotban maradna.
+      await logout();
+      Alert.alert("A fiók törölve", "Köszönjük, hogy velünk voltál.");
+      router.replace("/");
+    } catch (err) {
+      Alert.alert(
+        "Nem sikerült a törlés",
+        err instanceof ApiError ? err.userMessage : "Ismeretlen hiba.",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   if (!user) {
     return (
@@ -93,9 +154,31 @@ export default function ProfileScreen() {
         })
       )}
 
+      {/* Jogi tájékoztatók – mindkét store elvárja, hogy az appból elérhetők
+          legyenek, ne csak a weben lapuljanak. */}
+      <Text style={[styles.sectionTitle, { marginTop: 28 }]}>Jogi tájékoztatók</Text>
+      <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL(PRIVACY_URL)}>
+        <Text style={styles.linkText}>Adatkezelési tájékoztató</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => Linking.openURL(TERMS_URL)}>
+        <Text style={styles.linkText}>Általános szerződési feltételek</Text>
+      </TouchableOpacity>
+
       {/* Kijelentkezés */}
       <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
         <Text style={styles.logoutText}>Kijelentkezés</Text>
+      </TouchableOpacity>
+
+      {/* Fiók törlése – szándékosan a lap alján, tompított megjelenéssel:
+          kell hogy elérhető legyen, de nem szabad véletlenül rábökni. */}
+      <TouchableOpacity
+        style={styles.deleteBtn}
+        onPress={confirmDelete}
+        disabled={deleting}
+      >
+        {deleting
+          ? <ActivityIndicator color="#B91C1C" />
+          : <Text style={styles.deleteText}>Fiók törlése</Text>}
       </TouchableOpacity>
     </ScrollView>
   );
@@ -132,4 +215,8 @@ const styles = StyleSheet.create({
   statusText:  { fontSize: 11, fontWeight: "600", color: "#374151" },
   logoutBtn: { marginTop: 30, borderWidth: 1, borderColor: "#FCA5A5", borderRadius: 10, paddingVertical: 14, alignItems: "center" },
   logoutText: { color: "#EF4444", fontWeight: "600", fontSize: 15 },
+  linkRow:  { backgroundColor: "#fff", borderRadius: 10, paddingVertical: 14, paddingHorizontal: 14, marginBottom: 8 },
+  linkText: { color: "#2563EB", fontSize: 15, fontWeight: "500" },
+  deleteBtn:  { marginTop: 14, paddingVertical: 14, alignItems: "center" },
+  deleteText: { color: "#B91C1C", fontSize: 14, textDecorationLine: "underline" },
 });
