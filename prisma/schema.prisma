@@ -127,6 +127,11 @@ model User {
   suspendedReason          String?
   emailNotifications       Boolean   @default(true)
   dashboardTourSeen        Boolean   @default(false)
+  /// Látta-e már a Napi állatok funkciómagyarázót.
+  dailyIntroSeen           Boolean   @default(false)
+  /// Beleegyezett-e, hogy az ismerősi körén kívülről is lásson képeket.
+  /// Alapból hamis: aki nem kérte, csak azt látja, akit ismer.
+  dailyFeedExpanded        Boolean   @default(false)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
@@ -150,6 +155,8 @@ model User {
   notifications       Notification[]
   connectionsSent     UserConnection[]       @relation("ConnectionRequester")
   connectionsReceived UserConnection[]       @relation("ConnectionAddressee")
+  dailyPosts          DailyPost[]            @relation("DailyPostAuthor")
+  dailyPostLikes      DailyPostLike[]
   inventoryTxs        InventoryTransaction[] @relation("InventoryTxCreator")
   behaviorLogsAdded   BehaviorLog[]          @relation("BehaviorLogAuthor")
   fosterProfiles      FosterProfile[]
@@ -349,6 +356,7 @@ model Animal {
   @@index([status])
   @@index([shelterId, status])
   @@index([type, status])
+  dailyPosts       DailyPost[]
 }
 
 // -------------------------------------------------------
@@ -1100,6 +1108,8 @@ enum NotificationType {
   // Ismerősök
   CONNECTION_REQUEST  // User: valaki bejelölte ismerősként
   CONNECTION_ACCEPTED // User: elfogadták a jelölését
+  // Napi állatok
+  DAILY_POST_LIKED    // User: valaki kedvelte a napi képét
 }
 
 model Notification {
@@ -1628,4 +1638,45 @@ model UserConnection {
 
   @@index([requesterId, status])
   @@index([addresseeId, status])
+}
+
+/// Napi állatkép – az „Instagram/BeReal"-jellegű, rövid életű képfolyam.
+///
+/// A kép a FEEDBŐL 24 óra után kiesik (lásd `DAILY_FEED_HOURS`), de a sor nem
+/// törlődik: a szerző a saját profilján NAPTÁRBAN visszanézheti a korábbi
+/// napjait. Ezért nem törlünk, csak a feed-lekérdezés szűkít időben — a
+/// visszanézés így nem igényel külön archívumot.
+model DailyPost {
+  id String @id @default(cuid())
+
+  authorId String
+  author   User   @relation("DailyPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  /// Opcionális: ha a kép egy menhelyi állatról szól, ide köthető.
+  animalId String?
+  animal   Animal? @relation(fields: [animalId], references: [id], onDelete: SetNull)
+
+  imageUrl String
+  caption  String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  likes DailyPostLike[]
+
+  /// A feed mindig időrendben, szerzőnként szűrve kérdez.
+  @@index([authorId, createdAt])
+  @@index([createdAt])
+}
+
+model DailyPostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post DailyPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
 }
