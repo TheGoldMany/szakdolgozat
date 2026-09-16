@@ -173,13 +173,13 @@ export function FeedingScheduleForm({ shelterId, inventoryItems, schedule, onClo
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/30 transition-opacity"
+        className="animate-fade-in fixed inset-0 z-40 bg-black/30 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Panel */}
-      <aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl">
+      <aside className="animate-drawer fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <h2 className="text-base font-semibold text-gray-900">

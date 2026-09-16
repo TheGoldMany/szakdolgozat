@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageTransition } from "@/components/layout/page-transition";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { ShelterSwitcher } from "@/components/dashboard/shelter-switcher";
 import { resolveActingShelter } from "@/lib/acting-shelter";
@@ -72,7 +73,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   )}
                   <SidebarNav role={role} />
                 </aside>
-                <main className="flex-1 min-w-0">{children}</main>
+                <main className="flex-1 min-w-0">
+                  {/* A dashboardon a legtöbb navigáció menü és tartalom között
+                      történik; enélkül semmi nem jelezte a váltást. */}
+                  <PageTransition>{children}</PageTransition>
+                </main>
               </div>
 
               <Footer />
