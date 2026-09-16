@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
+import { DailyLauncher } from "@/components/daily/daily-launcher";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { routing } from "@/i18n/routing";
@@ -66,6 +67,7 @@ export default async function LocaleLayout({
               aria-hidden
             />
             <Suspense><MobileBottomNav /></Suspense>
+            <Suspense><DailyLauncher /></Suspense>
             <CookieBanner />
           </Providers>
         </NextIntlClientProvider>

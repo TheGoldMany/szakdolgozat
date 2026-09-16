@@ -175,6 +175,25 @@ input[type="radio"]:checked {
 /* Jobbról nyíló panel (mobil menü) */
 .animate-drawer { animation: drawerInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* ─── Napi állatok: lebegő gomb ────────────────────────────
+   Mobilon a fix alsó menüsáv (3,5rem) és a készülék biztonsági sávja FÖLÉ
+   kell kerülnie, különben a sáv eltakarja. Asztali gépen nincs alsó sáv,
+   ott alacsonyabban ülhet. Ez azért CSS és nem inline stílus, mert a
+   médiakérdést inline nem lehet leírni. */
+.daily-fab { bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) {
+  .daily-fab { bottom: 1.5rem; }
+}
+
+/* Amíg a süti-sáv áll, mobilon eltakarná a gombot (teljes szélességű és
+   fölötte van), tehát a gomb elérhetetlen lenne — pont az első látogatáskor.
+   Egy elérhetetlen gomb rosszabb, mint egy elrejtett: a döntés után rögtön
+   megjelenik. Asztali nézetben a sáv kis kártya a bal alsó sarokban, ott
+   nincs ütközés, ezért ott végig látszik. */
+@media (max-width: 639px) {
+  body[data-cookie-banner] .daily-fab { display: none; }
+}
+
 /* ─── Modális ablakok ──────────────────────────────────────
    A felugró panel eddig azonnal ott volt, háttérrel együtt. Ha egy doboz
    villanásszerűen megjelenik, a szem nem tudja, hogy ez egy réteg a tartalom
