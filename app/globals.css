@@ -175,6 +175,23 @@ input[type="radio"]:checked {
 /* Jobbról nyíló panel (mobil menü) */
 .animate-drawer { animation: drawerInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* ─── Modális ablakok ──────────────────────────────────────
+   A felugró panel eddig azonnal ott volt, háttérrel együtt. Ha egy doboz
+   villanásszerűen megjelenik, a szem nem tudja, hogy ez egy réteg a tartalom
+   FÖLÖTT, vagy maga a tartalom változott meg. A rövid felnagyítás a háttér
+   behalványodásával együtt ezt a kérdést válaszolja meg.
+
+   Itt sincs `fill-mode`, ugyanazért, amiért az oldalváltásnál: a megmaradó
+   `transform` pozicionálási kerete lenne a panel `position: fixed`
+   gyerekeinek. Nyugalmi állapotban a `scale(1)` és az `opacity: 1` amúgy is
+   a természetes érték, tehát nincs mit megtartani. */
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-modal { animation: modalIn 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
+
 /* ─── Fejléc ───────────────────────────────────────────────
    Görgetés közben a fejléc "leválik" a tartalomról: tömörebb háttér és
    árnyék jelzi, hogy már réteg van alatta. A magassága NEM változik, mert
@@ -273,6 +290,7 @@ input[type="radio"]:checked {
   .skeleton::after,
   .animate-dropdown,
   .animate-drawer,
+  .animate-modal,
   .page-enter,
   .page-enter-back,
   .press:active,

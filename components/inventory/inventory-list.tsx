@@ -244,8 +244,8 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
 
       {/* Edit modal */}
       {editItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="animate-modal w-full max-w-lg rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-900">Tétel szerkesztése</h2>
               <button onClick={() => setEditItem(null)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 transition-colors">

@@ -54,8 +54,8 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="animate-modal w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <h2 className="mb-1 text-lg font-bold text-gray-900">Állat áthelyezése</h2>
             <p className="mb-4 text-sm text-gray-500">
               <strong>{animalName}</strong> áthelyezési kérelme a kiválasztott menhelyre

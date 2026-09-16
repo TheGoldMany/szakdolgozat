@@ -38,7 +38,17 @@ const prismaMock = {
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 
-const { recordSubscriptionPayment, invoiceSubscriptionId } = await import("@/lib/subscription-payments");
+/** A Stripe-tól visszaadott számlák a visszatöltés-teszthez. */
+const stripeInvoices: unknown[] = [];
+vi.mock("@/lib/stripe", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/stripe")>();
+  return {
+    ...actual,
+    getStripe: () => ({ invoices: { list: async () => ({ data: stripeInvoices }) } }),
+  };
+});
+
+const { recordSubscriptionPayment, invoiceSubscriptionId, backfillSubscriptionPayments } = await import("@/lib/subscription-payments");
 
 /** A használt API-verzió alakja: az előfizetés a parent alatt van. */
 function invoice(overrides: Record<string, unknown> = {}): Stripe.Invoice {
@@ -137,5 +147,72 @@ describe("recordSubscriptionPayment", () => {
   it("nulla összegű számlát kihagy (pl. 100%-os kupon)", async () => {
     const { recorded } = await recordSubscriptionPayment(invoice({ amount_paid: 0 }));
     expect(recorded).toBe(false);
+  });
+});
+
+describe("az elveszett első havi fizetés (sorrendi hiba)", () => {
+  /**
+   * A Stripe nem garantálja az események sorrendjét. Ha az
+   * `invoice.payment_succeeded` megelőzi a `checkout.session.completed`-et,
+   * az előfizetés sor még nem létezik, a fizetés csendben kiesik, és a Stripe
+   * soha nem próbálja újra — mert 200-at kapott. Pont az ELSŐ, legfontosabb
+   * terhelés maradt így könyveletlenül.
+   *
+   * A javítás nem az újrapróbálás kikényszerítése, hanem a visszatöltés:
+   * amikor a sor létrejön, megkérdezzük a Stripe-tól a hozzá tartozó
+   * számlákat, és lekönyveljük a kimaradtakat.
+   */
+  beforeEach(() => {
+    stripeInvoices.length = 0;
+  });
+
+  it("fordított sorrendnél a fizetés először tényleg kiesik", async () => {
+    db.subscription = null;  // a checkout még nem futott le
+    db.sponsorship  = null;
+
+    const { recorded } = await recordSubscriptionPayment(invoice());
+
+    expect(recorded).toBe(false);
+    expect(db.payments).toHaveLength(0);
+  });
+
+  it("a visszatöltés utólag lekönyveli a kimaradt első terhelést", async () => {
+    // 1) a számla-esemény korán érkezik – nincs mihez kötni
+    db.subscription = null;
+    db.sponsorship  = null;
+    await recordSubscriptionPayment(invoice());
+    expect(db.payments).toHaveLength(0);
+
+    // 2) megjön a checkout, létrejön az előfizetés
+    db.subscription = { id: "s1", tier: { amount: 5_000 } };
+    stripeInvoices.push(invoice());
+
+    // 3) a visszatöltés pótolja
+    const { recorded } = await backfillSubscriptionPayments("sub_1");
+
+    expect(recorded).toBe(1);
+    expect(db.payments).toHaveLength(1);
+    expect(db.payments[0].totalPaid).toBe(5_345);
+  });
+
+  it("a visszatöltés nem könyvel duplán, ha a számla már bent van", async () => {
+    db.subscription = { id: "s1", tier: { amount: 5_000 } };
+    await recordSubscriptionPayment(invoice());   // normál sorrend: már lekönyvelve
+    stripeInvoices.push(invoice());
+
+    const { recorded } = await backfillSubscriptionPayments("sub_1");
+
+    expect(recorded).toBe(0);
+    expect(db.payments).toHaveLength(1);
+  });
+
+  it("több kimaradt számlát is pótol", async () => {
+    db.subscription = { id: "s1", tier: { amount: 5_000 } };
+    stripeInvoices.push(invoice({ id: "in_1" }), invoice({ id: "in_2" }));
+
+    const { recorded } = await backfillSubscriptionPayments("sub_1");
+
+    expect(recorded).toBe(2);
+    expect(db.payments).toHaveLength(2);
   });
 });

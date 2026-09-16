@@ -34,7 +34,8 @@
     "myCampaigns": "Meine Sammlungen",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
-    "more": "Mehr"
+    "more": "Mehr",
+    "connections": "Kontakte"
   },
   "footer": {
     "description": "Wir verbinden Tierheime und zur Adoption bereitgestellte Tiere mit Menschen, die ihnen ein liebevolles Zuhause geben können.",
@@ -1802,5 +1803,33 @@
     "ratingRequired": "Bitte gib eine Bewertung ab.",
     "submitError": "Beim Senden ist ein Fehler aufgetreten.",
     "submit": "Rückmeldung senden"
+  },
+  "connections": {
+    "title": "Kontakte",
+    "intro": "Finde andere Adoptierende und vernetze dich mit Menschen, die du kennst. Die Verbindung entsteht, sobald ihr euch beide markiert habt.",
+    "searchLabel": "Nach Namen suchen",
+    "searchPlaceholder": "Namen eingeben…",
+    "searchHint": "Gib mindestens zwei Zeichen ein.",
+    "searching": "Suche…",
+    "noResults": "Niemand mit diesem Namen gefunden.",
+    "searchResults": "Ergebnisse",
+    "tabAccepted": "Kontakte",
+    "tabIncoming": "Wartet auf dich",
+    "tabOutgoing": "Gesendet",
+    "connect": "Vernetzen",
+    "pending": "Anfrage gesendet",
+    "connected": "Vernetzt",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "remove": "Entfernen",
+    "cancelRequest": "Zurückziehen",
+    "emptyAccepted": "Noch keine Kontakte. Suche oben nach jemandem.",
+    "emptyIncoming": "Keine Anfragen, die auf deine Antwort warten.",
+    "emptyOutgoing": "Du hast keine Anfragen gesendet.",
+    "networkError": "Das hat nicht funktioniert. Bitte versuche es erneut.",
+    "confirmRemove": "Diese Person aus deinen Kontakten entfernen?",
+    "mutualHint": "Diese Person hatte dich schon markiert — ihr seid jetzt vernetzt.",
+    "loginRequired": "Melde dich an, um deine Kontakte zu verwalten.",
+    "viewProfile": "Profil öffnen"
   }
 }

@@ -34,7 +34,8 @@
     "myCampaigns": "Moje zbiórki",
     "openMenu": "Otwórz menu",
     "closeMenu": "Zamknij menu",
-    "more": "Więcej"
+    "more": "Więcej",
+    "connections": "Znajomi"
   },
   "footer": {
     "description": "Łączymy schroniska dla zwierząt i zwierzęta do adopcji z ludźmi, którzy mogą zapewnić im kochający dom.",
@@ -1802,5 +1803,33 @@
     "ratingRequired": "Podaj proszę ocenę.",
     "submitError": "Wystąpił błąd podczas wysyłania.",
     "submit": "Wyślij opinię"
+  },
+  "connections": {
+    "title": "Znajomi",
+    "intro": "Znajdź innych adoptujących i dodaj do znajomych tych, których znasz. Znajomość powstaje, gdy oboje zaznaczycie się wzajemnie.",
+    "searchLabel": "Szukaj po imieniu",
+    "searchPlaceholder": "Wpisz imię…",
+    "searchHint": "Wpisz co najmniej dwa znaki.",
+    "searching": "Szukam…",
+    "noResults": "Nie znaleziono nikogo o tym imieniu.",
+    "searchResults": "Wyniki",
+    "tabAccepted": "Znajomi",
+    "tabIncoming": "Czeka na Ciebie",
+    "tabOutgoing": "Wysłane",
+    "connect": "Dodaj do znajomych",
+    "pending": "Zaproszenie wysłane",
+    "connected": "Znajomy",
+    "accept": "Akceptuję",
+    "decline": "Odrzucam",
+    "remove": "Usuń",
+    "cancelRequest": "Wycofaj",
+    "emptyAccepted": "Nie masz jeszcze znajomych. Poszukaj kogoś powyżej.",
+    "emptyIncoming": "Brak zaproszeń oczekujących na odpowiedź.",
+    "emptyOutgoing": "Nie wysłałeś żadnych zaproszeń.",
+    "networkError": "Coś poszło nie tak. Spróbuj ponownie.",
+    "confirmRemove": "Usunąć tę osobę ze znajomych?",
+    "mutualHint": "Ta osoba już Cię dodała — jesteście teraz znajomymi.",
+    "loginRequired": "Zaloguj się, aby zarządzać znajomymi.",
+    "viewProfile": "Otwórz profil"
   }
 }

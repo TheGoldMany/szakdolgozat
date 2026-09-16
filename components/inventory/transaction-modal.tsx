@@ -64,8 +64,8 @@ export function TransactionModal({ item, onClose }: Props) {
   const inputCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white shadow-xl">
+    <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+      <div className="animate-modal w-full max-w-sm rounded-2xl bg-white shadow-xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">

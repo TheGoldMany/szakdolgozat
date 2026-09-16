@@ -148,6 +148,8 @@ model User {
   appointments        Appointment[]
   volunteering        Volunteer[]
   notifications       Notification[]
+  connectionsSent     UserConnection[]       @relation("ConnectionRequester")
+  connectionsReceived UserConnection[]       @relation("ConnectionAddressee")
   inventoryTxs        InventoryTransaction[] @relation("InventoryTxCreator")
   behaviorLogsAdded   BehaviorLog[]          @relation("BehaviorLogAuthor")
   fosterProfiles      FosterProfile[]
@@ -1095,6 +1097,9 @@ enum NotificationType {
   SHELTER_DELETED      // Shelter admin: shelter deleted by super admin
   SHELTER_REGISTRATION_PENDING // Super admin: a new shelter self-registered, awaiting verification
   SHELTER_VERIFIED     // Shelter admin: shelter approved/verified by super admin
+  // Ismerősök
+  CONNECTION_REQUEST  // User: valaki bejelölte ismerősként
+  CONNECTION_ACCEPTED // User: elfogadták a jelölését
 }
 
 model Notification {
@@ -1563,4 +1568,64 @@ model PaymentDispute {
 
   @@index([status])
   @@index([createdAt])
+}
+
+/// Már feldolgozott Stripe-webhook események.
+///
+/// A Stripe *legalább egyszer* kézbesít: minden nem-2xx válasz után
+/// újrapróbálkozik, és sikeres kézbesítés után is küldhet duplikátumot. Az
+/// egyes ágak külön-külön idempotensek, ez a tábla a fölöttük lévő gyors
+/// kilépés — a már végigfutott eseményt meg se próbáljuk újra feldolgozni.
+///
+/// A sor SZÁNDÉKOSAN csak a teljes, hibátlan feldolgozás UTÁN jön létre. Ha az
+/// elején foglalnánk le az eseményt, egy közben történő összeomlás örökre
+/// „feldolgozottnak" jelölné azt, amit valójában senki nem végzett el, és a
+/// Stripe újraküldése sem segítene rajta.
+model ProcessedWebhookEvent {
+  /// A Stripe `event.id`-je – ez maga a kulcs, nincs szükség külön azonosítóra.
+  id   String @id
+  type String
+
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+/// Két felhasználó közötti ismerős-kapcsolat.
+///
+/// Egy SOR tartozik egy emberpárhoz, függetlenül attól, ki jelölte be a másikat
+/// előbb. Ezt a `pairKey` kényszeríti ki: a két azonosító ábécésorrendben
+/// összefűzve, egyedi indexszel. A `@@unique([requesterId, addresseeId])`
+/// egyedül nem lenne elég — az csak az „A → B kétszer" esetet zárja ki, az
+/// „A → B és közben B → A" esetet nem, és két egyidejű jelölésnél két
+/// versengő sor jönne létre ugyanarra a párra.
+///
+/// A `requesterId` és `addresseeId` az IRÁNYT tartja meg: ebből derül ki, kinek
+/// kell válaszolnia egy várakozó jelölésre.
+model UserConnection {
+  id String @id @default(cuid())
+
+  /// A két azonosító rendezve, `kisebb_nagyobb` alakban. Lásd `connectionPairKey`.
+  pairKey String @unique
+
+  requesterId String
+  requester   User   @relation("ConnectionRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User   @relation("ConnectionAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status ConnectionStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  /// Mikor fogadták el vagy utasították el.
+  respondedAt DateTime?
+
+  @@index([requesterId, status])
+  @@index([addresseeId, status])
 }
