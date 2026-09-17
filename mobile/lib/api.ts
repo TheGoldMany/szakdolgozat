@@ -329,6 +329,69 @@ export function getMyApplications(): Promise<MyApplication[]> {
   return request<MyApplication[]>("/api/applications/my");
 }
 
+// ── Örökbefogadási kérvény (dinamikus űrlap) ───────────
+
+/**
+ * A kérdőív mezőtípusai.
+ *
+ * A séma `FieldType` enumját tükrözi (prisma/schema.prisma). SZÁNDÉKOSAN nincs
+ * a mobilban rögzített kérdéssor: a menhely a dashboardon állítja össze a saját
+ * kérdőívét, és a mobil azt jeleníti meg, amit a szerver ad. Egy lemásolt,
+ * statikus űrlap az első kérdésmódosításnál elavulna.
+ */
+export type FieldType = "TEXT" | "TEXTAREA" | "IMAGE" | "FILE";
+
+export interface ApplyField {
+  id:       string;
+  label:    string;
+  type:     FieldType;
+  required: boolean;
+  order:    number;
+}
+
+export interface ApplyForm {
+  animalName:      string;
+  animalSlug:      string;
+  animalImage:     string | null;
+  formTitle:       string;
+  formDescription: string | null;
+  fields:          ApplyField[];
+}
+
+/** Egy mezőre adott válasz: szöveg VAGY feltöltött fájl címe. */
+export interface ApplyResponse {
+  fieldId:  string;
+  value?:   string;
+  fileUrl?: string;
+}
+
+/**
+ * A meghívóhoz tartozó kérdőív.
+ *
+ * A meghívó egy beszélgetés-üzenetként érkezik (`Message.inviteToken`), ezért
+ * a mobilban a beszélgetés a belépési pont — ugyanúgy, ahogy a weben.
+ *
+ * 404: érvénytelen vagy lejárt meghívó. 409: már felhasználták.
+ */
+export function getApplyForm(token: string): Promise<ApplyForm> {
+  return request<ApplyForm>(`/api/apply/${token}`);
+}
+
+/** A kitöltött kérdőív beküldése. A kötelező mezőket a szerver is ellenőrzi. */
+export function submitApplyForm(
+  token: string, responses: ApplyResponse[],
+): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>(`/api/apply/${token}`, {
+    method: "POST",
+    body:   JSON.stringify({ responses }),
+  });
+}
+
+/** A webes kitöltő címe – fájlt igénylő mezőnél ide irányítunk. */
+export function applyWebUrl(token: string): string {
+  return `${BASE_URL}/apply/${token}`;
+}
+
 // ── Favourites ─────────────────────────────────────────
 export function getFavoriteIds(): Promise<{ animalIds: string[] }> {
   return request<{ animalIds: string[] }>("/api/favorites");
