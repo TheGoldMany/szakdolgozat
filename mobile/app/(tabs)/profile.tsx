@@ -132,6 +132,9 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/notifications")}>
         <Text style={styles.linkText}>Értesítések</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/notifications/settings")}>
+        <Text style={styles.linkText}>Értesítési beállítások</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/favorites")}>
         <Text style={styles.linkText}>Kedvenceim</Text>
       </TouchableOpacity>

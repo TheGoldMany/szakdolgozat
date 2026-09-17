@@ -487,6 +487,30 @@ export function markAllNotificationsRead(): Promise<unknown> {
   return request("/api/notifications/read-all", { method: "POST" });
 }
 
+// ── Push ───────────────────────────────────────────────
+
+/**
+ * Az eszköz regisztrálása push értesítésre.
+ *
+ * A szerver a tokent egyedi kulcsként kezeli: ha ugyanezen a telefonon más
+ * jelentkezik be, a token átkerül hozzá — az előző felhasználó nem kapja
+ * tovább az értesítéseit erre a készülékre.
+ */
+export function registerPushToken(token: string, platform: "ios" | "android"): Promise<unknown> {
+  return request("/api/notifications/push-token", {
+    method: "POST",
+    body:   JSON.stringify({ token, platform }),
+  });
+}
+
+/** Leregisztrálás kijelentkezéskor. */
+export function deletePushToken(token: string): Promise<unknown> {
+  return request("/api/notifications/push-token", {
+    method: "DELETE",
+    body:   JSON.stringify({ token }),
+  });
+}
+
 // ── Messaging ──────────────────────────────────────────
 export interface Conversation {
   id: string;
@@ -610,7 +634,18 @@ export function createDailyPost(data: {
 }
 
 // ── Profile ────────────────────────────────────────────
-export interface Profile {
+
+/** A push kapcsolók. A típus → kategória leképezés a szerveren (`lib/push.ts`) él. */
+export interface NotificationPrefs {
+  /** Üzenetek és válaszok. */
+  pushMessages:    boolean;
+  /** Ügyintézés: kérelem, időpont, utánkövetés. */
+  pushCaseUpdates: boolean;
+  /** Közösség: ismerős-jelölés, napi kép kedvelése. */
+  pushCommunity:   boolean;
+}
+
+export interface Profile extends NotificationPrefs {
   id: string;
   name: string | null;
   email: string;
@@ -618,9 +653,25 @@ export interface Profile {
   address: string | null;
   city: string | null;
   role: string;
+  emailNotifications: boolean;
 }
 
-export function updateProfile(data: Partial<Pick<Profile, "name" | "phone" | "address" | "city">>): Promise<{ user: Profile }> {
+/**
+ * A saját profil.
+ *
+ * A bejelentkezéskor kapott adat csak az azonosítót, nevet és szerepkört
+ * tartalmazza — a kapcsolók állását nem. Enélkül a beállítások képernyő
+ * mindig bekapcsolva mutatná őket, akkor is, ha a felhasználó kikapcsolta.
+ */
+export function getProfile(): Promise<{ user: Profile }> {
+  return request<{ user: Profile }>("/api/profile");
+}
+
+export function updateProfile(
+  data: Partial<Pick<Profile,
+    "name" | "phone" | "address" | "city" | "emailNotifications"
+    | "pushMessages" | "pushCaseUpdates" | "pushCommunity">>,
+): Promise<{ user: Profile }> {
   return request<{ user: Profile }>("/api/profile", {
     method: "PATCH",
     body: JSON.stringify(data),

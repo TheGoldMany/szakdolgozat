@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { apiLogin, setUnauthorizedHandler, type AuthUser } from "./api";
+import { unregisterFromPush } from "./push";
 
 interface AuthCtx {
   user: AuthUser | null;
@@ -29,6 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function logout() {
+    // A push leregisztrálása MÉG a munkamenet törlése előtt: a szerver
+    // hitelesítést vár, utána már nem volna mivel hitelesíteni. Enélkül a
+    // következő belépő ezen a telefonon az előző értesítéseit kapná meg.
+    await unregisterFromPush();
     await SecureStore.deleteItemAsync("session_token");
     await SecureStore.deleteItemAsync("session_user");
     setUser(null);

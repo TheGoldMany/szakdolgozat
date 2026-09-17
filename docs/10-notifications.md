@@ -4,6 +4,37 @@
 
 Ez a modul fedi le a platform értesítési rendszerét. A felhasználók automatikus in-app értesítéseket kapnak különböző eseményekre (kérelem státuszváltás, önkéntesi jóváhagyás, kampány döntés stb.). Az értesítések a fejléc `NotificationBell` komponensén keresztül érhetők el, ahol piros badge jelzi az olvasatlan értesítések számát. Az értesítések egyenként vagy egyszerre is olvasottnak jelölhetők. A teljes értesítési lista a `/hu/notifications` oldalon érhető el, ahol az összes / csak olvasatlan szűrő is elérhető. Az értesítések 30 másodpercenként automatikusan frissülnek.
 
+A mobilalkalmazás ugyanezt az értesítéslistát mutatja, és **push értesítést** is kap. A push nem külön értesítési csatorna: minden értesítés a `createNotification()` / `createNotifications()` függvényen keresztül keletkezik (34 hívási hely), és ez a két függvény küldi a pusht is — így nem lehet olyan értesítést létrehozni, ami „elfelejt" szólni.
+
+### Amit a push nem csinál
+
+**Az in-app értesítés a hiteles forrás, a push csak figyelemfelhívás.** Ha a küldés elhasal (az Expo nem elérhető, lejárt a token, nincs telepítve az app), az értesítés akkor is létrejön és megjelenik a listában. A `lib/push.ts` ezért soha nem dob hibát a hívó felé.
+
+### Kategóriák
+
+51 értesítéstípus van, de a felhasználó **három kapcsolót** kap, mert nem típusokban gondolkodik:
+
+| Kategória | Mit fed le |
+|---|---|
+| Üzenetek és válaszok | `NEW_MESSAGE` |
+| Ügyintézés | kérelem, időpont, önkéntesség, befogadás, bejelentés, adomány, esemény, utánkövetés, készlet, áthelyezés, menhely-státusz |
+| Közösség | ismerős-jelölés, ismerős elfogadása, napi kép kedvelése, támogatott állat híre |
+
+A leképezés a `lib/push.ts`-ben `Record<NotificationType, PushCategory>` típusú, tehát **új értesítéstípusnál fordítási hiba** jelez — nem marad ki csendben. A kapcsolók a `User` táblán (`pushMessages`, `pushCaseUpdates`, `pushCommunity`), a mobilban a Profil → Értesítési beállítások képernyőn állíthatók.
+
+**Kikapcsolt kategóriánál az értesítés létrejön, csak nem szól.**
+
+### Eszközök
+
+Az Expo push tokenek külön táblában (`PushToken`) vannak, nem a `User` egy mezőjében: egy felhasználónak több készüléke lehet, és egy készüléket többen is használhatnak. A token az egyedi kulcs, ezért ha ugyanazon a telefonon más jelentkezik be, a token **átkerül** hozzá. Kijelentkezéskor az app leregisztrál; az Expo által `DeviceNotRegistered`-ként visszautasított tokent a szerver törli.
+
+### Ami még hiányzik a működéshez
+
+- **iOS**: APNs-kulcs (Apple-tagsághoz kötött). Amíg nincs, az app iOS-en csendben nem regisztrál — az `EXPO_PUBLIC_PUSH_IOS_ENABLED` kapcsolja be.
+- **Android**: FCM V1 szolgáltatásfiók-kulcs feltöltése az EAS-hez.
+
+Részletek: `docs/20-mobil-kiadas.md`.
+
 ---
 
 ## Felhasználói Történetek
@@ -207,6 +238,80 @@ Az összes értesítés `readAt` mezője frissül, a badge eltűnik, a csak olva
 
 **Elvárt eredmény:**
 Az oldal betölt az összes értesítéssel, az olvasott/olvasatlan szűrő funkcionál, az ikonok típusonként eltérnek, a relatív időbélyegek helyesek. Az értesítésen kattintva a releváns oldalra navigál.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-10-06: Push értesítés megérkezik a telefonra
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | `preview` vagy development build telepítve Android készülékre (**Expo Go NEM jó**: SDK 53 óta nem támogat távoli pusht); az EAS-en fel van töltve az FCM V1 kulcs; `user@test.hu` bejelentkezve a mobilappban |
+| **URL** | mobilapp + `/dashboard/applications` (admin, weben) |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] Bejelentkezés után az app engedélyt kér az értesítésekhez
+- [ ] Engedélyezés után a `PushToken` táblában létrejön egy sor a felhasználóhoz, `platform: "android"` értékkel
+- [ ] Admin oldali státuszváltás után a telefonon megjelenik az értesítés (cím + szöveg)
+- [ ] Az értesítés akkor is megjelenik, ha az app a háttérben van vagy be van zárva
+- [ ] Az értesítésre koppintva az app a kérelmekhez navigál (nem csak elindul)
+- [ ] Ugyanaz az értesítés az Értesítések képernyőn is ott van, olvasatlanként
+- [ ] Kijelentkezés után a `PushToken` sor törlődik
+
+**Tesztelési lépések:**
+1. Telepítsd a buildet, jelentkezz be `user@test.hu` fiókkal, és **engedélyezd** az értesítéseket.
+2. Ellenőrizd az adatbázisban, hogy létrejött a `PushToken` sor.
+3. Zárd be az appot (ne csak háttérbe tedd).
+4. Weben, admin fiókkal változtasd a felhasználó kérelmét `PENDING` → `REVIEWING` státuszra.
+5. Ellenőrizd, hogy a telefon értesítést mutat.
+6. Koppints az értesítésre – ellenőrizd, hogy az app a kérelmekhez nyílik.
+7. Nyisd meg az Értesítések képernyőt – ellenőrizd, hogy az értesítés ott is szerepel.
+8. Jelentkezz ki, és ellenőrizd, hogy a `PushToken` sor eltűnt.
+
+**Elvárt eredmény:**
+Az értesítés megérkezik a telefonra bezárt app mellett is, koppintásra a megfelelő képernyőre visz, és ugyanaz az értesítés az in-app listában is megtalálható.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
+
+---
+
+### TC-10-07: Kikapcsolt kategória nem szól, de az értesítés létrejön
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | TC-10-06 sikeresen lefutott (van regisztrált eszköz); két teszt-fiók, amelyek ismerősnek tudják jelölni egymást |
+| **URL** | mobilapp → Profil → Értesítési beállítások |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Elfogadási feltételek:**
+- [ ] A beállítások képernyő **három** kapcsolót mutat, nem típusonként egyet
+- [ ] A kapcsoló a szerverre menti az értékét (újranyitás után is kikapcsolva marad)
+- [ ] A „Közösség" kikapcsolása után ismerős-jelölésre **nem érkezik push**
+- [ ] Ugyanez az értesítés az Értesítések képernyőn **megjelenik** olvasatlanként
+- [ ] Az „Üzenetek és válaszok" kapcsoló közben bekapcsolva marad, és új üzenetre **érkezik push**
+- [ ] Sikertelen mentésnél a kapcsoló visszaáll, és hibaüzenet jelenik meg
+
+**Tesztelési lépések:**
+1. A mobilappban nyisd meg: Profil → Értesítési beállítások.
+2. Kapcsold ki a „Közösség" kategóriát, majd lépj vissza és nyisd meg újra – ellenőrizd, hogy kikapcsolva maradt.
+3. A másik fiókkal jelöld be ismerősnek az első fiókot.
+4. Ellenőrizd, hogy a telefon **nem** mutat értesítést.
+5. Nyisd meg az Értesítések képernyőt – ellenőrizd, hogy az ismerős-jelölés ott **szerepel**, olvasatlanként.
+6. A másik fiókkal küldj üzenetet az elsőnek.
+7. Ellenőrizd, hogy erre **érkezik** push (az „Üzenetek" kategória bekapcsolva maradt).
+
+**Elvárt eredmény:**
+A kikapcsolt kategória elnémítja a pusht, de az értesítés létrejön és a listában megtalálható. A többi kategória működése változatlan.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

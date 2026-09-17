@@ -29,6 +29,7 @@ származik: minden sor mellett ott van, honnan.
 | **Üzenetek** | menhellyel folytatott beszélgetés | kommunikáció | igen |
 | **Kedvencek, kérelmek, időpontok** | app használat | a funkció működése | igen |
 | **Fotók (kamera vagy galéria)** | bejelentés, napi kép | az állat azonosítása, illetve a napi képfolyam | igen |
+| **Push token (eszközazonosító)** | értesítések | a telefon értesítést kapjon új üzenetről, kérelemről | igen |
 
 ### Ami külön figyelmet érdemel
 
@@ -52,7 +53,8 @@ Ezeket nyugodtan „nem" válasszal jelölheted:
   **letiltja**. Nem használt engedélyt kérni fölösleges kockázat.
 - **Nincs harmadik félnek átadott adat.** Az app kizárólag a saját backendünkkel
   beszél. A képek a saját Vercel Blob tárolónkba kerülnek, a `/api/upload`
-  végponton keresztül.
+  végponton keresztül. **Egy kivétel van: a push értesítés** — lásd alább, ezt
+  a kérdőívben jelölni kell.
 - **Nincs nyomon követés (tracking).** Nincs reklámazonosító-használat, tehát az
   App Tracking Transparency sem kell.
 
@@ -100,6 +102,40 @@ Az app nem akad el. A fotózás és a galéria **két külön gomb**, nem egy k�
 választó mögött — ha a kamerahozzáférést megtagadják, a galéria gomb ugyanúgy
 ott van és működik. Végleges elutasításnál (`canAskAgain === false`) a
 rendszerbeállításokra mutatunk, mert onnan már csak ott lehet visszavonni.
+
+### Push értesítés — új engedély és új adattovábbítás
+
+**Ez a lista a push bevezetésével bővült.** Két dolgot érint a kérdőívekben:
+
+| Engedély | Platform | Hogyan |
+|---|---|---|
+| Értesítési engedély | iOS | a rendszer kéri, az `expo-notifications` hívja |
+| `android.permission.POST_NOTIFICATIONS` | Android | az `expo-notifications` plugin adja hozzá (Android 13+) |
+
+**Adattovábbítás az Expo felé.** A push az **Expo push szolgáltatásán**
+keresztül megy, tehát ez az egyetlen pont, ahol adat hagyja el a saját
+rendszerünket. Ami átmegy: az eszköz push tokenje, valamint az értesítés
+**címe és szövege** — ez utóbbi tartalmazhat nevet (pl. „Új üzenet Kiss
+Páltól"). Üzenet tartalmát nem küldünk. A kérdőívben ezt „harmadik félnek
+átadott adat"-ként kell jelölni.
+
+**Amit a felhasználó szabályozni tud.** Három kapcsoló az appban (Profil →
+Értesítési beállítások): *Üzenetek és válaszok*, *Ügyintézés*, *Közösség*.
+Nem 51 kapcsoló típusonként — a leképezés a szerveren, a `lib/push.ts`-ben van.
+Kikapcsolt kategóriánál az értesítés **létrejön** (az Értesítések listában
+megtalálja), csak nem szól.
+
+**iOS-en jelenleg ki van kapcsolva.** Az Apple push szolgáltatásához APNs-kulcs
+kell, ami a fejlesztői tagsághoz kötött, és az még nincs meg. Az app iOS-en
+addig **csendben nem regisztrál** push tokent, és engedélyt sem kér — nem hibát
+mutat. Bekapcsolás: `EXPO_PUBLIC_PUSH_IOS_ENABLED=true` a build környezetében.
+
+**Az Expo Go nem jó a teszteléshez.** SDK 53 óta nem támogatja a távoli push
+értesítést; development vagy `preview` build kell hozzá.
+
+**Androidhoz FCM-kulcs kell az Expo oldalán.** A Firebase-projekt szolgáltatás-
+fiókkulcsát (FCM V1) fel kell tölteni az `eas credentials` alatt, különben az
+Expo nem tudja kézbesíteni az üzenetet. Ez még nincs meg.
 
 ### Tárolás az eszközön
 
@@ -181,9 +217,13 @@ azt te döntöd el.
 | Build-szám léptetés | ✅ kész (EAS oldalon) |
 | Fiók törlése az appból | ✅ kész |
 | Adatvédelmi tájékoztató elérése az appból | ✅ kész (profil képernyő) |
-| Adatkezelési kérdőívek | ⬜ a fenti lista alapján neked kell kitölteni — **a fotók már benne vannak** |
+| Adatkezelési kérdőívek | ⬜ a fenti lista alapján neked kell kitölteni — **a fotók és a push token már benne vannak** |
 | iOS usage description szövegek | ✅ kész (magyarul, `app.json`) |
 | Android kamera-engedély | ✅ kész |
+| Push értesítés (kód, beállítások, leiratkozás) | ✅ kész |
+| **APNs-kulcs** (iOS push) | ⬜ Apple-tagsághoz kötött; addig iOS-en ki van kapcsolva |
+| **FCM V1 szolgáltatásfiók-kulcs** (Android push) | ⬜ `eas credentials` alatt feltölteni |
+| `EXPO_ACCESS_TOKEN` a Vercelen | ⬜ enélkül is megy a küldés, de vele nem tud más a nevünkben küldeni |
 | **Apple Developer Program** (99 USD/év) | ⬜ napok–hetek átfutás |
 | **Google Play Console** (25 USD egyszeri) | ⬜ + zárt teszt, lásd lent |
 | Store assetek (képernyőképek, leírás, kategória) | ⬜ |

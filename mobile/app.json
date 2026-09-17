@@ -41,6 +41,13 @@
         }
       ],
       [
+        "expo-notifications",
+        {
+          "color": "#E6F4FE",
+          "defaultChannel": "default"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "cameraPermission": "Az ÁllatiMenhelyek a kamerát a helyszínen készített fotókhoz használja: elveszett vagy talált állat bejelentéséhez, illetve napi kép feltöltéséhez.",

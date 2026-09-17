@@ -152,8 +152,51 @@ dokumentáció alapján ellenőrizve):
 - **Hozzáadja a `RECORD_AUDIO`-t**, amire nincs szükség (állóképet készítünk).
   Ezt a `microphonePermission: false` blokkolja.
 
+Az app **push értesítést** is küld (`expo-notifications`), ezért kér értesítési
+engedélyt. Androidon a `POST_NOTIFICATIONS`-t a plugin adja hozzá, nem kézzel.
+
 Ha új engedélyt veszel fel, a `docs/20-mobil-kiadas.md` adatkezelési listáját
 is frissíteni kell — a store-kérdőívek abból készülnek.
+
+## Push értesítés
+
+**Az in-app értesítés a hiteles forrás, a push csak figyelemfelhívás.** Ha a
+push bármiért elmarad (nincs engedély, nincs hálózat, lejárt a token), az
+értesítés az Értesítések képernyőn akkor is ott van. Ezért a `lib/push.ts`-ből
+**soha nem terjedhet hiba a hívó felé** — minden ág `null`-lal vagy némán tér
+vissza, és a naplóba ír.
+
+**iOS-en alapból KI VAN KAPCSOLVA.** Az Apple push szolgáltatásához APNs-kulcs
+kell (fejlesztői tagsághoz kötött), ami még nincs meg. Kulcs nélkül a
+`getExpoPushTokenAsync` hibát dob, ezért iOS-en addig **engedélyt sem kérünk** —
+egy egyszer elutasított engedélyt nehéz visszaszerezni. Bekapcsolás:
+`EXPO_PUBLIC_PUSH_IOS_ENABLED=true`.
+
+**Az Expo Go SDK 53 óta nem támogatja a távoli push értesítést** — development
+vagy `preview` build kell. Ha szimulátoron „nem jön az értesítés", valószínűleg
+nem hiba.
+
+**EAS projektazonosító nélkül nincs token.** A `getExpoPushTokenAsync`
+`projectId`-t vár, ami az `eas init` után kerül az `app.json`-ba. Amíg nincs, a
+regisztráció figyelmeztetéssel kimarad.
+
+Három fájl:
+
+- `lib/push.ts` — regisztráció, leregisztrálás, Android csatorna, jelvény.
+- `lib/use-push.ts` — bekötés: regisztráció bejelentkezés után, és a koppintás
+  kezelése. A `useLastNotificationResponse` újracsatoláskor ugyanazt a választ
+  adja vissza, ezért az azonosítója **meg van jegyezve** — enélkül minden
+  képernyőváltás után újra odaugranánk.
+- `lib/notification-link.ts` — a webes `href` → mobil képernyő leképezés,
+  ugyanaz, amit az értesítéslista használ.
+
+**Kijelentkezéskor a leregisztrálás a munkamenet törlése ELŐTT fut**
+(`AuthProvider.logout`): a szerver hitelesítést vár, utána már nem volna mivel.
+Enélkül a következő belépő ezen a telefonon az előző értesítéseit kapná meg.
+
+A kapcsolók (Profil → Értesítési beállítások) három kategóriát adnak, nem
+51-et. A típus → kategória leképezés a **szerveren** van (`lib/push.ts`), és
+`Record<NotificationType, …>`, tehát új értesítéstípusnál fordítási hiba jelez.
 
 **Fotózás a kódban:** a `lib/photo.ts` intézi a választást, az engedélykérést és
 a feltöltést, a `components/ui/PhotoField.tsx` pedig a felületet. Ne írj újat.
