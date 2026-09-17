@@ -135,11 +135,30 @@ hozzányúl a `main`-hez, az fog elindulni. Ne oda írj kódot.
 
 ## Engedélyek
 
-Az app **nem** használ kamerát, fotótárat és helyadatot (nincs
-`expo-image-picker`, `expo-location`, `expo-camera`). Ezért iOS usage
-description stringre NINCS szükség. Ha ilyen funkciót írsz, akkor viszont
-kötelező — és csak azokat vedd fel, amiket valóban használsz, mert az Apple a
-fölösleges engedélykérést elutasítja.
+Az app **kamerát és fotótárat használ** (`expo-image-picker`): a bejelentésnél
+és a napi képnél. Helyadatot NEM használ (nincs `expo-location`).
+
+Az engedélyszövegek az `app.json`-ban, az `expo-image-picker` plugin
+konfigurációjában vannak, **magyarul** — a felhasználó pontosan azt a mondatot
+olvassa az engedélykérő ablakban, és az Apple el is utasítja a semmitmondó
+indoklást.
+
+Két dolog, amit a plugin NEM úgy csinál, ahogy elsőre gondolnád (v56-os
+dokumentáció alapján ellenőrizve):
+
+- **Nem adja hozzá az Android `CAMERA` engedélyt** — csak az iOS usage
+  descriptiont állítja be. Ezért az `android.permissions` tömbben szerepel
+  kézzel.
+- **Hozzáadja a `RECORD_AUDIO`-t**, amire nincs szükség (állóképet készítünk).
+  Ezt a `microphonePermission: false` blokkolja.
+
+Ha új engedélyt veszel fel, a `docs/20-mobil-kiadas.md` adatkezelési listáját
+is frissíteni kell — a store-kérdőívek abból készülnek.
+
+**Fotózás a kódban:** a `lib/photo.ts` intézi a választást, az engedélykérést és
+a feltöltést, a `components/ui/PhotoField.tsx` pedig a felületet. Ne írj újat.
+A `/api/upload` NEM multipart űrlapot fogad, hanem a Vercel Blob kliens-token
+folyamatát — ezért kell a `@vercel/blob` a mobilban is.
 
 ## Ami a store-os kiadáshoz még hiányzik
 

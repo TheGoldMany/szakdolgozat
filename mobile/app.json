@@ -19,7 +19,10 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -35,6 +38,14 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#E6F4FE"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Az ÁllatiMenhelyek a kamerát a helyszínen készített fotókhoz használja: elveszett vagy talált állat bejelentéséhez, illetve napi kép feltöltéséhez.",
+          "photosPermission": "Az ÁllatiMenhelyek a fotóidhoz azért kér hozzáférést, hogy a bejelentéshez vagy a napi képhez korábban készült fotót is választhass.",
+          "microphonePermission": false
         }
       ]
     ],

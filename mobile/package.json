@@ -4,8 +4,10 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@react-navigation/native": "^7.2.5",
+    "@vercel/blob": "^2.3.3",
     "expo": "~56.0.8",
     "expo-constants": "~56.0.16",
+    "expo-image-picker": "~56.0.25",
     "expo-router": "~56.2.8",
     "expo-secure-store": "~56.0.4",
     "expo-splash-screen": "~56.0.15",

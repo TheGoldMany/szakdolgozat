@@ -121,6 +121,14 @@ export default function ProfileScreen() {
       </View>
 
       {/* Gyorslinkek – a tabsáv négy helye tele van, ezek innen érhetők el. */}
+      {/* A két fotózós belépési pont elöl: ezért éri meg telefonon használni. */}
+      <TouchableOpacity style={styles.primaryRow} onPress={() => router.push("/reports/new")}>
+        <Text style={styles.primaryText}>Elveszett vagy talált állat bejelentése</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.primaryRow} onPress={() => router.push("/daily/new")}>
+        <Text style={styles.primaryText}>Napi kép feltöltése</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/favorites")}>
         <Text style={styles.linkText}>Kedvenceim</Text>
       </TouchableOpacity>
@@ -230,6 +238,8 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 30, borderWidth: 1, borderColor: "#FCA5A5", borderRadius: 10, paddingVertical: 14, alignItems: "center" },
   logoutText: { color: "#EF4444", fontWeight: "600", fontSize: 15 },
   linkRow:  { backgroundColor: "#fff", borderRadius: 10, paddingVertical: 14, paddingHorizontal: 14, marginBottom: 8 },
+  primaryRow:  { backgroundColor: "#2563EB", borderRadius: 10, paddingVertical: 14, paddingHorizontal: 14, marginBottom: 8 },
+  primaryText: { color: "#fff", fontSize: 15, fontWeight: "700" },
   linkText: { color: "#2563EB", fontSize: 15, fontWeight: "500" },
   deleteBtn:  { marginTop: 14, paddingVertical: 14, alignItems: "center" },
   deleteText: { color: "#B91C1C", fontSize: 14, textDecorationLine: "underline" },

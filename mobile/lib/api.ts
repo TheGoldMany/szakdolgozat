@@ -534,6 +534,62 @@ export function getUnreadCount(): Promise<{ count: number }> {
   return request<{ count: number }>("/api/messages/unread");
 }
 
+// ── Bejelentések (elveszett / talált / kóbor) ──────────
+
+/** A séma ReportType enumja. */
+export type ReportType = "LOST" | "FOUND" | "STRAY";
+
+/**
+ * Új bejelentés (docs/09-reports-map.md, US-09-A).
+ *
+ * A kötelező mezők a szerver zod-sémájából jönnek: `description` legalább 10
+ * karakter, `contactName` legalább 2, a `city`, `contactPhone` és
+ * `contactEmail` nem lehet üres. A képek opcionálisak, legfeljebb 6.
+ */
+export interface ReportInput {
+  type:         ReportType;
+  animalType:   string;
+  description:  string;
+  city:         string;
+  contactName:  string;
+  contactPhone: string;
+  contactEmail: string;
+  name?:        string;
+  breed?:       string;
+  color?:       string;
+  gender?:      "MALE" | "FEMALE" | "UNKNOWN";
+  address?:     string;
+  imageUrls?:   string[];
+  lat?:         number;
+  lng?:         number;
+}
+
+export function createReport(data: ReportInput): Promise<{ id: string }> {
+  return request<{ id: string }>("/api/reports", {
+    method: "POST",
+    body:   JSON.stringify(data),
+  });
+}
+
+// ── Napi állat ─────────────────────────────────────────
+
+/**
+ * Napi kép feltöltése.
+ *
+ * A kép 24 óra után kiesik a folyamból, de a szerző a profilján naptárban
+ * visszanézheti — ezért a feltöltés nem visszavonhatatlan döntés.
+ */
+export function createDailyPost(data: {
+  imageUrl: string;
+  caption?: string | null;
+  animalId?: string | null;
+}): Promise<{ id: string }> {
+  return request<{ id: string }>("/api/daily-posts", {
+    method: "POST",
+    body:   JSON.stringify(data),
+  });
+}
+
 // ── Profile ────────────────────────────────────────────
 export interface Profile {
   id: string;
