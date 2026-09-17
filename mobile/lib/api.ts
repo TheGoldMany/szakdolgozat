@@ -329,6 +329,18 @@ export function getMyApplications(): Promise<MyApplication[]> {
   return request<MyApplication[]>("/api/applications/my");
 }
 
+/**
+ * Kérelem visszavonása (US-03-F).
+ *
+ * A szerver CSAK `PENDING` állapotban engedi, és 409-cel utasít el minden
+ * mást — ezt nem duplikáljuk itt kliensoldali ellenőrzéssel, mert a státusz
+ * közben megváltozhat (a menhely épp elbírálás alá vehette). A felület a
+ * gombot elrejti, ami elég; a döntést a szerver hozza.
+ */
+export function withdrawApplication(id: string): Promise<unknown> {
+  return request(`/api/applications/${id}`, { method: "PATCH" });
+}
+
 // ── Örökbefogadási kérvény (dinamikus űrlap) ───────────
 
 /**
