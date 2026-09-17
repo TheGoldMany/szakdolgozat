@@ -131,6 +131,102 @@ async function request<T>(
   }
 }
 
+// ── Lekérdezés és lapozás ──────────────────────────────
+
+export type QueryParams = Record<string, string | number | boolean | undefined | null>;
+
+/**
+ * Paraméterek URL-re fűzése, az üres értékeket kihagyva.
+ *
+ * A jelenlegi végpontok elnézik az üres értéket (`?type=` ugyanazt adja, mint
+ * a szűrő nélküli kérés), de ez a megvalósítás véletlene, nem ígéret: a route
+ * `...(type && { type })`-ot ír, és az üres sztring történetesen hamis. Egy
+ * szigorúbban validáló végpont ugyanerre 400-at adna.
+ *
+ * Ezért a kihagyást ITT végezzük el, és nem támaszkodunk a szerver
+ * elnézésére — a cím is olvashatóbb marad a naplókban.
+ */
+export function withQuery(path: string, params: QueryParams = {}): string {
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null || value === "") continue;
+    qs.set(key, String(value));
+  }
+  const s = qs.toString();
+  return s ? `${path}?${s}` : path;
+}
+
+/** A webes lapozott végpontok metaadata. */
+export interface PageInfo {
+  total:      number;
+  page:       number;
+  limit:      number;
+  totalPages: number;
+}
+
+/** Egy adag elem és a lapozás állapota, végponttól függetlenül azonos alakban. */
+export interface Page<T> {
+  items: T[];
+  info:  PageInfo;
+}
+
+/**
+ * Oldalszámos lista lekérése.
+ *
+ * A webes végpontok a tömböt SAJÁT néven adják vissza (`animals`, `users`, …),
+ * a lapozást pedig `pagination` alatt. Ha ezt minden hívó maga bontaná ki, a
+ * listakezelő kód sem lehetne közös — ezért itt egyszer normalizáljuk.
+ *
+ * A hiányzó `pagination` nem hiba: több végpont sima tömböt ad. Ilyenkor egy
+ * egyoldalas leírást gyártunk, hogy a hívónak ne kelljen két esetet kezelnie.
+ */
+export async function getPage<T>(
+  path: string, key: string, params: QueryParams = {},
+): Promise<Page<T>> {
+  const raw = await request<Record<string, unknown>>(withQuery(path, params));
+
+  const items = Array.isArray(raw[key]) ? (raw[key] as T[]) : [];
+  const info  = (raw.pagination as PageInfo | undefined) ?? {
+    total: items.length, page: 1, limit: items.length, totalPages: 1,
+  };
+  return { items, info };
+}
+
+/**
+ * Sima tömböt adó végpont beburkolása egyoldalas lapba.
+ *
+ * Így a lista-komponensek egyetlen alakot ismernek, akkor is, ha a végpont nem
+ * lapoz (menhelyek, értesítések, beszélgetések).
+ */
+export async function getAllAsPage<T>(path: string, params: QueryParams = {}): Promise<Page<T>> {
+  const items = await request<T[]>(withQuery(path, params));
+  const list  = Array.isArray(items) ? items : [];
+  return { items: list, info: { total: list.length, page: 1, limit: list.length, totalPages: 1 } };
+}
+
+/** Kurzoros lapozás – a hírfolyam-jellegű végpontok ezt az alakot adják. */
+export interface CursorPage<T> {
+  items:      T[];
+  nextCursor: string | null;
+}
+
+/**
+ * Kurzoros lista lekérése.
+ *
+ * Miért kell a kettő egymás mellett? Mert a webes API mindkettőt használja:
+ * az állatlista oldalszámos, a hírfolyam kurzoros. Nem a mobil dolga eldönteni,
+ * melyik a jobb — a meglévő végpontokhoz kell illeszkedni.
+ */
+export async function getCursorPage<T>(
+  path: string, key: string, params: QueryParams = {},
+): Promise<CursorPage<T>> {
+  const raw = await request<Record<string, unknown>>(withQuery(path, params));
+  return {
+    items:      Array.isArray(raw[key]) ? (raw[key] as T[]) : [],
+    nextCursor: (raw.nextCursor as string | null | undefined) ?? null,
+  };
+}
+
 // ── Animals ────────────────────────────────────────────
 export interface AnimalImage { url: string; isPrimary: boolean }
 export interface AnimalShelter { id: string; name: string; city: string }
@@ -150,28 +246,24 @@ export interface Animal {
   createdAt: string;
 }
 
-export interface AnimalListResponse {
-  animals: Animal[];
-  pagination: { total: number; page: number; limit: number; totalPages: number };
-}
-
-export function getAnimals(params: {
-  page?: number;
-  type?: string;
-  status?: string;
-  size?: string;
-  gender?: string;
-  q?: string;
+/**
+ * `type` és nem `interface`: a TypeScript csak a type aliasoknak ad implicit
+ * index-szignatúrát, tehát csak így adható át a `QueryParams`-ot váró
+ * `getPage`-nek anélkül, hogy castolni kellene.
+ */
+export type AnimalFilters = {
+  page?:      number;
+  type?:      string;
+  status?:    string;
+  size?:      string;
+  gender?:    string;
+  q?:         string;
   shelterId?: string;
-} = {}): Promise<AnimalListResponse> {
-  const qs = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries(params)
-        .filter(([, v]) => v !== undefined && v !== "")
-        .map(([k, v]) => [k, String(v)])
-    )
-  ).toString();
-  return request<AnimalListResponse>(`/api/animals${qs ? `?${qs}` : ""}`);
+};
+
+/** Állatlista – a közös `Page` alakban, hogy a listakezelő kód újrahasznosítható legyen. */
+export function getAnimals(filters: AnimalFilters = {}): Promise<Page<Animal>> {
+  return getPage<Animal>("/api/animals", "animals", filters);
 }
 
 export interface AnimalDetail extends Animal {

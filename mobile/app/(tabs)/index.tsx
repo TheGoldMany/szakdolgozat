@@ -26,8 +26,8 @@ export default function AnimalsScreen() {
   const load = useCallback(async (nextPage = 1, append = false) => {
     try {
       const res = await getAnimals({ page: nextPage, type: type || undefined, q: search || undefined });
-      setAnimals(prev => append ? [...prev, ...res.animals] : res.animals);
-      setTotalPages(res.pagination.totalPages);
+      setAnimals(prev => append ? [...prev, ...res.items] : res.items);
+      setTotalPages(res.info.totalPages);
       setPage(nextPage);
     } finally {
       setLoading(false);

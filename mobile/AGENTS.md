@@ -89,6 +89,43 @@ Az állat három egészségügyi jelzője át van nevezve: az adatbázisban
 `isVaccinated` / `isNeutered` / `isMicrochipped`, az app viszont `vaccinated` /
 `neutered` / `chipped` néven kéri. A leképezés a `publicAnimal()`-ben van.
 
+## Alapkészlet — ezeket ne írd meg újra
+
+Képernyőt írni ezekből kell, nem nulláról:
+
+**Adatlekérés** (`lib/use-api.ts`) — nincs benne külön könyvtár, mert a webes
+oldal sem használ ilyet (nincs SWR, React Query): 86 kliens-komponens sima
+`fetch` + `useState`/`useEffect` mintával dolgozik. Egy könyvtár behozása
+kettéosztaná a projektet.
+
+- `useApi(fetcher, deps)` → `{ data, error, loading, reload }`
+- `usePagedList(fetchPage, deps)` → `{ items, error, loading, refreshing,
+  loadingMore, hasMore, refresh, loadMore }`
+
+Mindkettő eldobja az elavult válaszokat (gyors szűrőváltásnál a régi kérés
+megelőzheti az újat), és lecsatolás után nem állít állapotot.
+
+**Lista-lekérés** (`lib/api.ts`) — a webes végpontok a tömböt saját néven adják
+(`animals`, `users`, …), a lapozást `pagination` alatt. A `getPage(path, key)`
+ezt normalizálja `{ items, info }` alakra, a `getAllAsPage(path)` pedig a sima
+tömböt adó végpontokat burkolja egyoldalas lappá — így a listakezelő kód
+mindenhol ugyanaz. Kurzoros végponthoz `getCursorPage`.
+
+Paramétert `withQuery`-vel fűzz, ne kézzel: az üres értékeket kihagyja.
+
+**Komponensek** (`components/ui/`) — `Button`, `Field`, `DataList`, és a
+`ScreenState`-ből `Loading` / `EmptyState` / `ErrorState` / `ListState`.
+Színt és térközt a `theme.ts`-ből vegyél, ne írj hexakódot a képernyőbe.
+
+A `DataList` az egész `usePagedList`-állapotot egy propban kapja meg,
+szándékosan: így nem lehet a felét elfelejteni bekötni — és épp a hibaág az,
+ami eddig kimaradt.
+
+**A hibaág kötelező.** Az „üres lista" és a „nem sikerült betölteni" nem
+ugyanaz. A `ListState` a hibát az üresség ELŐTT vizsgálja, mert fordítva egy
+elhasalt lekérés „nincs találat"-ként jelenne meg, és a felhasználó a szűrőjét
+kezdené igazgatni.
+
 ## Belépési pont
 
 A `package.json` `main` értéke `expo-router/entry`, tehát a navigáció az `app/`
