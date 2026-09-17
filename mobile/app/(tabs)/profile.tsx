@@ -120,8 +120,13 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Gyorslinkek – a tabsáv négy helye tele van, ezek innen érhetők el. */}
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/favorites")}>
+        <Text style={styles.linkText}>Kedvenceim</Text>
+      </TouchableOpacity>
+
       {/* Kérelmek */}
-      <Text style={styles.sectionTitle}>Kérelmeim</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Kérelmeim</Text>
       {loading ? (
         <ActivityIndicator color="#2563EB" style={{ marginTop: 20 }} />
       ) : apps.length === 0 ? (

@@ -345,6 +345,31 @@ export function removeFavorite(animalId: string): Promise<unknown> {
   return request(`/api/favorites/${animalId}`, { method: "DELETE" });
 }
 
+/**
+ * A kedvenc állatok teljes adata.
+ *
+ * A `/api/favorites` SZÁNDÉKOSAN csak azonosítókat ad vissza (a webes kedvencek
+ * oldal szerver-komponens, és közvetlenül az adatbázisból kérdez), tehát az
+ * állatokat darabonként kell lekérni. Ez N+1 kérés — kedvenclistánál ez néhány
+ * elem, tehát elfogadható, de nem skálázódik százas nagyságrendre.
+ *
+ * Ha ez egyszer szűk lesz, a helyes megoldás nem itt van: a `/api/animals`
+ * végpontnak kellene egy `?ids=` szűrő. Most azért nem így csináljuk, mert új
+ * végpont írása nélkül kell megoldani.
+ *
+ * A hibás azonosítókat kihagyjuk a `Promise.allSettled`-del: egy törölt állat
+ * miatt ne boruljon az egész lista.
+ */
+export async function getFavoriteAnimals(): Promise<Animal[]> {
+  const { animalIds } = await getFavoriteIds();
+  if (animalIds.length === 0) return [];
+
+  const results = await Promise.allSettled(animalIds.map((id) => getAnimal(id)));
+  return results
+    .filter((r): r is PromiseFulfilledResult<AnimalDetail> => r.status === "fulfilled")
+    .map((r) => r.value);
+}
+
 // ── Notifications ──────────────────────────────────────
 export interface Notification {
   id: string;
