@@ -472,8 +472,12 @@ export function markAllNotificationsRead(): Promise<unknown> {
 export interface Conversation {
   id: string;
   updatedAt: string;
-  animal:  { id: string; name: string; slug: string; images: AnimalImage[] } | null;
-  shelter: { id: string; name: string } | null;
+  animal:  { name: string; slug: string; images: AnimalImage[] } | null;
+  shelter: { name: string; slug: string } | null;
+  /** A legutóbbi üzenet – a végpont `take: 1`-gyel adja, időrendben csökkenőn. */
+  messages: Message[];
+  /** Olvasatlanok száma; a szerver egyetlen aggregált lekérdezéssel számolja. */
+  unreadCount: number;
 }
 
 export interface Message {
@@ -483,11 +487,36 @@ export interface Message {
   attachmentName: string | null;
   createdAt: string;
   readAt: string | null;
+  /** "TEXT" vagy meghívó-üzenet. A séma alapértelmezése "TEXT". */
+  type: string;
+  /**
+   * Kérvény-meghívó azonosítója, ha ez egy meghívó-üzenet.
+   *
+   * A /api/conversations/[id]/invite egy Message sort hoz létre ezzel a
+   * mezővel, a messages végpont pedig `include`-dal kérdez — tehát a token
+   * benne van a válaszban. Ez a mobil EGYETLEN útja a kérvény-kitöltőhöz: a
+   * /api/applications/my szándékosan nem adja vissza a tokent.
+   */
+  inviteToken: string | null;
   sender: { id: string; name: string | null; role: string };
 }
 
 export function getConversations(): Promise<Conversation[]> {
   return request<Conversation[]>("/api/conversations");
+}
+
+/**
+ * Beszélgetés indítása egy állathoz.
+ *
+ * A szerver ugyanahhoz az állat–felhasználó párhoz nem nyit másodikat
+ * (`animalId_userId` egyedi kulcs), tehát ez biztonsággal hívható akkor is,
+ * ha már van beszélgetés — a meglévőt adja vissza.
+ */
+export function startConversation(animalId: string): Promise<Conversation> {
+  return request<Conversation>("/api/conversations", {
+    method: "POST",
+    body:   JSON.stringify({ animalId }),
+  });
 }
 
 export function getMessages(conversationId: string): Promise<Message[]> {

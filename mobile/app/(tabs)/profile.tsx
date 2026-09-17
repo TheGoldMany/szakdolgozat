@@ -124,6 +124,12 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/favorites")}>
         <Text style={styles.linkText}>Kedvenceim</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/messages")}>
+        <Text style={styles.linkText}>Üzenetek</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/applications")}>
+        <Text style={styles.linkText}>Kérelmeim</Text>
+      </TouchableOpacity>
 
       {/* Kérelmek */}
       <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Kérelmeim</Text>

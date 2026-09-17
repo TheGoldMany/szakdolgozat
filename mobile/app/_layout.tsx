@@ -13,6 +13,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="favorites/index" options={{ headerShown: true, title: "Kedvenceim" }} />
+        <Stack.Screen name="messages/index" options={{ headerShown: true, title: "Üzenetek" }} />
+        <Stack.Screen name="messages/[id]" options={{ headerShown: true, title: "Beszélgetés" }} />
         <Stack.Screen name="applications/index" options={{ headerShown: true, title: "Kérelmeim" }} />
         <Stack.Screen name="apply/[token]" options={{ headerShown: true, title: "Örökbefogadási kérvény" }} />
         <Stack.Screen name="animals/[id]" options={{ headerShown: true, title: "" }} />
