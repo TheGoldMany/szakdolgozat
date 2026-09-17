@@ -13,6 +13,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="favorites/index" options={{ headerShown: true, title: "Kedvenceim" }} />
+        <Stack.Screen name="notifications/index" options={{ headerShown: true, title: "Értesítések" }} />
         <Stack.Screen name="reports/new" options={{ headerShown: true, title: "Új bejelentés" }} />
         <Stack.Screen name="daily/new" options={{ headerShown: true, title: "Napi kép" }} />
         <Stack.Screen name="appointments/index" options={{ headerShown: true, title: "Időpontjaim" }} />

@@ -456,8 +456,27 @@ export interface Notification {
   createdAt: string;
 }
 
-export function getNotifications(): Promise<Notification[]> {
-  return request<Notification[]>("/api/notifications");
+export interface NotificationList {
+  notifications: Notification[];
+  /** Az ÖSSZES olvasatlan száma, nem csak a most lekérteké. */
+  unreadCount:   number;
+}
+
+/**
+ * Értesítések.
+ *
+ * A végpont `{ notifications, unreadCount }` OBJEKTUMOT ad, nem tömböt — ez a
+ * típus korábban tömbként volt megadva, tehát egy `.map()` futásidőben
+ * elhasalt volna. (Képernyő még nem használta, ezért nem derült ki.)
+ *
+ * A sorrendet a szerver adja: előbb az olvasatlanok, azon belül a legújabb —
+ * ezért itt nem rendezünk újra.
+ */
+export function getNotifications(params: {
+  filter?: "unread";
+  limit?:  number;
+} = {}): Promise<NotificationList> {
+  return request<NotificationList>(withQuery("/api/notifications", params));
 }
 
 export function markNotificationRead(id: string): Promise<unknown> {
