@@ -567,6 +567,14 @@ export function getMyAppointments(): Promise<Appointment[]> {
   return request<Appointment[]>("/api/appointments");
 }
 
+/**
+ * Időpontkérés (docs/05-appointments.md, US-05-A).
+ *
+ * A `proposedAt` ISO-8601 időbélyeg — a szerver `z.string().datetime()`-mal
+ * validálja, tehát a `Date.toISOString()` alakja kell, nem helyi formátum.
+ * A menhely az `animalId`-t is ellenőrzi: ha az állat nem ehhez a menhelyhez
+ * tartozik, 400-at ad.
+ */
 export function requestAppointment(data: {
   shelterId: string;
   animalId?: string;
@@ -576,6 +584,19 @@ export function requestAppointment(data: {
   return request<Appointment>("/api/appointments", {
     method: "POST",
     body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Saját időpont lemondása (US-05-E).
+ *
+ * A végpont művelet-alapú (`action`), nem státuszt fogad: a szerver dönti el,
+ * mi következik az adott állapotból. A jogosultságot is ő ellenőrzi.
+ */
+export function cancelAppointment(id: string): Promise<unknown> {
+  return request(`/api/appointments/${id}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ action: "CANCEL" }),
   });
 }
 

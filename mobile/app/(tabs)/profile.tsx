@@ -130,6 +130,9 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/applications")}>
         <Text style={styles.linkText}>Kérelmeim</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/appointments")}>
+        <Text style={styles.linkText}>Időpontjaim</Text>
+      </TouchableOpacity>
 
       {/* Kérelmek */}
       <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Kérelmeim</Text>
