@@ -24,6 +24,7 @@ const EXACT: Record<string, string> = {
   "/applications": "/applications",
   "/appointments": "/appointments",
   "/favorites":    "/favorites",
+  "/events":       "/events",
 };
 
 /**
@@ -36,6 +37,9 @@ const EXACT: Record<string, string> = {
 const PREFIXES: { web: string; mobile: (rest: string) => string }[] = [
   { web: "/messages/", mobile: (rest) => `/messages/${rest}` },
   { web: "/animals/",  mobile: (rest) => `/animals/${rest}` },
+  // Az esemény-értesítések slugot tartalmaznak; a mobil végpont slugot és
+  // azonosítót is elfogad, ezért a slug változtatás nélkül átmehet.
+  { web: "/events/",   mobile: (rest) => `/events/${rest}` },
 ];
 
 export type LinkTarget =

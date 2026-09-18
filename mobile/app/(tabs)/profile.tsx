@@ -129,6 +129,9 @@ export default function ProfileScreen() {
         <Text style={styles.primaryText}>Napi kép feltöltése</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/events")}>
+        <Text style={styles.linkText}>Események</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/map")}>
         <Text style={styles.linkText}>Térkép</Text>
       </TouchableOpacity>

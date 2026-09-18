@@ -354,6 +354,66 @@ export function getMapData(params: { type?: string; status?: string } = {}): Pro
   return request<MapData>(withQuery("/api/map", params));
 }
 
+// ── Események ──────────────────────────────────────────
+
+export interface EventRegistration {
+  eventId: string;
+  /** "REGISTERED" | "CANCELLED" */
+  status:  string;
+  /** Kísérők száma a jelentkezőn felül. */
+  guests:  number;
+}
+
+export interface EventItem {
+  id: string; slug: string; title: string; description: string;
+  type: string; location: string;
+  startsAt: string; endsAt: string | null;
+  capacity: number | null;
+  imageUrl: string | null;
+  status: string;
+  shelter: { id: string; name: string; city: string; slug: string };
+  /** Az AKTÍV jelentkezők SZÁMA (fejek) – a lemondott már nem számít. */
+  _count: { registrations: number };
+  /**
+   * A ténylegesen elfoglalt helyek: jelentkezők + kísérőik.
+   *
+   * Ez NEM ugyanaz, mint a `_count.registrations`: a kapacitást a jelentkező
+   * és a kísérői EGYÜTT töltik ki, a szerver is így ellenőrzi. A fejek számát
+   * a „hányan jönnek" kiírásához, ezt a szabad helyek számításához használd.
+   */
+  takenSpots: number;
+  /** A saját jelentkezésem, ha van. Kijelentkezve mindig `null`. */
+  registration: EventRegistration | null;
+}
+
+/** Közzétett, közelgő események. Bejelentkezés nélkül is működik. */
+export function getEvents(): Promise<{ events: EventItem[] }> {
+  return request<{ events: EventItem[] }>("/api/events/public");
+}
+
+/** Egy esemény azonosító vagy slug alapján. */
+export function getEvent(idOrSlug: string): Promise<{ event: EventItem }> {
+  return request<{ event: EventItem }>(`/api/events/public/${idOrSlug}`);
+}
+
+/**
+ * Jelentkezés egy eseményre.
+ *
+ * A végpont AZONOSÍTÓT vár az útvonalban, nem slugot — ezért kell a
+ * részletezőnek az `event.id`, nem elég, amivel megnyitották.
+ */
+export function registerForEvent(eventId: string, data: { guests?: number; note?: string } = {}): Promise<unknown> {
+  return request(`/api/events/${eventId}/register`, {
+    method: "POST",
+    body:   JSON.stringify(data),
+  });
+}
+
+/** A saját jelentkezés lemondása. */
+export function cancelEventRegistration(eventId: string): Promise<unknown> {
+  return request(`/api/events/${eventId}/register`, { method: "DELETE" });
+}
+
 // ── Applications ───────────────────────────────────────
 export interface ApplicationInput {
   animalId: string;
