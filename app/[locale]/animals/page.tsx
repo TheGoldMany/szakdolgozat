@@ -115,13 +115,13 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="w-full shrink-0 lg:w-64">
+          <aside className="w-full shrink-0 lg:w-64" data-tour="animal-filters">
             <Suspense>
               <AnimalsFilters cities={cities} />
             </Suspense>
           </aside>
 
-          <main className="flex-1">
+          <main className="flex-1" data-tour="animal-list">
             {animals.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
                 <PawPrint className="h-12 w-12 text-gray-300" />

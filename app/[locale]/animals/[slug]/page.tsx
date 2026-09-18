@@ -336,7 +336,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 )}
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2" data-tour="animal-health">
                 {animal.isVaccinated && (
                   <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                     <Syringe className="h-3 w-3" /> {t("vaccinated")}
@@ -409,7 +409,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
         {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
-            <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="adopt">
               <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
               <AdoptionBlock />
             </div>
@@ -444,13 +444,13 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="adopt">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
             <AdoptionBlock />
           </div>
         )}
 
-        <div className="mt-8">
+        <div className="mt-8" data-tour="animal-timeline">
           <HealthTimeline animalId={animal.id} />
         </div>
 

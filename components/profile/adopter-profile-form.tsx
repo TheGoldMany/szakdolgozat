@@ -69,7 +69,7 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="adopter-profile">
       <div className="mb-1 flex items-center gap-2">
         <UserRound className="h-4 w-4 text-gray-500" />
         <h2 className="text-sm font-semibold text-gray-700">{t("adopterTitle")}</h2>

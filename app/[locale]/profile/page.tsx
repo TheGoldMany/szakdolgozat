@@ -195,7 +195,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Personal data */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="profile-data">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("personalData")}</h2>
             <ProfileForm user={user} />
           </div>

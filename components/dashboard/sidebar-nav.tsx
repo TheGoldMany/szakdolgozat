@@ -11,6 +11,7 @@ import {
   Menu, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { startTour } from "@/components/onboarding/tour";
 import { useTranslations } from "next-intl";
 
 type IconType = typeof LayoutDashboard;
@@ -161,7 +162,7 @@ export function SidebarNav({ role }: { role: string }) {
       <div className="mt-4 border-t border-gray-100 pt-3">
         <button
           type="button"
-          onClick={() => window.dispatchEvent(new Event("start-dashboard-tour"))}
+          onClick={() => startTour("dashboard")}
           className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-brand-50 hover:text-brand-600"
         >
           <Sparkles className="h-4 w-4 shrink-0 text-gray-400" />

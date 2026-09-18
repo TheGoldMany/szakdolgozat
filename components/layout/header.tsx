@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Menu, X, MessageCircle, Globe, ChevronDown } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { cn } from "@/lib/utils";
+import { TourButton } from "@/components/onboarding/tour-button";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -179,6 +180,9 @@ export function Header() {
             <Link
               key={l.href}
               href={l.href}
+              // A bemutató horgonya. Az útvonalból származik, hogy új menüpont
+              // felvételekor ne lehessen elfelejteni: `/animals` → `nav-animals`.
+              data-tour={`nav-${l.href.replace("/", "")}`}
               aria-current={isActive(l.href) ? "page" : undefined}
               className={cn(
                 "nav-link text-sm font-medium transition-colors hover:text-brand-500",
@@ -226,6 +230,9 @@ export function Header() {
 
         {/* Desktop right side */}
         <div className="hidden items-center gap-2 md:flex">
+
+          {/* Bemutató – csak azokon az oldalakon látszik, ahol van mit mutatni */}
+          <TourButton />
 
           {/* Language switcher */}
           <div className="relative">
@@ -345,6 +352,9 @@ export function Header() {
 
         {/* Mobile right side: messages + notifications + hamburger */}
         <div className="flex items-center gap-1 md:hidden">
+          {/* Telefonon is legyen elérhető a bemutató – itt van a legkevesebb
+              hely, ezért csak ikon, felirat nélkül. */}
+          <TourButton className="p-2" />
           {session && (
             <Link
               href="/messages"
