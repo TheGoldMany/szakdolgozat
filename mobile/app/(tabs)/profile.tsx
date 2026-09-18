@@ -109,8 +109,9 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Felhasználó fejléc */}
-      <View style={styles.header}>
+      {/* Felhasználó fejléc – koppintásra a szerkesztés nyílik, mert ez az a
+          hely, ahol a felhasználó a saját adatait keresi. */}
+      <TouchableOpacity style={styles.header} onPress={() => router.push("/profile/edit")}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{user.name[0]?.toUpperCase()}</Text>
         </View>
@@ -118,7 +119,8 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.userEmail}>{user.email}</Text>
         </View>
-      </View>
+        <Text style={styles.headerEdit}>Szerkesztés ›</Text>
+      </TouchableOpacity>
 
       {/* Gyorslinkek – a tabsáv négy helye tele van, ezek innen érhetők el. */}
       {/* A két fotózós belépési pont elöl: ezért éri meg telefonon használni. */}
@@ -244,6 +246,7 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 22, fontWeight: "700", color: "#2563EB" },
   userName:   { fontSize: 17, fontWeight: "700", color: "#111827" },
   userEmail:  { fontSize: 13, color: "#6B7280" },
+  headerEdit: { marginLeft: "auto", fontSize: 13, color: "#2563EB", fontWeight: "600" },
   sectionTitle: { fontSize: 13, fontWeight: "700", color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 10 },
   empty:    { color: "#9CA3AF", fontSize: 14, textAlign: "center", marginTop: 20 },
   appCard:  { flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderRadius: 10, padding: 10, marginBottom: 10, gap: 10 },

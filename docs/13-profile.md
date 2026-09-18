@@ -5,6 +5,32 @@
 Ez a modul fedi le a felhasználói profiloldalt és a hozzá tartozó beállításokat. A `/hu/profile` oldal bejelentkezett felhasználóknak érhető el, és megjeleníti a fiókadatokat (e-mail, szerepkör, regisztráció dátuma, kérelmek száma), a személyes adatok szerkesztő űrlapját (`ProfileForm` – név, telefon, város, cím), az avatar feltöltést (`AvatarUpload`, Vercel Blob tárolóval), a jelszóváltó űrlapot (`ChangePasswordForm` – csak jelszavas fiókoknál), az e-mail értesítési beállításokat, a fióktörlést, a GDPR-adatexportot, valamint a felhasználó saját aktivitását: előfizetések (`SubscriptionsList`), virtuális örökbefogadások (`SponsorshipsList`) és az örökbefogadási előzmények listáját. A profilon a felhasználó a saját Stripe fiókját is kezelheti a „Stripe fiók" szekcióban (csatlakoztatás, regisztráció befejezése, vezérlőpult megnyitása), így az általa indított kampányokhoz adományokat fogadhat. A nyelvváltás a fejléc Globe ikonos nyelvi váltójával történik (hu/en/de/pl), a `next-intl` útválasztással.
 
 
+### Mobilalkalmazás — profil szerkesztése
+
+Az appban szerkeszthető: profilkép, alapadatok (név, telefon, város, cím), az
+**örökbefogadói bemutatkozás** (bemutatkozás, lakhatás típusa, kert, gyermek,
+háziállat, korábbi tapasztalat) és a jelszó.
+
+**Három, egymástól független mentés van**, nem egy közös „Mentés" gomb: az
+adatok (`PATCH /api/profile`), a profilkép (`PATCH /api/profile/avatar`) és a
+jelszó (`POST /api/auth/change-password`) külön végpontokon, külön hibákkal
+mennek. Egy közös gomb elrejtené, melyik ment el és melyik nem.
+
+Két szerveroldali változás kellett hozzá:
+
+- **A `GET /api/profile` kiegészült** a profilképpel, az örökbefogadói
+  bemutatkozás mezőivel, és egy `hasPassword` jelzővel. A GET és a PATCH
+  mostantól **ugyanazt az alakot** adja — korábban a PATCH szűkebb volt, és a
+  mobil űrlap egy sikeres mentés után üres bemutatkozást kapott volna vissza.
+  A jelszó-hash sosem hagyja el a szervert, csak az, hogy **van-e** jelszó
+  (social login-nal készült fióknak nincs, ott a jelszóűrlap sem jelenik meg).
+- **A `POST /api/auth/change-password`** eddig csak böngésző-munkamenetet
+  fogadott el (`getServerSession`), tehát az appból a jelszóváltás lehetetlen
+  volt. Most `requireAuthUser` — a webes viselkedés változatlan.
+
+Az üres mező **törlést** jelent, nem „nem változott": a végpont elfogadja a
+`null`-t, és a séma is nullázhatónak írja ezeket a mezőket.
+
 ### Mobilalkalmazás — ismerősök
 
 Az app külön képernyőn kezeli a kapcsolatokat (Profil → Ismerősök): keresés

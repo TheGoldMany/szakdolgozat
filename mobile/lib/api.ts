@@ -937,8 +937,33 @@ export interface Profile extends NotificationPrefs {
   address: string | null;
   city: string | null;
   role: string;
+  image: string | null;
   emailNotifications: boolean;
+
+  // ── Örökbefogadói bemutatkozás ──────────────────────
+  // Az EMBERRE vonatkozik, nem egy konkrét állatra, ezért a profilon él:
+  // egyszer kell megírni, és minden kérelembe automatikusan bekerül.
+  bio: string | null;
+  /** "HOUSE" | "APARTMENT" | "OTHER" */
+  homeType: string | null;
+  hasGarden: boolean | null;
+  hasChildren: boolean | null;
+  hasPets: boolean | null;
+  adoptionExperience: string | null;
+
+  /**
+   * Van-e jelszava a fióknak.
+   *
+   * A szerver SOHA nem adja ki a jelszó-hasht, csak ezt. A social login-nal
+   * készült fióknak nincs jelszava, ott a jelszóváltoztató űrlapnak sincs
+   * értelme.
+   */
+  hasPassword: boolean;
 }
+
+/** A lakhatás típusa – a séma pontosan ezt a három értéket fogadja el. */
+export const HOME_TYPES = ["HOUSE", "APARTMENT", "OTHER"] as const;
+export type HomeType = (typeof HOME_TYPES)[number];
 
 /**
  * A saját profil.
@@ -954,11 +979,40 @@ export function getProfile(): Promise<{ user: Profile }> {
 export function updateProfile(
   data: Partial<Pick<Profile,
     "name" | "phone" | "address" | "city" | "emailNotifications"
-    | "pushMessages" | "pushCaseUpdates" | "pushCommunity">>,
+    | "pushMessages" | "pushCaseUpdates" | "pushCommunity"
+    | "bio" | "homeType" | "hasGarden" | "hasChildren" | "hasPets"
+    | "adoptionExperience">>,
 ): Promise<{ user: Profile }> {
   return request<{ user: Profile }>("/api/profile", {
     method: "PATCH",
     body: JSON.stringify(data),
+  });
+}
+
+/**
+ * Profilkép mentése.
+ *
+ * Külön végpont, mert a kép a Vercel Blob tárolóba megy (`/api/upload`), és
+ * csak a kész CÍMET kell a profilhoz kötni — a `PATCH /api/profile` nem fogad
+ * el `image` mezőt.
+ */
+export function updateAvatar(image: string): Promise<{ image: string }> {
+  return request<{ image: string }>("/api/profile/avatar", {
+    method: "PATCH",
+    body:   JSON.stringify({ image }),
+  });
+}
+
+/**
+ * Jelszó megváltoztatása.
+ *
+ * A végpont korábban csak böngésző-munkamenetet fogadott el; most `Bearer`
+ * tokennel is működik. Social login-nal készült fióknál 400-at ad.
+ */
+export function changePassword(currentPassword: string, newPassword: string): Promise<unknown> {
+  return request("/api/auth/change-password", {
+    method: "POST",
+    body:   JSON.stringify({ currentPassword, newPassword }),
   });
 }
 

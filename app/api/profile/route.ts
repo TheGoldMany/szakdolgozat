@@ -39,19 +39,44 @@ export async function GET(req: NextRequest) {
   try {
     const user = await prisma.user.findUnique({
       where:  { id: authUser!.id },
-      select: {
-        id: true, name: true, email: true, phone: true, address: true, city: true, role: true,
-        emailNotifications: true,
-        pushMessages: true, pushCaseUpdates: true, pushCommunity: true,
-      },
+      select: PROFILE_SELECT,
     });
     if (!user) return NextResponse.json({ error: "Nem található" }, { status: 404 });
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user: toPublicProfile(user) });
   } catch (error) {
     console.error("[api/profile GET]", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
+}
+
+/**
+ * Amit a profil-végpontok visszaadnak.
+ *
+ * A GET és a PATCH UGYANAZT az alakot adja, szándékosan: a mobil űrlap a PATCH
+ * válaszából frissíti magát, és ha az szűkebb lenne, a bemutatkozás mezői
+ * üresen jönnének vissza egy sikeres mentés után.
+ *
+ * A `password` csak azért van benne, hogy eldönthessük, VAN-e jelszó — a hasht
+ * a válaszból kivesszük (lásd `toPublicProfile`).
+ */
+const PROFILE_SELECT = {
+  id: true, name: true, email: true, phone: true, address: true, city: true, role: true,
+  image: true,
+  emailNotifications: true,
+  pushMessages: true, pushCaseUpdates: true, pushCommunity: true,
+  // Örökbefogadói bemutatkozás: a kérelmek ebből töltődnek, ezért a
+  // szerkesztéshez ismerni kell a jelenlegi értékeket. Enélkül a mobil űrlap
+  // üresen indulna, és a mentés felülírná a korábbi válaszokat.
+  bio: true, homeType: true, hasGarden: true, hasChildren: true,
+  hasPets: true, adoptionExperience: true,
+  password: true,
+} as const;
+
+/** A jelszó-hash SOHA nem hagyhatja el a szervert; csak a léte érdekes. */
+function toPublicProfile<T extends { password: string | null }>(user: T) {
+  const { password, ...safe } = user;
+  return { ...safe, hasPassword: !!password };
 }
 
 export async function PATCH(req: NextRequest) {
@@ -71,14 +96,10 @@ export async function PATCH(req: NextRequest) {
     const user = await prisma.user.update({
       where: { id: authUser!.id },
       data: parsed.data,
-      select: {
-        id: true, name: true, email: true, phone: true, address: true, city: true, role: true,
-        emailNotifications: true,
-        pushMessages: true, pushCaseUpdates: true, pushCommunity: true,
-      },
+      select: PROFILE_SELECT,
     });
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ user: toPublicProfile(user) });
   } catch (error) {
     console.error('[api/profile PATCH]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
