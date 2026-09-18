@@ -29,11 +29,16 @@ OLTP és külön DWH), NextAuth 4 JWT-sessionnel, next-intl lokalizáció, Strip
 fizetésekhez, Tailwind CSS, Vitest + Playwright tesztek. Három szerepkör:
 látogató/örökbefogadó, `SHELTER_ADMIN` (menhelyi admin), `SUPER_ADMIN`.
 
+Van **mobilalkalmazás** is (`mobile/`, Expo SDK 56 + expo-router). Nem külön
+backend: ugyanazokat a webes API-végpontokat hívja, `Bearer` tokennel. A mobil
+saját íratlan szabályai a `mobile/AGENTS.md`-ben vannak — **azt is olvasd el**,
+ha a `mobile/` mappához nyúlsz.
+
 ## Íratlan szabályok, amiket tarts be
 
 **Nyelvek.** A publikus oldalak (`app/[locale]/`) négy nyelven mennek: hu, en,
 de, pl. A `messages/*.json` fájloknak **kulcsra pontosan azonosnak kell
-lenniük** — jelenleg mind a négy 1738 kulcs. Ha új szöveget veszel fel,
+lenniük** — jelenleg mind a négy 1840 kulcs. Ha új szöveget veszel fel,
 mind a négybe vedd fel. A dashboard (`app/dashboard/`) **szándékosan csak
 magyar** — ez nem hiányosság, ne "javítsd meg".
 
@@ -47,6 +52,29 @@ komment azt magyarázza meg, ami a kódból nem derül ki — miért így, mi vo
 rossz alternatíva, mi törik el, ha valaki visszaírja. Ne kommenteld ki azt,
 ami a sorból amúgy is látszik.
 
+**Új API-végponton `requireAuthUser(req)` / `getAuthUser(req)`, ne
+`getServerSession`.** Az utóbbi csak böngésző-munkamenetet fogad el, tehát a
+mobilalkalmazásból elérhetetlen lesz a funkció. Ez már négyszer megtörtént
+(fióktörlés, jelszóváltás, kérelem-elbírálás, események) — mind utólag kellett
+javítani. A `lib/api-auth.ts` előbb a session-t nézi, utána a fejlécet, tehát a
+webes viselkedés nem változik tőle.
+
+**Publikus végponton `lib/public-shapes.ts`, kifejezett `select`-tel.** A
+`Shelter` sor bankszámlaszámot, adószámot és Stripe-fiókazonosítót is tartalmaz;
+egy `include` vagy a teljes sor visszaadása kiszivárogtatná. Kizárás helyett
+felsorolás: ha a sémába új érzékeny mező kerül, az így nem jelenik meg magától.
+
+**Értesítést mindig a `createNotification` / `createNotifications`
+függvényekkel készíts.** 34 hívási hely van, és ez a kettő küldi a push
+értesítést is — közvetlen `prisma.notification.create` hívással a push némán
+elmaradna. Új `NotificationType` felvételekor a `lib/push.ts` kategória-
+leképezése **fordítási hibát** ad, amíg be nem sorolod; ez szándékos.
+
+**Végigvezető bemutatóhoz ne írj új komponenst.** A `lib/tours.ts`-be kerül a
+lépéssorozat, a kiemelendő elemre egy `data-tour` attribútum — a motor és a
+kirakás kész (`components/onboarding/`). Ha egy lépés célpontja hiányzik vagy
+rejtett, a lépés magától kimarad, nem kell rá elágazást írni.
+
 **Pénzt érintő kód mellé teszt jár.** A `tests/` alatt van
 `stripe.test.ts`, `donations.test.ts`, `refunds.test.ts`,
 `subscription-payments.test.ts`. Ha a fizetési logikához nyúlsz, a tesztet is
@@ -57,7 +85,7 @@ bizonyít semmit.
 
 ```bash
 npx tsc --noEmit                      # típusellenőrzés
-npx vitest run                        # 83 unit teszt
+npx vitest run                        # 162 unit teszt
 SKIP_ENV_VALIDATION=1 npx next build  # éles build
 ```
 
@@ -155,7 +183,14 @@ Ezek ismert, még lezáratlan kérdések. Ha a közelükbe kerül a munka, szól
    felületén. Enélkül a visszatérítések, chargebackek és a havi megújítások nem
    könyvelődnek.
 3. **`www` / nem-`www` eltérés** a Stripe webhook-végpont és a
-   `NEXT_PUBLIC_APP_URL` között. A Stripe nem követi az átirányítást.
+   `NEXT_PUBLIC_APP_URL` között. A Stripe nem követi az átirányítást. Ugyanez a
+   kérdés a mobil `EXPO_PUBLIC_API_URL` tartalékértékénél is nyitott — a hármat
+   EGYSZERRE kell majd javítani, ne írd át egyiket találgatásból.
+4. **A mobilkiadáshoz hiányzó kulcsok.** iOS push: APNs-kulcs (Apple-tagsághoz
+   kötött, addig a push iOS-en csendben ki van kapcsolva). Android push: FCM V1
+   szolgáltatásfiók-kulcs. Android térkép: Google Maps API-kulcs — enélkül a
+   térkép szürke marad, de a build lefut, tehát csak eszközön derül ki.
+   Részletek: `docs/20-mobil-kiadas.md`.
 
 ---
 

@@ -38,7 +38,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: '[data-tour="nav-animals"]',
         title: "Állatok",
-        body:  "Az összes örökbefogadható állat, szűrhetően faj, méret, kor és tulajdonságok szerint.",
+        body:  "Az összes örökbefogadható állat, szűrhetően faj, méret, nem, település és tulajdonságok szerint — például oltott-e, vagy kijön-e gyerekkel.",
       },
       {
         selector: '[data-tour="nav-map"]',
@@ -53,7 +53,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Ennyi az egész",
-        body:  "A részletes leírásokat a lap alján lévő Súgóban találod, szerepkörök szerint. A bemutatót bármelyik oldalon újraindíthatod a Súgó gombbal.",
+        body:  "A részletes leírásokat a lap alján lévő Súgóban találod, szerepkörök szerint. Ezt a bemutatót pedig bármikor újranézheted a fejléc kérdőjel gombjával.",
       },
     ],
   },
@@ -122,7 +122,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: '[data-tour="shelter-reviews"]',
         title: "Értékelések",
-        body:  "Csak az értékelhet, akinek volt már ügye a menhellyel. Ezért itt valódi tapasztalatokat olvasol, nem véletlen látogatók véleményét.",
+        body:  "Bejelentkezve te is értékelheted a menhelyet, egy–öt csillaggal és pár mondattal. Menhelyenként egy értékelésed lehet; ha meggondolnád magad, töröld és írj újat.",
       },
     ],
   },
@@ -181,7 +181,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: '[data-tour="report-new"]',
         title: "Új bejelentés",
-        body:  "A bejelentéshez fotó és helyszín kell. A KÓBOR bejelentésről a környékbeli menhelyek automatikusan értesítést kapnak, tehát nem kell külön telefonálnod.",
+        body:  "Kötelező a leírás, a település és az elérhetőséged; fotót feltölteni érdemes, de nem kötelező. A KÓBOR bejelentésről a környékbeli menhelyek automatikusan értesítést kapnak, tehát nem kell külön telefonálnod.",
       },
       {
         selector: null,
@@ -222,7 +222,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Mire megy a pénz",
-        body:  "Minden gyűjtésnél látod a célt és az eddig összegyűlt összeget. Az adományaidat és előfizetéseidet a profilodon bármikor megnézheted és lemondhatod.",
+        body:  "Minden gyűjtésnél látod a célt és az eddig összegyűlt összeget. A profilodon visszanézheted a támogatásaidat, és ott mondhatod le a havi előfizetést is.",
       },
     ],
   },
@@ -270,8 +270,8 @@ export const TOURS: Record<string, Tour> = {
     steps: [
       {
         selector: null,
-        title: "Beszélgetések menhelyenként",
-        body:  "Minden menhellyel egy beszélgetésed van, akkor is, ha több állatukról kérdezel. A legutóbbi üzenet szerint sorrendben.",
+        title: "Beszélgetés állatonként",
+        body:  "Minden állathoz külön beszélgetés tartozik, még ha ugyanazzal a menhellyel is leveleztek. Így nem keverednek össze, ha többük iránt érdeklődsz.",
       },
       {
         selector: null,
@@ -299,7 +299,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "A többi adatod",
-        body:  "Lejjebb a támogatásaid, virtuális örökbefogadásaid és az örökbefogadási előzményed. A jelszóváltás, az adatletöltés és a fióktörlés a Beállítások oldalon van.",
+        body:  "Lejjebb a támogatásaid, virtuális örökbefogadásaid és az örökbefogadási előzményed. A jelszóváltás, az adataid letöltése és a fióktörlés is itt van, a lap alján — és ugyanezek a Beállítások oldalon is.",
       },
     ],
   },
@@ -361,7 +361,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Mi ez pontosan",
-        body:  "Az ideiglenes befogadó átmenetileg otthont ad egy állatnak, amíg gazdára talál. A költségeket jellemzően a menhely állja — a részleteket velük egyeztesd.",
+        body:  "Az ideiglenes befogadó átmenetileg otthont ad egy állatnak, amíg gazdára talál. Hogy a menhely mit biztosít hozzá (eledel, állatorvos), azt velük kell egyeztetni — menhelyenként eltér.",
       },
       {
         selector: null,
@@ -415,7 +415,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Napi kép",
-        body:  "Napi egy kép az állataidról vagy a menhely lakóiról. A képfolyam 24 órás: ami ennél régebbi, kikerül belőle — de a naptárban visszanézhető.",
+        body:  "Képek az állataidról vagy a menhely lakóiról. A képfolyam 24 órás: ami ennél régebbi, kikerül belőle — de a naptárban bármikor visszanézhető.",
       },
       {
         selector: null,
