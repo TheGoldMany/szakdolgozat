@@ -41,6 +41,12 @@
         }
       ],
       [
+        "expo-maps",
+        {
+          "requestLocationPermission": false
+        }
+      ],
+      [
         "expo-notifications",
         {
           "color": "#E6F4FE",

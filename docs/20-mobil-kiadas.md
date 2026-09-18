@@ -46,7 +46,10 @@ Ezeket nyugodtan „nem" válasszal jelölheted:
 - **Nincs analitika, nincs összeomlás-jelentő, nincs reklám-SDK.** A `mobile/`
   15 függősége között egy sem ilyen — ellenőrizve.
 - **Nincs helyadat.** Nincs `expo-location`, az app nem kér helyet. A
-  bejelentésnél a felhasználó *beírja* a várost, nem a készülék méri.
+  bejelentésnél a felhasználó *beírja* a várost, nem a készülék méri. A térkép
+  sem kér: az `expo-maps` plugin `requestLocationPermission: false`
+  beállítással van felvéve, tehát nem ad hozzá helyengedélyt, és a kezdő nézet
+  fix (Magyarország), nem a felhasználó helyzete.
 - **Nincs mikrofon- és videóhozzáférés.** Csak állóképet készítünk. Az
   `expo-image-picker` alapértelmezésben `RECORD_AUDIO`-t kérne Androidon;
   ezt a plugin `microphonePermission: false` beállítása kifejezetten
@@ -223,6 +226,7 @@ azt te döntöd el.
 | Push értesítés (kód, beállítások, leiratkozás) | ✅ kész |
 | **APNs-kulcs** (iOS push) | ⬜ Apple-tagsághoz kötött; addig iOS-en ki van kapcsolva |
 | **FCM V1 szolgáltatásfiók-kulcs** (Android push) | ⬜ `eas credentials` alatt feltölteni |
+| **Google Maps API-kulcs** (Android térkép) | ⬜ `eas secret:create --name GOOGLE_MAPS_API_KEY`; enélkül a térkép szürke |
 | `EXPO_ACCESS_TOKEN` a Vercelen | ⬜ enélkül is megy a küldés, de vele nem tud más a nevünkben küldeni |
 | **Apple Developer Program** (99 USD/év) | ⬜ napok–hetek átfutás |
 | **Google Play Console** (25 USD egyszeri) | ⬜ + zárt teszt, lásd lent |

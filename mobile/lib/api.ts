@@ -301,6 +301,59 @@ export function getShelter(id: string): Promise<Shelter> {
   return request<Shelter>(`/api/shelters/${id}`);
 }
 
+// ── Térkép ─────────────────────────────────────────────
+
+/**
+ * A térkép adatai.
+ *
+ * A `lat`/`lng` az adatbázisban nullázható, itt mégis `number`: a `/api/map`
+ * végpont KIZÁRJA a koordináta nélküli sorokat (`lat: { not: null }`), tehát
+ * amit visszaad, arra mindig rá lehet tenni egy jelölőt. Ha `number | null`
+ * lenne, minden jelölőnél fölösleges ellenőrzést kellene írni.
+ */
+export interface MapReport {
+  id: string; type: string; animalType: string;
+  name: string | null; breed: string | null;
+  city: string; description: string;
+  imageUrl: string | null;
+  lat: number; lng: number;
+  status: string; createdAt: string;
+  contactPhone: string | null; contactName: string | null;
+}
+
+export interface MapShelter {
+  id: string; name: string; city: string;
+  address: string | null; phone: string | null; email: string | null;
+  isVerified: boolean; logoUrl: string | null;
+  lat: number; lng: number; slug: string;
+  /** Az örökbefogadható állatok száma – a végpont `_count.animals` néven adja. */
+  _count: { animals: number };
+}
+
+export interface MapVet {
+  id: string; name: string; city: string;
+  address: string | null; phone: string | null; website: string | null;
+  openingHours: string | null; isEmergency: boolean;
+  lat: number; lng: number;
+}
+
+export interface MapData {
+  reports:  MapReport[];
+  shelters: MapShelter[];
+  vets:     MapVet[];
+}
+
+/**
+ * A térkép összes rétege EGY kérésben.
+ *
+ * A végpont szándékosan nem lapoz: a térképnek egyszerre kell látnia
+ * mindent, ami a nézetben lehet. A bejelentésekre 500-as felső korlát van
+ * szerver oldalon.
+ */
+export function getMapData(params: { type?: string; status?: string } = {}): Promise<MapData> {
+  return request<MapData>(withQuery("/api/map", params));
+}
+
 // ── Applications ───────────────────────────────────────
 export interface ApplicationInput {
   animalId: string;

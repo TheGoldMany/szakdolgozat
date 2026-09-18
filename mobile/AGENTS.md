@@ -158,6 +158,33 @@ engedélyt. Androidon a `POST_NOTIFICATIONS`-t a plugin adja hozzá, nem kézzel
 Ha új engedélyt veszel fel, a `docs/20-mobil-kiadas.md` adatkezelési listáját
 is frissíteni kell — a store-kérdőívek abból készülnek.
 
+## Térkép
+
+**A webes Leaflet NEM vihető át.** A weben `ssr: false` dinamikus importtal
+elrejtett Leaflet fut, ami böngészős DOM-ra épül; natív appban nincs DOM. Itt
+`expo-maps` megy: Androidon Google Maps, iOS-en Apple Maps.
+
+**Az `expo-maps`-nek nincs közös komponense.** `GoogleMaps.View` és
+`AppleMaps.View` külön létezik, eltérő tulajdonságokkal — ezért van a
+képernyőn két ág. A közös rész (jelölők összeállítása, koppintás
+visszafejtése) a `lib/map-markers.ts`-ben van, hogy ne kelljen kétszer
+karbantartani.
+
+**Androidhoz Google Maps API-kulcs kell**, különben a térkép szürke marad. A
+kulcs az `app.config.js`-ben van, környezeti változóból (`GOOGLE_MAPS_API_KEY`)
+— azért van egyáltalán `app.config.js`, mert az `app.json` statikus JSON, és
+nem tud környezeti változót behelyettesíteni. Az `app.json` marad a beállítások
+helye. iOS-hez nincs kulcs, az Apple Maps nem kér ilyet.
+
+**Helyadatot itt sem kérünk.** Az `expo-maps` plugin `requestLocationPermission:
+false` beállítással van felvéve, tehát NEM ad hozzá helyengedélyt. A kezdő
+nézet fix (Magyarország), a jelölő koppintásakor az útvonaltervet a rendszer
+térképalkalmazása intézi, a célcím átadásával.
+
+**Androidon a jelölő nem színezhető** (a Google jelölő csak saját képfájlt
+fogad el), ezért ott a réteget a buborék szövege és a jelmagyarázat
+különbözteti meg; iOS-en a `tintColor` megy.
+
 ## Push értesítés
 
 **Az in-app értesítés a hiteles forrás, a push csak figyelemfelhívás.** Ha a
