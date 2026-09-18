@@ -4,6 +4,16 @@ import { getAuthUser } from "@/lib/api-auth";
 import { publicEvents } from "@/lib/public-shapes";
 
 /**
+ * A Next enélkül STATIKUSAN előállította ezt a választ a build során, és
+ * onnantól mindenkinek ugyanazt adta volna: a build pillanatában közelgő
+ * eseményeket, `registration: null`-lal — tehát a saját jelentkezés sosem
+ * látszott volna, és a lejárt események sem tűntek volna el. A válasz két
+ * dologtól is függ, amit a build nem ismer: az AKTUÁLIS időtől és a kérés
+ * `Authorization` fejlécétől.
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * GET /api/events/public – közzétett, közelgő események.
  *
  * MIÉRT KÜLÖN ÚTVONAL: a `/api/events` a menhely adminé — a saját menhelye

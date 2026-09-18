@@ -230,6 +230,17 @@ a feltöltést, a `components/ui/PhotoField.tsx` pedig a felületet. Ne írj új
 A `/api/upload` NEM multipart űrlapot fogad, hanem a Vercel Blob kliens-token
 folyamatát — ezért kell a `@vercel/blob` a mobilban is.
 
+## Menhelyi admin — mi van az appban
+
+Az admin fül (`app/(tabs)/admin.tsx`) SZŰK szándékosan. Csak az kerül ide, ami
+értesítéssel érkezik, egy döntés, és a késlekedésnek ára van: a kérelem
+elbírálása, az időpont visszaigazolása, és az üzenetváltás. Minden más
+(állatnyilvántartás, egészségügy, készlet, pénzügy, űrlapok, kennelek,
+áthelyezések, eseményszervezés, analitika) a webes vezérlőpulton marad.
+
+**Ha új admin funkciót vennél fel, előbb nézd meg a docs/11 „Mi kerül a mobilba"
+szakaszát** — ott van a három feltétel és az, mit hagytam ki szándékosan.
+
 ## Ami a store-os kiadáshoz még hiányzik
 
 Ezek tudott hiányok, nem felfedezésre várnak:

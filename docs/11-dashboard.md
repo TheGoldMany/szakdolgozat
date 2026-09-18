@@ -33,6 +33,49 @@ A bal oldali `SidebarNav` a bejelentkezett felhasználó szerepköre (`role`) al
 | **Beállítások** | Profil admin | `/profile/admin` | ✅ | ✅ |
 | | Menhely beállítások | `/dashboard/settings` | ✅ | – |
 
+
+### Mi kerül a mobilba a vezérlőpultból — és mi nem
+
+**A vezérlőpult a weben marad.** Az appba csak az kerül át, ami mindhárom
+feltételnek megfelel:
+
+1. **Értesítéssel érkezik** — valaki vár rá, nem az admin keresi meg.
+2. **Egy döntés, nem űrlapkitöltés** — elfér egy telefonképernyőn.
+3. **A késlekedésnek ára van** — a jelentkező közben másik állatot keres, vagy
+   valaki visszaigazolás nélkül indul el a menhelyre.
+
+Ebből pontosan három dolog jön ki:
+
+| Funkció | Miért telefonra való |
+|---|---|
+| **Örökbefogadási kérelem elbírálása** | értesítéssel jön, egy státuszdöntés, és a jelentkező vár rá |
+| **Időpont visszaigazolása / elutasítása** | a legidőérzékenyebb: konkrét napra és órára jönne valaki |
+| **Üzenetre válasz** | már megvolt az appban; az adminnak ugyanaz a képernyő |
+
+**Ami szándékosan NEM került át:** állatnyilvántartás, egészségügyi napló,
+készlet, pénzügy és adományok, űrlapszerkesztő, kennelek, áthelyezések,
+eseményszervezés, analitika. Ezek hosszú űrlapok és széles táblázatok — a
+telefon rossz eszköz hozzájuk, és a gép úgyis ott van.
+
+**Határeset, amit mégis kihagytam:** az önkéntes- és befogadói jelentkezések
+jóváhagyása. Értesítéssel érkezik és egy döntés, de nem időérzékeny, és egy
+ember megítéléséhez a motivációs szöveget kell elolvasni — az nem a „gyorsan
+elintézem a buszon" műfaj.
+
+Két szerveroldali változás kellett hozzá:
+
+- **`GET /api/dashboard/applications/[id]`** — új. Az áttekintő csak nevet és
+  státuszt ad, dönteni viszont csak a válaszok ismeretében lehet; a webes
+  felület ezt eddig szerverkomponensből olvasta, végpont nem létezett hozzá.
+- **A `PATCH /api/dashboard/applications/[id]`** eddig csak böngésző-
+  munkamenetet fogadott el (`getServerSession`), most `requireAuthUser`. A
+  szerepkör-ellenőrzés szándékosan a keresés **előtt** maradt: enélkül a 404 és
+  a 403 különbségéből egy kívülálló megtudná, létezik-e az adott azonosítójú
+  kérelem.
+
+Az időponthoz nem kellett semmi: a `GET` és a `PATCH /api/appointments/[id]`
+eddig is elfogadott `Bearer` tokent, és ismerte a menhely adminját.
+
 ---
 
 ## Felhasználói Történetek

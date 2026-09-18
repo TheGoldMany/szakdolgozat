@@ -1032,6 +1032,21 @@ export function getMyAppointments(): Promise<Appointment[]> {
 }
 
 /**
+ * Egy időpont részletei.
+ *
+ * A kérelmező ÉS a menhely adminja is lekérheti — a végpont mindkettőt
+ * engedi, mást nem. A `user` mező ezért van benne: az admin képernyőnek
+ * tudnia kell, ki kéri az időpontot.
+ */
+export interface AppointmentDetail extends Appointment {
+  user: { name: string | null; email: string } | null;
+}
+
+export function getAppointment(id: string): Promise<AppointmentDetail> {
+  return request<AppointmentDetail>(`/api/appointments/${id}`);
+}
+
+/**
  * Időpontkérés (docs/05-appointments.md, US-05-A).
  *
  * A `proposedAt` ISO-8601 időbélyeg — a szerver `z.string().datetime()`-mal
@@ -1144,4 +1159,82 @@ export interface ShelterAdminOverview {
 
 export function getShelterAdminOverview(): Promise<ShelterAdminOverview> {
   return request<ShelterAdminOverview>("/api/shelter-admin/overview");
+}
+
+/**
+ * Egy kérelem a döntéshez.
+ *
+ * Az áttekintő csak nevet és státuszt ad — dönteni csak a válaszok
+ * ismeretében lehet, ezért kell a külön lekérés.
+ */
+export interface AdminApplicationDetail {
+  id: string;
+  /** "PENDING" | "REVIEWING" | "APPROVED" | "REJECTED" | "INVITED" | "WITHDRAWN" */
+  status: string;
+  message: string | null;
+  /** "HOUSE" | "APARTMENT" | "OTHER" */
+  homeType: string | null;
+  hasGarden: boolean | null;
+  hasChildren: boolean | null;
+  hasPets: boolean | null;
+  experience: string | null;
+  reviewNotes: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  user: {
+    id: string; name: string | null; email: string;
+    phone: string | null; city: string | null; bio: string | null;
+  } | null;
+  animal: { id: string; name: string; slug: string; shelterId: string };
+}
+
+export function getAdminApplication(id: string): Promise<{ application: AdminApplicationDetail }> {
+  return request<{ application: AdminApplicationDetail }>(`/api/dashboard/applications/${id}`);
+}
+
+/**
+ * Döntés egy kérelemről.
+ *
+ * A végpont HÁROM státuszt fogad el: REVIEWING, APPROVED, REJECTED. A döntés
+ * értesítést és e-mailt is küld a kérelmezőnek, jóváhagyásnál pedig
+ * utánkövetést ütemez — ezért nem visszavonható egy újabb állításssal.
+ */
+export function decideApplication(
+  id: string,
+  status: "REVIEWING" | "APPROVED" | "REJECTED",
+  reviewNotes?: string,
+): Promise<unknown> {
+  return request(`/api/dashboard/applications/${id}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ status, reviewNotes }),
+  });
+}
+
+/**
+ * Időpont visszaigazolása a menhely részéről.
+ *
+ * A `confirmedAt` KÖTELEZŐ és ISO időbélyeg: a menhely nem csak rábólint, hanem
+ * megmondja, mikorra várja a látogatót — ez lehet a kért időpont, de más is.
+ */
+export function confirmAppointment(id: string, confirmedAt: string, adminNote?: string): Promise<unknown> {
+  return request(`/api/appointments/${id}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ action: "CONFIRM", confirmedAt, adminNote }),
+  });
+}
+
+/** Időpont elutasítása. A kérelmező értesítést kap az indoklással. */
+export function rejectAppointment(id: string, adminNote?: string): Promise<unknown> {
+  return request(`/api/appointments/${id}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ action: "REJECT", adminNote }),
+  });
+}
+
+/** Megtörtént látogatás lezárása. */
+export function completeAppointment(id: string): Promise<unknown> {
+  return request(`/api/appointments/${id}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ action: "COMPLETE" }),
+  });
 }
