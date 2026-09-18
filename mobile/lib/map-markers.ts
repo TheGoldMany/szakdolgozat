@@ -37,9 +37,9 @@ export const REPORT_TYPE_LABELS: Record<string, string> = {
   STRAY: "Kóbor",
 };
 
+/** A séma `AnimalType` értékei — pontosan ez az öt van, nincs több. */
 export const ANIMAL_TYPE_LABELS: Record<string, string> = {
-  DOG: "kutya", CAT: "macska", RABBIT: "nyúl", BIRD: "madár",
-  RODENT: "rágcsáló", REPTILE: "hüllő", OTHER: "egyéb",
+  DOG: "kutya", CAT: "macska", RABBIT: "nyúl", BIRD: "madár", OTHER: "egyéb",
 };
 
 /**

@@ -281,6 +281,13 @@ export function getAnimal(id: string): Promise<AnimalDetail> {
 // ── Shelters ───────────────────────────────────────────
 export interface Shelter {
   id: string;
+  /**
+   * A végpont eddig is adta (`SHELTER_PUBLIC_SELECT`), csak nem volt itt
+   * felvéve. Azért kell: az önkéntes- és befogadói jelentkezések a menhelyet
+   * `{ name, city, slug }` alakban adják vissza, azonosító nélkül — a „már
+   * jelentkeztem ide" kiszűrése csak slug alapján lehetséges.
+   */
+  slug: string;
   name: string;
   city: string;
   country: string;
@@ -352,6 +359,79 @@ export interface MapData {
  */
 export function getMapData(params: { type?: string; status?: string } = {}): Promise<MapData> {
   return request<MapData>(withQuery("/api/map", params));
+}
+
+// ── Önkéntesség és ideiglenes befogadás ────────────────
+
+/** A séma `AnimalType` értékei. Pontosan ez az öt van. */
+export const ANIMAL_TYPES = ["DOG", "CAT", "RABBIT", "BIRD", "OTHER"] as const;
+export type AnimalTypeValue = (typeof ANIMAL_TYPES)[number];
+
+export interface VolunteerRecord {
+  id: string;
+  /** "PENDING" | "ACTIVE" | "INACTIVE" | "REJECTED" */
+  status: string;
+  motivation: string | null;
+  skills: string | null;
+  availability: string | null;
+  createdAt: string;
+  shelter: { name: string; city: string; slug: string };
+  /** Felvett feladatok. A `task` a feladat adatait tartalmazza. */
+  assignments: { id: string; task: { title: string; scheduledAt: string | null; status: string } }[];
+}
+
+export interface FosterRecord {
+  id: string;
+  /** "PENDING" | "ACTIVE" | "INACTIVE" | "REJECTED" */
+  status: string;
+  preferredTypes: AnimalTypeValue[];
+  maxWeightKg: number | null;
+  canQuarantine: boolean;
+  motivation: string | null;
+  createdAt: string;
+  shelter: { name: string; city: string; slug: string };
+  /** A nálam lévő állatok. */
+  fosteredAnimals: { id: string; name: string; slug: string }[];
+}
+
+/** A saját önkéntes jelentkezéseim, menhelyenként egy. */
+export function getMyVolunteering(): Promise<VolunteerRecord[]> {
+  return request<VolunteerRecord[]>("/api/volunteers");
+}
+
+/** A saját ideiglenes befogadói profiljaim, menhelyenként egy. */
+export function getMyFostering(): Promise<FosterRecord[]> {
+  return request<FosterRecord[]>("/api/foster");
+}
+
+export interface VolunteerInput {
+  shelterId:    string;
+  motivation?:  string;
+  skills?:      string;
+  availability?: string;
+}
+
+/**
+ * Jelentkezés önkéntesnek.
+ *
+ * Menhelyenként egy jelentkezés lehet: a szerver 409-et ad, ha már van.
+ * Ezért a felület a már jelentkezett menhelyeket kiveszi a választhatók közül.
+ */
+export function applyAsVolunteer(data: VolunteerInput): Promise<unknown> {
+  return request("/api/volunteers", { method: "POST", body: JSON.stringify(data) });
+}
+
+export interface FosterInput {
+  shelterId:      string;
+  preferredTypes?: AnimalTypeValue[];
+  maxWeightKg?:   number;
+  canQuarantine?: boolean;
+  motivation?:    string;
+}
+
+/** Jelentkezés ideiglenes befogadónak. Menhelyenként szintén egy. */
+export function applyAsFoster(data: FosterInput): Promise<unknown> {
+  return request("/api/foster", { method: "POST", body: JSON.stringify(data) });
 }
 
 // ── Események ──────────────────────────────────────────

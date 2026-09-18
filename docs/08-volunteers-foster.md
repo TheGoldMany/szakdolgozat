@@ -4,6 +4,31 @@
 
 Ez a modul fedi le az önkéntesi és ideiglenes befogadói rendszert. A felhasználók önkéntes munkára jelentkezhetnek a menhely profiloján keresztül (`VolunteerApplyButton`), az adminok jóváhagyhatják vagy elutasíthatják a kérelmeket, és nyilvános feladatokat hirdethetnek meg. Az ideiglenes befogadói rendszer (`FosterApplyButton`) lehetővé teszi, hogy felhasználók állatok ideiglenes gondozását vállalják, az adminok kezeljék a befogadói kérelmeket, és ellátmány-napló bejegyzéseket rögzítsenek. A saját önkéntességi és feladatjelentkezési állapot a `/hu/volunteers` oldalon tekinthető meg.
 
+
+### Mobilalkalmazás
+
+Az appban a **jelentkezés** és a **saját állapot** érhető el, egy képernyőn
+(Profil → Önkénteskedés és befogadás). A kettő azért van együtt, mert ugyanaz
+a szándék, csak más mértékben: „segítenék ennek a menhelynek". Külön
+menüpontok mögött a felhasználónak előre tudnia kellene, melyiket keresi.
+
+Új végpont NEM kellett — a `/api/volunteers` és a `/api/foster` már eddig is
+`Bearer` tokent is elfogadott (`getAuthUser` / `requireAuthUser`).
+
+**A menhelylista szűrve van.** Menhelyenként egy jelentkezés lehet, a szerver
+a másodikra 409-et ad (mérve). A már megjelölt menhelyeket ezért az űrlap
+kiveszi a választhatók közül, ahelyett hogy hagyná kiválasztani, majd hibát
+mutatna. A kizárás **slug alapján** történik: a `/api/volunteers` és a
+`/api/foster` a menhelyet `{ name, city, slug }` alakban adja, azonosító
+nélkül.
+
+**Az üres `preferredTypes` jelentése: bármilyen állat** — ezt a séma is így
+érti (`üres = bármi`). Az űrlap ki is írja, különben a felhasználó azt hinné,
+hogy hiányosan töltötte ki.
+
+Az **admin oldal** (jóváhagyás, elutasítás, feladatkiírás, ellátmány-napló)
+a weben marad.
+
 ---
 
 ## Felhasználói Történetek
