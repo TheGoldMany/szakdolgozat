@@ -28,6 +28,8 @@ export default function RootLayout() {
         <Stack.Screen name="map/index" options={{ headerShown: true, title: "Térkép" }} />
         <Stack.Screen name="events/index" options={{ headerShown: true, title: "Események" }} />
         <Stack.Screen name="events/[id]" options={{ headerShown: true, title: "Esemény" }} />
+        <Stack.Screen name="connections/index" options={{ headerShown: true, title: "Ismerősök" }} />
+        <Stack.Screen name="connections/search" options={{ headerShown: true, title: "Emberek keresése" }} />
         <Stack.Screen name="helping/index" options={{ headerShown: true, title: "Segítenék" }} />
         <Stack.Screen name="helping/apply" options={{ headerShown: true, title: "Jelentkezés" }} />
         <Stack.Screen name="notifications/index" options={{ headerShown: true, title: "Értesítések" }} />

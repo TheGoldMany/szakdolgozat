@@ -129,6 +129,9 @@ export default function ProfileScreen() {
         <Text style={styles.primaryText}>Napi kép feltöltése</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/connections")}>
+        <Text style={styles.linkText}>Ismerősök</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/helping")}>
         <Text style={styles.linkText}>Önkénteskedés és befogadás</Text>
       </TouchableOpacity>

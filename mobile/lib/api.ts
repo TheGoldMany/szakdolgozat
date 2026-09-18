@@ -361,6 +361,97 @@ export function getMapData(params: { type?: string; status?: string } = {}): Pro
   return request<MapData>(withQuery("/api/map", params));
 }
 
+// ── Ismerősök ──────────────────────────────────────────
+
+/** Egy ember a kapcsolataim között. */
+export interface ConnectionPerson {
+  /** A KAPCSOLAT azonosítója, nem a felhasználóé – az elfogadás/törlés ezt kéri. */
+  connectionId: string;
+  id:    string;
+  name:  string | null;
+  image: string | null;
+  city:  string | null;
+}
+
+export interface ConnectionLists {
+  /** Kölcsönösen elfogadott ismerősök. */
+  accepted: ConnectionPerson[];
+  /** Nekem érkezett, válaszra váró jelölések. */
+  incoming: ConnectionPerson[];
+  /** Amiket én küldtem, és még nem fogadták el. */
+  outgoing: ConnectionPerson[];
+}
+
+export function getConnections(): Promise<ConnectionLists> {
+  return request<ConnectionLists>("/api/connections");
+}
+
+/**
+ * A keresés találata és a hozzá tartozó kapcsolat állapota.
+ *
+ * Az állapot AZÉRT jön a találattal együtt, mert enélkül minden találatra
+ * külön kérdést kellene feltenni, hogy a lista tudja, melyik gombot mutassa.
+ */
+export interface UserSearchHit {
+  id:    string;
+  name:  string | null;
+  image: string | null;
+  city:  string | null;
+  role:  string;
+  connection: {
+    /** "none" | "connected" | "declined" | "outgoing" | "incoming" */
+    state: string;
+    /** A kapcsolat azonosítója, ha már van sor. */
+    id: string | null;
+  };
+}
+
+/** A kereséshez szükséges legrövidebb szöveg – a szerver ennél rövidebbre üres listát ad. */
+export const MIN_SEARCH_LENGTH = 2;
+
+/**
+ * Felhasználók keresése név szerint.
+ *
+ * Bejelentkezés kell hozzá: a névsor ne legyen kívülről lekérdezhető. A szerver
+ * percenként 30 keresést enged; ennél sűrűbb gépelésnél 429 jön, ezért a
+ * képernyő késleltetve keres, nem minden leütésre.
+ */
+export function searchUsers(q: string): Promise<{ results: UserSearchHit[]; tooShort?: boolean }> {
+  return request<{ results: UserSearchHit[]; tooShort?: boolean }>(
+    withQuery("/api/users/search", { q }),
+  );
+}
+
+/**
+ * Bejelölés — vagy a másik fél jelölésének elfogadása.
+ *
+ * A KÖLCSÖNÖS JELÖLÉS MAGA AZ ELFOGADÁS: ha a másik már bejelölt minket, a mi
+ * jelölésünk nem új kérés, hanem igen. Ezt a válasz `outcome` mezője mondja
+ * meg, ezért érdemes kiírni, ne csak „elküldve"-t mutatni.
+ */
+export type ConnectOutcome =
+  | "requested" | "accepted" | "already_pending" | "already_connected" | "self";
+
+export function connectWith(userId: string): Promise<{ outcome: ConnectOutcome; id?: string }> {
+  return request<{ outcome: ConnectOutcome; id?: string }>("/api/connections", {
+    method: "POST",
+    body:   JSON.stringify({ userId }),
+  });
+}
+
+/** Válasz egy érkezett jelölésre. A `connectionId` kell hozzá, nem a felhasználó azonosítója. */
+export function respondToConnection(connectionId: string, action: "accept" | "decline"): Promise<unknown> {
+  return request(`/api/connections/${connectionId}`, {
+    method: "PATCH",
+    body:   JSON.stringify({ action }),
+  });
+}
+
+/** Kapcsolat megszüntetése vagy a saját, még el nem fogadott jelölés visszavonása. */
+export function removeConnection(connectionId: string): Promise<unknown> {
+  return request(`/api/connections/${connectionId}`, { method: "DELETE" });
+}
+
 // ── Önkéntesség és ideiglenes befogadás ────────────────
 
 /** A séma `AnimalType` értékei. Pontosan ez az öt van. */

@@ -25,6 +25,9 @@ const EXACT: Record<string, string> = {
   "/appointments": "/appointments",
   "/favorites":    "/favorites",
   "/events":       "/events",
+  // Az ismerős-értesítések a webes profil aloldalára mutatnak; a mobilban
+  // ennek külön képernyője van.
+  "/profile/ismerosok": "/connections",
 };
 
 /**

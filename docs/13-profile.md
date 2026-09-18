@@ -4,6 +4,28 @@
 
 Ez a modul fedi le a felhasználói profiloldalt és a hozzá tartozó beállításokat. A `/hu/profile` oldal bejelentkezett felhasználóknak érhető el, és megjeleníti a fiókadatokat (e-mail, szerepkör, regisztráció dátuma, kérelmek száma), a személyes adatok szerkesztő űrlapját (`ProfileForm` – név, telefon, város, cím), az avatar feltöltést (`AvatarUpload`, Vercel Blob tárolóval), a jelszóváltó űrlapot (`ChangePasswordForm` – csak jelszavas fiókoknál), az e-mail értesítési beállításokat, a fióktörlést, a GDPR-adatexportot, valamint a felhasználó saját aktivitását: előfizetések (`SubscriptionsList`), virtuális örökbefogadások (`SponsorshipsList`) és az örökbefogadási előzmények listáját. A profilon a felhasználó a saját Stripe fiókját is kezelheti a „Stripe fiók" szekcióban (csatlakoztatás, regisztráció befejezése, vezérlőpult megnyitása), így az általa indított kampányokhoz adományokat fogadhat. A nyelvváltás a fejléc Globe ikonos nyelvi váltójával történik (hu/en/de/pl), a `next-intl` útválasztással.
 
+
+### Mobilalkalmazás — ismerősök
+
+Az app külön képernyőn kezeli a kapcsolatokat (Profil → Ismerősök): keresés
+név szerint, bejelölés, az érkezett jelölések elfogadása/elutasítása, és a
+saját jelölés visszavonása. Új végpont nem kellett — a `/api/connections`, a
+`/api/connections/[id]` és a `/api/users/search` már eddig is `Bearer` tokent
+is elfogadott.
+
+Két dolog, ami a felület viselkedését meghatározza:
+
+- **A találat MELLÉ jön a kapcsolat állapota** (`connection.state`), ezért a
+  lista egyből a helyes gombot tudja mutatni, és nem kell találatonként külön
+  kérdezni.
+- **A keresés késleltetett (400 ms).** A szerver percenként 30 keresést enged;
+  minden leütésre küldeni azt jelentené, hogy a felhasználó a gépelés közepén
+  kap 429-et.
+
+Az **érkezett jelölések listája van legelöl**, mert az az egyetlen, ami választ
+vár. A művelet után teljes újratöltés jön: egy elfogadás két listát is
+megváltoztat, és ezt helyben követni fölösleges hibalehetőség.
+
 ---
 
 ## Felhasználói Történetek
