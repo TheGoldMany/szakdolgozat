@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
       role:               true,
       birthDate:          true,
       emailNotifications: true,
+      pushMessages:       true,
+      pushCaseUpdates:    true,
+      pushCommunity:      true,
       createdAt:          true,
       applications: {
         orderBy: { createdAt: "desc" },
@@ -107,6 +110,11 @@ export async function GET(req: NextRequest) {
       role:               user.role,
       birthDate:          user.birthDate,
       emailNotifications: user.emailNotifications,
+      pushNotifications:  {
+        messages:    user.pushMessages,
+        caseUpdates: user.pushCaseUpdates,
+        community:   user.pushCommunity,
+      },
       memberSince:        user.createdAt,
     },
     adoptionApplications: user.applications,

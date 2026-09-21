@@ -52,7 +52,7 @@ export function VirtualAdoptionCard({
   }
 
   return (
-    <div className="rounded-2xl border border-pink-100 bg-pink-50 p-5">
+    <div className="rounded-2xl border border-pink-100 bg-pink-50 p-5" data-tour="sponsor">
       <div className="mb-1 flex items-center gap-2">
         <Heart className="h-4 w-4 text-pink-500" />
         <h2 className="text-sm font-semibold text-pink-800">{t("virtualAdoption")}</h2>

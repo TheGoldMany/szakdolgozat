@@ -1,21 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { compare, hash } from "bcryptjs";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordChangedEmail } from "@/lib/email";
+import { requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   currentPassword: z.string().min(1),
   newPassword:     z.string().min(8, "Legalább 8 karakter szükséges"),
 });
 
+/**
+ * POST /api/auth/change-password
+ *
+ * `requireAuthUser`, nem `getServerSession`: az utóbbi CSAK böngésző-
+ * munkamenetet fogad el, tehát a mobilalkalmazás `Bearer` tokenjével a jelszó
+ * megváltoztatása lehetetlen volt. A `requireAuthUser` előbb a session-t
+ * nézi, utána a fejlécet — a webes viselkedés változatlan.
+ */
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  const { user: authUser, error: authError } = await requireAuthUser(req);
+  if (authError) return authError;
 
   const body = await req.json();
   const parsed = schema.safeParse(body);
@@ -28,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const user = await prisma.user.findUnique({
-      where:  { id: session.user.id },
+      where:  { id: authUser!.id },
       select: { password: true, email: true, name: true },
     });
 
@@ -46,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     const hashed = await hash(parsed.data.newPassword, 12);
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: authUser!.id },
       data:  { password: hashed },
     });
 

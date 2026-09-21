@@ -5,6 +5,8 @@ import { upload } from "@vercel/blob/client";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
+// Függőségmentes fájlból, hogy a Stripe SDK ne kerüljön a böngésző bundle-jébe.
+import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 
 interface Shelter { id: string; name: string }
 interface Animal  { id: string; name: string; breed: string | null }
@@ -101,7 +103,10 @@ export function NewCampaignForm({
     const parsed = parseInt(targetAmount, 10);
     if (!title.trim()) { setError(t("newTitleRequired")); return; }
     if (!description.trim()) { setError(t("newDescRequired")); return; }
-    if (isNaN(parsed) || parsed < 1000) { setError(t("newTargetMin")); return; }
+    if (isNaN(parsed) || parsed < MIN_CAMPAIGN_TARGET_HUF) {
+      setError(t("newTargetMin", { min: MIN_CAMPAIGN_TARGET_HUF }));
+      return;
+    }
 
     setLoading(true);
     setError(null);

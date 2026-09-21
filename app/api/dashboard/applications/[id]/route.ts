@@ -1,28 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ApplicationStatus } from "@prisma/client";
 import { sendApplicationStatusEmail } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
+import { requireAuthUser, type AuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
   status:      z.enum(["REVIEWING", "APPROVED", "REJECTED"]),
   reviewNotes: z.string().max(1000).optional(),
 });
 
+/**
+ * Kezelheti-e ez a felhasználó ezt a kérelmet?
+ *
+ * A menhely adminja CSAK a saját menhelyéhez tartozó kérelmet — a kérelem a
+ * menhelyhez az ÁLLATON keresztül kötődik, nem közvetlenül.
+ */
+async function canManage(user: AuthUser, shelterId: string): Promise<boolean> {
+  if (user.role === "SUPER_ADMIN") return true;
+  if (user.role !== "SHELTER_ADMIN") return false;
+  const admin = await prisma.shelterAdmin.findUnique({
+    where: { userId_shelterId: { userId: user.id, shelterId } },
+  });
+  return !!admin;
+}
+
+/**
+ * GET /api/dashboard/applications/[id] – egy kérelem a döntéshez.
+ *
+ * A mobil admin képernyőnek kell: az áttekintő csak nevet és státuszt ad, de
+ * dönteni csak a válaszok ismeretében lehet. A webes felület ezt eddig
+ * szerverkomponensből olvasta, tehát végpont nem létezett hozzá.
+ */
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
+
+  // Szerepkör előbb, keresés utána: így a 404 és a 403 különbsége nem árulja
+  // el egy kívülállónak, hogy létezik-e ilyen azonosítójú kérelem.
+  if (user!.role !== "SHELTER_ADMIN" && user!.role !== "SUPER_ADMIN") {
+    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  }
+
+  try {
+    const application = await prisma.adoptionApplication.findUnique({
+      where:  { id: params.id },
+      select: {
+        id: true, status: true, message: true,
+        homeType: true, hasGarden: true, hasChildren: true, hasPets: true,
+        experience: true, reviewNotes: true, reviewedAt: true, createdAt: true,
+        // A kérelmező elérhetőségei: a menhely innen veszi fel vele a
+        // kapcsolatot, ha a döntéshez kérdezni akar valamit.
+        user:   { select: { id: true, name: true, email: true, phone: true, city: true, bio: true } },
+        animal: { select: { id: true, name: true, slug: true, shelterId: true } },
+      },
+    });
+    if (!application) {
+      return NextResponse.json({ error: "Kérelem nem található" }, { status: 404 });
+    }
+
+    if (!(await canManage(user!, application.animal.shelterId))) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+
+    return NextResponse.json({ application });
+  } catch (error) {
+    console.error("[api/dashboard/applications/[id] GET]", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
-  }
+  // `requireAuthUser`, nem `getServerSession`: az utóbbi csak böngésző-
+  // munkamenetet fogad el, tehát a mobil admin képernyő nem tudott dönteni.
+  const { user: authUser, error: authError } = await requireAuthUser(req);
+  if (authError) return authError;
 
-  const role = session.user.role;
-  if (role !== "SHELTER_ADMIN" && role !== "SUPER_ADMIN") {
+  // A szerepkör-ellenőrzés a keresés ELŐTT marad, ahogy eddig is: enélkül egy
+  // sima felhasználó a 404 és a 403 különbségéből megtudná, létezik-e az adott
+  // azonosítójú kérelem.
+  if (authUser!.role !== "SHELTER_ADMIN" && authUser!.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
   }
 
@@ -38,19 +99,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Kérelem nem található" }, { status: 404 });
   }
 
-  // Shelter admin csak a saját menhelyéhez tartozó kérelmet kezelheti
-  if (role === "SHELTER_ADMIN") {
-    const admin = await prisma.shelterAdmin.findUnique({
-      where: {
-        userId_shelterId: {
-          userId:    session.user.id,
-          shelterId: application.animal.shelterId,
-        },
-      },
-    });
-    if (!admin) {
-      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
-    }
+  if (!(await canManage(authUser!, application.animal.shelterId))) {
+    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
   }
 
   const body = await req.json();

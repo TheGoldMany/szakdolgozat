@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 import { createNotifications } from "@/lib/notifications";
 import { blockIfSuspended } from "@/lib/account-status";
 function slugify(text: string) {
@@ -17,7 +18,9 @@ function slugify(text: string) {
 const createSchema = z.object({
   title:        z.string().min(2).max(200),
   description:  z.string().min(2),
-  targetAmount: z.number().int().positive(),
+  // A minimumot a SZERVER is kikényszeríti, nem csak az űrlap: a végpontot
+  // közvetlenül hívva eddig 1 Ft-os célösszeg is átment.
+  targetAmount: z.number().int().min(MIN_CAMPAIGN_TARGET_HUF),
   imageUrl:     z.string().url().optional().or(z.literal("")).optional(),
   endsAt:       z.string().datetime().optional().nullable(),
   shelterId:    z.string().optional().nullable(), // opcionális – menhelyhez köthető

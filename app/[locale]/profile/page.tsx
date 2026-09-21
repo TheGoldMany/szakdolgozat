@@ -18,6 +18,7 @@ import { AdopterProfileForm } from "@/components/profile/adopter-profile-form";
 import { MyCampaigns } from "@/components/profile/my-campaigns";
 import { PawPrint } from "lucide-react";
 import { Role } from "@prisma/client";
+import { connectedAccountState } from "@/lib/stripe";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -143,6 +144,11 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/auth/login");
 
+  // A csatolt Stripe fiók VALÓS állapota. A tárolt `stripeOnboardingComplete`
+  // csak azt tudja, hogy egyszer végigment a folyamaton — azt nem, hogy a fiók
+  // ma is elérhető-e. Lásd a `lib/stripe.ts` `connectedAccountState` leírását.
+  const userStripeState = await connectedAccountState(user.stripeAccountId);
+
   const ROLE_LABELS: Record<Role, string> = {
     USER:          t("roleUser"),
     SHELTER_ADMIN: t("roleShelterAdmin"),
@@ -195,7 +201,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Personal data */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="profile-data">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("personalData")}</h2>
             <ProfileForm user={user} />
           </div>
@@ -223,6 +229,7 @@ export default async function ProfilePage() {
           <StripeConnectSection
             stripeAccountId={user.stripeAccountId}
             stripeOnboardingComplete={user.stripeOnboardingComplete}
+            stripeState={userStripeState}
           />
 
           {/* Saját gyűjtések */}

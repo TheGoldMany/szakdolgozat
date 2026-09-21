@@ -3,6 +3,7 @@ import { NotificationType } from "@prisma/client";
 import { haversineKm } from "@/lib/geo";
 import { ANIMAL_TYPE_LABELS } from "@/lib/foster";
 import { sendNearbyReportEmail } from "@/lib/email";
+import { sendPush } from "@/lib/push";
 
 /** Sugár (km), amelyen belül egy kóbor bejelentésről a menhelyeket értesítjük. */
 const NEARBY_RADIUS_KM = 20;
@@ -15,13 +16,27 @@ interface CreateNotificationInput {
   href?:  string;
 }
 
+/**
+ * Egy értesítés létrehozása.
+ *
+ * A push küldése SZÁNDÉKOSAN itt van, nem a hívóknál: 34 helyen keletkezik
+ * értesítés, és ha mindegyiknek külön kellene pusholnia, előbb-utóbb kimaradna
+ * valahonnan. Így minden új értesítés automatikusan szól is.
+ *
+ * A push hibája nem érinti a visszatérési értéket: a `sendPush` soha nem dob,
+ * az értesítés pedig már létrejött, amikor sorra kerül.
+ */
 export async function createNotification(input: CreateNotificationInput) {
-  return prisma.notification.create({ data: input });
+  const notification = await prisma.notification.create({ data: input });
+  await sendPush([input]);
+  return notification;
 }
 
 export async function createNotifications(inputs: CreateNotificationInput[]) {
   if (inputs.length === 0) return;
-  return prisma.notification.createMany({ data: inputs });
+  const result = await prisma.notification.createMany({ data: inputs });
+  await sendPush(inputs);
+  return result;
 }
 
 /**

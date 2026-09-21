@@ -90,6 +90,15 @@ export default function AdminScreen() {
     >
       <Text style={styles.shelterName}>{data.shelter.name}</Text>
 
+      {/* Amit telefonról lehet intézni, az a kérelem-döntés és az
+          időpont-visszaigazolás: mindkettő értesítéssel érkezik, egy döntés,
+          és a késlekedésnek ára van. A menhely többi adminisztrációja
+          (állatnyilvántartás, egészségügy, készlet, pénzügy, űrlapok) a webes
+          vezérlőpulton marad — azok hosszú űrlapok és széles táblázatok. */}
+      <Pressable style={styles.messagesRow} onPress={() => router.push("/messages")}>
+        <Text style={styles.messagesText}>Üzenetek megnyitása</Text>
+      </Pressable>
+
       <View style={styles.statsRow}>
         <Stat value={data.counts.pendingApplications}  label="Kérelem" />
         <Stat value={data.counts.upcomingAppointments} label="Időpont" />
@@ -97,34 +106,46 @@ export default function AdminScreen() {
       </View>
 
       <Text style={styles.sectionTitle}>Feldolgozásra váró kérelmek</Text>
+      <Text style={styles.sectionHint}>Koppints egy sorra a döntéshez.</Text>
       {data.pendingApplications.length === 0 ? (
         <Text style={styles.empty}>Nincs feldolgozásra váró kérelem.</Text>
       ) : (
         data.pendingApplications.map((a) => (
-          <View key={a.id} style={styles.card}>
+          <Pressable
+            key={a.id}
+            style={styles.card}
+            onPress={() => router.push(`/admin/application/${a.id}`)}
+            accessibilityRole="button"
+          >
             <Text style={styles.cardTitle}>{a.animal.name}</Text>
             <Text style={styles.cardSub}>{a.user?.name ?? a.user?.email ?? "Ismeretlen"}</Text>
             <View style={styles.cardFooter}>
               <Text style={styles.badge}>{STATUS_LABEL[a.status] ?? a.status}</Text>
               <Text style={styles.date}>{formatDate(a.createdAt)}</Text>
             </View>
-          </View>
+          </Pressable>
         ))
       )}
 
       <Text style={styles.sectionTitle}>Közelgő időpontok</Text>
+      <Text style={styles.sectionHint}>Koppints egy sorra a visszaigazoláshoz.</Text>
       {data.upcomingAppointments.length === 0 ? (
         <Text style={styles.empty}>Nincs közelgő időpont.</Text>
       ) : (
         data.upcomingAppointments.map((ap) => (
-          <View key={ap.id} style={styles.card}>
+          <Pressable
+            key={ap.id}
+            style={styles.card}
+            onPress={() => router.push(`/admin/appointment/${ap.id}`)}
+            accessibilityRole="button"
+          >
             <Text style={styles.cardTitle}>{ap.animal?.name ?? "Általános látogatás"}</Text>
             <Text style={styles.cardSub}>{ap.user?.name ?? ap.user?.email ?? "Ismeretlen"}</Text>
             <View style={styles.cardFooter}>
               <Text style={styles.badge}>{STATUS_LABEL[ap.status] ?? ap.status}</Text>
               <Text style={styles.date}>{formatDate(ap.confirmedAt ?? ap.proposedAt)}</Text>
             </View>
-          </View>
+          </Pressable>
         ))
       )}
     </ScrollView>
@@ -140,6 +161,8 @@ const styles = StyleSheet.create({
   buttonText: { color: "#fff", fontWeight: "600" },
 
   shelterName: { fontSize: 20, fontWeight: "700", color: "#111827", marginBottom: 12 },
+  messagesRow:  { backgroundColor: "#2563EB", borderRadius: 12, paddingVertical: 14, alignItems: "center", marginBottom: 16 },
+  messagesText: { color: "#fff", fontWeight: "700", fontSize: 15 },
   statsRow: { flexDirection: "row", gap: 10, marginBottom: 20 },
   stat: {
     flex: 1, backgroundColor: "#fff", borderRadius: 16, paddingVertical: 14,
@@ -150,6 +173,7 @@ const styles = StyleSheet.create({
 
   sectionTitle: { fontSize: 13, fontWeight: "700", color: "#374151", marginTop: 8, marginBottom: 8 },
   empty: { fontSize: 13, color: "#9CA3AF", marginBottom: 12 },
+  sectionHint: { fontSize: 12, color: "#9CA3AF", marginBottom: 8 },
 
   card: {
     backgroundColor: "#fff", borderRadius: 16, padding: 14, marginBottom: 10,

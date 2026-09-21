@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, isStaleAccountError } from "@/lib/stripe";
 
 // POST /api/stripe/connect/dashboard
 // Returns a Stripe Express dashboard login link for the shelter's connected account.
@@ -46,11 +46,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Stripe fiók nem található" }, { status: 404 });
     }
 
-    const loginLink = await getStripe().accounts.createLoginLink(accountId);
-    return NextResponse.json({ url: loginLink.url });
+    try {
+      const loginLink = await getStripe().accounts.createLoginLink(accountId);
+      return NextResponse.json({ url: loginLink.url });
+    } catch (linkErr) {
+      // Az elérhetetlen fiók NEM szerverhiba, hanem egy állapot, amit a
+      // felhasználónak meg kell tudnia oldani. A Stripe nyers szövege erre
+      // alkalmatlan: angol, és benne van a PLATFORM titkos kulcsának a vége
+      // meg a belső `acct_` azonosító — ezt a menhely adminjának nem kell
+      // látnia.
+      if (isStaleAccountError(linkErr)) {
+        console.error("[stripe] elérhetetlen csatolt fiók:", accountId, linkErr);
+        return NextResponse.json(
+          {
+            code:  "account_inaccessible",
+            error: "Ez a Stripe fiók már nem érhető el a platformról. "
+                 + "Ez akkor fordul elő, ha a fiók még tesztüzemben készült, "
+                 + "vagy ha a hozzáférést visszavonták a Stripe-nál. "
+                 + "Kapcsolódj újra, és a rendszer új fiókot hoz létre.",
+          },
+          { status: 409 },
+        );
+      }
+      throw linkErr;
+    }
   } catch (err) {
     console.error("Stripe dashboard link error:", err);
-    const message = err instanceof Error ? err.message : "Ismeretlen hiba";
-    return NextResponse.json({ error: message }, { status: 500 });
+    // Általános hiba: a Stripe belső szövegét nem adjuk ki, csak naplózzuk.
+    return NextResponse.json(
+      { error: "A Stripe vezérlőpult most nem érhető el. Próbáld újra később." },
+      { status: 500 },
+    );
   }
 }

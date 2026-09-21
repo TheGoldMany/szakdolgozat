@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardTour, type TourStep } from "@/components/onboarding/dashboard-tour";
+import { Tour, type TourStep } from "@/components/onboarding/tour";
 
 const STEPS: TourStep[] = [
   {
@@ -45,6 +45,21 @@ const STEPS: TourStep[] = [
   },
 ];
 
+/**
+ * A vezérlőpult bemutatója.
+ *
+ * Ugyanazt a motort használja, mint a nyilvános oldalak — de a „láttam" jelzés
+ * itt az ADATBÁZISBA megy (`User.dashboardTourSeen`), nem a böngészőbe. Ez a
+ * vezérlőpult bejelentkezés mögött van, tehát mindig van hova írni, és a
+ * menhely adminja jellemzően több gépről is dolgozik: neki többet ér, ha a
+ * bemutató nem indul újra minden új böngészőben.
+ */
 export function DashboardTourLauncher({ autoStart }: { autoStart: boolean }) {
-  return <DashboardTour steps={STEPS} autoStart={autoStart} />;
+  return (
+    <Tour
+      tour={{ id: "dashboard", version: 1, title: "Vezérlőpult", steps: STEPS }}
+      autoStart={autoStart}
+      onSeen={() => { fetch("/api/onboarding", { method: "POST" }).catch(() => {}); }}
+    />
+  );
 }

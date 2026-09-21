@@ -3,7 +3,7 @@
 > Fejlesztői onboarding-dokumentum az **ÁllatiMenhelyek.hu** állatmenhely-örökbefogadási
 > platformhoz. Célja, hogy egy új fejlesztő gyorsan átlássa a kódbázis felépítését,
 > a fő modulokat és a köztük lévő kapcsolatokat. A funkcionális tesztesetek a
-> [docs/README.md](./README.md) alatti `01-17` dokumentumokban találhatók.
+> [docs/README.md](./README.md) alatti számozott dokumentumokban találhatók.
 
 ---
 
@@ -19,6 +19,16 @@ A platform egy többszereplős állatmenhely-örökbefogadási rendszer:
 - **Super admin** (`SUPER_ADMIN`) a teljes platformot felügyeli: menhelyek, felhasználók,
   kampány- és űrlap-jóváhagyások, ETL futtatás.
 
+A platformnak **mobilalkalmazása** is van (`mobile/`, Expo + expo-router). Nem külön
+backendet használ: ugyanazokat a webes API-végpontokat hívja, `Authorization: Bearer`
+fejléccel. Ezért fontos, hogy új végpont a `lib/api-auth.ts` segédjeit használja —
+a `getServerSession` önmagában csak böngészőből működik.
+
+**Végigvezető bemutatók.** Minden fontosabb oldalon fut egy rövid, lépésenkénti
+bemutató az első látogatáskor (`components/onboarding/`, `lib/tours.ts`). A
+bemutató egyetlen komponensből kerül ki minden oldalra, az útvonal alapján —
+részletek: [21-bemutatok.md](./21-bemutatok.md).
+
 ### Fő technológiák
 
 | Réteg | Technológia | Hol |
@@ -32,6 +42,8 @@ A platform egy többszereplős állatmenhely-örökbefogadási rendszer:
 | UI | **Tailwind CSS 3**, lucide-react ikonok, Recharts, react-leaflet térkép | `components/`, `tailwind.config.js` |
 | Űrlapok / validáció | react-hook-form + **Zod** (API oldalon is) | `lib/validations/`, API route-ok |
 | E-mail | nodemailer (SMTP) | `lib/email.ts` |
+| Push értesítés | **expo-server-sdk** (Expo push szolgáltatás) | `lib/push.ts`, `app/api/notifications/push-token/` |
+| Mobil | **Expo SDK 56** + expo-router, expo-maps, expo-notifications | `mobile/` |
 | PDF | @react-pdf/renderer (örökbefogadási szerződés) | `lib/pdf/adoption-contract.tsx` |
 | Tesztelés | **Vitest** (unit) + **Playwright** (e2e) | `tests/`, `e2e/`, `vitest.config.ts`, `playwright.config.ts` |
 
@@ -73,7 +85,9 @@ szakdolgozat/
 ├── components/                # React komponensek funkcionális mappákban
 │   ├── ui/                    # Általános építőelemek (button, card, input,
 │   │                          #   image-upload, leaflet-map, skeletons …)
-│   ├── layout/                # header.tsx, footer.tsx
+│   ├── layout/                # header.tsx, footer.tsx, page-transition.tsx
+│   ├── onboarding/            # végigvezető bemutatók (tour.tsx = motor,
+│   │                          #   page-tour.tsx = útvonal → lépések, tour-button.tsx)
 │   ├── dashboard/             # admin-specifikus komponensek (form-builder,
 │   │                          #   analytics-section, application-review …)
 │   ├── animals/, shelters/, applications/, chat/, donate/, events/,
@@ -87,6 +101,10 @@ szakdolgozat/
 │   ├── stripe.ts              # Stripe singleton + platformdíj-logika
 │   ├── email.ts               # nodemailer sablonos levelek
 │   ├── notifications.ts       # In-app értesítés létrehozó helperek
+│   ├── push.ts                # Expo push küldés (51 típus → 3 kategória)
+│   ├── public-shapes.ts       # Mit adunk ki bejelentkezés nélkül (kifejezett select)
+│   ├── tours.ts               # A bemutatók lépései útvonalanként
+│   ├── tour-seen.ts           # „Láttam már" állapot (localStorage)
 │   ├── etl-helpers.ts         # ETL tiszta függvények (unit-tesztelve)
 │   ├── rate-limit.ts          # Egyszerű in-memory rate limiter
 │   ├── validations/           # Zod sémák (auth.ts)
@@ -95,15 +113,21 @@ szakdolgozat/
 ├── i18n/                      # next-intl konfiguráció (routing, request, navigation)
 ├── messages/                  # hu.json, en.json, de.json, pl.json
 ├── prisma/
-│   ├── schema.prisma          # OLTP séma (42 modell)
+│   ├── schema.prisma          # OLTP séma (57 modell, 30 enum)
 │   ├── dwh.prisma             # Data Warehouse csillagséma (8 modell)
 │   ├── seed.ts                # Alap seed (npm run prisma:seed)
 │   └── seed-demo.ts           # Demó adatok (npm run prisma:seed:demo)
 ├── middleware.ts              # next-intl + NextAuth middleware
 ├── tests/                     # Vitest unit tesztek
 ├── e2e/                       # Playwright end-to-end tesztek
-├── docs/                      # Teszteset-dokumentáció (01-17) + ez a fájl
-├── mobile/                    # Külön React Native (Expo) mobilkliens
+├── docs/                      # Teszteset-dokumentáció (01–18, 21) + 19–20 + ez a fájl
+├── mobile/                    # Expo (React Native) kliens – a webes API-t hívja
+│   ├── app/                   # expo-router képernyők
+│   ├── lib/                   # api.ts, use-api.ts, push.ts, map-markers.ts …
+│   ├── components/ui/         # közös alapkészlet (Button, Field, DataList …)
+│   ├── app.json               # Expo beállítások és engedélyek
+│   ├── app.config.js          # amit az app.json nem tud: Google Maps API-kulcs
+│   └── AGENTS.md              # a mobil íratlan szabályai
 └── types/next-auth.d.ts       # Session/JWT típusbővítés (id, role)
 ```
 
@@ -324,7 +348,11 @@ Konvenciók:
 - Route Handler-ek (`route.ts`), REST-szerű felépítés: gyűjtemény (`/api/animals`) +
   elem (`/api/animals/[id]`) szinten `GET/POST/PATCH/DELETE`.
 - **Zod-validáció** minden írási végponton (`safeParse` → 400 + `error.flatten()`).
-- **`getServerSession(authOptions)`** a jogosultsághoz (a middleware nem fedi az API-t).
+- **`requireAuthUser(req)` / `getAuthUser(req)`** (`lib/api-auth.ts`) a jogosultsághoz:
+  előbb a böngésző NextAuth-munkamenetét nézi, utána a mobilalkalmazás
+  `Authorization: Bearer <jwt>` fejlécét. **Új végponton ezt használd**, ne közvetlenül
+  a `getServerSession`-t — az utóbbi csak böngészőből működik, és emiatt már többször
+  fordult elő, hogy egy funkció a mobilból elérhetetlen volt.
 - Magyar nyelvű hibaüzenetek JSON-ben (`{ error: "..." }`), megfelelő HTTP-státuszokkal.
 - Érzékeny végpontokon **rate limit** (`lib/rate-limit.ts`, in-memory, IP-alapú).
 - Mellékhatások: `lib/notifications.ts` (in-app) és `lib/email.ts` (SMTP) hívások.
@@ -344,7 +372,13 @@ Fontosabb endpoint-csoportok:
 | `/api/stripe/connect/onboard` \| `callback` \| `dashboard` | Stripe Connect onboarding és Express-vezérlőpult menhelynek **és** felhasználónak |
 | `/api/campaigns`, `/api/subscriptions`, `/api/sponsorships` | Kampányok (opcionális menhely/állat + Stripe-feltétel), előfizetések, virtuális örökbefogadások |
 | `/api/shelters/list` | Aktív menhelyek könnyű listája (kampány-űrlap legördülő) |
-| `/api/onboarding` | A dashboard-bemutató „látott" állapotának mentése (`dashboardTourSeen`) |
+| `/api/onboarding` | A vezérlőpult-bemutató „látott" állapotának mentése (`dashboardTourSeen`). A nyilvános oldalak bemutatói a böngészőben tárolódnak, lásd [21-bemutatok.md](./21-bemutatok.md) |
+| `/api/notifications/push-token` | Mobil eszköz regisztrálása / leregisztrálása push értesítésre |
+| `/api/events/public`, `/api/events/public/[slug]` | **Publikus** eseménylista és -adatlap (a `/api/events` az adminé) |
+| `/api/profile`, `/api/profile/avatar` | Saját profil lekérése és módosítása, profilkép |
+| `/api/connections`, `/api/users/search` | Ismerősök és névre keresés |
+| `/api/shelter-admin/overview` | A menhely napi áttekintője egy kérésben (mobil admin fül) |
+| `/api/daily-posts` | Napi állatok képfolyam és naptár |
 | `/api/posts`, `/api/posts/[id]/like` | Közösségi hírfolyam posztok és lájkok |
 | `/api/kennels`, `/api/inventory`, `/api/transfers` | Menhely-üzemeltetés (kennelek, készlet, áthelyezések) |
 | `/api/volunteers`, `/api/volunteer-tasks`, `/api/foster` | Önkéntes- és foster-kezelés |
@@ -507,3 +541,15 @@ funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell
 | `SMTP_HOST/PORT/USER/PASS/FROM` | nodemailer e-mail küldés |
 | `ETL_SECRET` | `/api/etl` Bearer-token |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob feltöltés |
+| `EXPO_ACCESS_TOKEN` | Push küldés az Expo nevében (opcionális, de nélküle bárki küldhetne egy megszerzett tokenre) |
+
+### A mobilalkalmazás változói (`mobile/`)
+
+Ezeket az Expo **build időben behelyettesíti**, tehát bekerülnek a csomagba —
+titkot közéjük soha ne írj.
+
+| Változó | Mire kell |
+|---|---|
+| `EXPO_PUBLIC_API_URL` | A backend címe |
+| `EXPO_PUBLIC_PUSH_IOS_ENABLED` | iOS push bekapcsolása (alapból hamis: nincs még APNs-kulcs) |
+| `GOOGLE_MAPS_API_KEY` | Android térkép (EAS titok; nélküle a térkép szürke) |

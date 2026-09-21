@@ -4,6 +4,38 @@
 
 Ez a modul fedi le a menhelyi események kezelését. A publikus `/hu/events` oldal a `PUBLISHED` státuszú, jövőbeli eseményeket listázza kártyákon (típus badge, dátum, helyszín, létszám), a részletoldal (`/hu/events/[slug]`) pedig a teljes leírást és a jelentkezési lehetőséget mutatja. Bejelentkezett felhasználó az `EventRegisterButton` komponensen keresztül jelentkezhet (kísérők száma 0–20, opcionális megjegyzés), illetve lemondhatja a részvételét. Az esemény típusai (`EventType`): `ADOPTION_DAY`, `FUNDRAISER`, `VOLUNTEER_DAY`, `OPEN_DAY`, `EDUCATION`, `OTHER`; státuszai (`EventStatus`): `DRAFT` (Vázlat), `PUBLISHED` (Közzétéve), `CANCELLED` (Lemondva), `COMPLETED` (Lezárult). Az admin a `/dashboard/events` oldalon az `EventsManager` komponenssel hozhat létre, szerkeszthet, tehet közzé, mondhat le és törölhet eseményeket, valamint megtekintheti a jelentkezőket. A kapacitáskorlát (`capacity`) a jelentkezőket és kísérőiket együtt számolja; lemondáskor a jelentkezés `CANCELLED` státuszra vált, az admin értesítést és a jelentkezők lemondáskor e-mailt is kapnak.
 
+
+### Mobilalkalmazás
+
+Az app a **közelgő, közzétett** eseményeket listázza, és ugyanúgy lehet
+jelentkezni és lemondani, mint a weben. Az esemény LÉTREHOZÁSA és szerkesztése
+nem került át — az a `/dashboard/events` oldalon marad.
+
+Ehhez új publikus végpont kellett: a `/api/events` a menhely adminé (a saját
+menhelye eseményeit adja, vázlatokkal együtt, és csak böngésző-munkamenetet
+fogad el), a publikus lista pedig eddig **csak szerverkomponensként** létezett,
+tehát az appnak nem volt mit hívnia. Az új végpontok:
+
+| Végpont | Mit ad |
+|---|---|
+| `GET /api/events/public` | közzétett, jövőbeli események |
+| `GET /api/events/public/[slug]` | egy esemény azonosító **vagy** slug alapján |
+
+Mindkettő bejelentkezés nélkül is működik; bejelentkezve a **saját jelentkezés
+állapota** is jön, így a lista egyből a helyes gombot tudja mutatni, és nem kell
+eseményenként külön kérdezni.
+
+**`takenSpots` — a szabad helyek helyes számításához.** A `_count.registrations`
+csak a jelentkezők SZÁMÁT adja, a kapacitást viszont a jelentkező és a kísérői
+EGYÜTT töltik ki (a jelentkezés végpontja is így ellenőrzi). Egy 3 férőhelyes,
+egyetlen háromfős jelentkezéssel telt esemény a fejek alapján „2 szabad
+hely"-et mutatna, és a felhasználó csak a beküldéskor ütközne a „betelt"
+hibába. Ezért a végpont külön adja a ténylegesen elfoglalt helyeket.
+
+A lemondott esemény a részletező végponton **elérhető marad** (a listából
+kimarad): aki jelentkezett rá, értesítést kapott egy hivatkozással, és 404
+helyett látnia kell, mi történt.
+
 ---
 
 ## Felhasználói Történetek

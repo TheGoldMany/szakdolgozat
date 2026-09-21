@@ -39,6 +39,7 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "expo-server-sdk": "^7.2.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.378.0",
     "next": "14.2.35",

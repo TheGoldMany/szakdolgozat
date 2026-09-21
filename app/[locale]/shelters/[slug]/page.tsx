@@ -268,7 +268,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
         {/* Önkéntesség */}
         {session && (
-          <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8" data-tour="shelter-help">
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-base font-semibold text-gray-800">{t("volunteer")}</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
@@ -282,7 +282,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         )}
 
         {/* Értékelések */}
-        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8" data-tour="shelter-reviews">
           <ShelterReviews shelterId={shelter.id} />
         </div>
       </div>

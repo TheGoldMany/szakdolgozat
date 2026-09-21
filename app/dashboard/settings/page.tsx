@@ -8,6 +8,7 @@ import { PageInfo } from "@/components/dashboard/page-info";
 import { prisma } from "@/lib/prisma";
 import { ShelterSettingsForm } from "@/components/dashboard/shelter-settings-form";
 import { resolveActingShelter } from "@/lib/acting-shelter";
+import { connectedAccountState } from "@/lib/stripe";
 
 export const metadata: Metadata = { title: "Menhely beállítások" };
 
@@ -55,6 +56,19 @@ export default async function ShelterSettingsPage() {
     );
   }
 
+  /**
+   * A csatolt Stripe fiók VALÓS állapota, nem a tárolt jelző.
+   *
+   * A `stripeOnboardingComplete` egy pillanatkép abból, amikor a menhely
+   * végigment a Stripe folyamatán. Ha a fiók azóta elérhetetlenné vált
+   * (kulcsváltás teszt→éles, visszavont hozzáférés), a mező marad `true`, és
+   * az oldal zöld pipával azt írta, hogy „az adományok automatikusan érkeznek
+   * a számlára" — miközben a fizetési útvonal már elutasította őket. Ez a
+   * kérdés egy Stripe-hívásba kerül, egy ritkán megnyitott oldalon; a hamis
+   * biztonság ennél sokkal drágább.
+   */
+  const stripeState = await connectedAccountState(shelter.stripeAccountId);
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -75,7 +89,7 @@ export default async function ShelterSettingsPage() {
           {t("settingsPublicPage")}
         </a>
       </div>
-      <ShelterSettingsForm shelter={shelter} />
+      <ShelterSettingsForm shelter={shelter} stripeState={stripeState} />
     </div>
   );
 }

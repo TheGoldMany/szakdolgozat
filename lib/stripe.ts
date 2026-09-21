@@ -39,11 +39,14 @@ export function toStatementSuffix(text: string): string {
 }
 
 /**
- * Platform fee taken from every payment (donations + subscriptions).
- * The remainder is transferred in full to the connected account (shelter /
- * campaign owner). Change this single value to adjust the platform's cut.
+ * A platform díjszázaléka.
+ *
+ * A definíció a `lib/donation-limits.ts`-ben van, mert a FELÜLET is kiírja, és
+ * onnan a Stripe SDK nélkül importálható. Itt csak újraexportáljuk, hogy a
+ * szerveroldali hívóknak ne kelljen átírni az importjaikat.
  */
-export const PLATFORM_FEE_PERCENT = 5;
+export { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
+import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 
 /**
  * Stripe processing fee rates for HUF payments.
@@ -161,5 +164,88 @@ export async function resolveTransferDestination(
   } catch (err) {
     console.log(`[stripe] resolveTransferDestination: error retrieving ${accountId}:`, err);
     return null;
+  }
+}
+
+/**
+ * Elérhető-e egyáltalán ez a csatolt fiók a mostani Stripe-kulccsal?
+ *
+ * A Stripe TESZT és ÉLES módja két teljesen külön világ: egy teszt módban
+ * létrehozott `acct_…` az éles kulccsal NEM létezik, és fordítva. Ha a
+ * platform kulcsot váltott, a korábban elmentett azonosító ott marad az
+ * adatbázisban, és onnantól minden rá irányuló hívás elhasal ezzel:
+ *
+ *   "The provided key 'sk_live_…' does not have access to account 'acct_…'
+ *    (or that account does not exist). Application access may have been revoked."
+ *
+ * Ugyanezt a hibát adja, ha a fiók másik platformhoz tartozik, vagy ha a
+ * menhely visszavonta a hozzáférést a Stripe-nál. Mindhárom eset ugyanazt
+ * jelenti nekünk: az azonosító használhatatlan, újra kell kapcsolódni.
+ *
+ * MIÉRT SZŰK EZ A FELTÉTEL: korábban a kapcsolódási útvonal minden
+ * `StripeInvalidRequestError`-t elavult fióknak vett, és ilyenkor ÚJ Stripe
+ * fiókot hozott létre a menhelynek. Egy rossz `return_url` vagy bármilyen más
+ * érvénytelen paraméter így elárvította volna a menhely valódi, működő
+ * fiókját — az adatvesztést csak az mentette meg, hogy eddig nem fordult elő.
+ * Ezért itt kifejezetten a HOZZÁFÉRÉSRE utaló jelzéseket keressük.
+ */
+export function isStaleAccountError(err: unknown): boolean {
+  const e = err as { type?: string; code?: string; message?: string; statusCode?: number } | null;
+  if (!e || typeof e !== "object") return false;
+
+  // A Stripe saját hibakódjai erre az esetre.
+  if (e.code === "account_invalid" || e.code === "resource_missing") return true;
+  if (e.type === "StripePermissionError") return true;
+
+  // Kódot nem mindig kapunk, a szöveget viszont igen. Kisbetűsítve, hogy a
+  // Stripe szövegváltoztatása ne törje el azonnal.
+  const msg = (e.message ?? "").toLowerCase();
+  return (
+    msg.includes("does not have access to account") ||
+    msg.includes("not connected to your platform") ||
+    msg.includes("no such account") ||
+    msg.includes("no such destination")
+  );
+}
+
+/**
+ * Egy csatolt fiók állapota, ahogy a FELÜLETNEK tudnia kell.
+ *
+ * Miért nem elég a tárolt `stripeOnboardingComplete` mező: az egy pillanatkép
+ * abból az időből, amikor a menhely végigment a Stripe folyamatán. Ha a fiók
+ * azóta elérhetetlenné vált (kulcsváltás, visszavont hozzáférés), a mező
+ * továbbra is `true`, és a beállítások oldal zöld pipával azt írja, hogy „az
+ * adományok automatikusan érkeznek a számlára" — miközben a fizetési útvonal
+ * már elutasítja őket. A felhasználó a valótlan állítás miatt nem is tudja,
+ * hogy tennie kellene valamit.
+ */
+export type ConnectedAccountState =
+  /** Nincs elmentett azonosító – még nem kapcsolódott. */
+  | "missing"
+  /** Van azonosító, de ezzel a kulccsal elérhetetlen → újrakapcsolódás kell. */
+  | "inaccessible"
+  /** Elérhető, de a Stripe folyamatot nem fejezte be. */
+  | "incomplete"
+  /** Elérhető és fogadhat utalást. */
+  | "ready"
+  /** A Stripe most nem válaszolt – NEM tudjuk. Ilyenkor ne riasszunk. */
+  | "unknown";
+
+export async function connectedAccountState(
+  accountId: string | null | undefined,
+): Promise<ConnectedAccountState> {
+  if (!accountId) return "missing";
+
+  try {
+    const account = await getStripe().accounts.retrieve(accountId);
+    // `details_submitted` a valódi kapu: destination charge-nál a platform
+    // terheli a kártyát, a `charges_enabled` csak a közvetlen terhelést gátolja.
+    return account.details_submitted ? "ready" : "incomplete";
+  } catch (err) {
+    if (isStaleAccountError(err)) return "inaccessible";
+    // Hálózati hiba, lejárt kulcs, Stripe-kimaradás: ezekből NEM következik,
+    // hogy a menhely fiókja rossz. Inkább ne mondjunk semmit, mint valótlant.
+    console.error("[stripe] connectedAccountState: nem sikerült ellenőrizni", accountId, err);
+    return "unknown";
   }
 }
