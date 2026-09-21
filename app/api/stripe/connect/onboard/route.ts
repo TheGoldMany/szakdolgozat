@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, isStaleAccountError } from "@/lib/stripe";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -11,19 +11,6 @@ const bodySchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("shelter"), shelterId: z.string().min(1) }),
   z.object({ type: z.literal("user") }),
 ]);
-
-/** Returns true when a Stripe error indicates the stored account ID is invalid/stale */
-function isInvalidAccountError(err: unknown): boolean {
-  if (err && typeof err === "object" && "type" in err) {
-    const stripeErr = err as { type: string; code?: string; message?: string };
-    if (stripeErr.type === "StripeInvalidRequestError") return true;
-  }
-  if (err instanceof Error) {
-    const msg = err.message.toLowerCase();
-    return msg.includes("not connected to your platform") || msg.includes("does not exist");
-  }
-  return false;
-}
 
 // POST /api/stripe/connect/onboard
 export async function POST(req: NextRequest) {
@@ -91,7 +78,7 @@ export async function POST(req: NextRequest) {
           type:        "account_onboarding",
         });
       } catch (linkErr) {
-        if (!isInvalidAccountError(linkErr)) throw linkErr;
+        if (!isStaleAccountError(linkErr)) throw linkErr;
 
         // Stale/test account ID – create a new live account
         const newAccount = await getStripe().accounts.create({
@@ -148,7 +135,7 @@ export async function POST(req: NextRequest) {
         type:        "account_onboarding",
       });
     } catch (linkErr) {
-      if (!isInvalidAccountError(linkErr)) throw linkErr;
+      if (!isStaleAccountError(linkErr)) throw linkErr;
 
       const newAccount = await getStripe().accounts.create({
         type:    "express",
@@ -171,7 +158,13 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error("Stripe Connect onboard error:", err);
-    const message = err instanceof Error ? err.message : "Ismeretlen Stripe hiba";
-    return NextResponse.json({ error: message }, { status: 500 });
+    // A Stripe nyers szövegét NEM adjuk ki: angol, és a hozzáférési hibák
+    // esetében benne van a platform titkos kulcsának a vége meg a belső
+    // `acct_` azonosító. Ez a menhely adminjának se nem érthető, se nem az ő
+    // adata — naplóba való, nem a felületre.
+    return NextResponse.json(
+      { error: "A Stripe kapcsolódás most nem sikerült. Próbáld újra később." },
+      { status: 500 },
+    );
   }
 }

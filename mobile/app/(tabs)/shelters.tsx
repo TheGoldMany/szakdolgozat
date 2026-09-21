@@ -3,6 +3,7 @@ import {
   ActivityIndicator, FlatList, Linking, StyleSheet,
   Text, TouchableOpacity, View,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { getShelters, type Shelter } from "@/lib/api";
 
 function ShelterCard({ shelter }: { shelter: Shelter }) {
@@ -36,6 +37,7 @@ function ShelterCard({ shelter }: { shelter: Shelter }) {
 }
 
 export default function SheltersScreen() {
+  const router = useRouter();
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [loading, setLoading]   = useState(true);
 
@@ -51,6 +53,13 @@ export default function SheltersScreen() {
       keyExtractor={s => s.id}
       renderItem={({ item }) => <ShelterCard shelter={item} />}
       contentContainerStyle={styles.list}
+      // A térkép belépési pontja itt van, mert a "hol vannak menhelyek"
+      // kérdést a legtöbben ezen a fülön teszik fel, nem a profilon.
+      ListHeaderComponent={
+        <TouchableOpacity style={styles.mapLink} onPress={() => router.push("/map")}>
+          <Text style={styles.mapLinkText}>🗺️  Megnyitás térképen</Text>
+        </TouchableOpacity>
+      }
       ListEmptyComponent={<Text style={styles.empty}>Nincs menhely.</Text>}
     />
   );
@@ -59,6 +68,11 @@ export default function SheltersScreen() {
 const styles = StyleSheet.create({
   spinner: { marginTop: 60 },
   list:    { padding: 12 },
+  mapLink: {
+    backgroundColor: "#DBEAFE", borderRadius: 12,
+    paddingVertical: 12, alignItems: "center", marginBottom: 12,
+  },
+  mapLinkText: { color: "#1D4ED8", fontWeight: "700", fontSize: 14 },
   empty:   { textAlign: "center", color: "#9CA3AF", marginTop: 40 },
   card: {
     backgroundColor: "#fff",

@@ -105,6 +105,7 @@ export default function MapView() {
       {/* Mobile toggle button */}
       <button
         onClick={() => setPanelOpen(v => !v)}
+        data-tour="map-filters-mobile"
         className="absolute left-3 top-3 z-[1001] flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-md md:hidden"
         aria-label={t("filters")}
       >
@@ -113,7 +114,7 @@ export default function MapView() {
       </button>
 
       {/* Control panel – top left */}
-      <div className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-200 bg-white shadow-lg transition-transform md:translate-y-0 ${
+      <div data-tour="map-filters" className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-200 bg-white shadow-lg transition-transform md:translate-y-0 ${
         panelOpen ? "translate-y-12" : "hidden md:block"
       }`}>
         {/* Header */}

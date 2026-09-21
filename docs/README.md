@@ -26,11 +26,28 @@
 | [15-events.md](./15-events.md) | Események (publikus + admin) | TC-15-01 – TC-15-07 |
 | [16-forms-kennels-transfers.md](./16-forms-kennels-transfers.md) | Kérvénysablonok, kennelek, áthelyezések | TC-16-01 – TC-16-09 |
 | [17-settings-tiers.md](./17-settings-tiers.md) | Menhely beállítások, Stripe Connect, térképes helyszín, támogatói szintek | TC-17-01 – TC-17-08 |
-| [18-fizetesi-teszt-jegyzokonyv.md](./18-fizetesi-teszt-jegyzokonyv.md) | **Fizetési teszt jegyzőkönyv**: a három fizetési útvonal, visszatérítés, chargeback, pénzügyi egyeztetés | TC-18-01 – TC-18-35 |
+| [18-fizetesi-teszt-jegyzokonyv.md](./18-fizetesi-teszt-jegyzokonyv.md) | **Fizetési teszt jegyzőkönyv**: a három fizetési útvonal, visszatérítés, chargeback, pénzügyi egyeztetés | TC-18-01 – TC-18-36 |
+| [21-bemutatok.md](./21-bemutatok.md) | Végigvezető bemutatók (onboarding tour) minden fontosabb oldalon | TC-21-01 – TC-21-07 |
+| [22-kozosseg-tartalom-adatok.md](./22-kozosseg-tartalom-adatok.md) | Napi állatok, ismerősök, cikkek, állatorvosi rendelők, audit napló | TC-22-01 – TC-22-06 |
 
-**Összesen: ~162 teszteset**
+**Összesen: 191 teszteset** (a fenti fájlokban lévő `TC-` azonosítók száma).
 
-> Rendszer-architektúra áttekintés új fejlesztőknek: [ARCHITECTURE.md](./ARCHITECTURE.md)
+### Teszteseteket nem tartalmazó dokumentumok
+
+| Fájl | Mire való |
+|---|---|
+| [19-ai-asszisztens-prompt.md](./19-ai-asszisztens-prompt.md) | Betanító szöveg AI-asszisztenshez: a projekt íratlan szabályai és a már egyszer megfizetett csapdák |
+| [20-mobil-kiadas.md](./20-mobil-kiadas.md) | A mobilalkalmazás store-kiadása: adatkezelési lista a kérdőívekhez, és a még hiányzó lépések |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Rendszer-architektúra áttekintés új fejlesztőknek |
+
+### Hol tart a mobilalkalmazás
+
+A `mobile/` mappában Expo (React Native) kliens van, amely **ugyanazt a webes
+API-t** hívja. A funkciói a saját moduljuk dokumentumában szerepelnek — keresd a
+„Mobilalkalmazás" szakaszt a
+[08](./08-volunteers-foster.md), [10](./10-notifications.md),
+[11](./11-dashboard.md), [13](./13-profile.md) és [15](./15-events.md)
+fájlokban. A mobilra vonatkozó íratlan szabályok a `mobile/AGENTS.md`-ben vannak.
 
 ---
 
@@ -61,9 +78,21 @@
 git clone <repo-url> && cd szakdolgozat
 npm install
 cp .env.example .env          # töltsd ki az env változókat
-npm run prisma:migrate
-npm run prisma:seed:demo       # demo adatokkal (ajánlott)
+npx prisma db push            # a séma szinkronizálása (a projekt NEM migrációkkal megy)
+npm run prisma:seed:demo      # demo adatokkal (ajánlott)
 npm run dev
+```
+
+> **A séma `prisma db push` alapú, nincs `migrations/` mappa.** Séma-változás
+> után `prisma generate` kell **mindkét** sémára (`schema.prisma` és
+> `prisma/dwh.prisma`) — a `npm run build` ezt magától megteszi.
+
+### 1/b. A mobilalkalmazás elindítása
+
+```bash
+cd mobile
+npm install                   # sima install, NEM --legacy-peer-deps
+npx expo start
 ```
 
 ### 2. Tesztkörnyezet alapadatok (`prisma:seed:demo` után)
@@ -99,4 +128,6 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 - Minden tesztesethez töltsd ki az **Tényleges eredmény** és **Státusz** mezőket.
 - Ha hibát találsz, nyiss egy GitHub Issue-t `bug` és az érintett feature label-lel.
 - Az e2e tesztek a `e2e/` mappában találhatók, futtatás: `npm run test:e2e`.
-- A unit tesztek a `tests/` mappában, futtatás: `npm run test`.
+- A unit tesztek a `tests/` mappában, futtatás: `npm run test` (jelenleg 12 fájl, 162 eset).
+- Típusellenőrzés: `npx tsc --noEmit` — a webes gyökérben és a `mobile/` mappában külön-külön.
+- Éles buildhez hasonló ellenőrzés adatbázis nélkül: `SKIP_ENV_VALIDATION=1 npx next build`.

@@ -89,6 +89,43 @@ Az állat három egészségügyi jelzője át van nevezve: az adatbázisban
 `isVaccinated` / `isNeutered` / `isMicrochipped`, az app viszont `vaccinated` /
 `neutered` / `chipped` néven kéri. A leképezés a `publicAnimal()`-ben van.
 
+## Alapkészlet — ezeket ne írd meg újra
+
+Képernyőt írni ezekből kell, nem nulláról:
+
+**Adatlekérés** (`lib/use-api.ts`) — nincs benne külön könyvtár, mert a webes
+oldal sem használ ilyet (nincs SWR, React Query): 86 kliens-komponens sima
+`fetch` + `useState`/`useEffect` mintával dolgozik. Egy könyvtár behozása
+kettéosztaná a projektet.
+
+- `useApi(fetcher, deps)` → `{ data, error, loading, reload }`
+- `usePagedList(fetchPage, deps)` → `{ items, error, loading, refreshing,
+  loadingMore, hasMore, refresh, loadMore }`
+
+Mindkettő eldobja az elavult válaszokat (gyors szűrőváltásnál a régi kérés
+megelőzheti az újat), és lecsatolás után nem állít állapotot.
+
+**Lista-lekérés** (`lib/api.ts`) — a webes végpontok a tömböt saját néven adják
+(`animals`, `users`, …), a lapozást `pagination` alatt. A `getPage(path, key)`
+ezt normalizálja `{ items, info }` alakra, a `getAllAsPage(path)` pedig a sima
+tömböt adó végpontokat burkolja egyoldalas lappá — így a listakezelő kód
+mindenhol ugyanaz. Kurzoros végponthoz `getCursorPage`.
+
+Paramétert `withQuery`-vel fűzz, ne kézzel: az üres értékeket kihagyja.
+
+**Komponensek** (`components/ui/`) — `Button`, `Field`, `DataList`, és a
+`ScreenState`-ből `Loading` / `EmptyState` / `ErrorState` / `ListState`.
+Színt és térközt a `theme.ts`-ből vegyél, ne írj hexakódot a képernyőbe.
+
+A `DataList` az egész `usePagedList`-állapotot egy propban kapja meg,
+szándékosan: így nem lehet a felét elfelejteni bekötni — és épp a hibaág az,
+ami eddig kimaradt.
+
+**A hibaág kötelező.** Az „üres lista" és a „nem sikerült betölteni" nem
+ugyanaz. A `ListState` a hibát az üresség ELŐTT vizsgálja, mert fordítva egy
+elhasalt lekérés „nincs találat"-ként jelenne meg, és a felhasználó a szűrőjét
+kezdené igazgatni.
+
 ## Belépési pont
 
 A `package.json` `main` értéke `expo-router/entry`, tehát a navigáció az `app/`
@@ -98,11 +135,111 @@ hozzányúl a `main`-hez, az fog elindulni. Ne oda írj kódot.
 
 ## Engedélyek
 
-Az app **nem** használ kamerát, fotótárat és helyadatot (nincs
-`expo-image-picker`, `expo-location`, `expo-camera`). Ezért iOS usage
-description stringre NINCS szükség. Ha ilyen funkciót írsz, akkor viszont
-kötelező — és csak azokat vedd fel, amiket valóban használsz, mert az Apple a
-fölösleges engedélykérést elutasítja.
+Az app **kamerát és fotótárat használ** (`expo-image-picker`): a bejelentésnél
+és a napi képnél. Helyadatot NEM használ (nincs `expo-location`).
+
+Az engedélyszövegek az `app.json`-ban, az `expo-image-picker` plugin
+konfigurációjában vannak, **magyarul** — a felhasználó pontosan azt a mondatot
+olvassa az engedélykérő ablakban, és az Apple el is utasítja a semmitmondó
+indoklást.
+
+Két dolog, amit a plugin NEM úgy csinál, ahogy elsőre gondolnád (v56-os
+dokumentáció alapján ellenőrizve):
+
+- **Nem adja hozzá az Android `CAMERA` engedélyt** — csak az iOS usage
+  descriptiont állítja be. Ezért az `android.permissions` tömbben szerepel
+  kézzel.
+- **Hozzáadja a `RECORD_AUDIO`-t**, amire nincs szükség (állóképet készítünk).
+  Ezt a `microphonePermission: false` blokkolja.
+
+Az app **push értesítést** is küld (`expo-notifications`), ezért kér értesítési
+engedélyt. Androidon a `POST_NOTIFICATIONS`-t a plugin adja hozzá, nem kézzel.
+
+Ha új engedélyt veszel fel, a `docs/20-mobil-kiadas.md` adatkezelési listáját
+is frissíteni kell — a store-kérdőívek abból készülnek.
+
+## Térkép
+
+**A webes Leaflet NEM vihető át.** A weben `ssr: false` dinamikus importtal
+elrejtett Leaflet fut, ami böngészős DOM-ra épül; natív appban nincs DOM. Itt
+`expo-maps` megy: Androidon Google Maps, iOS-en Apple Maps.
+
+**Az `expo-maps`-nek nincs közös komponense.** `GoogleMaps.View` és
+`AppleMaps.View` külön létezik, eltérő tulajdonságokkal — ezért van a
+képernyőn két ág. A közös rész (jelölők összeállítása, koppintás
+visszafejtése) a `lib/map-markers.ts`-ben van, hogy ne kelljen kétszer
+karbantartani.
+
+**Androidhoz Google Maps API-kulcs kell**, különben a térkép szürke marad. A
+kulcs az `app.config.js`-ben van, környezeti változóból (`GOOGLE_MAPS_API_KEY`)
+— azért van egyáltalán `app.config.js`, mert az `app.json` statikus JSON, és
+nem tud környezeti változót behelyettesíteni. Az `app.json` marad a beállítások
+helye. iOS-hez nincs kulcs, az Apple Maps nem kér ilyet.
+
+**Helyadatot itt sem kérünk.** Az `expo-maps` plugin `requestLocationPermission:
+false` beállítással van felvéve, tehát NEM ad hozzá helyengedélyt. A kezdő
+nézet fix (Magyarország), a jelölő koppintásakor az útvonaltervet a rendszer
+térképalkalmazása intézi, a célcím átadásával.
+
+**Androidon a jelölő nem színezhető** (a Google jelölő csak saját képfájlt
+fogad el), ezért ott a réteget a buborék szövege és a jelmagyarázat
+különbözteti meg; iOS-en a `tintColor` megy.
+
+## Push értesítés
+
+**Az in-app értesítés a hiteles forrás, a push csak figyelemfelhívás.** Ha a
+push bármiért elmarad (nincs engedély, nincs hálózat, lejárt a token), az
+értesítés az Értesítések képernyőn akkor is ott van. Ezért a `lib/push.ts`-ből
+**soha nem terjedhet hiba a hívó felé** — minden ág `null`-lal vagy némán tér
+vissza, és a naplóba ír.
+
+**iOS-en alapból KI VAN KAPCSOLVA.** Az Apple push szolgáltatásához APNs-kulcs
+kell (fejlesztői tagsághoz kötött), ami még nincs meg. Kulcs nélkül a
+`getExpoPushTokenAsync` hibát dob, ezért iOS-en addig **engedélyt sem kérünk** —
+egy egyszer elutasított engedélyt nehéz visszaszerezni. Bekapcsolás:
+`EXPO_PUBLIC_PUSH_IOS_ENABLED=true`.
+
+**Az Expo Go SDK 53 óta nem támogatja a távoli push értesítést** — development
+vagy `preview` build kell. Ha szimulátoron „nem jön az értesítés", valószínűleg
+nem hiba.
+
+**EAS projektazonosító nélkül nincs token.** A `getExpoPushTokenAsync`
+`projectId`-t vár, ami az `eas init` után kerül az `app.json`-ba. Amíg nincs, a
+regisztráció figyelmeztetéssel kimarad.
+
+Három fájl:
+
+- `lib/push.ts` — regisztráció, leregisztrálás, Android csatorna, jelvény.
+- `lib/use-push.ts` — bekötés: regisztráció bejelentkezés után, és a koppintás
+  kezelése. A `useLastNotificationResponse` újracsatoláskor ugyanazt a választ
+  adja vissza, ezért az azonosítója **meg van jegyezve** — enélkül minden
+  képernyőváltás után újra odaugranánk.
+- `lib/notification-link.ts` — a webes `href` → mobil képernyő leképezés,
+  ugyanaz, amit az értesítéslista használ.
+
+**Kijelentkezéskor a leregisztrálás a munkamenet törlése ELŐTT fut**
+(`AuthProvider.logout`): a szerver hitelesítést vár, utána már nem volna mivel.
+Enélkül a következő belépő ezen a telefonon az előző értesítéseit kapná meg.
+
+A kapcsolók (Profil → Értesítési beállítások) három kategóriát adnak, nem
+51-et. A típus → kategória leképezés a **szerveren** van (`lib/push.ts`), és
+`Record<NotificationType, …>`, tehát új értesítéstípusnál fordítási hiba jelez.
+
+**Fotózás a kódban:** a `lib/photo.ts` intézi a választást, az engedélykérést és
+a feltöltést, a `components/ui/PhotoField.tsx` pedig a felületet. Ne írj újat.
+A `/api/upload` NEM multipart űrlapot fogad, hanem a Vercel Blob kliens-token
+folyamatát — ezért kell a `@vercel/blob` a mobilban is.
+
+## Menhelyi admin — mi van az appban
+
+Az admin fül (`app/(tabs)/admin.tsx`) SZŰK szándékosan. Csak az kerül ide, ami
+értesítéssel érkezik, egy döntés, és a késlekedésnek ára van: a kérelem
+elbírálása, az időpont visszaigazolása, és az üzenetváltás. Minden más
+(állatnyilvántartás, egészségügy, készlet, pénzügy, űrlapok, kennelek,
+áthelyezések, eseményszervezés, analitika) a webes vezérlőpulton marad.
+
+**Ha új admin funkciót vennél fel, előbb nézd meg a docs/11 „Mi kerül a mobilba"
+szakaszát** — ott van a három feltétel és az, mit hagytam ki szándékosan.
 
 ## Ami a store-os kiadáshoz még hiányzik
 

@@ -145,12 +145,38 @@ export default function AnimalDetailScreen() {
             </Text>
           </TouchableOpacity>
         )}
+
+        {/* Látogatási időpont (docs/05-appointments.md, US-05-A). A docs
+            szerint innen, az állat adatlapjáról indul a foglalás. A menhely
+            azonosítóját az állat adja, mert a végpont azt várja — és
+            ellenőrzi is, hogy az állat ehhez a menhelyhez tartozik-e. */}
+        {animal.status === "AVAILABLE" && (
+          <TouchableOpacity
+            style={styles.visitBtn}
+            onPress={() => router.push({
+              pathname: "/appointments/new",
+              params: {
+                shelterId:   animal.shelterId,
+                animalId:    animal.id,
+                animalName:  animal.name,
+                shelterName: animal.shelter.name,
+              },
+            })}
+          >
+            <Text style={styles.visitBtnText}>Időpontot foglalok</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  visitBtn: {
+    marginTop: 10, borderWidth: 1, borderColor: "#2563EB", borderRadius: 10,
+    paddingVertical: 14, alignItems: "center",
+  },
+  visitBtnText: { color: "#2563EB", fontWeight: "700", fontSize: 15 },
   container:  { flex: 1, backgroundColor: "#fff" },
   content:    { paddingBottom: 40 },
   centered:   { flex: 1, justifyContent: "center", alignItems: "center" },

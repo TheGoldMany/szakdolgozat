@@ -10,6 +10,7 @@ import { PageTransition } from "@/components/layout/page-transition";
 import { DailyLauncher } from "@/components/daily/daily-launcher";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { CookieBanner } from "@/components/ui/cookie-banner";
+import { PageTour } from "@/components/onboarding/page-tour";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import "../globals.css";
@@ -69,6 +70,9 @@ export default async function LocaleLayout({
             <Suspense><MobileBottomNav /></Suspense>
             <Suspense><DailyLauncher /></Suspense>
             <CookieBanner />
+            {/* Az oldalhoz tartozó bemutató. EGY példány, az útvonalból
+                választja ki a lépéseket – így egyetlen oldalról sem maradhat le. */}
+            <Suspense><PageTour /></Suspense>
           </Providers>
         </NextIntlClientProvider>
       </body>

@@ -126,6 +126,19 @@ model User {
   suspendedAt              DateTime?
   suspendedReason          String?
   emailNotifications       Boolean   @default(true)
+
+  // ── Push értesítések kategóriánként ─────────────────────────────────────
+  // Nem típusonként kapcsolható (51 értesítéstípus van), hanem három
+  // csoportban, mert a felhasználó nem típusokban gondolkodik. A típus →
+  // kategória leképezés a `lib/push.ts`-ben van, nem az adatbázisban: új
+  // értesítéstípusnál így csak kódot kell írni, sémát nem.
+  /// Üzenetek és válaszok.
+  pushMessages             Boolean   @default(true)
+  /// Ügyintézés: kérelem, időpont, utánkövetés.
+  pushCaseUpdates          Boolean   @default(true)
+  /// Közösség: ismerős-jelölés, napi kép kedvelése.
+  pushCommunity            Boolean   @default(true)
+
   dashboardTourSeen        Boolean   @default(false)
   /// Látta-e már a Napi állatok funkciómagyarázót.
   dailyIntroSeen           Boolean   @default(false)
@@ -167,6 +180,7 @@ model User {
   transferResolutions AnimalTransfer[]       @relation("TransferResolver")
   posts               Post[]                 @relation("PostAuthor")
   postLikes           PostLike[]
+  pushTokens          PushToken[]
   auditLogs           AuditLog[]             @relation("AuditActor")
 }
 
@@ -1125,6 +1139,28 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+/// Egy eszköz Expo push tokenje.
+///
+/// Miért külön tábla és nem egy mező a User-en: egy felhasználónak több
+/// készüléke lehet (telefon + tablet), és egy készüléket többen is
+/// használhatnak egymás után. Ezért a token az egyedi kulcs, nem a userId —
+/// ha ugyanarra az eszközre más jelentkezik be, a token átkerül hozzá, és a
+/// korábbi tulajdonos nem kapja tovább az értesítéseit.
+model PushToken {
+  id         String   @id @default(cuid())
+  /// Expo push token (`ExponentPushToken[...]`).
+  token      String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// "ios" | "android" – csak diagnosztikához, a küldés nem függ tőle.
+  platform   String
+  createdAt  DateTime @default(now())
+  /// Utolsó sikeres regisztráció. A rég nem látott tokenek így kiszűrhetők.
+  lastUsedAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // -------------------------------------------------------

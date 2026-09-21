@@ -2,15 +2,64 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+// A nyelvi előtagot megtartó hivatkozás: sima `next/link`-kel a bemutató
+// hivatkozásai kiesnének a felhasználó nyelvéből.
+import { Link } from "@/i18n/navigation";
 import {
   PawPrint, Search, FileText, Heart, Bell, Building2, CreditCard, Upload,
   MessageCircle, ChevronRight, Users, CalendarDays, HandHeart, Package,
   ListChecks, BarChart2, Settings, ShieldCheck, AlertTriangle, CheckCircle2,
   Clock, ArrowDownCircle, ArrowUpCircle, RotateCcw, Info,
   Home, Map, ArrowLeftRight, Star, MessagesSquare, Share2, Navigation,
+  Compass, HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { listedTours } from "@/lib/tours";
+
+/**
+ * Végigvezető bemutatók listája.
+ *
+ * A bemutató mindig az ADOTT oldalon fut, ezért itt csak hivatkozás van rá:
+ * a `?bemutato=1` paraméterrel megnyitott oldalon a bemutató akkor is elindul,
+ * ha a felhasználó már látta egyszer.
+ */
+function TourIndex() {
+  const tours = listedTours();
+
+  return (
+    <section id="bemutatok" className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-1 flex items-center gap-2">
+        <Compass className="h-5 w-5 text-brand-600" />
+        <h2 className="text-lg font-bold text-gray-900">Végigvezető bemutatók</h2>
+      </div>
+      <p className="mb-5 text-sm text-gray-500">
+        Minden fontosabb oldalon indul egy rövid bemutató az első látogatáskor.
+        Itt bármelyiket újranézheted — a fejlécben lévő <HelpCircle className="inline h-3.5 w-3.5 align-text-bottom" />{" "}
+        gombbal pedig mindig az éppen nyitott oldalét indíthatod el.
+      </p>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {tours.map(({ tour, href }) => (
+          <Link
+            key={tour.id}
+            href={`${href}?bemutato=1`}
+            className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:border-brand-300 hover:bg-brand-50"
+          >
+            <span className="font-medium text-gray-700">{tour.title}</span>
+            <span className="shrink-0 text-xs text-gray-400">
+              {tour.steps.length} lépés
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      <p className="mt-4 text-xs text-gray-400">
+        Az állat és a menhely adatlapjának is van saját bemutatója; azok az adott
+        oldal megnyitásakor indulnak.
+      </p>
+    </section>
+  );
+}
 
 // ── Types & primitives ────────────────────────────────────────────────────
 
@@ -1316,6 +1365,9 @@ export default function HelpPage() {
             {activeTab === "user"       && <UserContent />}
             {activeTab === "admin"      && <AdminContent />}
             {activeTab === "superadmin" && <SuperAdminContent />}
+
+            {/* Végigvezető bemutatók */}
+            <TourIndex />
 
             {/* Footer CTA */}
             <div className="mt-10 rounded-2xl bg-brand-600 p-8 text-center text-white">

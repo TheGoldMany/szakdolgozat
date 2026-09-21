@@ -86,3 +86,52 @@ export async function publicShelter(idOrSlugValue: string) {
     select: SHELTER_PUBLIC_SELECT,
   });
 }
+
+/**
+ * Publikus esemény.
+ *
+ * Miért kell ez a mobilnak: a `/api/events` végpont NEM ezt adja — az a
+ * menhely admin saját eseményeit listázza, vázlatokkal együtt, és böngésző-
+ * munkamenetet vár. A publikus eseménylista eddig csak szerverkomponensként
+ * létezett (`app/[locale]/events/page.tsx`), tehát az appnak nem volt mit
+ * hívnia.
+ *
+ * A `_count.registrations` csak az AKTÍV jelentkezéseket számolja, mert a
+ * szabad helyek számításánál a lemondott jelentkezés már nem foglal helyet.
+ */
+const EVENT_PUBLIC_SELECT = {
+  id: true, slug: true, title: true, description: true, type: true,
+  location: true, startsAt: true, endsAt: true, capacity: true,
+  imageUrl: true, status: true,
+  shelter: { select: { id: true, name: true, city: true, slug: true } },
+  _count:  { select: { registrations: { where: { status: "REGISTERED" as const } } } },
+} as const;
+
+/**
+ * Közzétett, még el nem kezdődött események, időrendben.
+ *
+ * A múltbeli eseményeket szándékosan kihagyjuk: ugyanaz a szabály, mint a
+ * webes listában — amire már nem lehet jelentkezni, az csak zajt csinál.
+ */
+export async function publicEvents(limit = 100) {
+  return prisma.event.findMany({
+    where:   { status: "PUBLISHED", startsAt: { gte: new Date() } },
+    select:  EVENT_PUBLIC_SELECT,
+    orderBy: { startsAt: "asc" },
+    take:    limit,
+  });
+}
+
+/**
+ * Egy esemény publikus alakja.
+ *
+ * A LEMONDOTT eseményt itt kiadjuk (a listából kimarad), mert aki jelentkezett
+ * rá, értesítést kapott egy hivatkozással — ha 404-et kapna, nem tudná meg,
+ * mi történt. A vázlat viszont nem publikus.
+ */
+export async function publicEvent(idOrSlugValue: string) {
+  return prisma.event.findFirst({
+    where:  { status: { in: ["PUBLISHED", "CANCELLED", "COMPLETED"] }, ...idOrSlug(idOrSlugValue) },
+    select: EVENT_PUBLIC_SELECT,
+  });
+}

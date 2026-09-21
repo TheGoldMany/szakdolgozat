@@ -5,6 +5,10 @@ import { upload } from "@vercel/blob/client";
 import { useTranslations } from "next-intl";
 import { FileText, Trash2, Upload, Save, Camera, Loader2, PawPrint, Building2, CheckCircle, AlertTriangle, Info, ExternalLink, MapPin } from "lucide-react";
 import { LocationPicker } from "@/components/ui/location-picker";
+// A díjszázalék a `donation-limits`-ből jön, NEM a `lib/stripe.ts`-ből: az
+// importálja a Stripe SDK-t, és egy kliens komponensből behúzva a teljes SDK
+// bekerülne a böngésző bundle-jébe.
+import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 
 interface ShelterDoc {
   id:        string;
@@ -13,6 +17,12 @@ interface ShelterDoc {
   fileType:  string;
   createdAt: Date | string;
 }
+
+/**
+ * A csatolt Stripe fiók valós állapota, a szerveren lekérdezve.
+ * A `lib/stripe.ts` `ConnectedAccountState`-jének megfelelő értékek.
+ */
+type StripeState = "missing" | "inaccessible" | "incomplete" | "ready" | "unknown";
 
 interface Props {
   shelter: {
@@ -33,11 +43,12 @@ interface Props {
     stripeAccountId:         string | null;
     stripeOnboardingComplete: boolean;
   };
+  stripeState: StripeState;
 }
 
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
-export function ShelterSettingsForm({ shelter }: Props) {
+export function ShelterSettingsForm({ shelter, stripeState }: Props) {
   const t = useTranslations("dashboard");
 
   // --- Logo ---
@@ -286,15 +297,68 @@ export function ShelterSettingsForm({ shelter }: Props) {
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
-          {t("settingsStripeDesc")}
+          {t("settingsStripeDesc", { fee: PLATFORM_FEE_PERCENT })}
         </p>
 
-        {shelter.stripeOnboardingComplete ? (
+        {/* A fiók elérhetetlen: a tárolt jelző szerint kész, a Stripe szerint
+            nincs ilyen fiók. Ilyenkor az adományok NEM érkeznek meg, ezért itt
+            nem szépítünk — és rögtön adunk egy kiutat is. */}
+        {stripeState === "inaccessible" ? (
+          <div className="space-y-3">
+            <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
+              <div className="text-sm text-red-800">
+                <p className="font-semibold">A Stripe fiók nem érhető el</p>
+                <p className="mt-1">
+                  A platform nem látja ezt a fiókot, ezért <strong>adomány és
+                  előfizetés jelenleg nem érkezhet</strong> rá. Ez akkor fordul
+                  elő, ha a fiók még tesztüzemben készült, vagy ha a
+                  hozzáférést visszavonták a Stripe-nál. Kapcsolódj újra: a
+                  rendszer új fiókot hoz létre, és végigvezet a beállításán.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleStripeConnect}
+              disabled={stripeLoading}
+              className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
+            >
+              {stripeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {stripeLoading ? t("settingsStripeConnecting") : "Újrakapcsolódás a Stripe-hoz"}
+            </button>
+          </div>
+        ) : stripeState === "ready" ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
               <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />
               <p className="text-sm font-medium text-green-800">
                 {t("settingsStripeActive")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleStripeDashboard}
+              disabled={stripeDashLoading}
+              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60 transition-colors"
+            >
+              {stripeDashLoading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <ExternalLink className="h-4 w-4" />}
+              {stripeDashLoading ? t("settingsStripeConnecting") : t("settingsStripeDashboard")}
+            </button>
+          </div>
+        ) : stripeState === "unknown" && shelter.stripeOnboardingComplete ? (
+          /* A Stripe most nem válaszolt. Nem tudjuk, mi az igazság – a tárolt
+             jelzőt mutatjuk, de nem állítjuk biztosra. Hamis riasztás rosszabb
+             lenne, mint a bizonytalanság kimondása. */
+          <div className="space-y-3">
+            <div className="flex items-start gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+              <Info className="h-5 w-5 shrink-0 text-gray-500 mt-0.5" />
+              <p className="text-sm text-gray-700">
+                A Stripe fiók állapotát most nem sikerült ellenőrizni. A korábbi
+                adat szerint a fiók be van állítva. Töltsd újra az oldalt pár
+                perc múlva.
               </p>
             </div>
             <button
@@ -332,7 +396,7 @@ export function ShelterSettingsForm({ shelter }: Props) {
             <div className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
               <Info className="h-5 w-5 shrink-0 text-blue-600 mt-0.5" />
               <p className="text-sm text-blue-800">
-                {t("settingsStripeDesc")}
+                {t("settingsStripeDesc", { fee: PLATFORM_FEE_PERCENT })}
               </p>
             </div>
             <button

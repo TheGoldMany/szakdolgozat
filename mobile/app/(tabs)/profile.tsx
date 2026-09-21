@@ -109,8 +109,9 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Felhasználó fejléc */}
-      <View style={styles.header}>
+      {/* Felhasználó fejléc – koppintásra a szerkesztés nyílik, mert ez az a
+          hely, ahol a felhasználó a saját adatait keresi. */}
+      <TouchableOpacity style={styles.header} onPress={() => router.push("/profile/edit")}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{user.name[0]?.toUpperCase()}</Text>
         </View>
@@ -118,10 +119,51 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.userEmail}>{user.email}</Text>
         </View>
-      </View>
+        <Text style={styles.headerEdit}>Szerkesztés ›</Text>
+      </TouchableOpacity>
+
+      {/* Gyorslinkek – a tabsáv négy helye tele van, ezek innen érhetők el. */}
+      {/* A két fotózós belépési pont elöl: ezért éri meg telefonon használni. */}
+      <TouchableOpacity style={styles.primaryRow} onPress={() => router.push("/reports/new")}>
+        <Text style={styles.primaryText}>Elveszett vagy talált állat bejelentése</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.primaryRow} onPress={() => router.push("/daily/new")}>
+        <Text style={styles.primaryText}>Napi kép feltöltése</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/connections")}>
+        <Text style={styles.linkText}>Ismerősök</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/helping")}>
+        <Text style={styles.linkText}>Önkénteskedés és befogadás</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/events")}>
+        <Text style={styles.linkText}>Események</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/map")}>
+        <Text style={styles.linkText}>Térkép</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/notifications")}>
+        <Text style={styles.linkText}>Értesítések</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/notifications/settings")}>
+        <Text style={styles.linkText}>Értesítési beállítások</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/favorites")}>
+        <Text style={styles.linkText}>Kedvenceim</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/messages")}>
+        <Text style={styles.linkText}>Üzenetek</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/applications")}>
+        <Text style={styles.linkText}>Kérelmeim</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkRow} onPress={() => router.push("/appointments")}>
+        <Text style={styles.linkText}>Időpontjaim</Text>
+      </TouchableOpacity>
 
       {/* Kérelmek */}
-      <Text style={styles.sectionTitle}>Kérelmeim</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Kérelmeim</Text>
       {loading ? (
         <ActivityIndicator color="#2563EB" style={{ marginTop: 20 }} />
       ) : apps.length === 0 ? (
@@ -204,6 +246,7 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 22, fontWeight: "700", color: "#2563EB" },
   userName:   { fontSize: 17, fontWeight: "700", color: "#111827" },
   userEmail:  { fontSize: 13, color: "#6B7280" },
+  headerEdit: { marginLeft: "auto", fontSize: 13, color: "#2563EB", fontWeight: "600" },
   sectionTitle: { fontSize: 13, fontWeight: "700", color: "#6B7280", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 10 },
   empty:    { color: "#9CA3AF", fontSize: 14, textAlign: "center", marginTop: 20 },
   appCard:  { flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderRadius: 10, padding: 10, marginBottom: 10, gap: 10 },
@@ -216,6 +259,8 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 30, borderWidth: 1, borderColor: "#FCA5A5", borderRadius: 10, paddingVertical: 14, alignItems: "center" },
   logoutText: { color: "#EF4444", fontWeight: "600", fontSize: 15 },
   linkRow:  { backgroundColor: "#fff", borderRadius: 10, paddingVertical: 14, paddingHorizontal: 14, marginBottom: 8 },
+  primaryRow:  { backgroundColor: "#2563EB", borderRadius: 10, paddingVertical: 14, paddingHorizontal: 14, marginBottom: 8 },
+  primaryText: { color: "#fff", fontSize: 15, fontWeight: "700" },
   linkText: { color: "#2563EB", fontSize: 15, fontWeight: "500" },
   deleteBtn:  { marginTop: 14, paddingVertical: 14, alignItems: "center" },
   deleteText: { color: "#B91C1C", fontSize: 14, textDecorationLine: "underline" },

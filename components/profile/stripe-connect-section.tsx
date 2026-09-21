@@ -4,12 +4,17 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CreditCard, CheckCircle, AlertTriangle, Info, ExternalLink, Loader2 } from "lucide-react";
 
+/** A `lib/stripe.ts` `ConnectedAccountState`-jével egyező értékek. */
+type StripeState = "missing" | "inaccessible" | "incomplete" | "ready" | "unknown";
+
 interface Props {
   stripeAccountId:          string | null;
   stripeOnboardingComplete: boolean;
+  /** A szerveren lekérdezett VALÓS állapot – lásd a beállítások oldal magyarázatát. */
+  stripeState:              StripeState;
 }
 
-export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete }: Props) {
+export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete, stripeState }: Props) {
   const t = useTranslations("profile");
   const [connecting, setConnecting] = useState(false);
   const [opening, setOpening]       = useState(false);
@@ -62,7 +67,31 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
         {t("stripeDesc")}
       </p>
 
-      {stripeOnboardingComplete ? (
+      {/* Elérhetetlen fiók: a tárolt jelző szerint kész, a Stripe szerint nincs
+          ilyen fiók. Így adomány nem érkezhet rá, tehát nem mondhatjuk aktívnak. */}
+      {stripeState === "inaccessible" ? (
+        <div className="space-y-3">
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
+            <div className="text-sm text-red-800">
+              <p className="font-semibold">A Stripe fiók nem érhető el</p>
+              <p className="mt-1">
+                A platform nem látja ezt a fiókot, ezért adomány jelenleg nem
+                érkezhet rá. Kapcsolódj újra – a rendszer új fiókot hoz létre.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={connect}
+            disabled={connecting}
+            className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors"
+          >
+            {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Újrakapcsolódás a Stripe-hoz
+          </button>
+        </div>
+      ) : stripeState === "ready" || (stripeState === "unknown" && stripeOnboardingComplete) ? (
         <div className="space-y-3">
           <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
             <CheckCircle className="h-5 w-5 shrink-0 text-green-600" />

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 import { createNotification, createNotifications } from "@/lib/notifications";
 
 const patchSchema = z.object({
@@ -12,7 +13,7 @@ const patchSchema = z.object({
   // Vagy a gyűjtés adatainak szerkesztése
   title:        z.string().min(2).max(200).optional(),
   description:  z.string().min(2).optional(),
-  targetAmount: z.number().int().positive().optional(),
+  targetAmount: z.number().int().min(MIN_CAMPAIGN_TARGET_HUF).optional(),
   imageUrl:     z.string().url().nullable().optional().or(z.literal("")),
   endsAt:       z.string().datetime().nullable().optional(),
   status:       z.enum(["PENDING", "ACTIVE", "COMPLETED", "REJECTED"]).optional(),

@@ -1236,3 +1236,59 @@ TC-18-20 · TC-18-27 · TC-18-28 · TC-18-29 · TC-18-30 · TC-18-34 · TC-18-35
 
 Ezek mind olyan hibát fednének fel, ami **valódi pénzt érint**: elmaradt vagy
 duplázott könyvelést, hibás visszatérítést, vagy jogosulatlan hozzáférést.
+
+---
+
+### TC-18-36: Elérhetetlen csatolt Stripe fiók (teszt→éles kulcsváltás)
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Előfeltétel** | Olyan menhely, amelynek `stripeOnboardingComplete = true`, de a tárolt `stripeAccountId` a mostani kulccsal nem érhető el (pl. teszt módban készült fiók, éles kulcs mellett) |
+| **URL** | `/dashboard/settings` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Miért van ez a teszteset**
+
+Éles üzemben előfordult. A „Stripe fiók kezelése" gomb a Stripe nyers, angol
+hibáját írta ki a menhely adminjának:
+
+> The provided key 'sk_live_***…' does not have access to account
+> 'acct_***' (or that account does not exist). Application access may have
+> been revoked.
+
+A **teszt** és az **éles** Stripe két teljesen külön világ: egy teszt módban
+létrehozott `acct_…` az éles kulccsal nem létezik. A tárolt
+`stripeOnboardingComplete` viszont `true` maradt, ezért a beállítások oldal
+zöld pipával azt állította, hogy „az adományok automatikusan érkeznek a
+számlára" — közben a fizetési útvonal (`resolveTransferDestination`) már
+elutasította őket. **A felhasználó a valótlan állításból nem tudhatta, hogy
+tennie kellene valamit.** Ugyanezt a hibát adja a Stripe akkor is, ha a fiók
+másik platformhoz tartozik, vagy ha a hozzáférést visszavonták.
+
+**Elfogadási feltételek:**
+- [ ] A beállítások oldal **piros** figyelmeztetést mutat, nem zöld pipát
+- [ ] A szöveg kimondja, hogy adomány és előfizetés jelenleg **nem érkezhet**
+- [ ] Megjelenik egy „Újrakapcsolódás a Stripe-hoz" gomb
+- [ ] A gomb új Stripe fiókot hoz létre, és elindítja a Stripe folyamatát
+- [ ] A „Stripe fiók kezelése" hívás **409**-et ad `code: "account_inaccessible"` értékkel, magyar üzenettel
+- [ ] A válaszban **nem szerepel** sem a platform kulcsa, sem a belső `acct_` azonosító
+- [ ] Ugyanez érvényes a felhasználói Stripe fiókra a `/hu/profile` oldalon
+- [ ] Ha a Stripe **nem válaszol** (hálózati hiba), NEM jelenik meg a piros riasztás — a rendszer semleges üzenetet ad
+
+**Tesztelési lépések:**
+1. Állítsd egy teszt-menhely `stripeAccountId` mezőjét egy nem létező értékre (pl. `acct_teszt_nincs_ilyen`), a `stripeOnboardingComplete`-et pedig `true`-ra.
+2. Nyisd meg a `/dashboard/settings` oldalt menhelyi adminként.
+3. Ellenőrizd a piros figyelmeztetést és az „Újrakapcsolódás" gombot.
+4. Kattints a „Stripe fiók kezelése" gombra (ha még látszik) vagy hívd közvetlenül a `POST /api/stripe/connect/dashboard` végpontot, és nézd meg a választ.
+5. Kattints az „Újrakapcsolódás a Stripe-hoz" gombra, és kövesd a folyamatot.
+6. Ellenőrizd, hogy az adatbázisban új `stripeAccountId` van, és a `stripeOnboardingComplete` `false`-ra állt.
+
+**Elvárt eredmény:**
+A felület a valóságot mutatja, a felhasználó saját erőből meg tudja oldani, és
+a platform titkos kulcsa nem jut a felületre.
+
+**Tényleges eredmény:**
+> _Kitöltendő tesztelés után_
