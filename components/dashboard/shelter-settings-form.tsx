@@ -117,9 +117,20 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
   const [stripeDashLoading, setStripeDashLoading] = useState(false);
   const [stripeError,     setStripeError]     = useState("");
 
+  /** A Stripe gépi hibakódja – nem titok, és enélkül nem lehet diagnosztizálni. */
+  const [stripeCode, setStripeCode] = useState("");
+
+  /** `{ type, code, param }` egyetlen olvasható sorrá. */
+  function codeLine(info: unknown): string {
+    if (!info || typeof info !== "object") return "";
+    const { type, code, param } = info as { type?: string; code?: string; param?: string };
+    return [type, code, param && `param: ${param}`].filter(Boolean).join(" · ");
+  }
+
   async function handleStripeConnect() {
     setStripeLoading(true);
     setStripeError("");
+    setStripeCode("");
     try {
       const res = await fetch("/api/stripe/connect/onboard", {
         method:  "POST",
@@ -127,7 +138,10 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
         body:    JSON.stringify({ type: "shelter", shelterId: shelter.id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("analyticsError"));
+      if (!res.ok) {
+        setStripeCode(codeLine(data.stripe));
+        throw new Error(data.error ?? t("analyticsError"));
+      }
       window.location.href = data.url;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : t("tiersUnknownError");
@@ -139,6 +153,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
   async function handleStripeDashboard() {
     setStripeDashLoading(true);
     setStripeError("");
+    setStripeCode("");
     try {
       const res = await fetch("/api/stripe/connect/dashboard", {
         method:  "POST",
@@ -411,7 +426,18 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
           </div>
         )}
 
-        {stripeError && <p className="mt-2 text-xs text-red-500">{stripeError}</p>}
+        {stripeError && (
+          <div className="mt-2">
+            <p className="text-xs text-red-500">{stripeError}</p>
+            {/* A gépi hibakód. Kijelölhető szövegként, hogy továbbítani lehessen —
+                enélkül a hiba diagnosztizálhatatlan, ezt élesben megtanultuk. */}
+            {stripeCode && (
+              <p className="mt-1 select-all font-mono text-[11px] text-gray-400">
+                Stripe: {stripeCode}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Menhely logó */}

@@ -3,7 +3,9 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe, isStaleAccountError } from "@/lib/stripe";
+import {
+  getStripe, isStaleAccountError, isPlatformSetupError, stripeErrorInfo,
+} from "@/lib/stripe";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -158,12 +160,36 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error("Stripe Connect onboard error:", err);
-    // A Stripe nyers szövegét NEM adjuk ki: angol, és a hozzáférési hibák
-    // esetében benne van a platform titkos kulcsának a vége meg a belső
-    // `acct_` azonosító. Ez a menhely adminjának se nem érthető, se nem az ő
-    // adata — naplóba való, nem a felületre.
+
+    // A Stripe nyers SZÖVEGÉT nem adjuk ki (benne lehet a platform kulcsának a
+    // vége és a belső `acct_` azonosító), a gépi hibakódot viszont igen: abból
+    // derül ki, mi a baj. Egy általános „nem sikerült" ugyanolyan
+    // használhatatlan, mint a nyers hiba — ezt élesben megtanultuk.
+    const info = stripeErrorInfo(err);
+
+    // A leggyakoribb ok éles kulcsra váltás után: a PLATFORM Connect-profilja
+    // nincs kitöltve. Ezzel a menhely adminja nem tud mit kezdeni, ezért
+    // kimondjuk, hogy ez az üzemeltető dolga.
+    if (isPlatformSetupError(err)) {
+      return NextResponse.json(
+        {
+          code:  "platform_setup_incomplete",
+          error: "A Stripe még nem engedi új fiók létrehozását ezen a platformon. "
+               + "Ez a platform beállítása, nem a menhelyé: az üzemeltetőnek a Stripe "
+               + "vezérlőpultján be kell fejeznie a Connect platform-profilt. "
+               + "Szólj az üzemeltetőnek.",
+          stripe: info,
+        },
+        { status: 409 },
+      );
+    }
+
     return NextResponse.json(
-      { error: "A Stripe kapcsolódás most nem sikerült. Próbáld újra később." },
+      {
+        error: "A Stripe kapcsolódás most nem sikerült. Ha újrapróbálva is ezt kapod, "
+             + "add meg az üzemeltetőnek az alábbi hibakódot.",
+        stripe: info,
+      },
       { status: 500 },
     );
   }

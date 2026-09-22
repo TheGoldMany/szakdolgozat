@@ -217,3 +217,68 @@ describe("POST /api/stripe/connect/dashboard", () => {
     expect(JSON.stringify(body)).not.toContain("titkos_nyom");
   });
 });
+
+/**
+ * A hibakód biztonságos kiadása.
+ *
+ * Élesben ez a tanulság: az „általános üzenet" ugyanolyan használhatatlan,
+ * mint a nyers Stripe hiba — csak máshogy. A felhasználó annyit látott, hogy
+ * „nem sikerült", és senki nem tudta megmondani, miért. A gépi azonosítók
+ * (`type`, `code`, `param`) NEM titkok; a `message` viszont az, mert
+ * hozzáférési hibánál benne van a kulcs vége és a belső `acct_` azonosító.
+ */
+describe("stripeErrorInfo", () => {
+  it("a gépi azonosítókat kiadja", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    const err = Object.assign(new Error("bármi"), {
+      type: "StripeInvalidRequestError", code: "account_invalid", param: "account",
+    });
+    expect(stripeErrorInfo(err)).toEqual({
+      type: "StripeInvalidRequestError", code: "account_invalid", param: "account",
+    });
+  });
+
+  it("a MESSAGE-et soha nem adja ki", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    const err = Object.assign(
+      new Error("The provided key 'sk_live_REDACTED' does not have access to account 'acct_TESZT'."),
+      { type: "StripePermissionError" },
+    );
+    const info = stripeErrorInfo(err);
+    expect(JSON.stringify(info)).not.toContain("sk_live");
+    expect(JSON.stringify(info)).not.toContain("acct_");
+    expect(info).not.toHaveProperty("message");
+  });
+
+  it("nem hasal el nem-hiba értékeken", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    expect(stripeErrorInfo(null)).toEqual({});
+    expect(stripeErrorInfo("szöveg")).toEqual({});
+    expect(stripeErrorInfo({ type: 42 })).toEqual({ type: undefined, code: undefined, param: undefined });
+  });
+});
+
+describe("isPlatformSetupError", () => {
+  it("felismeri a kitöltetlen Connect platform-profilt", async () => {
+    const { isPlatformSetupError } = await import("@/lib/stripe");
+    for (const msg of [
+      "Please complete your platform profile before creating accounts.",
+      "Only Stripe accounts with Connect enabled can create other accounts.",
+      "You must finish Connect onboarding first.",
+    ]) {
+      expect(isPlatformSetupError(new Error(msg)), msg).toBe(true);
+    }
+  });
+
+  it("NEM keveri össze az elavult fiók hibájával", async () => {
+    const { isPlatformSetupError } = await import("@/lib/stripe");
+    const staleErr = Object.assign(
+      new Error("The provided key does not have access to account 'acct_TESZT'."),
+      { type: "StripePermissionError" },
+    );
+    // A kettő külön ok, külön üzenettel: az egyik a menhelyé, a másik az
+    // üzemeltetőé. Ha összemosnánk, a menhely olyasmit próbálna javítani,
+    // amihez hozzá sem fér.
+    expect(isPlatformSetupError(staleErr)).toBe(false);
+  });
+});

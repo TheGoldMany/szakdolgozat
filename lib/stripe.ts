@@ -249,3 +249,50 @@ export async function connectedAccountState(
     return "unknown";
   }
 }
+
+/**
+ * A Stripe hibájának BIZTONSÁGOS összefoglalója.
+ *
+ * A `message` szándékosan NINCS benne: hozzáférési hibáknál a Stripe beleírja
+ * a platform titkos kulcsának a végét és a belső `acct_` azonosítót, amit a
+ * menhely adminjának nem szabad látnia.
+ *
+ * A `type`, a `code` és a `param` viszont NEM titok — ezek gépi azonosítók a
+ * Stripe dokumentációjából. Éppen ezek hiánya miatt nem lehetett kideríteni,
+ * miért hasalt el az újrakapcsolódás: a felület csak annyit mondott, hogy „nem
+ * sikerült". Egy általános üzenet, ami elfedi az okot, nem jobb a nyers
+ * hibánál — csak máshogy használhatatlan.
+ */
+export interface SafeStripeError {
+  type?:  string;
+  code?:  string;
+  param?: string;
+}
+
+export function stripeErrorInfo(err: unknown): SafeStripeError {
+  const e = err as { type?: unknown; code?: unknown; param?: unknown } | null;
+  if (!e || typeof e !== "object") return {};
+  const pick = (v: unknown) => (typeof v === "string" ? v : undefined);
+  return { type: pick(e.type), code: pick(e.code), param: pick(e.param) };
+}
+
+/**
+ * A platform saját Connect-beállítása hiányos?
+ *
+ * Éles módban a Stripe addig NEM enged csatolt fiókot létrehozni, amíg a
+ * platform ki nem tölti a Connect platform-profilját. Ez a leggyakoribb ok,
+ * amiért egy addig működő fejlesztés az éles kulcsra váltás után elhasal — és
+ * a menhely adminja nem tud vele mit kezdeni, mert ez a PLATFORM beállítása.
+ */
+export function isPlatformSetupError(err: unknown): boolean {
+  const { code } = stripeErrorInfo(err);
+  if (code === "account_country_invalid_address" || code === "platform_account_required") return true;
+  const msg = ((err as { message?: string } | null)?.message ?? "").toLowerCase();
+  return (
+    msg.includes("platform profile") ||
+    msg.includes("complete your platform") ||
+    msg.includes("connect onboarding") ||
+    msg.includes("signed up for connect") ||
+    msg.includes("only stripe accounts with connect enabled")
+  );
+}
