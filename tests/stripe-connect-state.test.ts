@@ -22,10 +22,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  */
 
 const retrieve = vi.fn();
+const createAccount = vi.fn();
 
 vi.mock("stripe", () => ({
   default: class {
-    accounts = { retrieve };
+    accounts = { retrieve, create: createAccount };
   },
 }));
 
@@ -46,6 +47,8 @@ function stripeError(fields: { type?: string; code?: string; message?: string })
 
 beforeEach(() => {
   retrieve.mockReset();
+  createAccount.mockReset();
+  createAccount.mockResolvedValue({ id: "acct_uj" });
   process.env.STRIPE_SECRET_KEY = "sk_test_teszt";
 });
 
@@ -215,5 +218,117 @@ describe("POST /api/stripe/connect/dashboard", () => {
     const { status, body } = await callRoute();
     expect(status).toBe(500);
     expect(JSON.stringify(body)).not.toContain("titkos_nyom");
+  });
+});
+
+/**
+ * A hibakód biztonságos kiadása.
+ *
+ * Élesben ez a tanulság: az „általános üzenet" ugyanolyan használhatatlan,
+ * mint a nyers Stripe hiba — csak máshogy. A felhasználó annyit látott, hogy
+ * „nem sikerült", és senki nem tudta megmondani, miért. A gépi azonosítók
+ * (`type`, `code`, `param`) NEM titkok; a `message` viszont az, mert
+ * hozzáférési hibánál benne van a kulcs vége és a belső `acct_` azonosító.
+ */
+describe("stripeErrorInfo", () => {
+  it("a gépi azonosítókat kiadja", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    const err = Object.assign(new Error("bármi"), {
+      type: "StripeInvalidRequestError", code: "account_invalid", param: "account",
+    });
+    expect(stripeErrorInfo(err)).toEqual({
+      type: "StripeInvalidRequestError", code: "account_invalid", param: "account",
+    });
+  });
+
+  it("a MESSAGE-et soha nem adja ki", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    const err = Object.assign(
+      new Error("The provided key 'sk_live_REDACTED' does not have access to account 'acct_TESZT'."),
+      { type: "StripePermissionError" },
+    );
+    const info = stripeErrorInfo(err);
+    expect(JSON.stringify(info)).not.toContain("sk_live");
+    expect(JSON.stringify(info)).not.toContain("acct_");
+    expect(info).not.toHaveProperty("message");
+  });
+
+  it("nem hasal el nem-hiba értékeken", async () => {
+    const { stripeErrorInfo } = await import("@/lib/stripe");
+    expect(stripeErrorInfo(null)).toEqual({});
+    expect(stripeErrorInfo("szöveg")).toEqual({});
+    expect(stripeErrorInfo({ type: 42 })).toEqual({ type: undefined, code: undefined, param: undefined });
+  });
+});
+
+describe("isPlatformSetupError", () => {
+  it("felismeri a kitöltetlen Connect platform-profilt", async () => {
+    const { isPlatformSetupError } = await import("@/lib/stripe");
+    for (const msg of [
+      "Please complete your platform profile before creating accounts.",
+      "Only Stripe accounts with Connect enabled can create other accounts.",
+      "You must finish Connect onboarding first.",
+    ]) {
+      expect(isPlatformSetupError(new Error(msg)), msg).toBe(true);
+    }
+  });
+
+  it("NEM keveri össze az elavult fiók hibájával", async () => {
+    const { isPlatformSetupError } = await import("@/lib/stripe");
+    const staleErr = Object.assign(
+      new Error("The provided key does not have access to account 'acct_TESZT'."),
+      { type: "StripePermissionError" },
+    );
+    // A kettő külön ok, külön üzenettel: az egyik a menhelyé, a másik az
+    // üzemeltetőé. Ha összemosnánk, a menhely olyasmit próbálna javítani,
+    // amihez hozzá sem fér.
+    expect(isPlatformSetupError(staleErr)).toBe(false);
+  });
+});
+
+/**
+ * Csatolt fiók létrehozásának paraméterei.
+ *
+ * Ez pénzt és FELELŐSSÉGET érintő beállítás, ezért rögzítve van. A régi
+ * `type: "express"` élesben elhasalt: a Stripe elzárta ezt az utat az olyan
+ * platformok elől, ahol a platform a veszteségek viselője, és kifejezetten azt
+ * kérte, hogy a `losses_collector` `stripe` legyen.
+ */
+describe("createConnectedAccount", () => {
+  it("a Stripe által KÖVETELT beállításokkal hozza létre a fiókot", async () => {
+    const { createConnectedAccount } = await import("@/lib/stripe");
+    await createConnectedAccount();
+
+    const params = createAccount.mock.calls[0][0];
+
+    // 1. A legacy mező NEM mehet: pontosan ezt utasította el a Stripe.
+    expect(params).not.toHaveProperty("type");
+
+    // 2. Amit a Stripe követelt: a veszteséget ő viseli, nem a platform.
+    expect(params.controller.losses.payments).toBe("stripe");
+
+    // 3. A menhely ugyanazt az Express felületet kapja, mint eddig.
+    expect(params.controller.stripe_dashboard.type).toBe("express");
+
+    // 4. A Stripe díjait a platform fizeti – ez a MEGLÉVŐ fizetési logika:
+    //    az application_fee_amount a platform díját és a feldolgozási díjat is
+    //    tartalmazza, hogy a menhelyhez a teljes felajánlott összeg érkezzen.
+    expect(params.controller.fees.payer).toBe("application");
+
+    expect(params.country).toBe("HU");
+  });
+
+  it("az új hiba NEM minősül elavult fióknak", async () => {
+    // Enélkül a kapcsolódási útvonal „elavult fiók"-nak vette volna, és
+    // végtelen körben próbált volna új fiókot létrehozni ugyanazzal a hibával.
+    const { isStaleAccountError } = await import("@/lib/stripe");
+    const err = Object.assign(
+      new Error(
+        "You tried to create an Accounts v1 connected account using the legacy "
+        + "`type` field with your platform as the losses collector.",
+      ),
+      { type: "StripeInvalidRequestError" },
+    );
+    expect(isStaleAccountError(err)).toBe(false);
   });
 });

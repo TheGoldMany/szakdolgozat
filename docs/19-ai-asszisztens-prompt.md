@@ -138,6 +138,13 @@ ezért sokáig észrevétlen maradt.
 elemen.** A megmaradó `transform` pozicionálási kerete lesz minden
 `position: fixed` gyerekének, és a felugró panelek elcsúsznak.
 
+**A Stripe Connect fiók létrehozása NEM `type: "express"`.** A Stripe elzárta
+ezt az utat az olyan platformok elől, ahol a platform a veszteségek viselője;
+élesben `StripeInvalidRequestError`-t ad rá. A mai megfelelő a `controller`
+mező, és a fiókokat kizárólag a `createConnectedAccount()` hozza létre
+(`lib/stripe.ts`) — négy hívási helye volt, ezért van egy helyen. A
+paramétereket teszt rögzíti, mert felelősséget érintenek.
+
 ## Git és kiadás — ezt olvasd el figyelmesen
 
 A repóban **két, egymással nem rokon történetű ág** van:
@@ -176,9 +183,32 @@ Ezek ismert, még lezáratlan kérdések. Ha a közelükbe kerül a munka, szól
 
 1. **A Stripe-díj konstansai bizonytalanok.** A `lib/stripe.ts`-ben
    `STRIPE_PERCENT_FEE = 1.4` és `STRIPE_FIXED_FEE_HUF = 25` szerepel, de egy
-   valós tranzakción 10 000 Ft-ra 410 Ft (4,1%) díj jelent meg. Ha ez a valós
-   érték, a platform árrése feleződik. A tisztázáshoz a Stripe
-   "Plans and fees" oldal vagy egy második, eltérő összegű tranzakció kell.
+   valós tranzakción 10 000 Ft-ra 410 Ft (4,1%) díj jelent meg. Ezt a
+   **feldolgozási díjat a támogatóra terheljük**, tehát ha alábecsüljük, a
+   különbözet a platform 5%-os részéből megy el.
+
+   Kiszámolva, mit jelentene, ha a 4,1% a valós érték (a projekt saját
+   képleteivel, egyszeri adományra):
+
+   | Adomány | Támogató fizet | Menhely kap | Stripe valós díja | Platformnál marad |
+   |---|---|---|---|---|
+   | 500 Ft | 557 Ft | 500 Ft | 23 Ft | **34 Ft** (6,8%) |
+   | 2 000 Ft | 2 153 Ft | 2 000 Ft | 88 Ft | **65 Ft** (3,3%) |
+   | 10 000 Ft | 10 665 Ft | 10 000 Ft | 437 Ft | **228 Ft** (2,3%) |
+   | 50 000 Ft | 53 225 Ft | 50 000 Ft | 2 182 Ft | **1 043 Ft** (2,1%) |
+
+   Két tanulság. Egy: a platform **nem megy mínuszba** egyik vizsgált összegnél
+   sem (100 Ft-tól 200 000 Ft-ig ellenőrizve), tehát ez nem tűz. Kettő: a
+   szándékolt 5%-ból nagyobb adományoknál **nagyjából a fele marad** — a
+   különbözetet a rosszul becsült feldolgozási díj viszi el. Kis összegnél
+   fordítva: a támogatóra terhelt fix 25 Ft ott TÖBB, mint a Stripe valós
+   levonása, tehát a platform felülszámláz.
+
+   **Ezt egyetlen megfigyelésből nem szabad konstanssá tenni.** A 4,1% jellemző
+   oka nem-EEA kártya vagy devizaváltás lehet, ami tranzakciónként eltér. A
+   tisztázáshoz a Stripe „Plans and fees" oldala kell, vagy néhány valós
+   tranzakció díjsora (Balance → a fizetés részleteinél a `fee` bontás).
+   Amíg ez nincs meg, **ne írd át a konstansokat**.
 2. **A szükséges 9 webhook-eseményből csak 2 volt bekapcsolva** a Stripe
    felületén. Enélkül a visszatérítések, chargebackek és a havi megújítások nem
    könyvelődnek.

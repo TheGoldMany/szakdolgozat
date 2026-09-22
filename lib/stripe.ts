@@ -249,3 +249,96 @@ export async function connectedAccountState(
     return "unknown";
   }
 }
+
+/**
+ * A Stripe hibájának BIZTONSÁGOS összefoglalója.
+ *
+ * A `message` szándékosan NINCS benne: hozzáférési hibáknál a Stripe beleírja
+ * a platform titkos kulcsának a végét és a belső `acct_` azonosítót, amit a
+ * menhely adminjának nem szabad látnia.
+ *
+ * A `type`, a `code` és a `param` viszont NEM titok — ezek gépi azonosítók a
+ * Stripe dokumentációjából. Éppen ezek hiánya miatt nem lehetett kideríteni,
+ * miért hasalt el az újrakapcsolódás: a felület csak annyit mondott, hogy „nem
+ * sikerült". Egy általános üzenet, ami elfedi az okot, nem jobb a nyers
+ * hibánál — csak máshogy használhatatlan.
+ */
+export interface SafeStripeError {
+  type?:  string;
+  code?:  string;
+  param?: string;
+}
+
+export function stripeErrorInfo(err: unknown): SafeStripeError {
+  const e = err as { type?: unknown; code?: unknown; param?: unknown } | null;
+  if (!e || typeof e !== "object") return {};
+  const pick = (v: unknown) => (typeof v === "string" ? v : undefined);
+  return { type: pick(e.type), code: pick(e.code), param: pick(e.param) };
+}
+
+/**
+ * A platform saját Connect-beállítása hiányos?
+ *
+ * Éles módban a Stripe addig NEM enged csatolt fiókot létrehozni, amíg a
+ * platform ki nem tölti a Connect platform-profilját. Ez a leggyakoribb ok,
+ * amiért egy addig működő fejlesztés az éles kulcsra váltás után elhasal — és
+ * a menhely adminja nem tud vele mit kezdeni, mert ez a PLATFORM beállítása.
+ */
+export function isPlatformSetupError(err: unknown): boolean {
+  const { code } = stripeErrorInfo(err);
+  if (code === "account_country_invalid_address" || code === "platform_account_required") return true;
+  const msg = ((err as { message?: string } | null)?.message ?? "").toLowerCase();
+  return (
+    msg.includes("platform profile") ||
+    msg.includes("complete your platform") ||
+    msg.includes("connect onboarding") ||
+    msg.includes("signed up for connect") ||
+    msg.includes("only stripe accounts with connect enabled")
+  );
+}
+
+/**
+ * Új csatolt (Connect) fiók létrehozása.
+ *
+ * MIÉRT NEM `type: "express"`: a Stripe 2026 tavaszán elzárta ezt az utat az
+ * olyan platformok elől, ahol a platform a veszteségek viselője. Élesben
+ * pontosan ezt a hibát adta, amikor a menhely az „Újrakapcsolódás" gombot
+ * nyomta (`req_Jlf1n0iifqz6mV`):
+ *
+ *   "You tried to create an Accounts v1 connected account using the legacy
+ *    `type` field with your platform as the losses collector. Use Accounts v2,
+ *    remove `type`, and set `losses_collector` to `stripe`."
+ *
+ * A `controller` a `type` mai megfelelője, és mezőnként mondja meg ugyanazt,
+ * amit az „express" egyben jelentett. A `type`-ot NEM szabad mellé tenni.
+ *
+ * Amit a három mező jelent (a telepített SDK típusai szerint ellenőrizve):
+ *
+ * • `losses.payments: "stripe"` — a negatív egyenleget a Stripe viseli, nem a
+ *   platform. Ezt a Stripe KÖVETELI, nem mi választottuk; egyben kevesebb
+ *   kockázat is nekünk.
+ * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez a
+ *   MEGLÉVŐ viselkedés: a fizetési útvonal `application_fee_amount`-ja a
+ *   platform díját ÉS a feldolgozási díjat is tartalmazza, hogy a menhelyhez a
+ *   teljes felajánlott összeg érkezzen.
+ * • `stripe_dashboard.type: "express"` — a menhely az Express felületet kapja,
+ *   ugyanazt, mint eddig.
+ *
+ * A `requirement_collection` alapértéke `stripe`, vagyis a Stripe kéri be az
+ * adatokat a saját folyamatában — ez is az eddigi Express-viselkedés, ezért
+ * nincs kiírva.
+ *
+ * EGY HELYEN van, mert négy hívási helye volt (menhely és felhasználó, mindkettő
+ * első kapcsolódás és újrakapcsolódás). Négy másolatból a következő API-váltás
+ * legalább egyet itt felejtett volna.
+ */
+export function createConnectedAccount(country = "HU") {
+  return getStripe().accounts.create({
+    country,
+    controller: {
+      losses:           { payments: "stripe" },
+      fees:             { payer: "application" },
+      stripe_dashboard: { type: "express" },
+    },
+  });
+}
