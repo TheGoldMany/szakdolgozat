@@ -296,3 +296,49 @@ export function isPlatformSetupError(err: unknown): boolean {
     msg.includes("only stripe accounts with connect enabled")
   );
 }
+
+/**
+ * Új csatolt (Connect) fiók létrehozása.
+ *
+ * MIÉRT NEM `type: "express"`: a Stripe 2026 tavaszán elzárta ezt az utat az
+ * olyan platformok elől, ahol a platform a veszteségek viselője. Élesben
+ * pontosan ezt a hibát adta, amikor a menhely az „Újrakapcsolódás" gombot
+ * nyomta (`req_Jlf1n0iifqz6mV`):
+ *
+ *   "You tried to create an Accounts v1 connected account using the legacy
+ *    `type` field with your platform as the losses collector. Use Accounts v2,
+ *    remove `type`, and set `losses_collector` to `stripe`."
+ *
+ * A `controller` a `type` mai megfelelője, és mezőnként mondja meg ugyanazt,
+ * amit az „express" egyben jelentett. A `type`-ot NEM szabad mellé tenni.
+ *
+ * Amit a három mező jelent (a telepített SDK típusai szerint ellenőrizve):
+ *
+ * • `losses.payments: "stripe"` — a negatív egyenleget a Stripe viseli, nem a
+ *   platform. Ezt a Stripe KÖVETELI, nem mi választottuk; egyben kevesebb
+ *   kockázat is nekünk.
+ * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez a
+ *   MEGLÉVŐ viselkedés: a fizetési útvonal `application_fee_amount`-ja a
+ *   platform díját ÉS a feldolgozási díjat is tartalmazza, hogy a menhelyhez a
+ *   teljes felajánlott összeg érkezzen.
+ * • `stripe_dashboard.type: "express"` — a menhely az Express felületet kapja,
+ *   ugyanazt, mint eddig.
+ *
+ * A `requirement_collection` alapértéke `stripe`, vagyis a Stripe kéri be az
+ * adatokat a saját folyamatában — ez is az eddigi Express-viselkedés, ezért
+ * nincs kiírva.
+ *
+ * EGY HELYEN van, mert négy hívási helye volt (menhely és felhasználó, mindkettő
+ * első kapcsolódás és újrakapcsolódás). Négy másolatból a következő API-váltás
+ * legalább egyet itt felejtett volna.
+ */
+export function createConnectedAccount(country = "HU") {
+  return getStripe().accounts.create({
+    country,
+    controller: {
+      losses:           { payments: "stripe" },
+      fees:             { payer: "application" },
+      stripe_dashboard: { type: "express" },
+    },
+  });
+}

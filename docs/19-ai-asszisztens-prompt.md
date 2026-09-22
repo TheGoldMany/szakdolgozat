@@ -138,6 +138,13 @@ ezért sokáig észrevétlen maradt.
 elemen.** A megmaradó `transform` pozicionálási kerete lesz minden
 `position: fixed` gyerekének, és a felugró panelek elcsúsznak.
 
+**A Stripe Connect fiók létrehozása NEM `type: "express"`.** A Stripe elzárta
+ezt az utat az olyan platformok elől, ahol a platform a veszteségek viselője;
+élesben `StripeInvalidRequestError`-t ad rá. A mai megfelelő a `controller`
+mező, és a fiókokat kizárólag a `createConnectedAccount()` hozza létre
+(`lib/stripe.ts`) — négy hívási helye volt, ezért van egy helyen. A
+paramétereket teszt rögzíti, mert felelősséget érintenek.
+
 ## Git és kiadás — ezt olvasd el figyelmesen
 
 A repóban **két, egymással nem rokon történetű ág** van:

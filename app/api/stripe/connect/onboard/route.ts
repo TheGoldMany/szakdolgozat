@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   getStripe, isStaleAccountError, isPlatformSetupError, stripeErrorInfo,
+  createConnectedAccount,
 } from "@/lib/stripe";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -55,10 +56,7 @@ export async function POST(req: NextRequest) {
 
       // Create Stripe Express account if not exists
       if (!accountId) {
-        const account = await getStripe().accounts.create({
-          type:    "express",
-          country: "HU",
-        });
+        const account = await createConnectedAccount();
         accountId = account.id;
         await prisma.shelter.update({
           where: { id: shelterId },
@@ -83,10 +81,7 @@ export async function POST(req: NextRequest) {
         if (!isStaleAccountError(linkErr)) throw linkErr;
 
         // Stale/test account ID – create a new live account
-        const newAccount = await getStripe().accounts.create({
-          type:    "express",
-          country: "HU",
-        });
+        const newAccount = await createConnectedAccount();
         accountId = newAccount.id;
         await prisma.shelter.update({
           where: { id: shelterId },
@@ -113,10 +108,7 @@ export async function POST(req: NextRequest) {
     let accountId = user.stripeAccountId;
 
     if (!accountId) {
-      const account = await getStripe().accounts.create({
-        type:    "express",
-        country: "HU",
-      });
+      const account = await createConnectedAccount();
       accountId = account.id;
       await prisma.user.update({
         where: { id: userId },
@@ -139,10 +131,7 @@ export async function POST(req: NextRequest) {
     } catch (linkErr) {
       if (!isStaleAccountError(linkErr)) throw linkErr;
 
-      const newAccount = await getStripe().accounts.create({
-        type:    "express",
-        country: "HU",
-      });
+      const newAccount = await createConnectedAccount();
       accountId = newAccount.id;
       await prisma.user.update({
         where: { id: userId },

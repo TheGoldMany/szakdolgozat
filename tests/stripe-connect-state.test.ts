@@ -22,10 +22,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  */
 
 const retrieve = vi.fn();
+const createAccount = vi.fn();
 
 vi.mock("stripe", () => ({
   default: class {
-    accounts = { retrieve };
+    accounts = { retrieve, create: createAccount };
   },
 }));
 
@@ -46,6 +47,8 @@ function stripeError(fields: { type?: string; code?: string; message?: string })
 
 beforeEach(() => {
   retrieve.mockReset();
+  createAccount.mockReset();
+  createAccount.mockResolvedValue({ id: "acct_uj" });
   process.env.STRIPE_SECRET_KEY = "sk_test_teszt";
 });
 
@@ -280,5 +283,52 @@ describe("isPlatformSetupError", () => {
     // üzemeltetőé. Ha összemosnánk, a menhely olyasmit próbálna javítani,
     // amihez hozzá sem fér.
     expect(isPlatformSetupError(staleErr)).toBe(false);
+  });
+});
+
+/**
+ * Csatolt fiók létrehozásának paraméterei.
+ *
+ * Ez pénzt és FELELŐSSÉGET érintő beállítás, ezért rögzítve van. A régi
+ * `type: "express"` élesben elhasalt: a Stripe elzárta ezt az utat az olyan
+ * platformok elől, ahol a platform a veszteségek viselője, és kifejezetten azt
+ * kérte, hogy a `losses_collector` `stripe` legyen.
+ */
+describe("createConnectedAccount", () => {
+  it("a Stripe által KÖVETELT beállításokkal hozza létre a fiókot", async () => {
+    const { createConnectedAccount } = await import("@/lib/stripe");
+    await createConnectedAccount();
+
+    const params = createAccount.mock.calls[0][0];
+
+    // 1. A legacy mező NEM mehet: pontosan ezt utasította el a Stripe.
+    expect(params).not.toHaveProperty("type");
+
+    // 2. Amit a Stripe követelt: a veszteséget ő viseli, nem a platform.
+    expect(params.controller.losses.payments).toBe("stripe");
+
+    // 3. A menhely ugyanazt az Express felületet kapja, mint eddig.
+    expect(params.controller.stripe_dashboard.type).toBe("express");
+
+    // 4. A Stripe díjait a platform fizeti – ez a MEGLÉVŐ fizetési logika:
+    //    az application_fee_amount a platform díját és a feldolgozási díjat is
+    //    tartalmazza, hogy a menhelyhez a teljes felajánlott összeg érkezzen.
+    expect(params.controller.fees.payer).toBe("application");
+
+    expect(params.country).toBe("HU");
+  });
+
+  it("az új hiba NEM minősül elavult fióknak", async () => {
+    // Enélkül a kapcsolódási útvonal „elavult fiók"-nak vette volna, és
+    // végtelen körben próbált volna új fiókot létrehozni ugyanazzal a hibával.
+    const { isStaleAccountError } = await import("@/lib/stripe");
+    const err = Object.assign(
+      new Error(
+        "You tried to create an Accounts v1 connected account using the legacy "
+        + "`type` field with your platform as the losses collector.",
+      ),
+      { type: "StripeInvalidRequestError" },
+    );
+    expect(isStaleAccountError(err)).toBe(false);
   });
 });
