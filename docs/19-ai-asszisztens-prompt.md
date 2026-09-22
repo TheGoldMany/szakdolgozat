@@ -138,6 +138,14 @@ ezért sokáig észrevétlen maradt.
 elemen.** A megmaradó `transform` pozicionálási kerete lesz minden
 `position: fixed` gyerekének, és a felugró panelek elcsúsznak.
 
+**A Stripe hibaüzenetét a saját ágára olvasd.** A Connect fiók
+létrehozásánál a Stripe először azt mondta, hogy „Use Accounts v2, remove
+`type`, and set `losses_collector` to `stripe`" — ebből a `losses_collector`
+rész az ACCOUNTS V2 útra vonatkozik. A `controller`-es v1 úton a Stripe ennek
+az ellenkezőjét követeli: „With a dashboard type of `express`, the Connect
+application must control losses." Egy mondatot átvinni a másik ágra egy
+fölösleges kiadási kört ért.
+
 **A Stripe Connect fiók létrehozása NEM `type: "express"`.** A Stripe elzárta
 ezt az utat az olyan platformok elől, ahol a platform a veszteségek viselője;
 élesben `StripeInvalidRequestError`-t ad rá. A mai megfelelő a `controller`

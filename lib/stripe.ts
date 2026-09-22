@@ -312,17 +312,32 @@ export function isPlatformSetupError(err: unknown): boolean {
  * A `controller` a `type` mai megfelelője, és mezőnként mondja meg ugyanazt,
  * amit az „express" egyben jelentett. A `type`-ot NEM szabad mellé tenni.
  *
+ * ELSŐRE ROSSZUL OLVASTAM az idézett hibát. A „set `losses_collector` to
+ * `stripe`" mondat az ACCOUNTS V2 útra vonatkozik, nem erre; a `controller`-es
+ * v1 úton a Stripe ennek az ellenkezőjét követeli, és második nekifutásra ezt
+ * mondta (`req_fFcj2h5TohLpW1`):
+ *
+ *   "With a dashboard type of `express`, the Connect application must control
+ *    losses."
+ *
+ * A két üzenet együtt olvasva: az ELSŐ a legacy `type` mezőt kifogásolta, nem a
+ * veszteségviselést. Express felülethez a veszteséget a platformnak kell
+ * viselnie — ez amúgy is a projekt eddigi működése.
+ *
  * Amit a három mező jelent (a telepített SDK típusai szerint ellenőrizve):
  *
- * • `losses.payments: "stripe"` — a negatív egyenleget a Stripe viseli, nem a
- *   platform. Ezt a Stripe KÖVETELI, nem mi választottuk; egyben kevesebb
- *   kockázat is nekünk.
- * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez a
+ * • `losses.payments: "application"` — a negatív egyenleget a platform viseli.
+ *   Ezt KÖVETELI a Stripe az Express felület mellé, és ez a MEGLÉVŐ helyzet is:
+ *   destination charge-nál a visszaterhelés eddig is a platform egyenlegét
+ *   ütötte (lásd a `STATEMENT_SUFFIX` magyarázatát).
+ * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez is a
  *   MEGLÉVŐ viselkedés: a fizetési útvonal `application_fee_amount`-ja a
  *   platform díját ÉS a feldolgozási díjat is tartalmazza, hogy a menhelyhez a
  *   teljes felajánlott összeg érkezzen.
  * • `stripe_dashboard.type: "express"` — a menhely az Express felületet kapja,
- *   ugyanazt, mint eddig.
+ *   ugyanazt, mint eddig. Ez azért fontos, mert a „Stripe fiók kezelése" gomb
+ *   `createLoginLink`-je CSAK Express felülettel működik; `"none"` esetén az a
+ *   gomb értelmét vesztené.
  *
  * A `requirement_collection` alapértéke `stripe`, vagyis a Stripe kéri be az
  * adatokat a saját folyamatában — ez is az eddigi Express-viselkedés, ezért
@@ -336,7 +351,7 @@ export function createConnectedAccount(country = "HU") {
   return getStripe().accounts.create({
     country,
     controller: {
-      losses:           { payments: "stripe" },
+      losses:           { payments: "application" },
       fees:             { payer: "application" },
       stripe_dashboard: { type: "express" },
     },
