@@ -1241,7 +1241,7 @@ pozitív.
 | Csoport | Tesztek | Kész | Bukott |
 |---|---:|---:|---:|
 | A – Előkészítés | 3 | | |
-| B – Stripe fiókok | 3 | | |
+| B – Stripe fiókok | 4 | | |
 | C – Egyszeri adomány | 7 | | |
 | D – Állandó gyűjtés | 3 | | |
 | E – Havi csomag | 7 | | |
@@ -1249,15 +1249,16 @@ pozitív.
 | G – Visszatérítés és vita | 4 | | |
 | H – Kimutatások | 2 | | |
 | I – Jogosultságok | 2 | | |
-| J – Pénzügyi egyeztetés | 1 | | |
-| **Összesen** | **35** | | |
+| J – Pénzügyi egyeztetés | 2 | | |
+| **Összesen** | **37** | | |
 
 ### Éles indulás feltétele
 
 Az alábbi tesztek **bukása élesítést blokkoló**:
 
 TC-18-01 · TC-18-06 · TC-18-07 · TC-18-12 · TC-18-13 · TC-18-19 ·
-TC-18-20 · TC-18-27 · TC-18-28 · TC-18-29 · TC-18-30 · TC-18-34 · TC-18-35
+TC-18-20 · TC-18-27 · TC-18-28 · TC-18-29 · TC-18-30 · TC-18-34 · TC-18-35 ·
+TC-18-36 · TC-18-37
 
 Ezek mind olyan hibát fednének fel, ami **valódi pénzt érint**: elmaradt vagy
 duplázott könyvelést, hibás visszatérítést, vagy jogosulatlan hozzáférést.
@@ -1317,3 +1318,57 @@ a platform titkos kulcsa nem jut a felületre.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
+
+---
+
+### TC-18-37: Elveszett események utólagos pótlása
+
+| | |
+|---|---|
+| **Prioritás** | 🔴 Magas |
+| **Szerepkör** | 🛡️ SUPER_ADMIN (Stripe dashboard + konzol) |
+| **Előfeltétel** | Aktív előfizetés vagy egy sikeres adomány; `CRON_SECRET` beállítva |
+| **URL** | `GET /api/cron/reconcile-stripe` |
+| **Tesztelő** | |
+| **Dátum** | |
+| **Státusz** | ⬜ Nem tesztelt |
+
+**Miért van ez a teszteset**
+
+A havi megújításnak, a visszatérítésnek és a vitának **nincs** siker-oldalas
+tartaléka, mint az egyszeri adománynak: azok kizárólag a webhookon jönnek. A
+Stripe körülbelül három napig próbálkozik, majd feladja. Egy ennél hosszabb
+kiesés — rossz aláíró titok, letiltott endpoint, elérhetetlen alkalmazás —
+véglegesen elveszett könyvelés lenne. Ez a cron a Stripe 30 napos
+eseménylistájából pótolja.
+
+**Elfogadási feltételek:**
+- [ ] `CRON_SECRET` nélkül `401`
+- [ ] Kikapcsolt webhook mellett végzett visszatérítés a cron futása után
+      megjelenik (a gyűjtés összege csökken)
+- [ ] A válasz `recovered` mezője a pótolt események számát adja
+- [ ] **Másodszor futtatva `recovered: 0`** és az összeg nem változik tovább
+- [ ] A `?days=` paraméter legfeljebb 30 napra tekint vissza
+
+**Tesztelési lépések:**
+1. A Stripe dashboardon **kapcsold ki** (disable) a webhook endpointot.
+2. Téríts vissza egy sikeres adományt. Ellenőrizd, hogy a gyűjtés összege
+   **nem** változott (a webhook ki van kapcsolva).
+3. Futtasd az egyeztetést:
+   ```bash
+   curl -H "Authorization: Bearer $CRON_SECRET" \
+     "https://<domain>/api/cron/reconcile-stripe?days=7"
+   ```
+4. Ellenőrizd a gyűjtés összegét — most csökkennie kell.
+5. Futtasd **még egyszer** ugyanazt a hívást, és hasonlítsd össze a két választ.
+6. Kapcsold vissza a webhook endpointot.
+
+**Elvárt eredmény:**
+A 4. lépésben az összeg csökken, a 5. lépésben `recovered: 0` és az összeg
+változatlan. Ez a kettős védelem lényege: pótol, de nem duplázik.
+
+> **Ami élesben jelzés:** ha a napi cron `recovered` mezője tartósan nem nulla,
+> a webhook nem végzi a munkáját. Ilyenkor a napló hibaszintű sort ír, és a
+> `TC-18-01` szerint kell megnézni a Stripe webhook-beállítást.
+
+---

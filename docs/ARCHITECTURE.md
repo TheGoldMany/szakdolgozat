@@ -500,6 +500,52 @@ sémára futtat `prisma generate` + `db push`-t).
 
 ---
 
+## 9.5 Ütemezett feladatok (cron)
+
+A `vercel.json` `crons` tömbje definiálja őket. Mindegyik `GET`, és mindegyik
+ugyanúgy védett: `Authorization: Bearer <CRON_SECRET>` — enélkül `401`.
+
+| Útvonal | Mikor | Mit tesz |
+|---|---|---|
+| `/api/cron/feeding` | `0 6 * * *` | Etetési emlékeztetők. |
+| `/api/cron/purge-accounts` | `0 3 * * *` | A 30 napnál régebben törlésre jelölt fiókok véglegesítése, lejárt tokenek és régi olvasott értesítések takarítása. |
+| `/api/cron/reconcile-stripe` | `0 4 * * *` | **Pénzügyi egyeztetés:** a Stripe eseménylistájából visszamenőleg pótolja, ami a webhookon kimaradt. |
+
+### Miért van szükség a Stripe-egyeztetésre
+
+Az egyszeri adományt és az előfizetés-aktiválást a siker-oldal pótolja, ha a
+webhook elmarad. A **havi megújításnak**, a **visszatérítésnek** és a
+**vitának** viszont semmilyen más útja nincs — azok kizárólag a webhookon
+jönnek. A Stripe körülbelül három napig próbálkozik, majd feladja; sok hiba
+után le is tiltja az endpointot, ami utána *mindent* elvisz. Egy ennél hosszabb
+kiesés tehát véglegesen elveszett könyvelés, valódi pénzről.
+
+A Stripe az eseményeket **30 napig** listázhatóvá teszi. A cron alapból egy
+hétre tekint vissza (ez átfogja a háromnapos újrapróbálási ablakot és egy
+hétvégi kiesést is); hosszabb kiesés után kézzel nagyobb értékkel is hívható:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  "https://<domain>/api/cron/reconcile-stripe?days=30"
+```
+
+A feldolgozás ugyanazt a kódot futtatja, mint a webhook
+(`handleStripeEvent`, `lib/stripe-events.ts`) — nem párhuzamos logika, hanem új
+útvonal a meglévőhöz, ezért nem tud szétcsúszni a kettő. Kétszer lefuttatni
+biztonságos: minden ág idempotens, fölöttük pedig a `ProcessedWebhookEvent`
+tábla a gyors kilépés.
+
+A válasz `recovered` mezője a lényeg. **Ha ez tartósan nem nulla, a webhook nem
+végzi a munkáját** — ilyenkor a napló is hibaszintű sort ír, és a Stripe →
+Developers → Webhooks oldalt kell megnézni.
+
+Korlát: a *platform* eseménylistáját nézi. Destination charge modellben a
+terhelés, a visszatérítés és a vita is a platform fiókján jön létre, tehát a
+pénzügyileg kritikus események mind itt vannak; a csatolt fiókok saját
+eseményeit a Connect webhook endpoint hozza.
+
+---
+
 ## 10. Tesztelés
 
 ### 10.1 Unit tesztek — Vitest (`tests/`)
@@ -545,6 +591,7 @@ funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell
 | `NEXT_PUBLIC_APP_URL` | Checkout redirect URL-ek alapja |
 | `SMTP_HOST/PORT/USER/PASS/FROM` | nodemailer e-mail küldés |
 | `ETL_SECRET` | `/api/etl` Bearer-token |
+| `CRON_SECRET` | Az ütemezett feladatok Bearer-tokene (lásd 9.5) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob feltöltés |
 | `EXPO_ACCESS_TOKEN` | Push küldés az Expo nevében (opcionális, de nélküle bárki küldhetne egy megszerzett tokenre) |
 

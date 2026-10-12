@@ -220,6 +220,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 |---|---|
 | `DWH_DATABASE_URL` | Különálló PostgreSQL kapcsolati string (analytics DB) |
 | `ETL_SECRET` | ETL végpont védelmére – `openssl rand -hex 32` |
+| `CRON_SECRET` | Az ütemezett feladatok védelmére – `openssl rand -hex 32`. A Vercel ezt adja a `vercel.json`-ban definiált cronoknak. |
 | `SEED_SECRET` | Seed API végpont védelmére |
 
 ---
