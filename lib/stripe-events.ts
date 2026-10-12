@@ -5,6 +5,7 @@ import { createNotification } from "@/lib/notifications";
 import { fulfillDonation, notifyDonation } from "@/lib/donations";
 import { backfillSubscriptionPayments, invoiceSubscriptionId, recordSubscriptionPayment } from "@/lib/subscription-payments";
 import { applyRefund, recordDispute } from "@/lib/refunds";
+import { subscriptionPeriodEnd } from "@/lib/stripe";
 import {
   activateSubscription, notifySubscriptionStarted,
   activateSponsorship,  notifySponsorshipStarted,
@@ -54,14 +55,12 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string[]> 
   if (event.type === "customer.subscription.deleted") {
     await branch("subscription.deleted", async () => {
       const stripeSub = event.data.object as Stripe.Subscription;
-      await prisma.subscription.updateMany({
-        where: { stripeSubId: stripeSub.id },
-        data:  { status: "CANCELLED", cancelledAt: new Date() },
-      });
-      await prisma.sponsorship.updateMany({
-        where: { stripeSubId: stripeSub.id },
-        data:  { status: "CANCELLED", cancelledAt: new Date() },
-      });
+      // Ez a VÉGLEGES lezárás: a kifizetett időszak lejárt. A
+      // `cancelAtPeriodEnd` jelzőt ezért visszavesszük – nincs már mire várni,
+      // és a felületen nem „lemondva, eddig aktív", hanem „lemondva" a helyes.
+      const done = { status: "CANCELLED" as const, cancelledAt: new Date(), cancelAtPeriodEnd: false };
+      await prisma.subscription.updateMany({ where: { stripeSubId: stripeSub.id }, data: done });
+      await prisma.sponsorship.updateMany({ where: { stripeSubId: stripeSub.id }, data: done });
     });
   }
 
@@ -78,18 +77,20 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<string[]> 
           ? "CANCELLED"
           : "ACTIVE";
 
-      await prisma.subscription.updateMany({
-        where: { stripeSubId: stripeSub.id },
-        data:  status === "CANCELLED"
-          ? { status, cancelledAt: new Date() }
-          : { status },
-      });
-      await prisma.sponsorship.updateMany({
-        where: { stripeSubId: stripeSub.id },
-        data:  status === "CANCELLED"
-          ? { status, cancelledAt: new Date() }
-          : { status },
-      });
+      // A lemondás-az-időszak-végén jelzőt is a Stripe-tól vesszük át, nem csak
+      // a saját végpontunkon állítjuk. Így a Stripe Dashboardon vagy a számlázó
+      // portálon végzett lemondás is látszik nálunk — és ami fontosabb: ha a
+      // támogató ott VISSZAVONJA a lemondást, a jelző magától törlődik,
+      // különben örökre „lemondva" maradna egy élő, fizető előfizetés.
+      const sync = {
+        status,
+        cancelAtPeriodEnd: stripeSub.cancel_at_period_end === true,
+        currentPeriodEnd:  subscriptionPeriodEnd(stripeSub),
+        ...(status === "CANCELLED" ? { cancelledAt: new Date() } : {}),
+      };
+
+      await prisma.subscription.updateMany({ where: { stripeSubId: stripeSub.id }, data: sync });
+      await prisma.sponsorship.updateMany({ where: { stripeSubId: stripeSub.id }, data: sync });
     });
   }
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, subscriptionPeriodEnd } from "@/lib/stripe";
 import { createNotification } from "@/lib/notifications";
 import {
   sendSubscriptionCancelledEmail,
@@ -45,21 +45,35 @@ export async function POST(
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
 
-    if (subscription.status === "CANCELLED") {
+    if (subscription.status === "CANCELLED" || subscription.cancelAtPeriodEnd) {
       return NextResponse.json({ error: "Az előfizetés már le van mondva" }, { status: 409 });
     }
 
     // Cancel in Stripe at period end (user keeps access until the paid period ends)
+    let periodEnd: Date | null = null;
     if (subscription.stripeSubId) {
-      await getStripe().subscriptions.update(subscription.stripeSubId, {
+      const stripeSub = await getStripe().subscriptions.update(subscription.stripeSubId, {
         cancel_at_period_end: true,
       });
+      periodEnd = subscriptionPeriodEnd(stripeSub);
     }
 
-    // Update DB
+    // A STÁTUSZ ACTIVE MARAD, és ez szándékos.
+    //
+    // A Stripe-ban a lemondás `cancel_at_period_end`, tehát a már kifizetett
+    // hónap végéig él az előfizetés. Korábban a sor itt azonnal CANCELLED-re
+    // állt, aminek három következménye volt: a támogató juttatása azonnal
+    // eltűnt, pedig fizetett érte; a `TC-18-22` saját elfogadási feltétele
+    // („az időszak végéig még aktív marad") sérült; és mivel a feliratkozás
+    // duplikátum-ellenőrzése csak ACTIVE sort tilt, a támogató azonnal újra
+    // elő tudott fizetni ugyanarra a csomagra — az ÁTFEDŐ IDŐSZAKRA KÉTSZER
+    // FIZETETT.
+    //
+    // A végleges CANCELLED a `customer.subscription.deleted` eseményből jön,
+    // amikor az időszak valóban lejárt.
     const updated = await prisma.subscription.update({
       where: { id: params.id },
-      data:  { status: "CANCELLED", cancelledAt: new Date() },
+      data:  { cancelAtPeriodEnd: true, currentPeriodEnd: periodEnd },
     });
 
     createNotification({

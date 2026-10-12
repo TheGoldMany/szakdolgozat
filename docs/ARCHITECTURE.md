@@ -441,6 +441,20 @@ Connect-fiókjába kerül, a platformdíj levonásával.
      (`SUBSCRIPTION_STARTED` értesítés, visszaigazoló e-mail).
    - `metadata.sponsorAnimalId + userId` → `Sponsorship` létrehozása
      (`SPONSORSHIP_STARTED`).
+> **Lemondás — miért marad ACTIVE a sor.** A felhasználói lemondás a Stripe-ban
+> `cancel_at_period_end`, tehát a már kifizetett hónap végéig él az előfizetés.
+> A sor ezért `cancelAtPeriodEnd = true` jelzőt kap és **ACTIVE marad**; a
+> `currentPeriodEnd` mondja meg, meddig. A végleges `CANCELLED` a
+> `customer.subscription.deleted` eseményből jön. Ez nem kozmetika: a
+> feliratkozás duplikátum-ellenőrzése `ACTIVE` sort keres, tehát ez zárja ki,
+> hogy a támogató az átfedő, már kifizetett időszakra másodszor is fizessen.
+> A super admin lemondása ettől eltér (`subscriptions.cancel`) — az azonnali,
+> és ott a `CANCELLED` helyes.
+>
+> A periódus végét a `subscriptionPeriodEnd()` adja. **A `current_period_end`
+> ebben az API-verzióban már nincs a `Subscription` objektumon**, a tételeken
+> van — a helper ezt kezeli.
+
 3. **`customer.subscription.deleted`** → a megfelelő `Subscription` és `Sponsorship`
    rekordok `CANCELLED`-re állítása `stripeSubId` alapján.
 

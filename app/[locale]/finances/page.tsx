@@ -42,6 +42,8 @@ export default async function FinancesPage() {
         status:      true,
         createdAt:   true,
         cancelledAt: true,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd:  true,
         tier: {
           select: {
             name:    true,
@@ -61,6 +63,8 @@ export default async function FinancesPage() {
         isPublic:    true,
         createdAt:   true,
         cancelledAt: true,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd:  true,
         animal:      { select: { name: true, slug: true } },
       },
     }),
@@ -162,8 +166,9 @@ export default async function FinancesPage() {
             <SubscriptionsList
               subscriptions={subscriptions.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>
@@ -177,8 +182,9 @@ export default async function FinancesPage() {
             <SponsorshipsList
               sponsorships={sponsorships.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>

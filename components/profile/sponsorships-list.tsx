@@ -12,6 +12,9 @@ type Sponsorship = {
   isPublic:    boolean;
   createdAt:   string;
   cancelledAt: string | null;
+  /** Lemondva, de a kifizetett időszak még tart. */
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd:  string | null;
   animal:      { name: string; slug: string } | null;
 };
 
@@ -59,6 +62,16 @@ export function SponsorshipsList({ sponsorships }: { sponsorships: Sponsorship[]
           <div className="flex items-center gap-2">
             {s.status === "CANCELLED" ? (
               <span className="rounded-full bg-gray-200 px-2.5 py-0.5 text-xs text-gray-500">{t("cancelled")}</span>
+            ) : s.cancelAtPeriodEnd ? (
+              // Lemondva, de a hónap még ki van fizetve – a virtuális gazdi
+              // addig jár. Sem az „aktív", sem a „lemondva" nem igaz önmagában.
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                {s.currentPeriodEnd
+                  ? t("cancelledActiveUntil", {
+                      date: new Date(s.currentPeriodEnd).toLocaleDateString("hu-HU"),
+                    })
+                  : t("cancelledPendingEnd")}
+              </span>
             ) : (
               <>
                 <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">{t("activeStatus")}</span>

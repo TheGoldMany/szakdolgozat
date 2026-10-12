@@ -153,6 +153,39 @@ mező, és a fiókokat kizárólag a `createConnectedAccount()` hozza létre
 (`lib/stripe.ts`) — négy hívási helye volt, ezért van egy helyen. A
 paramétereket teszt rögzíti, mert felelősséget érintenek.
 
+**Egy Stripe-mező eltűnése nem hibázik, csak `undefined` lesz.** Ez a projektet
+már KÉTSZER megfogta ugyanúgy. Az `invoice.subscription` megszűnt a használt
+API-verzióban, ezért a sikertelen fizetések ága soha nem futott le — némán. A
+`current_period_end` ugyanígy nincs már a `Subscription` objektumon, hanem a
+tételeken (`items.data[].current_period_end`). Mindkettőre helper van
+(`invoiceSubscriptionId`, `subscriptionPeriodEnd`), és **mindkettőt teszt
+rögzíti**. Ha egy Stripe-mezőt olvasol, ellenőrizd a `node_modules/stripe`
+típusdefinícióban, hogy tényleg ott van-e, ahol az internetes példák mutatják.
+
+**Egy státusz, ami két dolgot jelent, pénzt visz.** A lemondás a Stripe-ban
+`cancel_at_period_end` — a hónap végéig él. A sor mégis azonnal `CANCELLED`-re
+állt, a duplikátum-ellenőrzés viszont `ACTIVE` sort tilt, tehát a támogató
+azonnal újra elő tudott fizetni egy még élő, kifizetett előfizetés mellé:
+**az átfedő időszakra kétszer fizetett.** Innen a `cancelAtPeriodEnd` jelző.
+A tanulság általános: ha egy állapot a külső rendszerben átmeneti („már
+lemondva, de még él"), nálunk is kell rá hely — különben a legközelebbi
+`where: { status: "ACTIVE" }` dönt helyettünk, és nem biztos, hogy jól.
+
+**Ha a webhook az egyetlen út valamihez, az adat előbb-utóbb elveszik.** Az
+egyszeri adományt és az előfizetés-aktiválást a siker-oldal pótolja; a
+megújításnak, a visszatérítésnek és a vitának semmi nem pótolta. A Stripe
+három nap után feladja. Ezért van `/api/cron/reconcile-stripe`, és ezért él a
+feldolgozás a `lib/stripe-events.ts`-ben, nem a route törzsében: **egy logika,
+két útvonal.** Új ágat írva a `RECONCILED_EVENT_TYPES` listát is bővítsd — ezt
+teszt fogja, mert a hiba működőnek látszik.
+
+**A hibaüzenet, ami minden okra ugyanaz, nem hibaüzenet.** A webhook
+aláírás-ellenőrzése ötféle okból bukhat, és a Stripe SDK mind az ötre ugyanazt
+a mondatot adja; a javítás viszont okonként teljesen más. Ahol egy művelet
+többféleképpen bukhat, és a javítás okonként különbözik, ott **nevezd meg az
+okot** — és ha a napló nem marad meg (Hobby csomag: 1 óra), oda tedd, ahol
+igen: a Stripe Dashboard megőrzi a HTTP-válaszunkat.
+
 ## Git és kiadás — ezt olvasd el figyelmesen
 
 A repóban **két, egymással nem rokon történetű ág** van:

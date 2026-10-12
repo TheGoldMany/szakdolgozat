@@ -786,7 +786,19 @@ Az előfizetés visszaáll aktívra, és a befizetés megjelenik a bevételben.
 - [ ] A lemondás visszaigazolást kér
 - [ ] A Stripe-on az előfizetés `cancel_at_period_end = true` lesz
 - [ ] Az időszak végéig még aktív marad
+- [ ] A profilon **„Lemondva – <dátum>-ig aktív"** jelzés látszik, nem sima „Lemondva"
+- [ ] A `/dashboard/subscriptions` listában sárga, dátumos jelölés van, és a
+      lemondás gomb eltűnik (az API `409`-et adna)
+- [ ] **Újra feliratkozni ugyanarra a csomagra NEM lehet** (`409`), amíg az
+      időszak le nem járt
 - [ ] Az időszak lejártakor `CANCELLED` állapotba kerül
+
+> **Ez a teszteset korábban bukott volna.** A kód beállította a Stripe-ban a
+> `cancel_at_period_end`-et, majd a saját sorát azonnal `CANCELLED`-re írta.
+> Emiatt a támogató juttatása azonnal eltűnt, pedig fizetett érte — és mivel a
+> feliratkozás duplikátum-ellenőrzése csak `ACTIVE` sort tilt, azonnal újra elő
+> tudott fizetni ugyanarra a csomagra, miközben az első előfizetés még élt és ki
+> volt fizetve. **Az átfedő időszakra kétszer fizetett.**
 
 **Tesztelési lépések:**
 1. Mondd le az előfizetést a profilodon.
@@ -917,14 +929,21 @@ Elutasítás, dupla terhelés nélkül.
 
 **Elfogadási feltételek:**
 - [ ] Lemondható a profilról
-- [ ] A Stripe-on is lemondásra kerül
-- [ ] Az állat oldaláról eltűnik a virtuális gazdi
+- [ ] A Stripe-on `cancel_at_period_end = true` lesz
+- [ ] A profilon „Lemondva – <dátum>-ig aktív" jelzés látszik
+- [ ] **A virtuális gazdi az állat oldalán MARAD az időszak végéig** – a
+      támogató kifizette ezt a hónapot
+- [ ] Ugyanarra az állatra nem lehet új örökbefogadást indítani (`409`)
+- [ ] Az időszak lejártakor kerül `CANCELLED`-be, és akkor tűnik el az állat oldaláról
 
 **Tesztelési lépések:**
-1. Mondd le a profilodon, majd nézd meg az állat oldalát.
+1. Mondd le a profilodon, majd nézd meg az állat oldalát — a gazdi még ott van.
+2. Próbálj újra virtuális gazdi lenni ugyanannál az állatnál — elutasítás.
+3. Test clockkal tekerd túl az időszak végét, majd nézd meg újra az állat oldalát.
 
 **Elvárt eredmény:**
-A lemondás mindkét oldalon érvényesül.
+A lemondás nem szakítja meg azonnal a már kifizetett időszakot. A 3. lépés után
+a gazdi eltűnik, mert a `customer.subscription.deleted` esemény lezárja a sort.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_
@@ -1107,10 +1126,14 @@ A számok megegyeznek a Stripe-on látottakkal, a visszatérítéssel csökkentv
 - [ ] „Összes visszatérő bevétel" az összeset
 - [ ] A terhelések száma egyezik a Stripe-on láthatóval
 - [ ] Az előfizetők számában csak az **élő** előfizetések szerepelnek
+- [ ] A lemondott, de még kifizetett időszakú előfizető **beleszámít** a
+      számlálóba (még fizet), de a listában sárga, dátumos jelöléssel látszik
 
 **Tesztelési lépések:**
 1. Vesd össze a számokat a Stripe → Subscriptions és Payments listával.
-2. Mondj le egy előfizetést, és nézd meg, hogy a számláló csökken-e.
+2. Mondj le egy előfizetést. A számláló **nem** csökken azonnal — a listában
+   viszont megjelenik a „Lemondva – <dátum>" jelölés.
+3. Test clockkal tekerd túl az időszak végét, és nézd meg újra a számlálót.
 
 **Elvárt eredmény:**
 A kimutatás a ténylegesen befolyt pénzt mutatja, nem az elvi havidíjat.

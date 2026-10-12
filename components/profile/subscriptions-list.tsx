@@ -16,6 +16,9 @@ type Subscription = {
   status:      string;
   createdAt:   string;
   cancelledAt: string | null;
+  /** Lemondva, de a kifizetett időszak még tart. */
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd:  string | null;
   tier:        Tier;
 };
 
@@ -60,6 +63,17 @@ export function SubscriptionsList({ subscriptions }: { subscriptions: Subscripti
           <div className="flex items-center gap-2">
             {sub.status === "CANCELLED" ? (
               <span className="rounded-full bg-gray-200 px-2.5 py-0.5 text-xs text-gray-500">{t("cancelled")}</span>
+            ) : sub.cancelAtPeriodEnd ? (
+              // Lemondva, de a hónap még ki van fizetve. Se a „aktív" (mert
+              // lemondta), se a „lemondva" (mert még jár neki) nem igaz
+              // önmagában – a dátum mondja meg, meddig tart.
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                {sub.currentPeriodEnd
+                  ? t("cancelledActiveUntil", {
+                      date: new Date(sub.currentPeriodEnd).toLocaleDateString("hu-HU"),
+                    })
+                  : t("cancelledPendingEnd")}
+              </span>
             ) : (
               <>
                 <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">{t("activeStatus")}</span>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, subscriptionPeriodEnd } from "@/lib/stripe";
 import { sendSponsorshipCancelledEmail } from "@/lib/email";
 
 // POST /api/sponsorships/[id]/cancel – virtuális örökbefogadás lemondása
@@ -20,19 +20,26 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
     if (sponsorship.userId !== session.user.id) {
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
-    if (sponsorship.status === "CANCELLED") {
+    if (sponsorship.status === "CANCELLED" || sponsorship.cancelAtPeriodEnd) {
       return NextResponse.json({ error: "Már le van mondva" }, { status: 409 });
     }
 
+    let periodEnd: Date | null = null;
     if (sponsorship.stripeSubId) {
-      await getStripe().subscriptions.update(sponsorship.stripeSubId, {
+      const stripeSub = await getStripe().subscriptions.update(sponsorship.stripeSubId, {
         cancel_at_period_end: true,
       });
+      periodEnd = subscriptionPeriodEnd(stripeSub);
     }
 
+    // A STÁTUSZ ACTIVE MARAD – ugyanaz az ok, mint az előfizetés lemondásánál:
+    // a Stripe-ban a hónap végéig él, tehát a virtuális gazdi addig jár, és
+    // addig új örökbefogadást sem indíthat ugyanarra az állatra (különben az
+    // átfedő időszakra kétszer fizetne). A végleges CANCELLED a
+    // `customer.subscription.deleted` eseményből jön.
     const updated = await prisma.sponsorship.update({
       where: { id: params.id },
-      data:  { status: "CANCELLED", cancelledAt: new Date() },
+      data:  { cancelAtPeriodEnd: true, currentPeriodEnd: periodEnd },
       include: {
         animal: { select: { name: true } },
         user:   { select: { email: true, name: true } },

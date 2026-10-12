@@ -391,6 +391,16 @@ model Sponsorship {
   createdAt   DateTime           @default(now())
   cancelledAt DateTime?
 
+  /// Igaz, ha a támogató már lemondott, de a KIFIZETETT időszak még tart.
+  /// Nem elegendő a `status`-t azonnal CANCELLED-re állítani: a Stripe-ban a
+  /// lemondás `cancel_at_period_end`, tehát a hónap végéig jár a juttatás, és
+  /// addig új előfizetést sem indíthat ugyanarra (különben az átfedő időszakra
+  /// kétszer fizetne). A végleges CANCELLED a `customer.subscription.deleted`
+  /// eseményből jön, amikor az időszak valóban lejárt.
+  cancelAtPeriodEnd Boolean   @default(false)
+  /// Eddig jár még a támogatás a már kifizetett időszakból.
+  currentPeriodEnd  DateTime?
+
   payments SubscriptionPayment[]
 
   @@index([animalId, status])
@@ -754,6 +764,16 @@ model Subscription {
   stripeSubId String?            @unique
   createdAt   DateTime           @default(now())
   cancelledAt DateTime?
+
+  /// Igaz, ha a támogató már lemondott, de a KIFIZETETT időszak még tart.
+  /// Nem elegendő a `status`-t azonnal CANCELLED-re állítani: a Stripe-ban a
+  /// lemondás `cancel_at_period_end`, tehát a hónap végéig jár a juttatás, és
+  /// addig új előfizetést sem indíthat ugyanarra (különben az átfedő időszakra
+  /// kétszer fizetne). A végleges CANCELLED a `customer.subscription.deleted`
+  /// eseményből jön, amikor az időszak valóban lejárt.
+  cancelAtPeriodEnd Boolean   @default(false)
+  /// Eddig jár még a támogatás a már kifizetett időszakból.
+  currentPeriodEnd  DateTime?
 
   user     User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   tier     DonationTier          @relation(fields: [tierId], references: [id], onDelete: Cascade)

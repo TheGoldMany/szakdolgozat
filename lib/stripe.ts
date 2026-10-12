@@ -357,3 +357,26 @@ export function createConnectedAccount(country = "HU") {
     },
   });
 }
+
+/**
+ * Egy Stripe-előfizetés kifizetett időszakának vége.
+ *
+ * FIGYELEM, API-VERZIÓ: a használt verzióban (2026-03-25.dahlia) a
+ * `current_period_end` MÁR NINCS az `Subscription` objektumon — az adat a
+ * tételeken (`items.data[].current_period_end`) él. Ugyanaz a csapda, ami
+ * korábban az `invoice.subscription` mezővel némán elvitte a sikertelen
+ * fizetések ágát: a mező egyszerűen `undefined`, nem hibázik.
+ *
+ * Elsőként a `cancel_at`-ot nézzük: `cancel_at_period_end: true` beállításakor
+ * a Stripe ezt kitölti az időszak végével, és ez a lemondás szempontjából a
+ * hiteles érték. Tartalékként a tételek legkésőbbi periódusvége.
+ */
+export function subscriptionPeriodEnd(sub: Stripe.Subscription): Date | null {
+  if (sub.cancel_at) return new Date(sub.cancel_at * 1000);
+
+  const ends = (sub.items?.data ?? [])
+    .map((item) => item.current_period_end)
+    .filter((value): value is number => typeof value === "number");
+
+  return ends.length > 0 ? new Date(Math.max(...ends) * 1000) : null;
+}
