@@ -45,6 +45,7 @@
     "guide": "Benutzerhandbuch",
     "adoptionProcess": "Adoptionsprozess",
     "donating": "Spenden",
+    "platformFee": "Wofür wird die Plattformgebühr verwendet?",
     "reporting": "Melden",
     "contact": "Kontakt",
     "legal": "Rechtliches",
@@ -1884,5 +1885,64 @@
     "loginRequired": "Melde dich an, um die Tiere des Tages zu nutzen.",
     "timeAgoHours": "vor {h} Stunden",
     "timeAgoJustNow": "Gerade jetzt"
+  },
+  "platformFee": {
+    "eyebrow": "Offen über das Geld",
+    "title": "Wofür wird die Plattformgebühr verwendet?",
+    "metaDescription": "Das Tierheim erhält die vollständige Spende. Die Plattformgebühr zahlen die Unterstützer, und damit finanzieren wir das Verwaltungssystem der Tierheime.",
+    "lead": "ÁllatiMenhelyek.hu ist mehr als eine Vermittlungsbörse. Angeschlossene Tierheime nutzen das vollständige Verwaltungssystem in der Grundstufe kostenlos — eine Software, für die anderswo eine monatliche Gebühr fällig wäre.",
+    "exampleHeading": "So sieht eine Spende von {amount} aus",
+    "exampleDonation": "Dein Spendenbetrag",
+    "examplePlatform": "Plattformgebühr ({percent, number}%)",
+    "exampleProcessing": "Bearbeitungsgebühr ({percent, number}% + {fixed, number} HUF)",
+    "exampleTotal": "Gesamtbetrag",
+    "exampleNoteStrong": "Das Tierheim erhält die vollen {amount}.",
+    "exampleNote": "Die Gebühr kommt obendrauf und wird nicht vom Tierheim abgezogen. So kommt genau der Betrag an, den du geben wolltest.",
+    "whatHeading": "Was bekommt das Tierheim dafür?",
+    "whatLead": "Keine Zeile in einer Funktionsliste. Das leistet das System heute, und das kann jedes angeschlossene Tierheim in der kostenlosen Grundstufe nutzen:",
+    "group1Title": "Tierverwaltung",
+    "group1Items": [
+      "Ein Profil für jedes Tier, mit Fotos und Status",
+      "Gesundheitsakte: Impfungen, Behandlungen, Tierarzteinträge",
+      "Offizielle Dokumente direkt am Tierprofil",
+      "Unterbringung mit Kapazität: Zwinger, Katzenzimmer, Quarantäne",
+      "Fütterungsprotokoll mit täglicher Erinnerung",
+      "Bestandsführung mit Zu- und Abgängen sowie Warnung bei niedrigem Bestand",
+      "Abgabe eines Tieres an ein anderes Tierheim, mit dessen Zustimmung"
+    ],
+    "group2Title": "Vermittlung",
+    "group2Items": [
+      "Vermittlungsanfragen annehmen und bearbeiten",
+      "Einen eigenen Fragebogen mit eigenen Fragen zusammenstellen",
+      "Terminbuchung und Bestätigung",
+      "Nachverfolgung nach der Vermittlung",
+      "Nachrichten mit Interessenten"
+    ],
+    "group3Title": "Gemeinschaft und Spenden",
+    "group3Items": [
+      "Ehrenamtliche und die ihnen zugewiesenen Aufgaben",
+      "Verzeichnis der Pflegestellen",
+      "Veranstaltungen organisieren, mit Anmeldungen",
+      "Spendenaktionen, monatliche Förderstufen, virtuelle Patenschaft",
+      "Liste der Förderer und Einnahmenübersicht"
+    ],
+    "group4Title": "Überblick",
+    "group4Items": [
+      "Auswertungen und Diagramme zur Arbeit des Tierheims",
+      "CSV-Export: Tiere, Ehrenamtliche, Veranstaltungen, Förderer, Spenden",
+      "Benachrichtigungen und Warnungen bei allem mit Frist"
+    ],
+    "whyHeading": "Warum diese Aufteilung?",
+    "whyBody1": "Ein Verwaltungssystem kostet Geld: Server, Datenbank, Entwicklung, Wartung. Jemand muss dafür aufkommen. Würden wir das Tierheim zur Kasse bitten, ginge dieses Geld von dem Budget ab, aus dem die Tiere gefüttert werden.",
+    "whyBody2": "Deshalb tragen die Unterstützer die Gebühr — zusätzlich zur Spende und als eigene Position, nicht aus den Einnahmen des Tierheims. Das Tierheim erhält aus jeder Spende den vollen vorgesehenen Betrag, und die Plattformgebühren halten das System am Laufen.",
+    "detailsHeading": "Im Detail",
+    "details_platform_q": "Wie hoch ist die Plattformgebühr?",
+    "details_platform_a": "5% der Spende, zusätzlich zum gespendeten Betrag. Dasselbe gilt für monatliche Förderstufen und die virtuelle Patenschaft.",
+    "details_processing_q": "Was ist die Bearbeitungsgebühr?",
+    "details_processing_a": "Die gehört nicht uns: Es ist die Gebühr des Zahlungsdienstleisters Stripe, die wir weitergeben. Etwa 1,4% + 25 HUF; der genaue Satz hängt von der Karte ab.",
+    "details_free_q": "Ist es für Tierheime wirklich kostenlos?",
+    "details_free_a": "Angeschlossene Tierheime nutzen die hier aufgeführten Funktionen in der Grundstufe kostenlos, und wir stellen ihnen dafür nichts in Rechnung. Der Dienst ist jung: Sollte später eine Zusatzfunktion kostenpflichtig werden, sagen wir das vorher und verständlich.",
+    "ctaDonate": "Spendenaktionen ansehen",
+    "ctaShelter": "Tierheim registrieren"
   }
 }

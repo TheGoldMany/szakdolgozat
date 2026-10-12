@@ -45,6 +45,7 @@
     "guide": "User guide",
     "adoptionProcess": "Adoption process",
     "donating": "Donating",
+    "platformFee": "Where does the platform fee go?",
     "reporting": "Reporting",
     "contact": "Contact",
     "legal": "Legal",
@@ -1884,5 +1885,64 @@
     "loginRequired": "Sign in to use daily animals.",
     "timeAgoHours": "{h} hours ago",
     "timeAgoJustNow": "Just now"
+  },
+  "platformFee": {
+    "eyebrow": "Open about the money",
+    "title": "Where does the platform fee go?",
+    "metaDescription": "The shelter receives the full donation. The platform fee is paid by the supporter, and it funds the record-keeping system shelters use.",
+    "lead": "ÁllatiMenhelyek.hu is more than an adoption listing site. Shelters that join get free basic use of the full record-keeping system — the kind of software they would otherwise pay a monthly fee for.",
+    "exampleHeading": "What a {amount} donation looks like",
+    "exampleDonation": "Your donation",
+    "examplePlatform": "Platform fee ({percent, number}%)",
+    "exampleProcessing": "Processing fee ({percent, number}% + {fixed, number} HUF)",
+    "exampleTotal": "Total to pay",
+    "exampleNoteStrong": "The shelter receives the full {amount}.",
+    "exampleNote": "The fee is added on top; it is not deducted from the shelter. That way the amount you intended to give is exactly the amount that arrives.",
+    "whatHeading": "What does the shelter get for it?",
+    "whatLead": "Not a line in a feature list. This is what the system does today, and what every shelter that joins can use with free basic access:",
+    "group1Title": "Animal records",
+    "group1Items": [
+      "A profile for every animal, with photos and status",
+      "Health log: vaccinations, treatments, veterinary notes",
+      "Official paperwork attached to the animal's profile",
+      "Housing units with capacity: kennels, cat rooms, quarantine",
+      "Feeding log with a daily reminder",
+      "Stock levels with intake, usage and low-stock alerts",
+      "Transferring an animal to another shelter, subject to their approval"
+    ],
+    "group2Title": "Adoption",
+    "group2Items": [
+      "Receiving and reviewing adoption applications",
+      "Building your own questionnaire with your own questions",
+      "Appointment booking and confirmation",
+      "Follow-ups after the adoption",
+      "Messaging with interested adopters"
+    ],
+    "group3Title": "Community and donations",
+    "group3Items": [
+      "Volunteers and the tasks assigned to them",
+      "A register of foster carers",
+      "Organising events, with sign-ups",
+      "Fundraisers, monthly supporter tiers, virtual adoption",
+      "Subscriber list and income reporting"
+    ],
+    "group4Title": "Overview",
+    "group4Items": [
+      "Reports and charts on how the shelter is doing",
+      "CSV export: animals, volunteers, events, subscribers, donations",
+      "Notifications and alerts for anything with a deadline"
+    ],
+    "whyHeading": "Why split it this way?",
+    "whyBody1": "A record-keeping system costs money: servers, a database, development, maintenance. Someone has to pay for it. If we asked the shelter, that money would come out of the budget they feed the animals from.",
+    "whyBody2": "So we put the fee on the supporter instead, on top of the donation and on its own line — not out of the shelter's income. The shelter receives the full intended amount from every donation, and supporters' platform fees keep the system running.",
+    "detailsHeading": "The specifics",
+    "details_platform_q": "How much is the platform fee?",
+    "details_platform_a": "5% of the donation, added on top of the amount you give. The same applies to monthly supporter tiers and virtual adoption.",
+    "details_processing_q": "What is the processing fee?",
+    "details_processing_a": "That one is not ours: it is the card-processing fee charged by Stripe, which we pass through. Roughly 1.4% + 25 HUF; the exact rate depends on the card.",
+    "details_free_q": "Is it really free for shelters?",
+    "details_free_a": "Shelters that join get free basic use of the features listed here, and we do not invoice them for it. The service is young: if some additional feature were to become paid later, we would say so clearly and in advance.",
+    "ctaDonate": "Browse the fundraisers",
+    "ctaShelter": "Register a shelter"
   }
 }

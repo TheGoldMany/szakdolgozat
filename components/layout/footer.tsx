@@ -27,6 +27,7 @@ export function Footer() {
     { label: t("guide"),           href: "/sugo"                 },
     { label: t("adoptionProcess"), href: "/sugo#u-orokbefogadas" },
     { label: t("donating"),        href: "/sugo#u-adomanyozas"   },
+    { label: t("platformFee"),     href: "/platformdij"          },
     { label: t("reporting"),       href: "/sugo#u-bejelentes"    },
     { label: t("map"),             href: "/sugo#u-terkep"        },
     { label: t("contact"),         href: "/kapcsolat"            },

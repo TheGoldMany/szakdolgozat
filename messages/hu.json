@@ -45,6 +45,7 @@
     "guide": "Útmutató",
     "adoptionProcess": "Örökbefogadás menete",
     "donating": "Adományozás",
+    "platformFee": "Mire megy a platformdíj?",
     "reporting": "Bejelentés",
     "contact": "Kapcsolat",
     "legal": "Jogi információk",
@@ -1884,5 +1885,64 @@
     "loginRequired": "A napi állatokhoz be kell jelentkezned.",
     "timeAgoHours": "{h} órával ezelőtt",
     "timeAgoJustNow": "Épp most"
+  },
+  "platformFee": {
+    "eyebrow": "Nyíltan a pénzről",
+    "title": "Mire megy a platformdíj?",
+    "metaDescription": "A menhely a teljes adományt megkapja. A platformdíjat a támogató fizeti, és abból tartjuk fenn a menhelyek nyilvántartó rendszerét.",
+    "lead": "Az ÁllatiMenhelyek.hu nem csak örökbefogadási hirdetőfelület. A csatlakozó menhelyek alapszinten ingyenesen használják a teljes nyilvántartó rendszert — azt, amiért máshol havidíjat kérnének.",
+    "exampleHeading": "Így néz ki egy {amount} adomány",
+    "exampleDonation": "Felajánlott összeg",
+    "examplePlatform": "Platformdíj ({percent, number}%)",
+    "exampleProcessing": "Feldolgozási díj ({percent, number}% + {fixed, number} Ft)",
+    "exampleTotal": "Összesen fizetendő",
+    "exampleNoteStrong": "A menhely a teljes {amount}-ot megkapja.",
+    "exampleNote": "A díj azon felül jelenik meg, nem a menhelytől vonjuk le. Így az adományozó pontosan annyit juttat a menhelynek, amennyit szánt neki.",
+    "whatHeading": "Mit kap a menhely a díjért cserébe?",
+    "whatLead": "Nem egy bejegyzés egy listában. Ez a rendszer működik ma, és ezt használhatja minden csatlakozó menhely alapszinten ingyenesen:",
+    "group1Title": "Állatnyilvántartás",
+    "group1Items": [
+      "Adatlap minden állatról, fotókkal és státusszal",
+      "Egészségügyi napló: oltás, kezelés, állatorvosi bejegyzés",
+      "Hivatalos papírok feltöltése az adatlaphoz",
+      "Férőhelyek kapacitással: kennel, macskaszoba, karantén",
+      "Etetési napló napi emlékeztetővel",
+      "Készlet be- és kivételezéssel, alacsony készlet riasztással",
+      "Állat áthelyezése másik menhelyre, a fogadó jóváhagyásával"
+    ],
+    "group2Title": "Örökbefogadás",
+    "group2Items": [
+      "Örökbefogadási kérelmek fogadása és elbírálása",
+      "Saját kérdőív összeállítása a menhely kérdéseivel",
+      "Időpontfoglalás és visszaigazolás",
+      "Utánkövetés az örökbefogadás után",
+      "Üzenetváltás az érdeklődőkkel"
+    ],
+    "group3Title": "Közösség és adományok",
+    "group3Items": [
+      "Önkéntesek és a rájuk osztott feladatok",
+      "Ideiglenes befogadók nyilvántartása",
+      "Események szervezése, jelentkezésekkel",
+      "Gyűjtések, havi támogatói csomagok, virtuális örökbefogadás",
+      "Előfizetők listája és bevételi kimutatás"
+    ],
+    "group4Title": "Áttekintés",
+    "group4Items": [
+      "Kimutatások és grafikonok a menhely működéséről",
+      "CSV export: állatok, önkéntesek, események, előfizetők, adományok",
+      "Értesítések és riasztások a határidős dolgokról"
+    ],
+    "whyHeading": "Miért így osztottuk el?",
+    "whyBody1": "Egy nyilvántartó rendszer pénzbe kerül: szerver, adatbázis, fejlesztés, karbantartás. Valakinek fizetnie kell érte. Ha a menhelyt kérnénk meg rá, abból a pénzből kellene elvonnia, amiből az állatokat eteti.",
+    "whyBody2": "Ezért a díjat a támogatóra tettük, az adományán felül, külön soron — nem a menhely bevételéből. A menhely minden adományból a teljes szánt összeget megkapja, a rendszert pedig a támogatók platformdíja tartja fenn.",
+    "detailsHeading": "Pontosan",
+    "details_platform_q": "Mennyi a platformdíj?",
+    "details_platform_a": "Az adomány 5%-a, a felajánlott összegen felül. Ugyanez vonatkozik a havi támogatói csomagokra és a virtuális örökbefogadásra is.",
+    "details_processing_q": "Mi az a feldolgozási díj?",
+    "details_processing_a": "Ez nem a miénk: a bankkártyás fizetést lebonyolító Stripe díja, amit továbbhárítunk. Nagyjából 1,4% + 25 Ft, a tényleges mérték a kártya típusától függ.",
+    "details_free_q": "Tényleg ingyenes a menhelyeknek?",
+    "details_free_a": "A felsorolt funkciókat alapszinten ingyenesen használják a csatlakozó menhelyek, és ezért nem számlázunk nekik semmit. A szolgáltatás még fiatal: ha később valamilyen kiegészítő funkció fizetőssé válna, azt előre és érthetően közöljük.",
+    "ctaDonate": "Megnézem a gyűjtéseket",
+    "ctaShelter": "Menhelyet regisztrálok"
   }
 }
