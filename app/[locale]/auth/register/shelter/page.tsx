@@ -147,6 +147,36 @@ export default function ShelterRegisterPage() {
                 </p>
               </div>
 
+              {/*
+                A költség kérdése a regisztráció ELŐTT jön elő, nem utána: aki
+                idáig eljutott, az azt mérlegeli, mibe kerül ez neki.
+
+                A hangnem szándékosan szerény. Ma NULLA menhely használja a
+                rendszert, tehát nincs mire hivatkozni — se referenciára, se
+                „menhelyek százaira". Amit mondani tudunk, az kettő: nem kérünk
+                pénzt, és szívesen halljuk, mi hiányzik. A második nem udvariassági
+                formula: egy menhely, aki az első héten belefut egy hiányba, a
+                túlígért szövegtől veszti el a bizalmát, nem a hiánytól.
+
+                A bal oldali márkapanel `lg:` alatt rejtett, ezért ez NEM oda
+                került — telefonon a menhelyek fele ott sem látná.
+              */}
+              <div className="mb-5 rounded-2xl border border-mint bg-cream p-5">
+                <p className="text-sm font-semibold text-graphite">{t("shelterCostTitle")}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-graphite/75">
+                  {t("shelterCostBody")}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-graphite/75">
+                  {t("shelterCostHonest")}
+                </p>
+                <Link
+                  href="/platformdij"
+                  className="mt-3 inline-block text-sm font-medium text-forest underline decoration-mint underline-offset-2 hover:decoration-forest"
+                >
+                  {t("shelterCostLink")}
+                </Link>
+              </div>
+
               <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   {/* Menhely adatok */}
