@@ -428,8 +428,12 @@ Connect-fiókjába kerül, a platformdíj levonásával.
 
 ### 7.3 Webhook flow (`POST /api/webhooks/stripe`)
 
-1. Raw body + `stripe-signature` fejléc → `webhooks.constructEvent` aláírás-ellenőrzés
-   (`STRIPE_WEBHOOK_SECRET`).
+1. Raw body + `stripe-signature` fejléc → `verifyWebhook` (`lib/stripe-webhook.ts`),
+   ami az **összes** beállított aláíró titokkal próbálkozik (`STRIPE_WEBHOOK_SECRET`
+   + `STRIPE_CONNECT_WEBHOOK_SECRET`, vesszős lista is), és bukáskor nem egy
+   üres „nem sikerült"-et ad, hanem megnevezett okot (`reason`) a válasz
+   törzsében is — mert a Stripe Dashboard azt megőrzi, a futásnaplót viszont a
+   hosting csomag egy óra után eldobja. Titkot nem tartalmaz.
 2. **`checkout.session.completed`** — a `metadata` alapján három ág:
    - `metadata.donationId` → `Donation.paidAt` kitöltése, kampány `raisedAmount`
      növelése, e-mail + in-app értesítés az adminoknak (`DONATION_RECEIVED`).
@@ -536,7 +540,8 @@ funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell
 | `dwh_POSTGRES_PRISMA_URL`, `dwh_POSTGRES_URL_NON_POOLING` | DWH PostgreSQL |
 | `NEXTAUTH_SECRET`, `NEXTAUTH_URL` | NextAuth JWT + URL-ek |
 | `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_CLIENT_ID/SECRET` | OAuth providerek (opcionális) |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe API + webhook aláírás |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe API + webhook aláírás (a titok vesszővel többes is lehet, rotációhoz) |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | A csatolt fiókos („Events from connected accounts") webhook endpoint saját aláíró titka (opcionális) |
 | `NEXT_PUBLIC_APP_URL` | Checkout redirect URL-ek alapja |
 | `SMTP_HOST/PORT/USER/PASS/FROM` | nodemailer e-mail küldés |
 | `ETL_SECRET` | `/api/etl` Bearer-token |

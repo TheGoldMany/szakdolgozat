@@ -80,18 +80,43 @@ A teljes lista a Stripe *Testing* dokumentációjában.
 
 **Elfogadási feltételek:**
 - [ ] Az endpoint URL-je a futó környezetre mutat
-- [ ] Mind a 9 esemény szerepel a kiválasztottak között
+- [ ] Mind a **10** esemény szerepel a kiválasztottak között (lásd `07-donations.md`)
 - [ ] A *Signing secret* megegyezik a `STRIPE_WEBHOOK_SECRET` értékével
+- [ ] Ha van **„Events from connected accounts"** endpoint is, annak a titka a
+      `STRIPE_CONNECT_WEBHOOK_SECRET` változóban van
+- [ ] Az endpoint módja (teszt/éles) megegyezik a `STRIPE_SECRET_KEY` módjával
 
 **Tesztelési lépések:**
 1. Nyisd meg az endpointot a Stripe dashboardon.
 2. Vesd össze az eseménylistát a `07-donations.md` táblázatával.
-3. Kattints a *Send test webhook* gombra egy `checkout.session.completed` eseménnyel.
-4. Nézd meg a válasz státuszát.
+3. Számold meg, **hány endpoint** van összesen, és hogy van-e köztük csatolt
+   fiókos. Mindegyiknek külön `whsec_…` titka van.
+4. Kattints a *Send test webhook* gombra egy `checkout.session.completed` eseménnyel.
+5. Nézd meg a válasz státuszát **és a válasz törzsét**.
 
 **Elvárt eredmény:**
-A teszt esemény `200`-as választ kap. Ha `400`, az aláírókulcs nem egyezik; ha
-`500`, alkalmazáshiba van a naplóban.
+A teszt esemény `200`-as választ kap.
+
+Bukásnál nem kell a futásnaplóhoz hozzáférni: a végpont a **válasz törzsében**
+megnevezi az okot, és a Stripe Dashboard ezt az endpoint *Events* nézetében
+megőrzi (a hosting futásnaplója Hobby csomagon egy óra után eldobja). A `reason`
+mező lehetséges értékei és a hozzá tartozó teendő:
+
+| `reason` | Mit jelent | Mit kell tenni |
+|---|---|---|
+| `signature_mismatch` | Egyik beállított titok sem egyezik | Vesd össze az endpoint *Signing secret* értékét az env változóval. Ha a `connectedAccountEvent: true`, akkor csatolt fiókos endpointról jött → `STRIPE_CONNECT_WEBHOOK_SECRET` kell. Ha az `eventLivemode` nem egyezik a kulcsod módjával, teszt és éles keveredett. |
+| `timestamp_out_of_tolerance` | Az aláírás helyes, csak öreg (>5 perc) | A kiszolgáló órája csúszott el, vagy egy régi eseményt küldtek újra. **A titok cseréje itt nem segít.** |
+| `malformed_signature_header` | Nincs a fejlécben `t=` és `v1=` | Egy köztes réteg (proxy, átirányítás) átírta a kérést. Nézd meg, hogy az endpoint URL-je nem átirányít-e (pl. www ↔ nem-www). |
+| `no_secret_configured` | Nincs beállítva titok | Vedd fel a `STRIPE_WEBHOOK_SECRET` változót. Ez `500`-at ad, nem `400`-at. |
+| `no_signature_header` | Nem a Stripe hívott | Általában kézi hívás vagy szkenner. |
+
+A `secretsNeedingTrim` mező azt mondja meg, hány beállított értéken kellett
+idézőjelet vagy szóközt levágni. Ha ez nem nulla, a hosting env felületén
+elgépelt a bemásolás — a kód ezt már tolerálja, de érdemes rendbe tenni.
+
+> A válasz törzse **nem** tartalmazza az aláíró titkot, sem annak részletét.
+> Az `eventLivemode` mezőt maga a küldő küldte, tehát annak visszaadása nem
+> árul el semmit — viszont pont ez dönti el a leggyakoribb éles hibát.
 
 **Tényleges eredmény:**
 > _Kitöltendő tesztelés után_

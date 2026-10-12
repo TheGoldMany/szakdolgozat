@@ -161,6 +161,12 @@ egyszerűen nem történik meg.
 | `charge.refunded` | **A visszatérített adomány bennmarad a gyűjtés összegében.** |
 | `charge.dispute.created` | A visszaterhelésről nem kap értesítést a super admin, így lemaradhat a bizonyítás határidejéről. |
 | `charge.dispute.updated` | A vita állapota nem frissül a naplóban. |
+| `charge.dispute.closed` | **A vita sosem ér végállapotba.** A `PaymentDispute.status` megragad a nyitott állapotban, és a „megnyerve" / „elveszítve" értesítés nem megy ki – pedig egy elvesztett vitánál az összeg és a vitadíj is a platformot terheli, tehát ezt könyvelni kell. |
+
+Összesen **tíz** esemény. (Ez a lista korábban kilencet sorolt fel: a
+`charge.dispute.closed` kezelése utólag került a kódba, a táblázat pedig nem
+követte. Ha a Stripe-on a régi, kilences lista van bekapcsolva, a viták
+végkimenetele nem jut el hozzánk.)
 
 ### Miért fontos a `charge.dispute.*`
 

@@ -193,7 +193,8 @@ npm run dev
 | Változó | Leírás |
 |---|---|
 | `STRIPE_SECRET_KEY` | Stripe titkos kulcs (`sk_test_…`) |
-| `STRIPE_WEBHOOK_SECRET` | Webhook aláírási titkos (`whsec_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook aláírási titok (`whsec_…`). Vesszővel több is megadható – titokcseréhez (rotáció) hasznos, mert az átfedő ablakban mindkettő érvényes. |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | **Opcionális.** A Stripe „Events from connected accounts" endpointja KÜLÖN endpoint, SAJÁT aláíró titokkal. Ha ilyen is be van állítva a Stripe-on, enélkül annak minden kézbesítése aláírás-hibára fut. |
 
 Lokális webhook teszteléshez:
 ```bash

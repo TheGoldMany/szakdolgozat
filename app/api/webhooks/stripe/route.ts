@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getStripe } from "@/lib/stripe";
+import { verifyWebhook, explainFailure } from "@/lib/stripe-webhook";
 import { prisma } from "@/lib/prisma";
 import { sendPaymentFailedEmail, sendSponsorshipPaymentFailedEmail } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
@@ -21,23 +21,32 @@ export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig  = req.headers.get("stripe-signature");
 
-  if (!sig) {
-    return NextResponse.json({ error: "Missing stripe-signature header" }, { status: 400 });
+  // Az ellenőrzés az ÖSSZES beállított titokkal próbálkozik (platform +
+  // Connect + rotáció), és bukáskor megmondja, miért. Lásd `lib/stripe-webhook.ts`.
+  const verified = verifyWebhook(body, sig);
+
+  if (!verified.ok) {
+    const { diagnosis } = verified;
+    console.error("Stripe webhook signature verification failed:", JSON.stringify(diagnosis));
+
+    // A diagnózis a VÁLASZBA is belekerül, mert a Stripe Dashboard az endpoint
+    // alatt megőrzi a válaszunkat, a futásnaplót viszont a hosting csomag egy
+    // óra után eldobja. Titkot nem tartalmaz – a részleteket lásd a helpernél.
+    const status = diagnosis.reason === "no_secret_configured" ? 500 : 400;
+    return NextResponse.json(
+      { error: "Webhook Error", ...diagnosis, hint: explainFailure(diagnosis) },
+      { status }
+    );
   }
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    console.error("STRIPE_WEBHOOK_SECRET is not set");
-    return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
-  }
+  const event = verified.event;
 
-  let event: Stripe.Event;
-  try {
-    event = getStripe().webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("Stripe webhook signature verification failed:", message);
-    return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
+  // Csatolt fiók eseménye (külön Connect endpointról). Az ágak mind a PLATFORM
+  // oldali azonosítók szerint keresnek (`stripeSubId`, `payment_intent`), ezért
+  // egy csatolt fiók saját azonosítója nem talál sort – nem téved, csak nem tesz
+  // semmit. A naplósor azért kell, hogy lássuk: ezek egyáltalán megérkeznek-e.
+  if (event.account) {
+    console.log(`[stripe webhook] connected-account event ${event.type} (${event.account})`);
   }
 
   // Ezt az eseményt már végigvittük – nincs mit tenni.
