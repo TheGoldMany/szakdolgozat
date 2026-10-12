@@ -49,32 +49,18 @@ export { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 
 /**
- * Stripe processing fee rates for HUF payments.
- * Used to pass the processing cost through to the payer transparently.
+ * A díjszámítás a `lib/donation-limits.ts`-ben él, mert a FIZETÉSI ŰRLAP is
+ * kiírja a bontást, és onnan a Stripe SDK nélkül importálható. Itt csak
+ * újraexportáljuk, hogy a szerveroldali hívóknak ne kelljen átírni az
+ * importjaikat — és hogy a kiírt meg a levont összeg mögött egy képlet legyen.
  */
-export const STRIPE_PERCENT_FEE      = 1.4;  // % of charge amount
-export const STRIPE_FIXED_FEE_HUF    = 25;   // flat HUF per transaction
+export {
+  STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF,
+  platformFee, stripeProcessingFee, donorTotal,
+} from "@/lib/donation-limits";
+import { platformFee, stripeProcessingFee } from "@/lib/donation-limits";
 
-/**
- * Platform fee for a given amount, in the same whole-currency unit (HUF).
- * Rounded to whole forints so charges stay valid for HUF.
- *
- * The fee is added on top of the donor's intended amount: the donor pays
- * `amount + platformFee(amount)`, the connected account receives the full
- * `amount`, and the platform keeps the fee.
- */
-export function platformFee(amount: number): number {
-  return Math.round((amount * PLATFORM_FEE_PERCENT) / 100);
-}
 
-/**
- * Estimated Stripe processing fee passed through to the payer, in HUF.
- * Applied to the donation/subscription amount (not the grossed-up total)
- * as a transparent approximation.
- */
-export function stripeProcessingFee(amount: number): number {
-  return Math.round(amount * STRIPE_PERCENT_FEE / 100) + STRIPE_FIXED_FEE_HUF;
-}
 
 /**
  * Az előfizetésekre alkalmazott `application_fee_percent`.

@@ -3,11 +3,22 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { MIN_DONATION_HUF } from "@/lib/donation-limits";
+import {
+  MIN_DONATION_HUF, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF,
+  platformFee, stripeProcessingFee, donorTotal,
+} from "@/lib/donation-limits";
 
 interface DonateFormProps {
   campaignId: string;
+  /**
+   * Menhelyi gyűjtés-e. Egy gyűjtés tartozhat menhelyhez VAGY
+   * magánszemélyhez (lásd `docs/07`), ezért nem írható ki fixen, hogy „a
+   * menhelyhez kerül" — annál a gyűjtésnél, aminek nincs menhelye, az
+   * egyszerűen nem lenne igaz.
+   */
+  isShelterCampaign?: boolean;
 }
 
 const PRESET_AMOUNTS = [1000, 2000, 5000, 10000];
@@ -16,7 +27,7 @@ function formatHUF(amount: number, locale: string) {
   return new Intl.NumberFormat(locale).format(amount) + " Ft";
 }
 
-export function DonateForm({ campaignId }: DonateFormProps) {
+export function DonateForm({ campaignId, isShelterCampaign = false }: DonateFormProps) {
   const t       = useTranslations("donate");
   const tCommon = useTranslations("common");
   const locale  = useLocale();
@@ -27,6 +38,11 @@ export function DonateForm({ campaignId }: DonateFormProps) {
   const [isAnonymous, setIsAnonymous]   = useState(false);
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState<string | null>(null);
+
+  // A bontás csak akkor jelenik meg, ha már van értelmes összeg: egy félig
+  // beírt „1" mellett a 25 Ft fix díj nagyobb lenne, mint az adomány, és a
+  // bontás a szándékkal ellentétesen riasztana el.
+  const validAmount = amount >= MIN_DONATION_HUF;
 
   function handlePreset(val: number) {
     setAmount(val);
@@ -127,6 +143,46 @@ export function DonateForm({ campaignId }: DonateFormProps) {
         />
         <span className="text-sm text-gray-600">{t("anonymousDonation")}</span>
       </label>
+
+      {/* A díjbontás ITT van, nem lábjegyzetben és nem csak a Stripe oldalán.
+          Korábban a támogató 10 000 Ft-ot választott, és először a fizetőoldalon
+          látott 10 665 Ft-ot — a díj meglepetés volt, a legrosszabb pillanatban.
+          A számokat ugyanaz a képlet adja, amivel a szerver a Stripe-sorokat
+          felépíti (`lib/donation-limits.ts`), tehát a kiírt végösszeg nem tud
+          elcsúszni a terheltől. */}
+      {validAmount && (
+        <div className="rounded-xl border border-mint bg-cream p-4">
+          <dl className="space-y-1.5 text-sm">
+            <div className="flex justify-between gap-3 text-graphite">
+              <dt>{t("feeLineDonation")}</dt>
+              <dd className="shrink-0 whitespace-nowrap font-medium">{formatHUF(amount, locale)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 text-xs text-gray-500">
+              <dt>{t("feeLinePlatform", { percent: PLATFORM_FEE_PERCENT })}</dt>
+              <dd className="shrink-0 whitespace-nowrap">{formatHUF(platformFee(amount), locale)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 text-xs text-gray-500">
+              <dt>{t("feeLineProcessing", { percent: STRIPE_PERCENT_FEE, fixed: STRIPE_FIXED_FEE_HUF })}</dt>
+              <dd className="shrink-0 whitespace-nowrap">{formatHUF(stripeProcessingFee(amount), locale)}</dd>
+            </div>
+            <div className="flex justify-between gap-3 border-t border-mint pt-1.5 text-graphite">
+              <dt className="font-semibold">{t("feeLineTotal")}</dt>
+              <dd className="shrink-0 whitespace-nowrap font-bold">{formatHUF(donorTotal(amount), locale)}</dd>
+            </div>
+          </dl>
+
+          {/* A fizetés pillanatában a hosszú indoklás védekezőnek hat, ezért itt
+              csak a támogatót érdeklő lényeg áll — a teljes összeg a menhelyé —,
+              a részletes magyarázat pedig egy kattintásra van. */}
+          <p className="mt-3 text-xs leading-relaxed text-gray-600">
+            {t(isShelterCampaign ? "feeExplainerShortShelter" : "feeExplainerShort",
+               { amount: formatHUF(amount, locale) })}{" "}
+            <Link href="/platformdij" className="font-medium text-forest underline decoration-mint underline-offset-2 hover:decoration-forest">
+              {t("feeExplainerLink")}
+            </Link>
+          </p>
+        </div>
+      )}
 
       {error && (
         <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>

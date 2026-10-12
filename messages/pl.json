@@ -316,7 +316,14 @@
     "stripeConnectOwn": "Podłącz własne konto Stripe",
     "stripeConnectError": "Błąd podczas łączenia ze Stripe.",
     "generalOngoing": "Stałe wsparcie codziennej działalności schroniska — bez terminu i celu.",
-    "startedByShelter": "Rozpoczęte przez"
+    "startedByShelter": "Rozpoczęte przez",
+    "feeLineDonation": "Twoja darowizna",
+    "feeLinePlatform": "Opłata platformy ({percent, number}%)",
+    "feeLineProcessing": "Opłata za obsługę ({percent, number}% + {fixed, number} HUF)",
+    "feeLineTotal": "Razem do zapłaty",
+    "feeExplainerShort": "Cała kwota {amount} trafia do odbiorcy. Z opłaty platformy utrzymujemy system ewidencji dla schronisk.",
+    "feeExplainerLink": "Co obejmuje?",
+    "feeExplainerShortShelter": "Cała kwota {amount} trafia do schroniska. Z opłaty platformy utrzymujemy system ewidencji dla schronisk."
   },
   "auth": {
     "loginTitle": "Zaloguj się",

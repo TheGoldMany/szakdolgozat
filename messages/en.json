@@ -316,7 +316,14 @@
     "stripeConnectOwn": "Connect my Stripe account",
     "stripeConnectError": "Error connecting to Stripe.",
     "generalOngoing": "Ongoing support for the shelter's day-to-day running — no deadline, no target.",
-    "startedByShelter": "Started by"
+    "startedByShelter": "Started by",
+    "feeLineDonation": "Your donation",
+    "feeLinePlatform": "Platform fee ({percent, number}%)",
+    "feeLineProcessing": "Processing fee ({percent, number}% + {fixed, number} HUF)",
+    "feeLineTotal": "Total to pay",
+    "feeExplainerShort": "The full {amount} goes to the recipient. The platform fee is what keeps the shelters' record-keeping system running.",
+    "feeExplainerLink": "What does it cover?",
+    "feeExplainerShortShelter": "The full {amount} goes to the shelter. The platform fee is what keeps the shelters' record-keeping system running."
   },
   "auth": {
     "loginTitle": "Sign in",

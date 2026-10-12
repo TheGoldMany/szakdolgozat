@@ -222,7 +222,10 @@ export default async function CampaignDetailPage({
             {/* Donate form */}
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-4 text-base font-semibold text-gray-900">{t("donateNow")}</h2>
-              <DonateForm campaignId={campaign.id} />
+              <DonateForm
+                campaignId={campaign.id}
+                isShelterCampaign={Boolean(campaign.shelter)}
+              />
             </div>
 
           </div>

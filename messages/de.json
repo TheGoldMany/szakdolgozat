@@ -316,7 +316,14 @@
     "stripeConnectOwn": "Eigenes Stripe-Konto verbinden",
     "stripeConnectError": "Fehler beim Verbinden mit Stripe.",
     "generalOngoing": "Laufende Unterstützung für den Alltag des Tierheims – ohne Frist und Zielbetrag.",
-    "startedByShelter": "Gestartet von"
+    "startedByShelter": "Gestartet von",
+    "feeLineDonation": "Dein Spendenbetrag",
+    "feeLinePlatform": "Plattformgebühr ({percent, number}%)",
+    "feeLineProcessing": "Bearbeitungsgebühr ({percent, number}% + {fixed, number} HUF)",
+    "feeLineTotal": "Gesamtbetrag",
+    "feeExplainerShort": "Die vollen {amount} gehen an den Empfänger. Mit der Plattformgebühr finanzieren wir das Verwaltungssystem der Tierheime.",
+    "feeExplainerLink": "Was ist enthalten?",
+    "feeExplainerShortShelter": "Die vollen {amount} gehen an das Tierheim. Mit der Plattformgebühr finanzieren wir das Verwaltungssystem der Tierheime."
   },
   "auth": {
     "loginTitle": "Anmelden",

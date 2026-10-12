@@ -151,6 +151,21 @@ export async function POST(req: NextRequest) {
       success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE}/donate/${campaign.id}`,
       metadata:    { donationId: donation.id },
+      // A magyarázat a Stripe oldalára is átmegy, mert a három díjsor ITT
+      // látszik először teljes összegként. A saját űrlapunk már kiírta a
+      // bontást, de a fizetőoldal az a pillanat, amikor a támogató a kártyáját
+      // adja meg — ha ott magyarázat nélkül állna egy nagyobb szám, az a
+      // legdrágább helyen keltene bizalmatlanságot.
+      ...(connectedAccountId && {
+        custom_text: {
+          submit: {
+            message:
+              `A ${amount.toLocaleString("hu-HU")} Ft teljes egészében a kedvezményezetthez kerül. ` +
+              `A platformdíjból tartjuk fenn a menhelyek nyilvántartó rendszerét: ` +
+              `${BASE}/hu/platformdij`,
+          },
+        },
+      }),
       ...(connectedAccountId && {
         payment_intent_data: {
           // A bankkivonaton felismerhető legyen, kire költött a támogató.

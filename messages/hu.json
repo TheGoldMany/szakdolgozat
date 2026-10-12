@@ -316,7 +316,14 @@
     "stripeConnectOwn": "Saját Stripe fiók csatlakoztatása",
     "stripeConnectError": "Hiba a Stripe csatlakozáskor.",
     "generalOngoing": "Folyamatos gyűjtés a menhely mindennapi működésére – nincs határidő és célösszeg.",
-    "startedByShelter": "Indította:"
+    "startedByShelter": "Indította:",
+    "feeLineDonation": "Felajánlott összeg",
+    "feeLinePlatform": "Platformdíj ({percent, number}%)",
+    "feeLineProcessing": "Feldolgozási díj ({percent, number}% + {fixed, number} Ft)",
+    "feeLineTotal": "Összesen fizetendő",
+    "feeExplainerShort": "A teljes {amount} a kedvezményezetthez kerül. A platformdíjból tartjuk fenn a menhelyek nyilvántartó rendszerét.",
+    "feeExplainerLink": "Mit tartalmaz?",
+    "feeExplainerShortShelter": "A teljes {amount} a menhelyhez kerül. A platformdíjból tartjuk fenn a menhelyek nyilvántartó rendszerét."
   },
   "auth": {
     "loginTitle": "Bejelentkezés",
