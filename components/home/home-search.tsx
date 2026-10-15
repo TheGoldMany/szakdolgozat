@@ -19,7 +19,7 @@ export function HomeSearch() {
 
   return (
     <form onSubmit={handleSearch} className="w-full" data-tour="home-search">
-      <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+      <div className="flex overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg focus-within:border-brand-600 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
         <div className="flex items-center pl-4 text-gray-400">
           <Search className="h-5 w-5" />
         </div>
@@ -32,7 +32,7 @@ export function HomeSearch() {
         />
         <button
           type="submit"
-          className="m-2 rounded-xl bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+          className="m-2 rounded-lg bg-brand-700 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
         >
           {tHome("search")}
         </button>

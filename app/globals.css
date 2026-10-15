@@ -51,17 +51,17 @@
 
 @layer base {
   /* Halvány háttér a beviteli mezőknek, hogy a doboz elváljon a kártyától.
-     A Tailwind bg-* utility ezt bármikor felülírja, ha valahol más kell. */
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]),
-  select,
-  textarea {
+     A `:where()` nulla specificitású: enélkül a sok `:not()` erősebb lenne
+     bármelyik bg-* utilitynél, és a `bg-transparent` mezők (pl. a kezdőlapi
+     kereső) szürke foltként váltak ki a fehér keretükből. */
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"])),
+  :where(select, textarea) {
     @apply bg-gray-50;
   }
 
   /* Fókuszban világosodjon, hogy látszódjon az aktív mező */
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]):focus,
-  select:focus,
-  textarea:focus {
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"])):focus,
+  :where(select, textarea):focus {
     @apply bg-white;
   }
 }

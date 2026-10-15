@@ -27,6 +27,13 @@ const ROLE_COLOR: Record<string, string> = {
   USER:          "bg-gray-100 text-gray-600",
 };
 
+interface NavItem {
+  href:       string;
+  label:      string;
+  /** Állandóan kiemelt menüpont (pirula), akkor is, ha nem aktív. */
+  highlight?: boolean;
+}
+
 export function Header() {
   const t = useTranslations("nav");
   const locale  = useLocale();
@@ -44,25 +51,64 @@ export function Header() {
   const [progress,     setProgress]     = useState(0);
   const [scrolled,     setScrolled]     = useState(false);
 
-  // A négy fő belépési pont mindig látszik; a többi a "Továbbiak" alá kerül,
-  // hogy a fejléc ne mossa össze a fontosat a ritkán használttal.
-  const PRIMARY_LINKS = [
+  // A fejléc menüje szimmetrikus: középen a kiemelt Bejelentések, tőle balra
+  // két fő belépési pont, jobbra a Menhelyek és a „Továbbiak". A ritkábban
+  // használt oldalak a lenyíló alá kerülnek, hogy a fejléc ne mossa össze a
+  // fontosat a ritkán használttal.
+  const LEFT_LINKS: NavItem[] = [
     { href: "/animals", label: t("animals") },
-    // Fizetés kikapcsolva: a Támogatás menüpont nem jelenik meg. A `filter`
-    // azért van, hogy a tömb többi eleme és a "Továbbiak" logika érintetlen
-    // maradjon — így a visszakapcsolás egyetlen env változó.
-    ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate") }] : []),
     { href: "/map",     label: t("map")     },
-    // A bejelentés a platform legidőérzékenyebb művelete: egy kóbor állatot
-    // MOST látnak meg, és ilyenkor nem keresgélni akar az ember. Ezért ez a
-    // menüpont akkor is kiemelt marad, ha a látogató más oldalon van.
-    { href: "/reports", label: t("reports"), highlight: true },
   ];
-  const SECONDARY_LINKS = [
+  // A bejelentés a platform legidőérzékenyebb művelete: egy kóbor állatot
+  // MOST látnak meg, és ilyenkor nem keresgélni akar az ember. Ezért ez a
+  // menüpont középre kerül, és akkor is kiemelt marad, ha a látogató más
+  // oldalon van.
+  const CENTER_LINK: NavItem = { href: "/reports", label: t("reports"), highlight: true };
+  const RIGHT_LINKS: NavItem[] = [
     { href: "/shelters", label: t("shelters") },
+  ];
+  const PRIMARY_LINKS: NavItem[] = [...LEFT_LINKS, CENTER_LINK, ...RIGHT_LINKS];
+  const SECONDARY_LINKS = [
+    // Fizetés kikapcsolva: a Támogatás menüpont nem jelenik meg; bekapcsolva
+    // a lenyílóba kerül, hogy a középső tengely két oldala egyforma maradjon.
+    ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate") }] : []),
     { href: "/events",   label: t("events")   },
     { href: "/articles", label: t("articles") },
   ];
+
+  function navLink(l: NavItem) {
+    return (
+      <Link
+        key={l.href}
+        href={l.href}
+        // A bemutató horgonya. Az útvonalból származik, hogy új menüpont
+        // felvételekor ne lehessen elfelejteni: `/animals` → `nav-animals`.
+        data-tour={`nav-${l.href.replace("/", "")}`}
+        aria-current={isActive(l.href) ? "page" : undefined}
+        className={cn(
+          "nav-link text-sm font-medium transition-colors",
+          // A kiemelt menüpont pirulát kap, hogy a sima szöveges linkek
+          // közül kiváljon. A kitöltött zöld SZÁNDÉKOSAN csak az aktív
+          // állapoté: enélkül nem lehetne megkülönböztetni a „kiemelt"
+          // és az „épp ezen vagyok" jelentést — és a tömör zöld a
+          // Regisztráció gombbal is versengene a figyelemért.
+          l.highlight
+            ? cn(
+                "rounded-full px-3 py-1.5",
+                isActive(l.href)
+                  ? "bg-forest text-white"
+                  : "bg-mint text-forest hover:bg-mint/70",
+              )
+            : cn(
+                "hover:text-brand-500",
+                isActive(l.href) ? "text-brand-600" : "text-gray-600",
+              ),
+        )}
+      >
+        {l.label}
+      </Link>
+    );
+  }
 
   /**
    * Görgetés-figyelés a fejléchez.
@@ -150,6 +196,33 @@ export function Header() {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+  // A menügomb két helyen jelenik meg: telefonon a mobil fejlécsorban, md–xl
+  // között pedig az asztali jobb oldal végén, mert ott a teljes menüsor még
+  // nem fér el a logó és a belépés gombjai között.
+  const menuButton = (
+      <button
+        className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
+        aria-expanded={mobileOpen}
+      >
+        <span className="relative block h-5 w-5">
+          <Menu
+            className={cn(
+              "absolute inset-0 h-5 w-5 transition-all duration-200",
+              mobileOpen ? "rotate-90 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100",
+            )}
+          />
+          <X
+            className={cn(
+              "absolute inset-0 h-5 w-5 transition-all duration-200",
+              mobileOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-75 opacity-0",
+            )}
+          />
+        </span>
+      </button>
+  );
+
   return (
     <header
       className={cn(
@@ -160,7 +233,7 @@ export function Header() {
       )}
     >
 
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         {/* Logo – mobilon is kiírjuk a nevet: ott a fejlécben csak a logó és a
             menügomb van, tehát bőven elfér, és a látogató tudja, hol jár. */}
@@ -183,72 +256,52 @@ export function Header() {
           />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 md:flex">
-          {PRIMARY_LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              // A bemutató horgonya. Az útvonalból származik, hogy új menüpont
-              // felvételekor ne lehessen elfelejteni: `/animals` → `nav-animals`.
-              data-tour={`nav-${l.href.replace("/", "")}`}
-              aria-current={isActive(l.href) ? "page" : undefined}
-              className={cn(
-                "nav-link text-sm font-medium transition-colors",
-                // A kiemelt menüpont pirulát kap, hogy a sima szöveges linkek
-                // közül kiváljon. A kitöltött zöld SZÁNDÉKOSAN csak az aktív
-                // állapoté: enélkül nem lehetne megkülönböztetni a „kiemelt"
-                // és az „épp ezen vagyok" jelentést — és a tömör zöld a
-                // Regisztráció gombbal is versengene a figyelemért.
-                l.highlight
-                  ? cn(
-                      "rounded-full px-3 py-1.5",
-                      isActive(l.href)
-                        ? "bg-forest text-white"
-                        : "bg-mint text-forest hover:bg-mint/70",
-                    )
-                  : cn(
-                      "hover:text-brand-500",
-                      isActive(l.href) ? "text-brand-600" : "text-gray-600",
-                    ),
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
+        {/* Desktop nav – széles kijelzőn a Bejelentések pontosan a fejléc
+            közepére kerül: a háromoszlopos rács két szélső oszlopa egyforma
+            széles, így a középső elem nem a két oldali csoport hosszától függ.
+            xl alatt a menüsor nem fér el a logó és a belépés gombjai között
+            (egymásra csúsznának), ezért ott a menügomb nyitja ugyanezt. */}
+        <nav className="hidden items-center gap-6 xl:absolute xl:left-1/2 xl:grid xl:w-[36rem] xl:-translate-x-1/2 xl:grid-cols-[1fr_auto_1fr]">
+          <div className="flex items-center justify-end gap-6">
+            {LEFT_LINKS.map(navLink)}
+          </div>
+          {navLink(CENTER_LINK)}
+          <div className="flex items-center gap-6">
+            {RIGHT_LINKS.map(navLink)}
 
-          {/* Másodlagos menüpontok */}
-          <div className="relative">
-            <button
-              onClick={() => setMoreOpen((v) => !v)}
-              className={cn(
-                "nav-link flex items-center gap-1 text-sm font-medium transition-colors hover:text-brand-500",
-                SECONDARY_LINKS.some((l) => isActive(l.href)) ? "text-brand-600" : "text-gray-600",
+            {/* Másodlagos menüpontok */}
+            <div className="relative">
+              <button
+                onClick={() => setMoreOpen((v) => !v)}
+                className={cn(
+                  "nav-link flex items-center gap-1 text-sm font-medium transition-colors hover:text-brand-500",
+                  SECONDARY_LINKS.some((l) => isActive(l.href)) ? "text-brand-600" : "text-gray-600",
+                )}
+                aria-current={SECONDARY_LINKS.some((l) => isActive(l.href)) ? "page" : undefined}
+                aria-expanded={moreOpen}
+              >
+                {t("more")}
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
+              </button>
+              {moreOpen && (
+                <>
+                  {/* Kattintás bárhová: bezárás */}
+                  <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+                  <div className="animate-dropdown absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
+                    {SECONDARY_LINKS.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        onClick={() => setMoreOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                </>
               )}
-              aria-current={SECONDARY_LINKS.some((l) => isActive(l.href)) ? "page" : undefined}
-              aria-expanded={moreOpen}
-            >
-              {t("more")}
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", moreOpen && "rotate-180")} />
-            </button>
-            {moreOpen && (
-              <>
-                {/* Kattintás bárhová: bezárás */}
-                <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                <div className="animate-dropdown absolute left-0 z-50 mt-2 w-44 rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg">
-                  {SECONDARY_LINKS.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      onClick={() => setMoreOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
-                </div>
-              </>
-            )}
+            </div>
           </div>
         </nav>
 
@@ -372,6 +425,7 @@ export function Header() {
               </Link>
             </>
           )}
+          <div className="xl:hidden">{menuButton}</div>
         </div>
 
         {/* Mobile right side: messages + notifications + hamburger */}
@@ -395,27 +449,7 @@ export function Header() {
             </Link>
           )}
           {session && <NotificationBell />}
-          <button
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
-            aria-expanded={mobileOpen}
-          >
-            <span className="relative block h-5 w-5">
-              <Menu
-                className={cn(
-                  "absolute inset-0 h-5 w-5 transition-all duration-200",
-                  mobileOpen ? "rotate-90 scale-75 opacity-0" : "rotate-0 scale-100 opacity-100",
-                )}
-              />
-              <X
-                className={cn(
-                  "absolute inset-0 h-5 w-5 transition-all duration-200",
-                  mobileOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-75 opacity-0",
-                )}
-              />
-            </span>
-          </button>
+          {menuButton}
         </div>
       </div>
 
@@ -429,7 +463,7 @@ export function Header() {
 
       {/* Mobile menu – rendered via portal so backdrop-filter on header doesn't trap it */}
       {mobileOpen && createPortal(
-        <div className="fixed inset-x-0 bottom-0 z-[9999] md:hidden" style={{ top: "64px" }}>
+        <div className="fixed inset-x-0 bottom-0 z-[9999] xl:hidden" style={{ top: "64px" }}>
           {/* Backdrop */}
           <div
             className="animate-fade-in absolute inset-0 bg-black/30"

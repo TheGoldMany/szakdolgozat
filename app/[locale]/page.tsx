@@ -237,10 +237,10 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       {/* ── "Neked" feed ─────────────────────────────────── */}
       <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between gap-6">
+          <div className="flex gap-8">
 
-            {/* Folyam – olvasható szélességen tartva */}
-            <div className="w-full max-w-2xl">
+            {/* Folyam – kitölti a helyet az oldalsávig, így nem marad üres sáv */}
+            <div className="min-w-0 flex-1">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
                 <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
