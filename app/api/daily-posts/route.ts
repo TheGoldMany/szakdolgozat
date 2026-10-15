@@ -4,6 +4,7 @@ import { requireAuthUser } from "@/lib/api-auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { createDailyPost, dailyFeed, type FeedTab } from "@/lib/daily-posts";
+import { ownImageUrl } from "@/lib/image-url";
 
 const TABS: FeedTab[] = ["friends", "recommended", "trending"];
 
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 }
 
 const createSchema = z.object({
-  imageUrl: z.string().url().max(2000),
+  imageUrl: ownImageUrl,
   caption:  z.string().max(500).optional().nullable(),
   animalId: z.string().optional().nullable(),
 });

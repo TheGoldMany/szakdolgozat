@@ -4,10 +4,11 @@ import { z } from "zod";
 import { sendNewMessageEmail } from "@/lib/email";
 import { createNotification, createNotifications } from "@/lib/notifications";
 import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
+import { ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
   content:        z.string().max(2000).optional(),
-  attachmentUrl:  z.string().url().optional(),
+  attachmentUrl:  ownImageUrl.optional(),
   attachmentName: z.string().max(255).optional(),
 }).refine((d) => (d.content && d.content.trim().length > 0) || d.attachmentUrl, {
   message: "Üzenet szövege vagy csatolmány szükséges",

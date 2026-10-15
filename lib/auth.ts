@@ -26,6 +26,11 @@ const NO_REMEMBER_MAX_AGE = 12 * 60 * 60;       // 12 óra
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt", maxAge: REMEMBER_MAX_AGE },
+  // A NextAuth a `Secure` sütit (és a `__Secure-` előtagot) magától csak akkor
+  // kapcsolja be, ha a NEXTAUTH_URL `https://`-sel kezdődik — egy elgépelt
+  // `http://` csendben kikapcsolná, és a munkamenet-süti titkosítatlan
+  // kapcsolaton is elmenne. A Vercelen minden környezet HTTPS, ott kötelező.
+  useSecureCookies: Boolean(process.env.VERCEL) || (process.env.NEXTAUTH_URL ?? "").startsWith("https://"),
   jwt: {
     async encode(params) {
       const rememberMe = (params.token?.rememberMe as boolean) ?? true;

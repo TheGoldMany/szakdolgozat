@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { createNotifications } from "@/lib/notifications";
+import { ownImageUrl } from "@/lib/image-url";
 
 // GET /api/apply/[token] – get form and animal info for the token
 export async function GET(
@@ -55,7 +56,7 @@ const responseSchema = z.object({
     z.object({
       fieldId: z.string(),
       value:   z.string().optional(),
-      fileUrl: z.string().url().optional(),
+      fileUrl: ownImageUrl.optional(),
     })
   ),
 });

@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
-  logoUrl: z.string().url(),
+  logoUrl: ownImageUrl,
 });
 
 export async function PATCH(

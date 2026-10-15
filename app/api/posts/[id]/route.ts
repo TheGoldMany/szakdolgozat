@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
 import { slugifyTitle, uniqueArticleSlug, isPublished } from "@/lib/articles";
 import { cleanTermList } from "@/lib/seo";
+import { optionalOwnImageUrl } from "@/lib/image-url";
 
 const patchSchema = z.object({
   title:      z.string().min(3).max(200).optional(),
   excerpt:    z.string().max(400).nullable().optional(),
   content:    z.string().min(1).optional(),
-  imageUrl:   z.string().url().nullable().optional().or(z.literal("")),
+  imageUrl:   optionalOwnImageUrl,
   /** Keresőoptimalizálás – mind opcionális, üresen értelmes tartalékot használunk. */
   seoTitle:        z.string().max(120).nullable().optional(),
   metaDescription: z.string().max(320).nullable().optional(),

@@ -7,6 +7,7 @@ import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 import { createNotifications } from "@/lib/notifications";
 import { blockIfSuspended } from "@/lib/account-status";
 import { paymentsDisabled } from "@/lib/payments-guard";
+import { optionalOwnImageUrl } from "@/lib/image-url";
 function slugify(text: string) {
   return text
     .toLowerCase()
@@ -22,7 +23,7 @@ const createSchema = z.object({
   // A minimumot a SZERVER is kikényszeríti, nem csak az űrlap: a végpontot
   // közvetlenül hívva eddig 1 Ft-os célösszeg is átment.
   targetAmount: z.number().int().min(MIN_CAMPAIGN_TARGET_HUF),
-  imageUrl:     z.string().url().optional().or(z.literal("")).optional(),
+  imageUrl:     optionalOwnImageUrl,
   endsAt:       z.string().datetime().optional().nullable(),
   shelterId:    z.string().optional().nullable(), // opcionális – menhelyhez köthető
   animalId:     z.string().optional().nullable(), // opcionális – állathoz köthető

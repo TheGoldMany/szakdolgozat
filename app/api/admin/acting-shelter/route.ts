@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
   if (shelterId) {
     res.cookies.set(ACTING_SHELTER_COOKIE, String(shelterId), {
       httpOnly: true,
+      // Lokális `http://` fejlesztésnél a böngésző eldobná a Secure sütit.
+      secure:   Boolean(process.env.VERCEL) || process.env.NODE_ENV === "production",
       sameSite: "lax",
       path:     "/",
       maxAge:   60 * 60 * 24 * 30, // 30 nap

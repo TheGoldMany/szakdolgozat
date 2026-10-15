@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
+import { ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
-  image: z.string().url(),
+  image: ownImageUrl,
 });
 
 export async function PATCH(req: NextRequest) {

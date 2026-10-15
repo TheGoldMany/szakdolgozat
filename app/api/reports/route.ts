@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { AnimalType, ReportType } from "@prisma/client";
 import { blockIfSuspended } from "@/lib/account-status";
 import { getAuthUser } from "@/lib/api-auth";
+import { optionalOwnImageUrl, ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
@@ -15,8 +16,8 @@ const schema = z.object({
   description:  z.string().min(10, "Legalább 10 karakter szükséges").max(2000),
   city:         z.string().min(1, "Kötelező mező").max(100),
   address:      z.string().max(200).optional(),
-  imageUrl:     z.string().url().optional().or(z.literal("")),
-  imageUrls:    z.array(z.string().url()).max(6).optional(),
+  imageUrl:     optionalOwnImageUrl,
+  imageUrls:    z.array(ownImageUrl).max(6).optional(),
   contactName:  z.string().min(2).max(100),
   contactPhone: z.string().min(1, "Kötelező mező").max(20),
   contactEmail: z.string().email("Érvénytelen email"),

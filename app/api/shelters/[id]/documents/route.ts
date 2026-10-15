@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
   name:     z.string().min(1).max(200),
-  url:      z.string().url(),
+  url:      ownImageUrl,
   fileType: z.string().optional(),
 });
 

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugifyEvent } from "@/lib/event";
 import { permittedShelterIds } from "@/lib/acting-shelter";
+import { optionalOwnImageUrl } from "@/lib/image-url";
 
 const createSchema = z.object({
   shelterId:   z.string().min(1),
@@ -15,7 +16,7 @@ const createSchema = z.object({
   startsAt:    z.string().datetime(),
   endsAt:      z.string().datetime().optional().nullable(),
   capacity:    z.number().int().min(1).max(100000).optional().nullable(),
-  imageUrl:    z.string().url().optional().or(z.literal("")).optional(),
+  imageUrl:    optionalOwnImageUrl,
   publish:     z.boolean().optional(),
 });
 

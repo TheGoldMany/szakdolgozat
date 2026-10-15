@@ -12,6 +12,7 @@ import {
   EVENT_STATUS_LABELS, EVENT_STATUS_COLORS,
 } from "@/lib/event";
 import type { EventType, EventStatus } from "@prisma/client";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export interface RegistrationEntry {
   id:        string;
@@ -182,10 +183,13 @@ export function EventsManager({ shelterId, events }: Props) {
                   className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-gray-600">Kép URL</label>
-                <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                  placeholder="https://…"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                {/* Kézi URL helyett feltöltő: a szerver csak a saját tárhelyről
+                    fogad el képet (lásd `lib/image-url.ts`). */}
+                <ImageUpload
+                  label="Kép"
+                  value={form.imageUrl}
+                  onChange={(url) => setForm(f => ({ ...f, imageUrl: url }))}
+                />
               </div>
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Leírás *</label>
