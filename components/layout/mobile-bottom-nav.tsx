@@ -12,6 +12,8 @@ interface Tab {
   href:  string;
   label: string;
   icon:  LucideIcon;
+  /** Állandóan kiemelt fül: inaktívan sem halványul el a többivel. */
+  highlight?: boolean;
 }
 
 /**
@@ -34,7 +36,10 @@ export function MobileBottomNav() {
     // Fizetés kikapcsolva: a sáv négy fülre szűkül, nem marad üres hely.
     ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate"), icon: HandHeart }] : []),
     { href: "/map",     label: t("map"),     icon: MapPin },
-    { href: "/reports", label: t("reports"), icon: FileWarning },
+    // A bejelentés a platform legidőérzékenyebb művelete: egy kóbor állatot
+    // MOST látnak meg. Ezért akkor is kiemelve marad, ha a látogató épp más
+    // oldalon van — nem kell megkeresnie, amikor sürgős lenne.
+    { href: "/reports", label: t("reports"), icon: FileWarning, highlight: true },
     loggedIn
       ? { href: "/profile",    label: t("profile"), icon: User }
       : { href: "/auth/login", label: t("login"),   icon: LogIn },
@@ -58,12 +63,16 @@ export function MobileBottomNav() {
       aria-label={t("openMenu")}
     >
       {/* Csúszó jelölő: átvándorol a megnyitott fülhöz, így a szem követni
-          tudja, honnan hová került a kijelölés. Öt egyenlő fül van, ezért
-          a szélessége 20%, és fülnyi lépésekben tolódik el. */}
+          tudja, honnan hová került a kijelölés.
+
+          A szélesség a FÜLEK SZÁMÁBÓL jön, nem fix 20%-ból: a fizetés
+          kikapcsolásával a Támogatás füle eltűnt, és a beégetett ötös
+          osztásból egy üres hasáb maradt volna a sáv jobb szélén. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 block w-1/5 transition-[transform,opacity] duration-300 ease-out"
+        className="pointer-events-none absolute inset-x-0 top-0 block transition-[transform,opacity] duration-300 ease-out"
         style={{
+          width:     `${100 / tabs.length}%`,
           transform: `translateX(${lastIndex.current * 100}%)`,
           opacity:   activeIndex >= 0 ? 1 : 0,
         }}
@@ -71,8 +80,11 @@ export function MobileBottomNav() {
         <span className="mx-auto block h-0.5 w-8 rounded-full bg-brand-500" />
       </span>
 
-      <ul className="grid grid-cols-5">
-        {tabs.map(({ href, label, icon: Icon }) => {
+      <ul
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+      >
+        {tabs.map(({ href, label, icon: Icon, highlight }) => {
           const active = isActive(href);
           return (
             <li key={href}>
@@ -81,12 +93,17 @@ export function MobileBottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "press flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
-                  active ? "text-brand-600" : "text-gray-400 hover:text-gray-600",
+                  active
+                    ? "text-brand-600"
+                    // A kiemelt fül inaktívan sem halványul el, mint a többi.
+                    : highlight
+                    ? "text-forest"
+                    : "text-gray-400 hover:text-gray-600",
                 )}
               >
                 <Icon
                   className={cn("h-5 w-5", active && "animate-pop")}
-                  strokeWidth={active ? 2.4 : 2}
+                  strokeWidth={active || highlight ? 2.4 : 2}
                 />
                 <span className="max-w-full truncate px-0.5">{label}</span>
               </Link>
