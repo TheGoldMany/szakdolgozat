@@ -25,11 +25,12 @@ const STATUS_COLOR: Record<AnimalStatus, string> = {
   MEDICAL_HOLD: "bg-red-100 text-red-700",
 };
 
-export default async function DashboardAnimalsPage({
-  searchParams,
-}: {
-  searchParams: { status?: string };
-}) {
+export default async function DashboardAnimalsPage(
+  props: {
+    searchParams: Promise<{ status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
@@ -109,12 +110,12 @@ export default async function DashboardAnimalsPage({
       </div>
 
       {animals.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
           <PawPrint className="h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm text-gray-500">{t("animalsEmpty")}</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
           <table className="w-full min-w-[680px] text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">

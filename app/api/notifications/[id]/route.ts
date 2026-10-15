@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
 
 // PATCH /api/notifications/[id] – mark single notification as read
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
@@ -31,10 +29,8 @@ export async function PATCH(
 }
 
 // DELETE /api/notifications/[id] – remove a single notification
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 

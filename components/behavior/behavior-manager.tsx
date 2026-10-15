@@ -158,11 +158,11 @@ export function BehaviorManager({
         </div>
 
         {showForm && (
-          <form onSubmit={handleAddLog} className="mb-6 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <form onSubmit={handleAddLog} className="mb-6 rounded-xl border border-brand-100 bg-brand-50 p-5">
             <label className="mb-1 block text-xs font-semibold text-gray-600">Bejegyzés *</label>
             <textarea required value={note} onChange={e => setNote(e.target.value)}
               rows={3} placeholder="pl. Pórázhoz szoktatás ma jól ment, kevésbé húzott."
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 resize-none" />
 
             <label className="mt-3 flex items-center gap-2 text-xs font-semibold text-gray-600">
               <input type="checkbox" checked={withProgress} onChange={e => setWithProgress(e.target.checked)}
@@ -187,7 +187,7 @@ export function BehaviorManager({
         )}
 
         {logs.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
+          <p className="rounded-xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
             Még nincs viselkedési bejegyzés.
           </p>
         ) : (

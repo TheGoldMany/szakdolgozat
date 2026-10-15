@@ -39,6 +39,7 @@ export interface MapLabels {
 import {
   SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
 } from "@/components/ui/map-colors";
+import { safeHref } from "@/lib/safe-url";
 
 // Külön modulból jönnek, hogy a jelmagyarázat ne ezen a fájlon keresztül
 // férjen hozzájuk – lásd a map-colors.ts fejlécét.
@@ -193,8 +194,8 @@ export default function AnimalMap({
             <div style="font-size:12px;color:#6B7280">${esc(v.city)}, ${esc(v.address)}</div>
             ${v.openingHours ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.openingHours)}</div>` : ""}
             ${v.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.phone)}</div>` : ""}
-            ${v.website
-              ? `<a href="${esc(v.website)}" target="_blank" rel="noopener noreferrer"
+            ${safeHref(v.website)
+              ? `<a href="${esc(safeHref(v.website))}" target="_blank" rel="noopener noreferrer"
                    style="display:inline-block;margin-top:6px;font-size:12px;color:${VET_COLOR};text-decoration:underline">${esc(labels.website)} &rarr;</a>`
               : ""}
           </div>

@@ -16,11 +16,12 @@ import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
-export default async function DashboardApplicationsPage({
-  searchParams,
-}: {
-  searchParams: { status?: string };
-}) {
+export default async function DashboardApplicationsPage(
+  props: {
+    searchParams: Promise<{ status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
@@ -112,7 +113,7 @@ export default async function DashboardApplicationsPage({
       </div>
 
       {applications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
           <ClipboardList className="h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm text-gray-500">{t("appsEmpty")}</p>
         </div>
@@ -125,7 +126,7 @@ export default async function DashboardApplicationsPage({
             const formFilled   = app._count.responses > 0;
 
             return (
-              <div key={app.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div key={app.id} className="rounded-xl border border-gray-200 bg-white p-5">
                 <div className="flex flex-col gap-4 sm:flex-row">
 
                   {/* Állat kép */}
@@ -180,7 +181,7 @@ export default async function DashboardApplicationsPage({
                     </div>
 
                     {app.message && (
-                      <p className="text-xs text-gray-500 italic line-clamp-3">"{app.message}"</p>
+                      <p className="text-xs text-gray-500 line-clamp-3">"{app.message}"</p>
                     )}
 
                     {app.reviewNotes && (

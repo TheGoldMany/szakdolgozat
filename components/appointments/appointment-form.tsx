@@ -52,7 +52,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-green-100 bg-green-50 p-6 text-center">
+      <div className="rounded-xl border border-green-100 bg-green-50 p-6 text-center">
         <CheckCircle className="mx-auto mb-3 h-10 w-10 text-green-500" />
         <p className="font-semibold text-green-800">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-green-600">{t("successDesc")}</p>
@@ -83,7 +83,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
           <input
             required type="date" value={date} min={minDateStr}
             onChange={e => setDate(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200"
           />
         </div>
         <div>
@@ -94,7 +94,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
           <input
             required type="time" value={time}
             onChange={e => setTime(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200"
           />
         </div>
       </div>
@@ -105,7 +105,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
           value={note} onChange={e => setNote(e.target.value)}
           rows={3} maxLength={1000}
           placeholder={t("notePlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 resize-none"
         />
       </div>
 

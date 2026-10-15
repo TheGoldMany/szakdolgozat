@@ -83,7 +83,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
 
   if (schedules.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
         <UtensilsCrossed className="h-10 w-10 text-gray-300" />
         <p className="mt-3 text-sm text-gray-500">Még nincs etetési ütemterv.</p>
         <p className="mt-1 text-xs text-gray-400">Kattints az „Új ütemterv" gombra az első létrehozásához.</p>
@@ -103,7 +103,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
         return (
           <div
             key={schedule.id}
-            className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+            className="rounded-xl border border-gray-200 bg-white overflow-hidden"
           >
             {/* Main card row */}
             <div className="flex items-start gap-4 p-4">
@@ -135,7 +135,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
                 <p className="mt-0.5 text-sm text-gray-500">
                   {formatFrequency(schedule.frequency, schedule.weekDays)}
                   {schedule.times.length > 0 && (
-                    <span className="ml-1 text-gray-400">— {schedule.times.join(", ")}</span>
+                    <span className="ml-1 text-gray-400">· {schedule.times.join(", ")}</span>
                   )}
                 </p>
                 <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-400">

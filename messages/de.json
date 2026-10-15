@@ -60,24 +60,19 @@
     "registerShelter": "Tierheim registrieren"
   },
   "home": {
-    "badge": "{count} Tiere warten auf ein Zuhause",
-    "heroTitle": "Finde deinen neuen",
-    "heroTitleHighlight": "besten Freund",
-    "heroDesc": "Stöbere unter adoptierbaren Tieren aus ungarischen Tierheimen oder melde ein verlorenes oder gefundenes Tier.",
+    "heroTitle": "Tiere aus ungarischen Tierheimen, die ein Zuhause suchen",
+    "heroDesc": "Sieh nach, wer in Tierheimen in deiner Nähe wartet, und nimm direkt Kontakt mit dem Tierheim auf. Wenn du ein Tier verloren oder gefunden hast, kannst du es hier auch melden.",
     "searchPlaceholder": "Nach Art, Name oder Ort suchen...",
     "search": "Suchen",
     "allAnimals": "Alle Tiere",
     "submitReport": "Meldung einreichen",
-    "statsAvailable": "Verfügbare Tiere",
-    "statsShelters": "Aktive Tierheime",
-    "statsAdopted": "Adoptiert",
-    "howTitle": "Wie funktioniert es?",
-    "step1Title": "Stöbern",
-    "step1Desc": "Finde das passende Tier nach Art, Alter und Standort.",
-    "step2Title": "Bewerben",
-    "step2Desc": "Fülle den Adoptionsantrag aus und nimm Kontakt mit dem Tierheim auf.",
-    "step3Title": "Adoptieren",
-    "step3Desc": "Triff das Tier und bring deinen neuen besten Freund nach Hause.",
+    "howTitle": "So läuft eine Vermittlung ab",
+    "step1Title": "Suchen",
+    "step1Desc": "Filtere nach Tierart, Größe und Ort und sieh dir das Profil jedes Tieres samt Gesundheitsakte an.",
+    "step2Title": "Anfragen",
+    "step2Desc": "Sende eine Vermittlungsanfrage oder schreib dem Tierheim direkt. Über die Antwort wirst du benachrichtigt.",
+    "step3Title": "Kennenlernen",
+    "step3Desc": "Vereinbare einen Besuch im Tierheim. Passt alles, genehmigt das Tierheim die Vermittlung.",
     "latestAnimals": "Neueste Tiere",
     "latestAnimalsDesc": "Kürzlich hochgeladene adoptierbare Tiere",
     "latestReports": "Neueste Meldungen",
@@ -86,13 +81,17 @@
     "feedTitle": "Für dich",
     "feedEmpty": "Noch keine Inhalte. Schau später wieder vorbei!",
     "ctaTitle": "Haustier verloren?",
-    "ctaDesc": "Gib eine Meldung auf – die Community hilft dir, es zu finden!",
+    "ctaDesc": "Deine Meldung erscheint in der Liste und auf der Karte, wo Menschen in der Nähe sie sehen.",
     "feedNewAnimals": "Neue Bewohner",
     "feedCampaigns": "Aktive Spendenaktionen",
     "feedEvents": "Bevorstehende Veranstaltungen",
     "feedReports": "Neueste Meldungen",
     "feedArticles": "Artikel",
-    "quickReport": "Meldung"
+    "quickReport": "Meldung",
+    "factAnimals": "{count, plural, one {Tier zur Vermittlung} other {Tiere zur Vermittlung}}",
+    "factShelters": "{count, plural, one {Tierheim} other {Tierheime}}",
+    "factAdopted": "{count, plural, one {Vermittlung} other {Vermittlungen}}",
+    "howIntro": "Wir stellen den Kontakt zum Tierheim her. Die Entscheidung trifft immer das Tierheim, nach seinen eigenen Bedingungen."
   },
   "animals": {
     "title": "Tiere",
@@ -440,8 +439,8 @@
     "shelterFormTitle": "Tierheim-Registrierung",
     "shelterFormDesc": "Gib die Daten des Tierheims und der Administration an. Nach der Freigabe erhaltet ihr ein Verifiziert-Abzeichen.",
     "shelterCostTitle": "Was kostet das das Tierheim?",
-    "shelterCostBody": "Nichts. Das Verwaltungssystem — Tiere, Anfragen, Zwinger, Bestand, Ehrenamtliche, Veranstaltungen, Spenden — nutzt du in der Grundstufe kostenlos, und wir stellen dir dafür nichts in Rechnung. Den Betrieb decken die Plattformgebühren der Unterstützer; das Tierheim erhält aus jeder Spende den vollen vorgesehenen Betrag.",
-    "shelterCostHonest": "Eine Bitte im Gegenzug: Das System ist neu, und es soll zu deiner täglichen Arbeit passen. Wenn etwas fehlt oder umständlich ist, schreib uns — das ist uns mehr wert als jedes Feedback-Formular.",
+    "shelterCostBody": "Nichts. Das Verwaltungssystem (Tiere, Anfragen, Zwinger, Bestand, Ehrenamtliche, Veranstaltungen, Spenden) nutzt du in der Grundstufe kostenlos, und wir stellen dir dafür nichts in Rechnung. Den Betrieb decken die Plattformgebühren der Unterstützer; das Tierheim erhält aus jeder Spende den vollen vorgesehenen Betrag.",
+    "shelterCostHonest": "Eine Bitte im Gegenzug: Das System ist neu, und es soll zu deiner täglichen Arbeit passen. Wenn etwas fehlt oder umständlich ist, schreib uns. Das ist uns mehr wert als jedes Feedback-Formular.",
     "shelterCostLink": "Wofür wird die Plattformgebühr verwendet?",
     "shelterSection": "Angaben zum Tierheim",
     "adminSection": "Administrator-Konto",
@@ -462,7 +461,8 @@
     "shelterSubmit": "Tierheim registrieren",
     "asIndividual": "Als Privatperson registrieren?",
     "plainRegister": "Normale Registrierung",
-    "registerError": "Bei der Registrierung ist ein Fehler aufgetreten."
+    "registerError": "Bei der Registrierung ist ein Fehler aufgetreten.",
+    "loginErrorTooMany": "Zu viele fehlgeschlagene Versuche. Bitte versuche es in 15 Minuten erneut."
   },
   "reports": {
     "title": "Verlorene und gefundene Tiere",
@@ -548,7 +548,8 @@
     "resolveError": "Konnte nicht markiert werden, bitte erneut versuchen",
     "formSuccess": "Meldung erfolgreich gesendet",
     "sendingMessage": "Senden...",
-    "sendMessage": "Nachricht senden"
+    "sendMessage": "Nachricht senden",
+    "contactHiddenClosed": "Der Fall ist abgeschlossen; die Kontaktdaten der meldenden Person sind nicht mehr öffentlich."
   },
   "help": {
     "title": "Benutzerhandbuch",
@@ -768,7 +769,7 @@
     "campaignCompleted": "Abgeschlossen",
     "donationsCount": "{count} Spenden",
     "stripeTitle": "Stripe-Konto",
-    "stripeDesc": "Verbinde dein Stripe-Konto, wenn du eine eigene Spendenaktion starten möchtest — die Spenden kommen direkt hier an.",
+    "stripeDesc": "Verbinde dein Stripe-Konto, wenn du eine eigene Spendenaktion starten möchtest. Die Spenden kommen direkt hier an.",
     "stripeActive": "Dein Stripe-Konto ist aktiv, du kannst Spenden empfangen.",
     "stripeOpenDashboard": "Stripe-Dashboard öffnen",
     "stripeIncomplete": "Deine Stripe-Registrierung ist noch nicht abgeschlossen.",
@@ -1387,7 +1388,7 @@
       "assignTitle": "Temporäre Unterbringung",
       "assignDesc": "Lege fest, bei welcher Pflegeperson sich das Tier physisch befindet. Bei Unterbringung wird der Tierstatus auf 'Temporäre Pflege' gesetzt.",
       "assignNoFosters": "Keine aktiven Pflegepersonen in diesem Tierheim.",
-      "assignNone": "— Im Tierheim (nicht untergebracht) —"
+      "assignNone": "Im Tierheim (nicht untergebracht)"
     },
     "fosterPageTitle": "Pflegepersonen",
     "notAssignedToShelter": "Dein Konto ist keinem Tierheim zugeordnet.",
@@ -1509,7 +1510,7 @@
     "assignTitle": "Temporäre Unterbringung",
     "assignDesc": "Lege fest, bei welcher Pflegeperson sich das Tier physisch befindet. Bei Unterbringung wird der Tierstatus auf 'Temporäre Pflege' gesetzt.",
     "assignNoFosters": "Keine aktiven Pflegepersonen in diesem Tierheim.",
-    "assignNone": "— Im Tierheim (nicht untergebracht) —"
+    "assignNone": "Im Tierheim (nicht untergebracht)"
   },
   "events": {
     "listTitle": "Kommende Events",
@@ -1845,7 +1846,7 @@
     "emptyOutgoing": "Du hast keine Anfragen gesendet.",
     "networkError": "Das hat nicht funktioniert. Bitte versuche es erneut.",
     "confirmRemove": "Diese Person aus deinen Kontakten entfernen?",
-    "mutualHint": "Diese Person hatte dich schon markiert — ihr seid jetzt vernetzt.",
+    "mutualHint": "Diese Person hatte dich schon markiert, ihr seid jetzt vernetzt.",
     "loginRequired": "Melde dich an, um deine Kontakte zu verwalten.",
     "viewProfile": "Profil öffnen"
   },
@@ -1853,10 +1854,10 @@
     "title": "Tiere des Tages",
     "launcherLabel": "Tiere des Tages öffnen",
     "introTitle": "Was ist das?",
-    "introLead": "Ein Foto pro Tag von Tieren — deinem, dem aus dem Tierheim, oder einem, das du auf der Straße gesehen hast.",
+    "introLead": "Ein Foto pro Tag von Tieren: deinem, dem aus dem Tierheim oder einem, das du auf der Straße gesehen hast.",
     "introPoint1": "Fotos verschwinden nach 24 Stunden aus dem Strom. Das ist keine Galerie, das ist heute.",
     "introPoint2": "Deine eigenen Fotos sind nicht endgültig weg: in einem Kalender auf deinem Profil kannst du sie wieder ansehen.",
-    "introPoint3": "Zuerst siehst du nur Fotos von Menschen, die du kennst. Für mehr braucht es einen eigenen Tipp — wir entscheiden das nicht für dich.",
+    "introPoint3": "Zuerst siehst du nur Fotos von Menschen, die du kennst. Für mehr braucht es einen eigenen Tipp; wir entscheiden das nicht für dich.",
     "introStart": "Verstanden, los",
     "tabFriends": "Kontakte",
     "tabRecommended": "Empfohlen",
@@ -1891,10 +1892,9 @@
     "timeAgoJustNow": "Gerade jetzt"
   },
   "platformFee": {
-    "eyebrow": "Offen über das Geld",
     "title": "Wofür wird die Plattformgebühr verwendet?",
     "metaDescription": "Das Tierheim erhält die vollständige Spende. Die Plattformgebühr zahlen die Unterstützer, und damit finanzieren wir das Verwaltungssystem der Tierheime.",
-    "lead": "ÁllatiMenhelyek.hu ist mehr als eine Vermittlungsbörse. Angeschlossene Tierheime nutzen das vollständige Verwaltungssystem in der Grundstufe kostenlos — eine Software, für die anderswo eine monatliche Gebühr fällig wäre.",
+    "lead": "ÁllatiMenhelyek.hu ist mehr als eine Vermittlungsbörse. Angeschlossene Tierheime nutzen das vollständige Verwaltungssystem in der Grundstufe kostenlos, eine Software, für die anderswo eine monatliche Gebühr fällig wäre.",
     "exampleHeading": "So sieht eine Spende von {amount} aus",
     "exampleDonation": "Dein Spendenbetrag",
     "examplePlatform": "Plattformgebühr ({percent, number}%)",
@@ -1938,7 +1938,7 @@
     ],
     "whyHeading": "Warum diese Aufteilung?",
     "whyBody1": "Ein Verwaltungssystem kostet Geld: Server, Datenbank, Entwicklung, Wartung. Jemand muss dafür aufkommen. Würden wir das Tierheim zur Kasse bitten, ginge dieses Geld von dem Budget ab, aus dem die Tiere gefüttert werden.",
-    "whyBody2": "Deshalb tragen die Unterstützer die Gebühr — zusätzlich zur Spende und als eigene Position, nicht aus den Einnahmen des Tierheims. Das Tierheim erhält aus jeder Spende den vollen vorgesehenen Betrag, und die Plattformgebühren halten das System am Laufen.",
+    "whyBody2": "Deshalb tragen die Unterstützer die Gebühr: Sie erscheint zusätzlich zur Spende als eigene Position und wird nie von den Einnahmen des Tierheims abgezogen. Das Tierheim erhält aus jeder Spende den vollen vorgesehenen Betrag, und die Plattformgebühren halten das System am Laufen.",
     "detailsHeading": "Im Detail",
     "details_platform_q": "Wie hoch ist die Plattformgebühr?",
     "details_platform_a": "5% der Spende, zusätzlich zum gespendeten Betrag. Dasselbe gilt für monatliche Förderstufen und die virtuelle Patenschaft.",
@@ -1948,5 +1948,19 @@
     "details_free_a": "Angeschlossene Tierheime nutzen die hier aufgeführten Funktionen in der Grundstufe kostenlos, und wir stellen ihnen dafür nichts in Rechnung. Der Dienst ist jung: Sollte später eine Zusatzfunktion kostenpflichtig werden, sagen wir das vorher und verständlich.",
     "ctaDonate": "Spendenaktionen ansehen",
     "ctaShelter": "Tierheim registrieren"
+  },
+  "seo": {
+    "homeTitle": "Hunde und Katzen aus dem Tierheim adoptieren",
+    "homeDescription": "Entdecke Hunde, Katzen, Kaninchen und Vögel, die in ungarischen Tierheimen auf ein Zuhause warten. Vermisste oder gefundene Tiere melden, Tierheime auf der Karte finden.",
+    "animalsTitle": "Tiere zur Adoption – Hunde, Katzen, Kaninchen",
+    "animalsDescription": "Suche nach einem Hund, einer Katze oder einem anderen Tier nach Art, Größe, Alter und Stadt. Alle Tiere stammen aus ungarischen Tierheimen.",
+    "sheltersTitle": "Tierheime in Ungarn",
+    "sheltersDescription": "Ungarische Tierheime nach Stadt: Kontaktdaten, Vorstellung und die Tiere, die dort auf ein Zuhause warten.",
+    "reportsTitle": "Vermisstes oder gefundenes Tier melden",
+    "reportsDescription": "Hund oder Katze vermisst? Melde es in wenigen Minuten oder sieh dir die Fundmeldungen aus deiner Umgebung an.",
+    "mapTitle": "Tierheime und vermisste Tiere auf der Karte",
+    "mapDescription": "Finde Tierheime in deiner Nähe auf der Karte, zusammen mit Meldungen zu vermissten und gefundenen Tieren.",
+    "eventsTitle": "Tierheim-Veranstaltungen und Adoptionstage",
+    "eventsDescription": "Adoptionstage, Spendenaktionen und Ehrenamtsprogramme in ungarischen Tierheimen."
   }
 }

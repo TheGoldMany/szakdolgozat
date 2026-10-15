@@ -89,6 +89,8 @@ function LoginForm() {
       if (res.error.includes("EMAIL_NOT_VERIFIED")) {
         setUnverifiedEmail(data.email);
         setServerError(t("loginErrorUnverified"));
+      } else if (res.error.includes("TOO_MANY_ATTEMPTS")) {
+        setServerError(t("loginErrorTooMany"));
       } else {
         setServerError(t("loginErrorCredentials"));
       }
@@ -173,7 +175,7 @@ function LoginForm() {
             type="email"
             placeholder="pelda@email.hu"
             autoComplete="email"
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
             {...register("email")}
           />
           {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
@@ -191,7 +193,7 @@ function LoginForm() {
             type="password"
             placeholder="••••••••"
             autoComplete="current-password"
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
             {...register("password")}
           />
           {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
@@ -202,7 +204,7 @@ function LoginForm() {
             type="checkbox"
             id="rememberMe"
             {...register("rememberMe")}
-            className="h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-500 accent-brand-500 focus:ring-brand-500"
+            className="h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-500 accent-brand-500 focus:ring-brand-200"
           />
           <label htmlFor="rememberMe" className="cursor-pointer select-none text-sm text-gray-600">
             {t("rememberMe")}
@@ -252,7 +254,7 @@ export default function LoginPage() {
         ))}
 
         <div className="relative z-10 text-center text-white">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 shadow-xl">
             <PawPrint className="h-10 w-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">ÁllatiMenhelyek.hu</h2>
@@ -264,7 +266,7 @@ export default function LoginPage() {
               { value: "7 000+", label: t("loginStatAnimals")  },
               { value: "500+",   label: t("loginStatAdoptions") },
             ].map(({ value, label }) => (
-              <div key={label} className="rounded-2xl bg-white/15 px-4 py-4 backdrop-blur-sm">
+              <div key={label} className="rounded-xl border border-white/20 px-4 py-4">
                 <div className="text-2xl font-bold">{value}</div>
                 <div className="mt-0.5 text-xs text-white/70">{label}</div>
               </div>
@@ -299,7 +301,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-8">
             <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-gray-100" />}>
               <LoginForm />
             </Suspense>

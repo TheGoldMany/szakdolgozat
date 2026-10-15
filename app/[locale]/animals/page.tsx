@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
@@ -10,14 +9,27 @@ import { AnimalStatus, AnimalType, AnimalSize } from "@prisma/client";
 import { PawPrint } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("animals");
-  return { title: t("title") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/animals",
+    title:       t("animalsTitle"),
+    description: t("animalsDescription"),
+  });
 }
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     type?: string;
     size?: string;
@@ -29,12 +41,13 @@ interface PageProps {
     goodWithDogs?: string;
     goodWithCats?: string;
     page?: string;
-  };
+  }>;
 }
 
 const PAGE_SIZE = 12;
 
-export default async function AnimalsPage({ searchParams }: PageProps) {
+export default async function AnimalsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   const t      = await getTranslations("animals");
   const locale = await getLocale();
   const basePath = locale === routing.defaultLocale ? "/animals" : `/${locale}/animals`;
@@ -123,18 +136,18 @@ export default async function AnimalsPage({ searchParams }: PageProps) {
 
           <main className="flex-1" data-tour="animal-list">
             {animals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
                 <PawPrint className="h-12 w-12 text-gray-300" />
                 <p className="mt-4 text-lg font-medium text-gray-700">{t("noResults")}</p>
                 <p className="mt-1 text-sm text-gray-400">{t("noResultsDesc")}</p>
               </div>
             ) : (
               <>
-                <Reveal stagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                   {animals.map((animal) => (
                     <AnimalCard key={animal.id} animal={animal} isFavorited={favoriteIds.has(animal.id)} />
                   ))}
-                </Reveal>
+                </div>
 
                 {totalPages > 1 && (
                   <Pagination page={page} totalPages={totalPages} searchParams={searchParams} basePath={basePath} t={t} />
@@ -178,13 +191,13 @@ function Pagination({
         className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
           page <= 1
             ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
-            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
         }`}
       >
         ← {t("prevPage")}
       </a>
 
-      <span className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-500 shadow-sm">
+      <span className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-500">
         {t("page", { current: page, total: totalPages })}
       </span>
 
@@ -194,7 +207,7 @@ function Pagination({
         className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
           page >= totalPages
             ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
-            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
         }`}
       >
         {t("nextPage")} →

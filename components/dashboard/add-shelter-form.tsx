@@ -212,7 +212,7 @@ export function AddShelterForm({ onClose }: { onClose: () => void }) {
 }
 
 // ── Helpers ──
-const inputCls = "w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition";
+const inputCls = "w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 transition";
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (

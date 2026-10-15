@@ -12,10 +12,8 @@ const patchSchema = z.discriminatedUnion("action", [
 ]);
 
 // PATCH /api/appointments/[id]
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
@@ -115,10 +113,8 @@ export async function PATCH(
 }
 
 // GET /api/appointments/[id]
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getAuthUser(req);
   if (!authUser) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

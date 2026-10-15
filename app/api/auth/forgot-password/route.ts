@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { randomBytes } from "crypto";
+import { newOneTimeToken } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -35,15 +35,16 @@ export async function POST(req: NextRequest) {
     // Delete any existing tokens for this user
     await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
 
-    // Generate a secure random token
-    const token = randomBytes(32).toString("hex");
+    // A felhasználó a nyers tokent kapja e-mailben, az adatbázisba csak a hash
+    // kerül — lásd `lib/password.ts`, miért.
+    const { raw, hashed } = newOneTimeToken();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await prisma.passwordResetToken.create({
-      data: { userId: user.id, token, expiresAt },
+      data: { userId: user.id, token: hashed, expiresAt },
     });
 
-    await sendPasswordResetEmail(email, token);
+    await sendPasswordResetEmail(email, raw);
   } catch (error) {
     console.error("Forgot password error:", error);
     // Still return 200 to avoid leaking info

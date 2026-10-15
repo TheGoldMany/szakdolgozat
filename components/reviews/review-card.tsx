@@ -39,7 +39,7 @@ export function ReviewCard({ review, currentUserId }: ReviewCardProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href={`/users/${review.author.id}`}>
@@ -48,10 +48,10 @@ export function ReviewCard({ review, currentUserId }: ReviewCardProps) {
                 src={review.author.image}
                 alt={review.author.name ?? ""}
                 width={36} height={36}
-                className="rounded-full object-cover transition hover:opacity-80"
+                className="rounded-full object-cover ring-brand-200 transition hover:ring-2"
               />
             ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600 transition hover:opacity-80">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-200">
                 {review.author.name?.[0]?.toUpperCase() ?? "?"}
               </div>
             )}

@@ -9,9 +9,10 @@ import { connectionState } from "@/lib/connections";
 import { UserReviews } from "@/components/reviews/user-reviews";
 import { ConnectButton } from "@/components/connections/connect-button";
 
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     select: { name: true },
@@ -19,7 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: user?.name ?? "Felhasználó" };
 }
 
-export default async function PublicUserProfilePage({ params }: Props) {
+export default async function PublicUserProfilePage(props: Props) {
+  const params = await props.params;
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     select: {
@@ -68,13 +70,13 @@ export default async function PublicUserProfilePage({ params }: Props) {
       <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
 
         {/* Profil kártya */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
           {/* Banner */}
-          <div className="h-24 bg-gradient-to-r from-brand-400 to-brand-600" />
+          <div className="h-24 bg-brand-700" />
 
           <div className="px-6 pb-6">
             {/* Avatar */}
-            <div className="relative -mt-12 mb-4 h-20 w-20 overflow-hidden rounded-2xl border-4 border-white shadow-md">
+            <div className="relative -mt-12 mb-4 h-20 w-20 overflow-hidden rounded-xl border-4 border-white shadow-md">
               {user.image ? (
                 <Image src={user.image} alt={user.name ?? ""} fill className="object-cover" />
               ) : (

@@ -50,7 +50,7 @@ export default async function DashboardPage() {
     const shelterId = admin?.shelterId;
     if (!shelterId) {
       return (
-        <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+        <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
           {t("noShelterAssigned")}
         </div>
       );
@@ -232,7 +232,7 @@ export default async function DashboardPage() {
         {/* Charts row */}
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Donut chart */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 lg:col-span-2">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAnimalsByStatusTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartAnimalsByStatusSubtitle")}</p>
             {animalStatusData.length > 0
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Applications bar chart */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-3">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 lg:col-span-3">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsMonthlyTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <ApplicationsBar data={appsChartData} />
@@ -252,7 +252,7 @@ export default async function DashboardPage() {
         {/* Adoptions trend + donations */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Adoptions line */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm lg:col-span-2">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 lg:col-span-2">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartAdoptionsTrendTitle")}</h2>
             <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
             <AdoptionsLine data={adoptionMonths.map(m => ({ month: m.month, adoptions: m.count }))} />
@@ -265,14 +265,14 @@ export default async function DashboardPage() {
                 sugallná, hogy van adományozás, csak nem jött be semmi. */}
             {paymentsEnabled() && (
             <>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <p className="text-xs font-medium text-gray-500">{t("donationsCollectedLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-emerald-700">
                 {(donationsAgg._sum.amount ?? 0).toLocaleString("hu-HU")}
                 <span className="ml-1 text-sm font-medium text-gray-400">HUF</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <p className="text-xs font-medium text-gray-500">{t("activeSubscribersLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-purple-700">{activeSubsCount}</p>
               <Link href="/dashboard/subscriptions"
@@ -284,7 +284,7 @@ export default async function DashboardPage() {
             )}
             <Link href="/dashboard/appointments"
               className={cn(
-                "flex items-center justify-between rounded-2xl border p-5 shadow-sm transition-colors",
+                "flex items-center justify-between rounded-xl border p-5 transition-colors",
                 pendingAppointments > 0
                   ? "border-amber-200 bg-amber-50 hover:bg-amber-100"
                   : "border-gray-100 bg-white hover:bg-gray-50"
@@ -303,7 +303,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent applications */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white">
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
             <Link href="/dashboard/applications" className="text-xs font-medium text-brand-500 hover:underline">
@@ -467,7 +467,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Platform health */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-4 text-sm font-bold text-gray-900">{t("platformHealthTitle")}</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl bg-green-50 p-3.5">
@@ -500,13 +500,13 @@ export default async function DashboardPage() {
       {/* Pending approvals */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link href="/dashboard/campaigns"
-          className="rounded-2xl border border-orange-100 bg-orange-50 p-5 shadow-sm transition-colors hover:bg-orange-100">
+          className="rounded-xl border border-orange-100 bg-orange-50 p-5 transition-colors hover:bg-orange-100">
           <p className="text-xs font-medium text-orange-600">{t("pendingCampaignApprovalsLabel")}</p>
           <p className="mt-2 text-3xl font-bold text-orange-700">{pendingCampaigns}</p>
           <p className="mt-1 text-sm font-medium text-orange-500">{t("approvalsLink")}</p>
         </Link>
         <Link href="/dashboard/campaigns"
-          className="rounded-2xl border border-yellow-100 bg-yellow-50 p-5 shadow-sm transition-colors hover:bg-yellow-100">
+          className="rounded-xl border border-yellow-100 bg-yellow-50 p-5 transition-colors hover:bg-yellow-100">
           <p className="text-xs font-medium text-yellow-600">{t("pendingFormApprovalsLabel")}</p>
           <p className="mt-2 text-3xl font-bold text-yellow-700">{pendingForms}</p>
           <p className="mt-1 text-sm font-medium text-yellow-500">{t("approvalsLink")}</p>
@@ -514,14 +514,14 @@ export default async function DashboardPage() {
       </div>
 
       {/* Applications chart */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("chartApplicationsPlatformTitle")}</h2>
         <p className="mb-4 text-xs text-gray-400">{t("chartLast6Months")}</p>
         <ApplicationsBar data={appsChartData} />
       </div>
 
       {/* Recent applications table */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white">
         <div className="border-b border-gray-100 px-5 py-4">
           <h2 className="text-sm font-semibold text-gray-700">{t("recentApplicationsTitle")}</h2>
         </div>
@@ -563,7 +563,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Recent donations */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white">
         <div className="border-b border-gray-100 px-5 py-4">
           <h2 className="text-sm font-semibold text-gray-700">{t("recentDonationsTitle")}</h2>
         </div>

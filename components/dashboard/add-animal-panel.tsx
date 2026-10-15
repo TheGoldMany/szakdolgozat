@@ -22,7 +22,7 @@ export function AddAnimalPanel() {
       )}
 
       {open && (
-        <div className="mt-4 rounded-2xl border border-brand-200 bg-white p-6 shadow-sm">
+        <div className="mt-4 rounded-xl border border-brand-200 bg-white p-6">
           <h2 className="mb-5 text-lg font-semibold text-gray-900">{t("animalsAddPanelTitle")}</h2>
           <AddAnimalForm onClose={() => setOpen(false)} />
         </div>

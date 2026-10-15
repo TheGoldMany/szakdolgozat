@@ -40,11 +40,11 @@ export function Uc03ReportsPanel({
   }));
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-5">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-sm font-semibold text-gray-700">UC-03 · Területi bejelentések</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Elveszett / megtalált / kóbor — platform-szerte</p>
+          <p className="text-xs text-gray-400 mt-0.5">Elveszett / megtalált / kóbor, platform-szerte</p>
         </div>
         <div className="flex gap-4 text-right flex-wrap">
           <div>

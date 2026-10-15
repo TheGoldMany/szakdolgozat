@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { compare } from "bcryptjs";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
-
-const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET ?? "fallback");
+import { verifyPassword } from "@/lib/password";
+import { jwtSecretKey } from "@/lib/secrets";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 const EXPIRES_IN = 30 * 24 * 60 * 60; // 30 nap másodpercben
 
 // POST /api/auth/mobile  – mobilapp JWT bejelentkezés
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json().catch(() => ({}));
+
+  // Korlát nélkül ez a végpont korlátlan jelszópróbálgatást engedett. Két
+  // kulcson: IP-re (egy támadó sok fiókra) és e-mailre (sok IP egy fiókra).
+  const ip = getClientIp(req);
+  const who = String(email ?? "").toLowerCase().slice(0, 200);
+  if (!checkRateLimit(`login-mobile-ip:${ip}`, 10, 15 * 60_000)
+   || !checkRateLimit(`login-mobile-email:${who}`, 5, 15 * 60_000)) {
+    return NextResponse.json(
+      { error: "Túl sok sikertelen próbálkozás. Próbáld újra 15 perc múlva." },
+      { status: 429 }
+    );
+  }
 
   if (!email || !password) {
     return NextResponse.json({ error: "Hiányzó adatok" }, { status: 400 });
@@ -24,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Hibás e-mail vagy jelszó" }, { status: 401 });
     }
 
-    const valid = await compare(String(password), user.password);
+    const valid = await verifyPassword(String(password), user.password);
     if (!valid) {
       return NextResponse.json({ error: "Hibás e-mail vagy jelszó" }, { status: 401 });
     }
@@ -37,7 +49,7 @@ export async function POST(req: NextRequest) {
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime(`${EXPIRES_IN}s`)
-      .sign(secret);
+      .sign(jwtSecretKey());
 
     return NextResponse.json({
       token,

@@ -21,8 +21,10 @@ const SITE_URL = siteUrl();
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
+import { JsonLd } from "@/components/seo/json-ld";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -87,7 +89,7 @@ function RelatedCard({
   return (
     <Link
       href={href}
-      className="press-card group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="press-card group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50">
         <Icon className="h-5 w-5 text-brand-500" />
@@ -101,7 +103,8 @@ function RelatedCard({
   );
 }
 
-export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
+export default async function ArticleDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 
@@ -190,11 +193,9 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <script
-        type="application/ld+json"
-        // Saját, gépelt objektumból származó JSON – nem felhasználói HTML.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* A cikk címe és leírása adatbázisból jön: egy `</script>` a címben a
+          nyers JSON.stringify mellett kitörne a blokkból. A JsonLd ezt szökteti. */}
+      <JsonLd data={jsonLd} />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex justify-center gap-6">
 
@@ -209,8 +210,8 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
           {t("back")}
         </Link>
 
-        <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300 sm:h-72">
+        <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <div className="relative h-44 w-full overflow-hidden bg-brand-100 sm:h-72">
             {article.imageUrl ? (
               <Image
                 src={article.imageUrl}

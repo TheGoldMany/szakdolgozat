@@ -70,7 +70,7 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-green-100 bg-green-50 p-5 text-center">
+      <div className="rounded-xl border border-green-100 bg-green-50 p-5 text-center">
         <CheckCircle className="mx-auto mb-2 h-8 w-8 text-green-500" />
         <p className="font-semibold text-green-800">{t("sent")}</p>
         <p className="mt-1 text-sm text-green-600">{t("sentDesc")}</p>
@@ -87,7 +87,7 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
           {t("apply")}
         </button>
       ) : (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-800">{t("applyTitle")}</p>
             <button type="button" onClick={() => setOpen(false)}
@@ -100,19 +100,19 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
             <label className="mb-1 block text-xs font-semibold text-gray-600">{t("motivation")}</label>
             <textarea value={motivation} onChange={e => setMotivation(e.target.value)}
               rows={3} maxLength={2000} placeholder={t("motivationPlaceholder")}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 resize-none" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold text-gray-600">{t("skills")}</label>
             <input value={skills} onChange={e => setSkills(e.target.value)} maxLength={500}
               placeholder={t("skillsPlaceholder")}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold text-gray-600">{t("availability")}</label>
             <input value={availability} onChange={e => setAvailability(e.target.value)} maxLength={200}
               placeholder={t("availabilityPlaceholder")}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
           </div>
 
           <button type="submit" disabled={loading}

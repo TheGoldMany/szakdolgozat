@@ -15,11 +15,12 @@ function formatDate(d: Date): string {
   return d.toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" });
 }
 
-export default async function DashboardArticlesPage({
-  searchParams,
-}: {
-  searchParams: { edit?: string };
-}) {
+export default async function DashboardArticlesPage(
+  props: {
+    searchParams: Promise<{ edit?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
@@ -78,7 +79,7 @@ export default async function DashboardArticlesPage({
 
       <div className="mt-6 space-y-3">
         {articles.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+          <p className="rounded-xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
             Még nincs egyetlen cikk sem. Írd meg az elsőt a fenti szerkesztőben.
           </p>
         )}
@@ -91,7 +92,7 @@ export default async function DashboardArticlesPage({
           return (
             <div
               key={a.id}
-              className={`flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-sm ${
+              className={`flex items-start gap-3 rounded-xl border bg-white p-4 ${
                 isEditing ? "border-brand-200 ring-1 ring-brand-100" : "border-gray-100"
               }`}
             >

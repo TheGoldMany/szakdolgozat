@@ -16,10 +16,8 @@ const schema = z.object({
 });
 
 // GET /api/animals/[id]/health
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const records = await prisma.healthRecord.findMany({
       where:   { animalId: params.id },
@@ -34,10 +32,8 @@ export async function GET(
 }
 
 // POST /api/animals/[id]/health  – csak a menhely saját adminja adhat hozzá
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

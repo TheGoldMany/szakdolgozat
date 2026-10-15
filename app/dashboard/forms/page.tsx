@@ -43,7 +43,7 @@ export default async function FormsPage() {
   if (!shelterId) {
     if (!acting.canSwitch) redirect("/dashboard");
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+      <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
         Válassz menhelyt a bal oldali „Kezelt menhely” választóval a kérvény sablonok kezeléséhez.
       </div>
     );
@@ -72,7 +72,7 @@ export default async function FormsPage() {
       </div>
 
       {forms.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-xl border border-dashed border-gray-200 bg-white p-12 text-center">
           <p className="text-sm text-gray-500">{t("formsEmpty")}</p>
           <Link
             href="/dashboard/forms/new"
@@ -87,7 +87,7 @@ export default async function FormsPage() {
           {forms.map((form) => (
             <div
               key={form.id}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center justify-between gap-4"
+              className="rounded-xl border border-gray-200 bg-white p-5 flex items-center justify-between gap-4"
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">

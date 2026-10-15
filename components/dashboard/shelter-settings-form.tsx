@@ -47,7 +47,7 @@ interface Props {
   stripeState: StripeState;
 }
 
-const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200";
 
 export function ShelterSettingsForm({ shelter, stripeState }: Props) {
   const t = useTranslations("dashboard");
@@ -312,7 +312,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       {/* Stripe Connect — fizetés kikapcsolva: az egész blokk kimarad.
           A menhely nem tud bekötni fiókot, amivel úgysem fogadhatna pénzt. */}
       {paymentsEnabled() && (
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsStripeDesc", { fee: PLATFORM_FEE_PERCENT })}
@@ -445,7 +445,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       )}
 
       {/* Menhely logó */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsShelterProfile")}</h2>
         <p className="mb-5 text-xs text-gray-400">
           {t("settingsShelterProfileDesc")}
@@ -482,13 +482,13 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       </div>
 
       {/* Helyszín a térképen */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <div className="mb-1 flex items-center gap-2">
           <MapPin className="h-4 w-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-700">Helyszín a térképen</h2>
         </div>
         <p className="mb-4 text-xs text-gray-400">
-          Jelöld ki a menhely pontos helyét a térképen — ez alapján jelenik meg a nyilvános térképen.
+          Jelöld ki a menhely pontos helyét a térképen. Ez alapján jelenik meg a nyilvános térképen.
           Kattints a térképre a pozíció beállításához.
         </p>
 
@@ -519,7 +519,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       </div>
 
       {/* Fizetési adatok */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center gap-2">
           <Building2 className="h-4 w-4 text-gray-500" />
           <h2 className="text-sm font-semibold text-gray-700">{t("settingsPaymentInfo")}</h2>
@@ -563,7 +563,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       </div>
 
       {/* Kapacitás */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsCapacity")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsCapacityDesc")}
@@ -592,14 +592,14 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       </div>
 
       {/* Örökbefogadási feltételek */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsAdoptionRequirements")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsAdoptionRequirementsDesc")}
         </p>
         <textarea value={requirements} onChange={(e) => setRequirements(e.target.value)}
           rows={8} placeholder={t("settingsAdoptionRequirementsPlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y" />
+          className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-y" />
         <div className="mt-3 flex items-center gap-3">
           <button type="button" onClick={saveRequirements} disabled={reqSaving}
             className="flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600 disabled:opacity-60 transition-colors">
@@ -611,7 +611,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       </div>
 
       {/* Dokumentumok */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("settingsDocuments")}</h2>
         <p className="mb-4 text-xs text-gray-400">
           {t("settingsDocumentsDesc")}
@@ -641,7 +641,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
           <p className="text-xs font-medium text-gray-500">{t("settingsDocUploadNew")}</p>
           <input type="text" placeholder={t("settingsDocNamePlaceholder")}
             value={docName} onChange={(e) => setDocName(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            className="w-full rounded-xl border border-gray-200 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200" />
           <div className="flex items-center gap-3">
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
               <Upload className="h-4 w-4" />

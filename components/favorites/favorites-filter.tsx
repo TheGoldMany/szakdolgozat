@@ -30,7 +30,7 @@ export function FavoritesFilter() {
       <select
         value={type}
         onChange={(e) => update("type", e.target.value)}
-        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
       >
         <option value="">{t("filterAllTypes")}</option>
         <option value="DOG">{t("filterDog")}</option>
@@ -43,7 +43,7 @@ export function FavoritesFilter() {
       <select
         value={status}
         onChange={(e) => update("status", e.target.value)}
-        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
       >
         <option value="">{t("filterAllStatuses")}</option>
         <option value="AVAILABLE">{t("filterAvailable")}</option>

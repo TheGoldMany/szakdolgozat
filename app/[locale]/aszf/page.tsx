@@ -102,7 +102,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
         heading: "What is ÁllatiMenhelyek.hu?",
         items: [
           "ÁllatiMenhelyek.hu is a digital intermediary platform connecting animal shelters with people looking to adopt a pet.",
-          "The platform does not own any animals — adoption decisions are made solely by the individual shelters.",
+          "The platform does not own any animals; adoption decisions are made solely by the individual shelters.",
         ],
       },
       {
@@ -310,10 +310,10 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
               <FileText className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
-                {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
-              </p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{content.title}</h1>
+              {/* Nem nagybetűs „felirat" a cím fölött, hanem tény a cím alatt: az
+                  olvasónak azt kell tudnia, hogy ez kivonat. */}
+              <p className="mt-1 text-sm text-gray-500">{content.legalLabel}, {content.summaryBadge.toLowerCase()}</p>
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-500">
@@ -323,7 +323,7 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <span>
@@ -360,7 +360,13 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
   );
 }
 
-export default function ASZFPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function ASZFPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   if (locale !== "hu") {
     return <ASZFSummaryPage locale={locale} />;
   }
@@ -376,7 +382,6 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
               <FileText className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">Jogi dokumentum</p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Általános Szerződési Feltételek</h1>
             </div>
           </div>
@@ -385,7 +390,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
           </p>
 
           {/* TOC */}
-          <nav className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4">
+          <nav className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tartalom</p>
             <ol className="space-y-1.5 text-sm text-brand-600">
               {[
@@ -415,7 +420,7 @@ export default function ASZFPage({ params: { locale } }: { params: { locale: str
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
 
           <P>
             Kérjük, olvassa el figyelmesen jelen Általános Szerződési Feltételeket (ÁSZF), mielőtt

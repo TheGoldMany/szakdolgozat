@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const hashed = await hash(password, 10);
+    const hashed = await hashPassword(password);
     const user = await prisma.user.create({
       data: { name, email, password: hashed, birthDate: new Date(birthDate) },
       select: { id: true, name: true, email: true, role: true },

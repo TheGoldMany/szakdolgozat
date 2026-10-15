@@ -77,7 +77,7 @@ export default function RegisterPage() {
         ))}
 
         <div className="relative z-10 text-center text-white">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 shadow-xl">
             <PawPrint className="h-10 w-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">{t("joinTitle")}</h2>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
               { icon: Bell,   title: t("feature2Title"), desc: t("feature2Desc") },
               { icon: Shield, title: t("feature3Title"), desc: t("feature3Desc") },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-start gap-3 rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
+              <div key={title} className="flex items-start gap-3 rounded-xl border border-white/20 p-4">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
                   <Icon className="h-4 w-4 text-white" />
                 </div>
@@ -124,7 +124,7 @@ export default function RegisterPage() {
           </div>
 
           {registeredEmail ? (
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+            <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
               <MailCheck className="mx-auto mb-4 h-12 w-12 text-brand-500" />
               <h2 className="text-xl font-bold text-gray-900">{t("verifyEmailSentTitle")}</h2>
               <p className="mt-2 text-sm text-gray-500">
@@ -153,7 +153,7 @@ export default function RegisterPage() {
               </div>
             </div>
           ) : (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -162,7 +162,7 @@ export default function RegisterPage() {
                 <input
                   placeholder={t("namePlaceholder")}
                   autoComplete="name"
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("name")}
                 />
                 {errors.name && (
@@ -178,7 +178,7 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="pelda@email.hu"
                   autoComplete="email"
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("email")}
                 />
                 {errors.email && (
@@ -193,7 +193,7 @@ export default function RegisterPage() {
                 <input
                   type="date"
                   max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().slice(0, 10)}
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("birthDate")}
                 />
                 {errors.birthDate && (
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                   type="password"
                   placeholder={t("passwordMinHint")}
                   autoComplete="new-password"
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("password")}
                 />
                 {errors.password && (
@@ -225,7 +225,7 @@ export default function RegisterPage() {
                   type="password"
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (

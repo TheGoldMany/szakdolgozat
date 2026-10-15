@@ -144,7 +144,7 @@ function TransferCard({
   const isLoading   = (a: string) => loading === t.id + a;
 
   return (
-    <div className={cn("rounded-xl border bg-white shadow-sm", expanded && "ring-2 ring-brand-300")}>
+    <div className={cn("rounded-xl border bg-white", expanded && "ring-2 ring-brand-300")}>
       <button
         className="flex w-full items-center gap-4 p-4 text-left"
         onClick={() => setExpandedId(expanded ? null : t.id)}
@@ -228,7 +228,7 @@ function TransferCard({
                 onChange={e => setNoteInputs({ ...noteInputs, [t.id]: e.target.value })}
                 rows={2}
                 placeholder="Döntési megjegyzés (opcionális)…"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
               />
               <div className="flex gap-2">
                 {isIncoming && (

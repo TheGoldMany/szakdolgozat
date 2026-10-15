@@ -9,9 +9,8 @@ import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Új gyűjtés indítása" };
 
-export default async function NewCampaignPage(
-  { searchParams }: { searchParams: { shelter?: string } }
-) {
+export default async function NewCampaignPage(props: { searchParams: Promise<{ shelter?: string }> }) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 
@@ -38,7 +37,7 @@ export default async function NewCampaignPage(
         <p className="mb-8 text-sm text-gray-500">
           Töltsd ki az alábbi mezőket. A gyűjtésed admin jóváhagyás után kerül nyilvánosságra.
         </p>
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
           <NewCampaignForm
             stripeConnected={stripeConnected}
             defaultShelterId={searchParams.shelter ?? ""}

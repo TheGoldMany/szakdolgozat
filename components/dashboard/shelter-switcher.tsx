@@ -36,7 +36,7 @@ export function ShelterSwitcher({ options, shelterId }: Props) {
   const busy = saving || pending;
 
   return (
-    <div className="mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+    <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3">
       <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
         <Building2 className="h-3 w-3" />
         Kezelt menhely
@@ -46,7 +46,7 @@ export function ShelterSwitcher({ options, shelterId }: Props) {
           value={shelterId ?? ""}
           disabled={busy}
           onChange={(e) => select(e.target.value)}
-          className="w-full appearance-none rounded-xl border border-gray-200 px-3 py-2 pr-8 text-sm font-medium text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 disabled:opacity-60"
+          className="w-full appearance-none rounded-xl border border-gray-200 px-3 py-2 pr-8 text-sm font-medium text-gray-700 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 disabled:opacity-60"
         >
           <option value="">Minden menhely</option>
           {options.map((o) => (

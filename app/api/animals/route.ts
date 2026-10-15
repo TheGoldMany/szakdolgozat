@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalType, AnimalStatus, AnimalSize } from "@prisma/client";
 import { z } from "zod";
+import { ownImageUrl } from "@/lib/image-url";
 
 // ── GET /api/animals ──────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -84,9 +85,9 @@ const createSchema = z.object({
   isGoodWithKids:  z.boolean().nullable().optional(),
   isGoodWithDogs:  z.boolean().nullable().optional(),
   isGoodWithCats:  z.boolean().nullable().optional(),
-  imageUrls:       z.array(z.string().url()).optional(),
+  imageUrls:       z.array(ownImageUrl).max(20).optional(),
   documents:       z.array(z.object({
-    url:       z.string().url(),
+    url:       ownImageUrl,
     name:      z.string().min(1).max(200),
     fileType:  z.string().min(1).max(150),
     sizeBytes: z.number().int().positive().optional(),

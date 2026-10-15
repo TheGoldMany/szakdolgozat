@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geo";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 const patchSchema = z.object({
   name:         z.string().min(1).max(200).optional(),
@@ -12,7 +13,7 @@ const patchSchema = z.object({
   zipCode:      z.string().max(20).nullable().optional(),
   phone:        z.string().max(40).nullable().optional(),
   email:        z.string().email().nullable().optional().or(z.literal("")),
-  website:      z.string().url().nullable().optional().or(z.literal("")),
+  website:      safeHttpUrl.nullable().optional().or(z.literal("")),
   openingHours: z.string().max(500).nullable().optional(),
   note:         z.string().max(1000).nullable().optional(),
   isEmergency:  z.boolean().optional(),
@@ -23,7 +24,8 @@ const patchSchema = z.object({
   regeocode:    z.boolean().optional(),
 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
@@ -65,7 +67,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });

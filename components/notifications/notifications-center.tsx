@@ -163,7 +163,7 @@ export function NotificationsCenter() {
           <Loader2 className="h-6 w-6 animate-spin text-gray-300" />
         </div>
       ) : shown.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+        <div className="rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
           <Bell className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">
             {filter === "unread" ? t("noUnread") : t("empty")}
@@ -179,7 +179,7 @@ export function NotificationsCenter() {
               <li
                 key={n.id}
                 className={cn(
-                  "group flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-sm transition-colors",
+                  "group flex items-start gap-3 rounded-xl border bg-white p-4 transition-colors",
                   n.readAt ? "border-gray-100" : "border-brand-200 bg-brand-50/40"
                 )}
               >

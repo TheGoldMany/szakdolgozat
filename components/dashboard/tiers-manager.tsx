@@ -138,7 +138,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
       )}
 
       {tiers.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-gray-200 px-5 py-8 text-center">
+        <div className="rounded-xl border border-dashed border-gray-200 px-5 py-8 text-center">
           <p className="text-sm text-gray-500">{t("tiersNoTiers")}</p>
           <Button
             type="button"
@@ -158,7 +158,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
             <form
               key={tier.id}
               onSubmit={(e) => handleEdit(e, tier.id)}
-              className="rounded-2xl border border-brand-200 bg-brand-50 p-4 space-y-3"
+              className="rounded-xl border border-brand-200 bg-brand-50 p-4 space-y-3"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">{t("tiersEdit")}</p>
@@ -175,7 +175,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
                     required
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
                   />
                 </div>
                 <div>
@@ -185,7 +185,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
                     placeholder={t("tiersDescriptionPlaceholder")}
                     value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
                   />
                 </div>
               </div>
@@ -202,7 +202,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
           ) : (
             <div
               key={tier.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+              className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">

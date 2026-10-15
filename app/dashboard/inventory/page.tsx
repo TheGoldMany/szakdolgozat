@@ -44,7 +44,7 @@ export default async function InventoryPage() {
     shelterIds = all.map((s) => s.id);
   } else {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+      <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
         {t("inventoryNoShelter")}
       </div>
     );

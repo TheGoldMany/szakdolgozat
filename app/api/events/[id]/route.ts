@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 import { sendEventCancelledEmail } from "@/lib/email";
+import { optionalOwnImageUrl } from "@/lib/image-url";
 
 const patchSchema = z.object({
   title:       z.string().min(2).max(200).optional(),
@@ -14,7 +15,7 @@ const patchSchema = z.object({
   startsAt:    z.string().datetime().optional(),
   endsAt:      z.string().datetime().optional().nullable(),
   capacity:    z.number().int().min(1).max(100000).optional().nullable(),
-  imageUrl:    z.string().url().optional().or(z.literal("")).optional(),
+  imageUrl:    optionalOwnImageUrl,
   status:      z.enum(["DRAFT", "PUBLISHED", "CANCELLED", "COMPLETED"]).optional(),
 });
 
@@ -25,7 +26,8 @@ async function canManage(userId: string, role: string | undefined, shelterId: st
 }
 
 // PATCH /api/events/[id] – admin edits an event or changes its status
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
@@ -116,7 +118,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE /api/events/[id]
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

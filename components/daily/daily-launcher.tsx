@@ -74,7 +74,7 @@ export function DailyLauncher() {
             role="dialog"
             aria-modal="true"
             aria-label={t("title")}
-            className="animate-modal relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[85vh] sm:max-w-lg sm:rounded-3xl"
+            className="animate-modal relative flex max-h-[88vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-h-[85vh] sm:max-w-lg sm:rounded-2xl"
           >
             <header className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 py-3">
               <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">

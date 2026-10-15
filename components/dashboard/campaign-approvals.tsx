@@ -52,7 +52,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
 
   if (campaigns.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
         <CheckCircle2 className="h-10 w-10 text-gray-300" />
         <p className="mt-3 text-sm text-gray-500">{t("campaignsPending")}</p>
       </div>
@@ -68,7 +68,7 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
       {campaigns.map((c) => (
         <div
           key={c.id}
-          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          className="rounded-xl border border-gray-200 bg-white p-5"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 space-y-1.5 flex-1">

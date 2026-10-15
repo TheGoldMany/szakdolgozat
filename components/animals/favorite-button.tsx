@@ -102,7 +102,7 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
       // a `document.querySelector` az elsőt adja vissza).
       data-tour="favorite"
       className={cn(
-        "press absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all hover:scale-110 disabled:opacity-70",
+        "press absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm transition-all hover:scale-110 disabled:opacity-70",
       )}
     >
       {loading

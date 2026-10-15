@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,7 +48,7 @@ type FormData = {
   imageUrls?:   string[];
 };
 
-const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200";
 const inputWhiteCls = `${inputCls} bg-white`;
 
 export function ReportForm() {
@@ -90,12 +90,15 @@ export function ReportForm() {
   const lat = watch("lat");
   const lng = watch("lng");
 
+  const honeypotRef = useRef<HTMLInputElement>(null);
+
   async function onSubmit(data: FormData) {
     setServerError(null);
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      // A csali mező értéke — embernél mindig üres (lásd az API-t).
+      body: JSON.stringify({ ...data, _hp: honeypotRef.current?.value ?? "" }),
     });
     const json = await res.json();
     if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
@@ -115,6 +118,19 @@ export function ReportForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Csali mező botoknak. Képernyőn kívül, nem fókuszálható, a
+          képernyőolvasó elől is rejtve — ember nem tölti ki. A „website" név
+          szándékos: az automatikus kitöltők erre ugranak a legszívesebben. */}
+      <input
+        ref={honeypotRef}
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        defaultValue=""
+        style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+      />
       {serverError && (
         <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {serverError}
@@ -171,7 +187,7 @@ export function ReportForm() {
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formGender")}</label>
           <select {...register("gender")}
-            className="h-9 w-full rounded-xl border border-gray-200 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            className="h-9 w-full rounded-xl border border-gray-200 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200">
             <option value="">{t("genderUnknown")}</option>
             <option value="MALE">{t("genderMale")}</option>
             <option value="FEMALE">{t("genderFemale")}</option>
@@ -186,7 +202,7 @@ export function ReportForm() {
         </label>
         <textarea {...register("description")} rows={4}
           placeholder={t("formDescriptionPlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" />
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none" />
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
       </div>
 
@@ -233,7 +249,7 @@ export function ReportForm() {
       </div>
 
       {/* Kapcsolattartó */}
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-4">
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-4">
         <p className="text-sm font-semibold text-gray-700">{t("formContactSection")}</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>

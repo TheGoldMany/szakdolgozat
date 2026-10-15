@@ -83,3 +83,40 @@ export async function resolveActingShelter(
     shelterName: selected?.name ?? null,
   };
 }
+
+/**
+ * Mely menhelyek adatait olvashatja a felhasználó — opcionálisan egy kért
+ * menhelyre szűkítve.
+ *
+ * MIÉRT KELL
+ *
+ * Három lista-végpont (`inventory`, `events`, `volunteer-tasks`) a
+ * `?shelterId=` paramétert ELLENŐRZÉS NÉLKÜL fogadta el: bármelyik
+ * bejelentkezett felhasználó — egy perce regisztrált sima USER is —
+ * elolvashatta bármelyik menhely készletét, piszkozat eseményeit és
+ * önkéntes-feladatait, ha beírta a menhely azonosítóját. A jogosultság a
+ * paraméteren nem múlhat: a kért menhely csak akkor jön vissza, ha a kérő
+ * tagja (vagy főadmin).
+ *
+ * Idegen menhelyre ÜRES listát ad, nem 403-at: így nem árulja el, hogy az
+ * azonosító létezik-e.
+ */
+export async function permittedShelterIds(
+  userId: string,
+  role: string | undefined,
+  requested?: string | null,
+): Promise<string[]> {
+  if (role === "SUPER_ADMIN") {
+    if (requested) return [requested];
+    const all = await prisma.shelter.findMany({ select: { id: true } });
+    return all.map((s) => s.id);
+  }
+
+  const memberships = await prisma.shelterAdmin.findMany({
+    where:  { userId },
+    select: { shelterId: true },
+  });
+  const own = memberships.map((m) => m.shelterId);
+  if (requested) return own.includes(requested) ? [requested] : [];
+  return own;
+}

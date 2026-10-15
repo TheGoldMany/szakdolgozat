@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { fontVariables } from "@/lib/fonts";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -14,16 +14,23 @@ import { PageTour } from "@/components/onboarding/page-tour";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import "../globals.css";
+import { siteUrl } from "@/lib/site-url";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const viewport: Viewport = {
-  themeColor: "#166534",
+  themeColor: "#187f3b",
   width: "device-width",
   initialScale: 1,
 };
 
+/**
+ * A `metadataBase` nélkül a Next a relatív OG- és kanonikus címeket nem tudja
+ * teljes URL-lé alakítani: a közösségi megosztás kép nélkül jelenik meg, és a
+ * kanonikus megjelölés is hiányos marad. Egy helyről, a `siteUrl()`-ből jön,
+ * hogy a sitemapban és az oldalakon ugyanaz a cím szerepeljen.
+ */
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "ÁllatiMenhelyek.hu",
     template: "%s | ÁllatiMenhelyek.hu",
@@ -31,13 +38,22 @@ export const metadata: Metadata = {
   description: "Találd meg új legjobb barátod! Böngéssz örökbefogadható állatok között magyarországi menhelyekről.",
 };
 
-export default async function LocaleLayout({
-  children,
-  params: { locale },
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
+export default async function LocaleLayout(
+  props: {
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
+  const {
+    children
+  } = props;
+
   if (!routing.locales.includes(locale as "hu" | "en" | "de" | "pl")) {
     notFound();
   }
@@ -45,13 +61,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={inter.variable}>
+    <html lang={locale} className={fontVariables}>
       <body>
-        {/* JavaScript nélkül a görgetésre megjelenő blokkok sosem kapnának
-            jelzést, hogy láthatóvá váljanak – ilyenkor egyszerűen látszanak. */}
-        <noscript>
-          <style>{".reveal-pending{opacity:1!important}"}</style>
-        </noscript>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Suspense><Header /></Suspense>

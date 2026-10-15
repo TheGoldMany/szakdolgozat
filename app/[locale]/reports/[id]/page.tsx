@@ -30,17 +30,25 @@ const STATUS_COLOR: Record<ReportStatus, string> = {
   CLOSED:   "bg-gray-100 text-gray-400",
 };
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const [r, t] = await Promise.all([
     prisma.animalReport.findUnique({ where: { id: params.id }, select: { type: true, city: true } }),
     getTranslations("reports"),
   ]);
   if (!r) return { title: t("notFound") };
   const typeLabel = { LOST: t("lost"), FOUND: t("found"), STRAY: t("stray") }[r.type];
-  return { title: `${typeLabel} – ${r.city}` };
+  return {
+    title: `${typeLabel} – ${r.city}`,
+    // A bejelentés-oldal egy magánszemély nevét, telefonszámát és e-mail-
+    // címét tartalmazza. Keresőben ennek nincs helye: a gyűjtőoldal
+    // (`/reports`) indexelődik, a személyes adatot hordozó egyedi oldal nem.
+    robots: { index: false, follow: true },
+  };
 }
 
-export default async function ReportDetailPage({ params }: { params: { id: string } }) {
+export default async function ReportDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const [report, session, t] = await Promise.all([
     prisma.animalReport.findUnique({
       where: { id: params.id },
@@ -56,6 +64,16 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
     (session?.user?.id && report.userId === session.user.id) ||
     session?.user?.role === "SUPER_ADMIN" ||
     session?.user?.role === "SHELTER_ADMIN";
+
+  /**
+   * Kinek jár a bejelentő elérhetősége.
+   *
+   * Eddig bárkinek, bejelentkezés nélkül, státusztól függetlenül — a lezárt
+   * ügyeknél is, örökre. A név, a telefon és az e-mail azért nyilvános, hogy
+   * aki megtalálta az állatot, elérje a gazdát; ez AKTÍV ügynél indokolt. Lezárt
+   * ügynél csak a bejelentőnek és a moderáló adminoknak.
+   */
+  const showContact = (rStatus: string) => rStatus === "ACTIVE" || !!isOwnerOrAdminForMatches;
 
   // Kép-alapú párosítási találatok (mindkét irány), a nem elvetettek.
   const matchRows = await prisma.reportMatch.findMany({
@@ -90,9 +108,12 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
           imageUrl: cp.imageUrl,
           city: cp.city,
           createdAt: cp.createdAt.toISOString(),
-          contactName: cp.contactName,
-          contactPhone: cp.contactPhone,
-          contactEmail: cp.contactEmail,
+          // A MÁSIK bejelentés elérhetősége csak a saját bejelentés gazdájának
+          // és az adminoknak jár — egy idegen látogatónak nincs rá szüksége —,
+          // és csak amíg az az ügy aktív.
+          ...(isOwnerOrAdminForMatches && showContact(cp.status)
+            ? { contactName: cp.contactName, contactPhone: cp.contactPhone, contactEmail: cp.contactEmail }
+            : { contactName: null, contactPhone: null, contactEmail: null }),
         },
       };
     })
@@ -133,7 +154,7 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
           <span className="text-gray-800">{typeLabel}</span>
         </nav>
 
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           {/* Header */}
           <div className={cn("px-6 py-5 flex items-center justify-between gap-3", typeColor.bg)}>
             <div className="flex items-center gap-3">
@@ -224,6 +245,7 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
               {new Date(report.createdAt).toLocaleDateString("hu-HU", { year: "numeric", month: "long", day: "numeric" })}
             </div>
 
+            {showContact(report.status) ? (
             <div className="rounded-xl bg-gray-50 p-4 space-y-2">
               <p className="text-sm font-semibold text-gray-700">
                 {t("contactSection")} {report.contactName}
@@ -237,6 +259,9 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
                 <Mail className="h-4 w-4" />{report.contactEmail}
               </a>
             </div>
+            ) : (
+              <p className="rounded-xl bg-gray-50 p-4 text-sm text-gray-500">{t("contactHiddenClosed")}</p>
+            )}
 
             {canResolve && <ResolveButton reportId={report.id} />}
           </div>

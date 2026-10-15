@@ -14,11 +14,12 @@ import { FosterAssign } from "@/components/foster/foster-assign";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const animal = await prisma.animal.findUnique({
     where:  { id: params.id },
     select: { name: true },
@@ -26,11 +27,12 @@ export async function generateMetadata({
   return { title: animal ? `${animal.name} – Iratok` : "Állat" };
 }
 
-export default async function AnimalDocumentsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function AnimalDocumentsPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
@@ -118,7 +120,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Documents section */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h2 className="mb-1 text-base font-semibold text-gray-800">{t("animalsDetailDocSection")}</h2>
         <p className="mb-5 text-sm text-gray-500">
           {t("animalsDetailDocDesc")}
@@ -127,7 +129,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Health records */}
-      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
         <HealthManager
           animalId={animal.id}
           initial={healthRecords.map(r => ({
@@ -139,7 +141,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Virtual adoption stats */}
-      <div className="mt-6 rounded-2xl border border-pink-100 bg-pink-50 p-6">
+      <div className="mt-6 rounded-xl border border-pink-100 bg-pink-50 p-6">
         <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-pink-800">
           {t("animalsDetailVirtualTitle")}
         </h2>
@@ -159,7 +161,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Foster placement */}
-      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
         <FosterAssign
           animalId={animal.id}
           currentFosterId={animal.fosterId}
@@ -168,7 +170,7 @@ export default async function AnimalDocumentsPage({
       </div>
 
       {/* Behavior & rehabilitation */}
-      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
         <BehaviorManager
           animalId={animal.id}
           initialFlags={animal.flags}

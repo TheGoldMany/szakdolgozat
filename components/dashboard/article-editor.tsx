@@ -31,7 +31,7 @@ export interface EditableArticle {
 interface ShelterOption { id: string; name: string }
 
 const cls =
-  "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100";
+  "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200";
 
 const EXCERPT_MAX = 400;
 
@@ -202,7 +202,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <FilePlus2 className="h-4 w-4 text-brand-500" />
@@ -364,7 +364,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
           />
           <p className="mt-1 text-[11px] text-gray-400">
             Hagyd üresen az azonnali publikáláshoz. Jövőbeli időpontnál a cikk csak
-            akkor jelenik meg a látogatóknak — addig itt marad, „Időzítve" jelöléssel.
+            akkor jelenik meg a látogatóknak, addig itt marad, „Időzítve" jelöléssel.
           </p>
         </div>
 

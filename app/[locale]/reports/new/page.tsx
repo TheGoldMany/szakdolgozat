@@ -34,7 +34,7 @@ export default async function NewReportPage() {
         </div>
 
         {isGuest && (
-          <div className="mb-6 flex gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+          <div className="mb-6 flex gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
             <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
             <div className="text-sm text-blue-800">
               <p className="font-semibold">{t("guestNotice")}</p>
@@ -52,7 +52,7 @@ export default async function NewReportPage() {
           </div>
         )}
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
           <ReportForm />
         </div>
       </div>

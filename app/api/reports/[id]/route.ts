@@ -9,10 +9,8 @@ const schema = z.object({
   status: z.nativeEnum(ReportStatus),
 });
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 

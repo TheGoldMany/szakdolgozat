@@ -97,7 +97,7 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Keresés…"
-            className="w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400"
+            className="w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-200"
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -120,7 +120,7 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
           <Package className="h-10 w-10 text-gray-300" />
           <p className="mt-3 text-sm text-gray-500">Nincs megjeleníthető tétel</p>
           {shelterId && (
@@ -133,7 +133,7 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
           )}
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
               <tr>
@@ -245,7 +245,7 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
       {/* Edit modal */}
       {editItem && (
         <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="animate-modal w-full max-w-lg rounded-2xl bg-white shadow-xl">
+          <div className="animate-modal w-full max-w-lg rounded-xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-900">Tétel szerkesztése</h2>
               <button onClick={() => setEditItem(null)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 transition-colors">

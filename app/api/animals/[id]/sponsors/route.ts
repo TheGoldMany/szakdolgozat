@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { paymentsDisabled } from "@/lib/payments-guard";
 
 // GET /api/animals/[id]/sponsors – aktív virtuális gazdik listája + statisztika
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;

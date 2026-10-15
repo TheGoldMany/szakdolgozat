@@ -20,11 +20,12 @@ function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
 
-export default async function UserApplicationDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function UserApplicationDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getTranslations("applications");
 
   const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -75,7 +76,7 @@ export default async function UserApplicationDetailPage({
         </Link>
 
         {/* Animal + status */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="flex gap-4 p-5">
             <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
               <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
@@ -132,7 +133,7 @@ export default async function UserApplicationDetailPage({
 
         {/* Submitted form responses */}
         {app.responses.length > 0 ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-5">
             <h2 className="font-semibold text-gray-900">
               {t("filledForm")}
               {app.form && (
@@ -171,14 +172,14 @@ export default async function UserApplicationDetailPage({
                   ) : resp.value ? (
                     <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                   ) : (
-                    <p className="text-sm text-gray-400 italic">{t("notFilled")}</p>
+                    <p className="text-sm text-gray-400">{t("notFilled")}</p>
                   )}
                 </div>
               ))}
             </div>
           </div>
         ) : app.formId ? (
-          <div className="rounded-2xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
+          <div className="rounded-xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
             <p className="text-sm text-yellow-700">{t("formNotSubmitted")}</p>
             {app.inviteToken && (
               <Link

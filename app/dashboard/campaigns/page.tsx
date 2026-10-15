@@ -34,9 +34,10 @@ function formatHUF(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
 }
 
-interface PageProps { searchParams: { status?: string } }
+interface PageProps { searchParams: Promise<{ status?: string }> }
 
-export default async function CampaignApprovalsPage({ searchParams }: PageProps) {
+export default async function CampaignApprovalsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 
@@ -119,7 +120,7 @@ export default async function CampaignApprovalsPage({ searchParams }: PageProps)
 
       {/* All campaigns table */}
       <div>
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white">
           {allCampaigns.length === 0 ? (
             <p className="px-5 py-8 text-sm text-gray-400">Nincs ilyen gyűjtés.</p>
           ) : (

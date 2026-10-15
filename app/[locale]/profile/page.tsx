@@ -177,7 +177,7 @@ export default async function ProfilePage() {
         <div className="space-y-6">
 
           {/* Account info */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("accountInfo")}</h2>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
@@ -208,14 +208,14 @@ export default async function ProfilePage() {
           </div>
 
           {/* Personal data */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="profile-data">
+          <div className="rounded-xl border border-gray-200 bg-white p-6" data-tour="profile-data">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("personalData")}</h2>
             <ProfileForm user={user} />
           </div>
 
           {/* Change password – only for password-based accounts */}
           {user.password && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-6">
               <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("changePassword")}</h2>
               <ChangePasswordForm />
             </div>
@@ -245,12 +245,12 @@ export default async function ProfilePage() {
               />
 
               {/* Saját gyűjtések */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-6">
                 <MyCampaigns campaigns={myCampaigns} />
               </div>
 
           {/* Subscriptions */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySubscriptions")}</h2>
             <SubscriptionsList
               subscriptions={user.subscriptions.map((s) => ({
@@ -263,7 +263,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* Virtual adoptions */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("mySponsorships")}</h2>
             <SponsorshipsList
               sponsorships={user.sponsorships.map((s) => ({
@@ -278,7 +278,7 @@ export default async function ProfilePage() {
           )}
 
           {/* Adoption history */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("adoptionHistory")}</h2>
             {adoptedApps.length === 0 ? (
               <p className="text-sm text-gray-400">{t("noAdoptions")}</p>
@@ -320,7 +320,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* My reports */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("myReports")}</h2>
             <ProfileReports
               reports={userReports.map((r) => ({
@@ -338,20 +338,20 @@ export default async function ProfilePage() {
           </div>
 
           {/* Notification preferences */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("notificationSettings")}</h2>
             <EmailNotificationsToggle enabled={user.emailNotifications} />
           </div>
 
           {/* GDPR data portability */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("myData")}</h2>
             <p className="mb-4 text-xs text-gray-500">{t("myDataDesc")}</p>
             <DownloadDataButton />
           </div>
 
           {/* Danger zone – account deletion */}
-          <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-red-100 bg-white p-6">
             <h2 className="mb-1 text-sm font-semibold text-red-700">{t("dangerZone")}</h2>
             <p className="mb-4 text-xs text-gray-500">{t("deleteAccountDesc")}</p>
             <DeleteAccountButton />

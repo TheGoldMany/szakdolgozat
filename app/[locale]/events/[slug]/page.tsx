@@ -11,14 +11,16 @@ import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { EventRegisterButton } from "@/components/events/event-register-button";
 import { ShareButton } from "@/components/ui/share-button";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const event = await prisma.event.findUnique({ where: { slug: params.slug }, select: { title: true } });
   return { title: event ? event.title : "Esemény" };
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function EventDetailPage({ params }: { params: { slug: string } }) {
+export default async function EventDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   const t = await getTranslations("events");
 
@@ -54,9 +56,8 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="relative h-52 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-64">
-        {event.imageUrl && <Image src={event.imageUrl} alt={event.title} fill className="object-cover opacity-60" priority />}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="relative h-52 w-full overflow-hidden bg-brand-700 sm:h-64">
+        {event.imageUrl && <Image src={event.imageUrl} alt={event.title} fill className="object-cover" priority />}
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -83,7 +84,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
               </div>
             )}
 
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
               <h2 className="mb-2 text-sm font-semibold text-gray-700">{t("aboutEvent")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{event.description}</p>
             </div>
@@ -91,7 +92,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
 
           {/* Sidebar */}
           <div className="space-y-5">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <ul className="space-y-3 text-sm text-gray-600">
                 <li className="flex items-start gap-2.5">
                   <CalendarHeart className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
@@ -130,7 +131,7 @@ export default async function EventDetailPage({ params }: { params: { slug: stri
                 initialGuests={myReg?.guests ?? 0}
               />
             ) : isPast ? (
-              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 text-center text-sm font-medium text-gray-500">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 text-center text-sm font-medium text-gray-500">
                 {t("pastNotice")}
               </div>
             ) : null}

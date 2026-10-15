@@ -82,7 +82,7 @@ export function InventoryItemForm({ shelterId, item, onClose }: Props) {
     onClose?.();
   }
 
-  const inputCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400";
+  const inputCls = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-200";
   const labelCls = "block text-xs font-medium text-gray-500 mb-1";
 
   return (
@@ -145,7 +145,7 @@ export function InventoryItemForm({ shelterId, item, onClose }: Props) {
       {/* Minimum készlet + lejárat */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Minimum ({effectiveUnit}) — riasztáshoz</label>
+          <label className={labelCls}>Riasztási minimum ({effectiveUnit})</label>
           <input
             type="number" min={0} step="any"
             value={minQty}

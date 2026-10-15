@@ -60,7 +60,7 @@ export function SendMessageForm({ reportId }: Props) {
         placeholder="Írd meg az üzeneted a bejelentő számára..."
         required
         rows={4}
-        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition resize-none"
+        className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 transition resize-none"
       />
       <button
         type="submit"

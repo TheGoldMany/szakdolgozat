@@ -8,17 +8,31 @@ import { ReportCard } from "@/components/reports/report-card";
 import { ReportType, ReportStatus } from "@prisma/client";
 import { getTranslations, getLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("reports");
-  return { title: t("title") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/reports",
+    title:       t("reportsTitle"),
+    description: t("reportsDescription"),
+  });
 }
 
 interface PageProps {
-  searchParams: { type?: string; status?: string };
+  searchParams: Promise<{ type?: string; status?: string }>;
 }
 
-export default async function ReportsPage({ searchParams }: PageProps) {
+export default async function ReportsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   const [t, locale, session] = await Promise.all([
     getTranslations("reports"),
     getLocale(),
@@ -108,7 +122,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
         )}
 
         {/* Filters */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex flex-col gap-3">
             {/* Type filters */}
             <div className="flex flex-wrap gap-2">
@@ -118,7 +132,7 @@ export default async function ReportsPage({ searchParams }: PageProps) {
                   href={buildUrl({ type: b.value, status: searchParams.status ?? "" })}
                   className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                     (searchParams.type ?? "") === b.value
-                      ? "bg-brand-500 text-white shadow-sm"
+                      ? "bg-brand-500 text-white"
                       : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
                   }`}
                 >
@@ -146,8 +160,8 @@ export default async function ReportsPage({ searchParams }: PageProps) {
         </div>
 
         {reports.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
               <Search className="h-7 w-7 text-gray-400" />
             </div>
             <p className="mt-4 text-lg font-medium text-gray-700">{t("noReports")}</p>

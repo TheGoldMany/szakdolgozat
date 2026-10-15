@@ -11,10 +11,8 @@ import {
 import { paymentsDisabled } from "@/lib/payments-guard";
 
 // POST /api/subscriptions/[id]/cancel
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;

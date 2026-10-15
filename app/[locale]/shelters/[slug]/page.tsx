@@ -17,8 +17,13 @@ import { VolunteerApplyButton } from "@/components/volunteers/volunteer-apply-bu
 import { FosterApplyButton } from "@/components/foster/foster-apply-button";
 import type { FosterStatus } from "@prisma/client";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { pageMetadata } from "@/lib/page-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import { shelterJsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
+import { safeHref } from "@/lib/safe-url";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const [shelter, t] = await Promise.all([
     prisma.shelter.findUnique({
       where:  { slug: params.slug },
@@ -32,22 +37,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const description = shelter.description?.slice(0, 160) ?? `${shelter.name} (${shelter.city}) – nézd meg az örökbefogadható állatokat.`;
   const image       = shelter.coverUrl ?? shelter.logoUrl ?? undefined;
 
-  return {
+  return pageMetadata({
+    locale:      params.locale,
+    path:        `/shelters/${params.slug}`,
     title,
     description,
-    openGraph: {
-      title, description, type: "website",
-      ...(image ? { images: [{ url: image, alt: shelter.name }] } : {}),
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title, description,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
+    image,
+  });
 }
 
-export default async function ShelterDetailPage({ params }: { params: { slug: string } }) {
+export default async function ShelterDetailPage(props: { params: Promise<{ slug: string; locale: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
 
   const [shelter, t] = await Promise.all([
@@ -118,19 +118,31 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-52">
-        {shelter.coverUrl && (
-          <Image src={shelter.coverUrl} alt="" fill className="object-cover opacity-50" priority />
+      {/* Az `AnimalShelter` a schema.org saját típusa erre. Ettől kerülhet a
+          menhely a helyi és térképes találatok közé — ez a „menhely + város"
+          keresésnél a legtöbbet érő megjelenés. */}
+      <JsonLd data={shelterJsonLd(shelter, params.locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: t("title"), path: "/shelters" },
+            { name: shelter.name, path: `/shelters/${shelter.slug}` },
+          ],
+          params.locale
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+      />
+
+      <div className="relative h-40 w-full overflow-hidden bg-brand-700 sm:h-52">
+        {shelter.coverUrl && (
+          <Image src={shelter.coverUrl} alt="" fill className="object-cover" priority />
+        )}
       </div>
 
-      <div className="border-b border-gray-100 bg-white shadow-sm">
+      <div className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:gap-5">
 
-            <div className="relative -mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md sm:-mt-14 sm:h-28 sm:w-28">
+            <div className="relative -mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-xl border-4 border-white bg-white shadow-md sm:-mt-14 sm:h-28 sm:w-28">
               {shelter.logoUrl ? (
                 <Image src={shelter.logoUrl} alt={shelter.name} fill className="object-cover" />
               ) : (
@@ -173,7 +185,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-3">
 
           {/* Animals column */}
@@ -191,7 +203,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             </div>
 
             {shelter.animals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
                 <PawPrint className="h-10 w-10 text-gray-300" />
                 <p className="mt-3 text-sm text-gray-500">{t("noAnimals")}</p>
               </div>
@@ -205,13 +217,13 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
           {/* Info column */}
           <div className="space-y-5">
             {shelter.description && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <h2 className="mb-2 text-sm font-semibold text-gray-700">{t("about")}</h2>
                 <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">{shelter.description}</p>
               </div>
             )}
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("contact")}</h2>
               <ul className="space-y-2.5 text-sm text-gray-600">
                 <li className="flex items-start gap-2.5">
@@ -233,7 +245,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
                 {shelter.website && (
                   <li className="flex items-center gap-2.5">
                     <Globe className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={shelter.website} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate hover:text-brand-500 transition-colors">
+                    <a href={safeHref(shelter.website)} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate hover:text-brand-500 transition-colors">
                       {shelter.website.replace(/^https?:\/\//, "")}
                     </a>
                   </li>
@@ -245,7 +257,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             {payments && generalCampaign && (
               <Link
                 href={`/donate/${generalCampaign.id}`}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
+                className="flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
               >
                 <HeartHandshake className="h-4 w-4" />
                 {t("supportShelter")}
@@ -253,7 +265,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
             )}
 
             {payments && shelter.tiers.length > 0 && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("monthlySubscriptions")}</h2>
                 <div className="flex flex-col gap-3">
                   {shelter.tiers.map((tier) => (
@@ -263,7 +275,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
               </div>
             )}
 
-            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+            <div className="rounded-xl border border-brand-100 bg-brand-50 p-5">
               <p className="text-center text-2xl font-bold sm:text-3xl text-brand-600">{shelter._count.animals}</p>
               <p className="mt-1 text-center text-sm text-brand-500">{t("animalsWaitingCount", { count: shelter._count.animals })}</p>
             </div>
@@ -272,12 +284,12 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
         {/* Önkéntesség */}
         {session && (
-          <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6 lg:px-8" data-tour="shelter-help">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="mt-10 grid gap-4 md:grid-cols-2" data-tour="shelter-help">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 text-base font-semibold text-gray-800">{t("volunteer")}</h2>
               <VolunteerApplyButton shelterId={shelter.id} existingStatus={existingVolStatus} />
             </div>
-            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-1 text-base font-semibold text-gray-800">{t("foster")}</h2>
               <p className="mb-3 text-sm text-gray-500">{t("fosterDesc")}</p>
               <FosterApplyButton shelterId={shelter.id} existingStatus={existingFosterStatus} />
@@ -286,7 +298,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
         )}
 
         {/* Értékelések */}
-        <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8" data-tour="shelter-reviews">
+        <div className="mt-10" data-tour="shelter-reviews">
           <ShelterReviews shelterId={shelter.id} />
         </div>
       </div>

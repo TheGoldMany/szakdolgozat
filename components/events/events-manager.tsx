@@ -12,6 +12,7 @@ import {
   EVENT_STATUS_LABELS, EVENT_STATUS_COLORS,
 } from "@/lib/event";
 import type { EventType, EventStatus } from "@prisma/client";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export interface RegistrationEntry {
   id:        string;
@@ -140,19 +141,19 @@ export function EventsManager({ shelterId, events }: Props) {
         </button>
 
         {showForm && (
-          <form onSubmit={e => handleSubmit(e, false)} className="mt-4 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <form onSubmit={e => handleSubmit(e, false)} className="mt-4 rounded-xl border border-brand-100 bg-brand-50 p-5">
             <p className="mb-4 font-semibold text-gray-800">{editId ? t('editEvent') : t('newEvent')}</p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Cím *</label>
                 <input required value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   placeholder="pl. Tavaszi örökbefogadási nap"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Típus *</label>
                 <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as EventType }))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200">
                   {ALL_EVENT_TYPES.map(t => <option key={t} value={t}>{EVENT_TYPE_LABELS[t]}</option>)}
                 </select>
               </div>
@@ -160,39 +161,42 @@ export function EventsManager({ shelterId, events }: Props) {
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Helyszín *</label>
                 <input required value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))}
                   placeholder="pl. Városliget, Budapest"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Kezdés *</label>
                 <input required type="datetime-local" value={form.startsAt}
                   onChange={e => setForm(f => ({ ...f, startsAt: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Befejezés</label>
                 <input type="datetime-local" value={form.endsAt}
                   onChange={e => setForm(f => ({ ...f, endsAt: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Létszámkorlát</label>
                 <input type="number" min={1} value={form.capacity}
                   onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
                   placeholder="Üres = korlátlan"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold text-gray-600">Kép URL</label>
-                <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                  placeholder="https://…"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                {/* Kézi URL helyett feltöltő: a szerver csak a saját tárhelyről
+                    fogad el képet (lásd `lib/image-url.ts`). */}
+                <ImageUpload
+                  label="Kép"
+                  value={form.imageUrl}
+                  onChange={(url) => setForm(f => ({ ...f, imageUrl: url }))}
+                />
               </div>
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Leírás *</label>
                 <textarea required rows={4} value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="Mi vár a látogatókra? Program, részletek…"
-                  className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -211,7 +215,7 @@ export function EventsManager({ shelterId, events }: Props) {
 
       {/* Events list */}
       {events.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
+        <p className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
           Még nincs létrehozott esemény.
         </p>
       ) : (
@@ -221,7 +225,7 @@ export function EventsManager({ shelterId, events }: Props) {
             const heads  = active.reduce((s, r) => s + 1 + r.guests, 0);
             const isOpen = expanded === ev.id;
             return (
-              <div key={ev.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div key={ev.id} className="rounded-xl border border-gray-200 bg-white p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -301,7 +305,7 @@ export function EventsManager({ shelterId, events }: Props) {
                             <div className="min-w-0">
                               <p className="font-medium text-gray-700">{r.user.name ?? r.user.email}</p>
                               <p className="text-gray-400">{r.user.email}</p>
-                              {r.note && <p className="mt-0.5 text-gray-500 italic">„{r.note}"</p>}
+                              {r.note && <p className="mt-0.5 text-gray-500">„{r.note}"</p>}
                             </div>
                             <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-gray-500">
                               {1 + r.guests} fő

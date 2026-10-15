@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
 import { slugifyTitle, uniqueArticleSlug, publishedWhere } from "@/lib/articles";
 import { cleanTermList } from "@/lib/seo";
+import { optionalOwnImageUrl } from "@/lib/image-url";
 
 const createSchema = z.object({
   title:      z.string().min(3, "A cím legalább 3 karakter legyen").max(200),
   excerpt:    z.string().max(400).optional().or(z.literal("")),
   content:    z.string().min(1, "Írd meg a cikk szövegét"),
-  imageUrl:   z.string().url().optional().or(z.literal("")),
+  imageUrl:   optionalOwnImageUrl,
   /** Keresőoptimalizálás – mind opcionális, üresen értelmes tartalékot használunk. */
   seoTitle:        z.string().max(120).nullable().optional(),
   metaDescription: z.string().max(320).nullable().optional(),

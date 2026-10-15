@@ -1,11 +1,12 @@
 import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireSecret } from "@/lib/secrets";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 function expectedToken(email: string): string {
-  return createHmac("sha256", process.env.NEXTAUTH_SECRET ?? "secret")
+  return createHmac("sha256", requireSecret("NEXTAUTH_SECRET"))
     .update(email.toLowerCase())
     .digest("hex")
     .slice(0, 32);

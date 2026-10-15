@@ -34,11 +34,12 @@ const ACTION_META: Record<AuditAction, { label: string; icon: LucideIcon; color:
  * Audit napló – az adminisztrátori műveletek visszakövethető listája.
  * Csak olvasható, kizárólag SUPER_ADMIN számára.
  */
-export default async function AuditPage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) {
+export default async function AuditPage(
+  props: {
+    searchParams: Promise<{ page?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/audit");
   if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");
@@ -78,7 +79,7 @@ export default async function AuditPage({
       </div>
 
       {disputes.length > 0 && (
-        <section className="rounded-2xl border border-red-200 bg-red-50 p-4">
+        <section className="rounded-xl border border-red-200 bg-red-50 p-4">
           <h2 className="mb-1 flex items-center gap-2 text-sm font-bold text-red-800">
             <AlertTriangle className="h-4 w-4" />
             Vitatott fizetések ({disputes.length})
@@ -108,7 +109,7 @@ export default async function AuditPage({
       )}
 
       {entries.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+        <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
           <ScrollText className="mx-auto mb-3 h-8 w-8 text-gray-200" />
           <p className="text-sm text-gray-400">Még nincs naplózott művelet.</p>
         </div>
@@ -118,14 +119,14 @@ export default async function AuditPage({
             const meta = ACTION_META[e.action];
             const Icon = meta.icon;
             return (
-              <li key={e.id} className="flex items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <li key={e.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4">
                 <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", meta.color)}>
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-800">
                     {meta.label}
-                    {e.targetName && <span className="text-gray-500"> — {e.targetName}</span>}
+                    {e.targetName && <span className="text-gray-500"> · {e.targetName}</span>}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">
                     {e.actor?.name ?? e.actor?.email ?? "ismeretlen admin"}

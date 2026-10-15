@@ -53,7 +53,10 @@ export function Header() {
     // maradjon — így a visszakapcsolás egyetlen env változó.
     ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate") }] : []),
     { href: "/map",     label: t("map")     },
-    { href: "/reports", label: t("reports") },
+    // A bejelentés a platform legidőérzékenyebb művelete: egy kóbor állatot
+    // MOST látnak meg, és ilyenkor nem keresgélni akar az ember. Ezért ez a
+    // menüpont akkor is kiemelt marad, ha a látogató más oldalon van.
+    { href: "/reports", label: t("reports"), highlight: true },
   ];
   const SECONDARY_LINKS = [
     { href: "/shelters", label: t("shelters") },
@@ -150,8 +153,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-100 backdrop-blur-sm",
-        scrolled ? "site-header--scrolled bg-white/95" : "bg-white/90",
+        // Tömör háttér: az áttetsző + elmosott „üveg" fejléc a sablonos kinézet
+        // egyik legismertebb jele, és a mögötte átsejlő tartalom zavarja a menüt.
+        "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white",
+        scrolled && "site-header--scrolled",
       )}
     >
 
@@ -189,8 +194,23 @@ export function Header() {
               data-tour={`nav-${l.href.replace("/", "")}`}
               aria-current={isActive(l.href) ? "page" : undefined}
               className={cn(
-                "nav-link text-sm font-medium transition-colors hover:text-brand-500",
-                isActive(l.href) ? "text-brand-600" : "text-gray-600",
+                "nav-link text-sm font-medium transition-colors",
+                // A kiemelt menüpont pirulát kap, hogy a sima szöveges linkek
+                // közül kiváljon. A kitöltött zöld SZÁNDÉKOSAN csak az aktív
+                // állapoté: enélkül nem lehetne megkülönböztetni a „kiemelt"
+                // és az „épp ezen vagyok" jelentést — és a tömör zöld a
+                // Regisztráció gombbal is versengene a figyelemért.
+                l.highlight
+                  ? cn(
+                      "rounded-full px-3 py-1.5",
+                      isActive(l.href)
+                        ? "bg-forest text-white"
+                        : "bg-mint text-forest hover:bg-mint/70",
+                    )
+                  : cn(
+                      "hover:text-brand-500",
+                      isActive(l.href) ? "text-brand-600" : "text-gray-600",
+                    ),
               )}
             >
               {l.label}
@@ -424,7 +444,12 @@ export function Header() {
               <nav className="flex flex-col gap-0.5">
                 {PRIMARY_LINKS.map((l) => (
                   <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
-                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                    className={cn(
+                      "rounded-lg px-3 py-2.5 text-sm font-medium",
+                      l.highlight
+                        ? "bg-mint text-forest hover:bg-mint/70"
+                        : "text-gray-700 hover:bg-gray-50 active:bg-gray-100",
+                    )}>
                     {l.label}
                   </Link>
                 ))}

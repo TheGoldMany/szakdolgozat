@@ -19,7 +19,7 @@ export function TodoWidget({ items }: { items: TodoItem[] }) {
   const total  = active.reduce((s, i) => s + i.count, 0);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white">
       <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
         <div className="flex items-center gap-2">
           <ListChecks className="h-4 w-4 text-brand-500" />
@@ -33,7 +33,7 @@ export function TodoWidget({ items }: { items: TodoItem[] }) {
       {active.length === 0 ? (
         <div className="flex items-center gap-3 px-5 py-6 text-sm text-gray-500">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500" />
-          Minden elintézve — jelenleg nincs teendő.
+          Minden elintézve, jelenleg nincs teendő.
         </div>
       ) : (
         <ul className="divide-y divide-gray-50">

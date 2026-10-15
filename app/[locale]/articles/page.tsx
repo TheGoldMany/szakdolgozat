@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -45,7 +44,7 @@ export default async function ArticlesListPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="mb-6 flex items-center gap-3 sm:mb-8">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <Newspaper className="h-6 w-6 text-brand-500" />
           </div>
           <div>
@@ -55,19 +54,19 @@ export default async function ArticlesListPage() {
         </div>
 
         {articles.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-10 text-center sm:p-16">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white p-10 text-center sm:p-16">
             <Newspaper className="mx-auto h-10 w-10 text-gray-300" />
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="press-card group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+                className="press-card group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md"
               >
-                <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
+                <div className="relative h-40 w-full overflow-hidden bg-brand-100">
                   {article.imageUrl ? (
                     <Image
                       src={article.imageUrl}
@@ -110,7 +109,7 @@ export default async function ArticlesListPage() {
                 </div>
               </Link>
             ))}
-          </Reveal>
+          </div>
         )}
       </div>
     </div>

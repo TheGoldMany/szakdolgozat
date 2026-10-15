@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -6,10 +5,23 @@ import { CalendarHeart, MapPin, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("nav");
-  return { title: t("events") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/events",
+    title:       t("eventsTitle"),
+    description: t("eventsDescription"),
+  });
 }
 // ISR: az eseménylista 5 percenként frissül (gyors betöltés cache-ből)
 export const revalidate = 300;
@@ -29,7 +41,7 @@ export default async function EventsListPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-50">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <CalendarHeart className="h-6 w-6 text-brand-500" />
           </div>
           <div>
@@ -39,16 +51,16 @@ export default async function EventsListPage() {
         </div>
 
         {events.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-16 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white p-16 text-center">
             <CalendarHeart className="mx-auto h-10 w-10 text-gray-300" />
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {events.map(ev => (
               <Link key={ev.id} href={`/events/${ev.slug}`}
-                className="press-card group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
-                <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
+                className="press-card group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
+                <div className="relative h-36 w-full overflow-hidden bg-brand-100">
                   {ev.imageUrl
                     ? <Image src={ev.imageUrl} alt={ev.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width:768px) 100vw, 33vw" />
                     : <div className="flex h-full items-center justify-center"><CalendarHeart className="h-10 w-10 text-white/70" /></div>}
@@ -74,7 +86,7 @@ export default async function EventsListPage() {
                 </div>
               </Link>
             ))}
-          </Reveal>
+          </div>
         )}
       </div>
     </div>

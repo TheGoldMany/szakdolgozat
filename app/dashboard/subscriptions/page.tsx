@@ -16,10 +16,11 @@ import { notFound } from "next/navigation";
 export const metadata: Metadata = { title: "Előfizetők" };
 
 interface PageProps {
-  searchParams: { status?: string };
+  searchParams: Promise<{ status?: string }>;
 }
 
-export default async function SubscriptionsPage({ searchParams }: PageProps) {
+export default async function SubscriptionsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 
@@ -109,19 +110,19 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
 
       {/* Visszatérő bevétel */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-400">{t("subsRevenueThisMonth")}</p>
           <p className="mt-0.5 text-xl font-bold text-gray-900">
             {((thisMonth._sum.netAmount ?? 0) - (thisMonth._sum.refundedAmount ?? 0)).toLocaleString("hu-HU")} Ft
           </p>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-400">{t("subsRevenueTotal")}</p>
           <p className="mt-0.5 text-xl font-bold text-gray-900">
             {((revenue._sum.netAmount ?? 0) - (revenue._sum.refundedAmount ?? 0)).toLocaleString("hu-HU")} Ft
           </p>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-400">{t("subsPaymentsCount")}</p>
           <p className="mt-0.5 text-xl font-bold text-gray-900">{revenue._count}</p>
         </div>
@@ -146,7 +147,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white">
         {subscriptions.length === 0 ? (
           <p className="px-5 py-8 text-sm text-gray-400">{t("subscriptionsEmpty")}</p>
         ) : (

@@ -84,7 +84,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
 
   if (submitted) {
     return (
-      <div className="animate-fade-in rounded-2xl bg-green-50 border border-green-200 p-6 text-center">
+      <div className="animate-fade-in rounded-xl bg-green-50 border border-green-200 p-6 text-center">
         <div className="mb-3 flex justify-center"><CheckCircle2 className="animate-pop h-10 w-10 text-green-500" /></div>
         <p className="font-semibold text-green-800">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-green-700">
@@ -112,7 +112,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
           {...register("message")}
           rows={4}
           placeholder={t("motivationPlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none"
         />
         {errors.message && (
           <p className="mt-1 text-xs text-red-500">{errors.message.message}</p>
@@ -126,7 +126,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
         </label>
         <select
           {...register("homeType")}
-          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         >
           <option value="">{t("homeTypeChoose")}</option>
           <option value="HOUSE">{t("homeTypeHouse")}</option>
@@ -149,7 +149,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
             <input
               type="checkbox"
               {...register(name)}
-              className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+              className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-200"
             />
             <span className="text-sm text-gray-700">{label}</span>
           </label>
@@ -166,7 +166,7 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
           {...register("experience")}
           rows={3}
           placeholder={t("experiencePlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none"
         />
       </div>
 

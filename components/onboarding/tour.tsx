@@ -368,7 +368,7 @@ export function Tour({ tour, autoStart, onSeen }: Props) {
       {resolved && (
       <div
         ref={cardRef}
-        className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-2xl bg-white p-5 shadow-2xl sm:w-[320px]"
+        className="absolute w-[320px] max-w-[calc(100vw-24px)] rounded-xl bg-white p-5 shadow-2xl sm:w-[320px]"
         style={cardStyle}
       >
         {/* Képernyőolvasónak: melyik lépésnél tartunk. A látó felhasználó ezt a

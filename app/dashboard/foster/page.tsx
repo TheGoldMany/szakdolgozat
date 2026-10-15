@@ -21,7 +21,7 @@ export default async function FosterDashboardPage() {
   // Super adminnál a "nincs kiválasztott menhely" továbbra is az összes menhelyet jelenti
   if (!shelterId && !acting.canSwitch) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+      <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
         {t("notAssignedToShelter")}
       </div>
     );

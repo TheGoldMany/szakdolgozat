@@ -20,11 +20,12 @@ const STATUS_MAP: Record<string, AnimalStatus> = {
   AVAILABLE: "AVAILABLE", PENDING: "PENDING", ADOPTED: "ADOPTED",
 };
 
-export default async function FavoritesPage({
-  searchParams,
-}: {
-  searchParams: { type?: string; status?: string };
-}) {
+export default async function FavoritesPage(
+  props: {
+    searchParams: Promise<{ type?: string; status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const [session, t] = await Promise.all([
     getServerSession(authOptions),
     getTranslations("favorites"),
@@ -78,7 +79,7 @@ export default async function FavoritesPage({
         {totalCount > 0 && <FavoritesFilter />}
 
         {animals.length === 0 && totalCount === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
             <Heart className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-500">{t("emptyTitle")}</p>
             <p className="mt-1 text-sm text-gray-400">{t("emptyDesc")}</p>
@@ -90,7 +91,7 @@ export default async function FavoritesPage({
             </Link>
           </div>
         ) : animals.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-12 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white py-12 text-center">
             <p className="text-gray-400">{t("noFavoritesForFilter")}</p>
           </div>
         ) : (

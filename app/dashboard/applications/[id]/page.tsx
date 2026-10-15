@@ -19,11 +19,12 @@ function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
 
-export default async function ApplicationDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ApplicationDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
@@ -98,7 +99,7 @@ export default async function ApplicationDetailPage({
 
       {/* Viselkedési ütközés figyelmeztetés */}
       {conflicts.length > 0 && (
-        <div className="rounded-2xl border-2 border-red-300 bg-red-50 p-4">
+        <div className="rounded-xl border-2 border-red-300 bg-red-50 p-4">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
             <div>
@@ -117,7 +118,7 @@ export default async function ApplicationDetailPage({
       )}
 
       {/* Header card */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
             <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
@@ -189,7 +190,7 @@ export default async function ApplicationDetailPage({
             </div>
 
             {app.message && (
-              <p className="text-xs text-gray-500 italic">"{app.message}"</p>
+              <p className="text-xs text-gray-500">"{app.message}"</p>
             )}
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
@@ -216,7 +217,7 @@ export default async function ApplicationDetailPage({
 
       {/* Form responses */}
       {app.responses.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-4">
           <h2 className="font-semibold text-gray-900">
             {t("appDetailFilledForm")}
             {app.form && (
@@ -258,7 +259,7 @@ export default async function ApplicationDetailPage({
                 ) : resp.value ? (
                   <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                 ) : (
-                  <p className="text-sm text-gray-400 italic">{t("appDetailNotFilled")}</p>
+                  <p className="text-sm text-gray-400">{t("appDetailNotFilled")}</p>
                 )}
               </div>
             ))}
@@ -267,13 +268,13 @@ export default async function ApplicationDetailPage({
       )}
 
       {app.responses.length === 0 && app.formId && (
-        <div className="rounded-2xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
+        <div className="rounded-xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
           <p className="text-sm text-yellow-700">{t("appDetailFormNotSubmitted")}</p>
         </div>
       )}
 
       {app.reviewNotes && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="mb-2 font-semibold text-gray-900">{t("appDetailAdminNote")}</h2>
           <p className="text-sm text-gray-600">{app.reviewNotes}</p>
         </div>

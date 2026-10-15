@@ -119,7 +119,7 @@ export function DonateForm({ campaignId, isShelterCampaign = false }: DonateForm
             "w-full rounded-xl border px-3 py-2 text-sm outline-none transition-colors",
             isCustom
               ? "border-brand-500 ring-1 ring-brand-500"
-              : "border-gray-200 focus:border-brand-400",
+              : "border-gray-200 focus:border-brand-600",
           ].join(" ")}
         />
       </div>
@@ -131,7 +131,7 @@ export function DonateForm({ campaignId, isShelterCampaign = false }: DonateForm
         </label>
         <textarea rows={3} placeholder={t("messagePlaceholder")}
           value={message} onChange={(e) => setMessage(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition-colors focus:border-brand-400 resize-none"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition-colors focus:border-brand-600 resize-none"
         />
       </div>
 

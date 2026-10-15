@@ -92,11 +92,12 @@ async function fulfillSession(sessionId: string) {
   }
 }
 
-export default async function DonateSuccessPage({
-  searchParams,
-}: {
-  searchParams: { session_id?: string };
-}) {
+export default async function DonateSuccessPage(
+  props: {
+    searchParams: Promise<{ session_id?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 
@@ -108,7 +109,7 @@ export default async function DonateSuccessPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-white p-10 text-center shadow-sm">
+      <div className="w-full max-w-md rounded-xl border border-brand-100 bg-white p-10 text-center">
         <CheckCircle2 className="mx-auto h-16 w-16 text-brand-500" />
         <h1 className="mt-5 text-2xl font-bold text-gray-900">
           {t("donateSuccess")}

@@ -47,7 +47,7 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
     <>
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 shadow-sm transition hover:bg-gray-50"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
       >
         <ArrowRightLeft className="h-4 w-4" />
         Áthelyezés kérése
@@ -55,7 +55,7 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
 
       {open && (
         <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="animate-modal w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="animate-modal w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
             <h2 className="mb-1 text-lg font-bold text-gray-900">Állat áthelyezése</h2>
             <p className="mb-4 text-sm text-gray-500">
               <strong>{animalName}</strong> áthelyezési kérelme a kiválasztott menhelyre
@@ -67,9 +67,9 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
                 <select
                   value={toShelterId}
                   onChange={e => setToShelterId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
                 >
-                  <option value="">— Válassz menhelyet —</option>
+                  <option value="">Válassz menhelyet…</option>
                   {shelters.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
@@ -83,7 +83,7 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
                   onChange={e => setNote(e.target.value)}
                   rows={3}
                   placeholder="Indoklás, különleges igények…"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
                 />
               </div>
 

@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ownImageUrl } from "@/lib/image-url";
 
 const createSchema = z.object({
   name:      z.string().min(1).max(200),
-  url:       z.string().url(),
+  url:       ownImageUrl,
   fileType:  z.string().min(1),
   sizeBytes: z.number().int().positive().optional(),
 });
@@ -20,10 +21,21 @@ async function canManageAnimal(animalId: string, userId: string, role: string) {
 }
 
 // GET /api/animals/[id]/documents
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+//
+// Eddig BEJELENTKEZÉS NÉLKÜL bárkinek kiadta az állat hivatalos papírjait
+// (oltási könyv, chip-regisztráció, szerződés). A nyilvános állatoldal ezeket
+// nem is mutatja — ott a menhely általános dokumentumai vannak —, tehát ez
+// nem egy szándékosan nyitott adat volt, hanem egy nyitva felejtett ajtó.
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
+  }
+  if (!(await canManageAnimal(params.id, session.user.id, session.user.role ?? ""))) {
+    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  }
+
   try {
     const docs = await prisma.animalDocument.findMany({
       where:   { animalId: params.id },
@@ -37,10 +49,8 @@ export async function GET(
 }
 
 // POST /api/animals/[id]/documents
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

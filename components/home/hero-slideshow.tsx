@@ -28,14 +28,14 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
 
   if (slides.length === 0) {
     return (
-      <div className="flex h-full w-full items-center justify-center rounded-2xl bg-brand-50">
+      <div className="flex h-full w-full items-center justify-center rounded-xl bg-brand-50">
         <PawPrint className="h-28 w-28 text-brand-100" />
       </div>
     );
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-xl">
+    <div className="relative h-full w-full overflow-hidden rounded-xl shadow-xl">
       {slides.map((s, idx) => (
         <Link
           key={s.slug}

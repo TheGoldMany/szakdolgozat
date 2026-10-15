@@ -18,8 +18,12 @@ import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { pageMetadata } from "@/lib/page-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const animal = await prisma.animal.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -33,19 +37,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const description = animal.description?.slice(0, 160) ?? `Ismerd meg ${animal.name} állatot, aki gazdira vár.`;
   const image       = animal.images[0]?.url;
 
-  return {
+  // Kanonikus cím és hreflang: enélkül a négy nyelvi változat ugyanazt az
+  // állatot mutatta külön oldalként, és a kereső kiválasztott közülük egyet.
+  return pageMetadata({
+    locale:      params.locale,
+    path:        `/animals/${params.slug}`,
     title,
     description,
-    openGraph: {
-      title, description, type: "article",
-      ...(image ? { images: [{ url: image, alt: animal.name }] } : {}),
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title, description,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
+    image,
+    type:        "article",
+  });
 }
 
 function Trait({ ok, label }: { ok: boolean | null; label: string }) {
@@ -60,7 +61,8 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
   );
 }
 
-export default async function AnimalDetailPage({ params }: { params: { slug: string } }) {
+export default async function AnimalDetailPage(props: { params: Promise<{ slug: string; locale: string }> }) {
+  const params = await props.params;
   const [animal, session, t] = await Promise.all([
     prisma.animal.findUnique({
       where: { slug: params.slug },
@@ -221,6 +223,17 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* A látható morzsasor mellé a gépi változat: ettől a keresőtalálatban
+          a puszta URL helyett olvasható útvonal jelenik meg. */}
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: t("breadcrumb"), path: "/animals" },
+            { name: animal.name, path: `/animals/${animal.slug}` },
+          ],
+          params.locale
+        )}
+      />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
         <nav className="mb-6 text-sm text-gray-500">
@@ -239,7 +252,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
               {animal.images.length > 0 ? (
                 <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {animal.images.map((img, i) => (
-                    <div key={img.id} className="relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-2xl bg-gray-100">
+                    <div key={img.id} className="relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-xl bg-gray-100">
                       <Image src={img.url} alt={img.alt ?? animal.name} fill className="object-cover" priority={i === 0} sizes="88vw" />
                       {i === 0 && (
                         <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
@@ -250,13 +263,13 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                   ))}
                 </div>
               ) : (
-                <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gray-100"><PawPrint className="h-16 w-16 text-gray-300" /></div>
+                <div className="flex aspect-[4/3] items-center justify-center rounded-xl bg-gray-100"><PawPrint className="h-16 w-16 text-gray-300" /></div>
               )}
             </div>
 
             {/* Desktop: fő kép + bélyegképek */}
             <div className="hidden space-y-3 lg:block">
-              <div className="relative overflow-hidden rounded-2xl bg-gray-100 aspect-[4/3]">
+              <div className="relative overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]">
                 {primaryImage ? (
                   <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="60vw" />
                 ) : (
@@ -279,7 +292,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
             {/* Leírás – a képek alatt, hogy a bal oszlop ne maradjon üresen */}
             {animal.description && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-6">
                 <h2 className="mb-3 text-lg font-semibold text-gray-800">{t("descSection")}</h2>
                 <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{animal.description}</p>
               </div>
@@ -288,7 +301,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
           {/* Details */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">{animal.name}</h1>
@@ -366,9 +379,9 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterSection")}</h2>
-              <Link href={`/shelters/${animal.shelter.slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <Link href={`/shelters/${animal.shelter.slug}`} className="-m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50">
                 <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-brand-50 flex items-center justify-center">
                   {animal.shelter.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -411,13 +424,13 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
         {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
-            <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="adopt">
+            <div className="lg:col-span-3 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
               <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
               <AdoptionBlock />
             </div>
             <div className="lg:col-span-2 space-y-4">
               {animal.shelter.adoptionRequirements && (
-                <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+                <div className="rounded-xl border border-brand-100 bg-brand-50 p-5">
                   <div className="mb-2.5 flex items-center gap-2">
                     <ClipboardList className="h-4 w-4 text-brand-600" />
                     <h2 className="text-sm font-semibold text-brand-800">{t("adoptionRequirements")}</h2>
@@ -426,7 +439,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
                 </div>
               )}
               {animal.shelter.documents.length > 0 && (
-                <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div className="rounded-xl border border-gray-200 bg-white p-5">
                   <div className="mb-3 flex items-center gap-2">
                     <FileText className="h-4 w-4 text-gray-500" />
                     <h2 className="text-sm font-semibold text-gray-700">{t("documentsSection")}</h2>
@@ -446,7 +459,7 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-tour="adopt">
+          <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
             <AdoptionBlock />
           </div>

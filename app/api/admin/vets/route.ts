@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geo";
+import { safeHttpUrl } from "@/lib/safe-url";
 
 const createSchema = z.object({
   name:         z.string().min(1).max(200),
@@ -12,7 +13,7 @@ const createSchema = z.object({
   zipCode:      z.string().max(20).optional().or(z.literal("")),
   phone:        z.string().max(40).optional().or(z.literal("")),
   email:        z.string().email().optional().or(z.literal("")),
-  website:      z.string().url().optional().or(z.literal("")),
+  website:      safeHttpUrl.optional().or(z.literal("")),
   openingHours: z.string().max(500).optional().or(z.literal("")),
   note:         z.string().max(1000).optional().or(z.literal("")),
   isEmergency:  z.boolean().optional(),

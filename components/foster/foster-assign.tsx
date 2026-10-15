@@ -50,7 +50,7 @@ export function FosterAssign({ animalId, currentFosterId, fosters }: Props) {
         </p>
       ) : (
         <select value={value} onChange={e => handleChange(e.target.value)} disabled={saving}
-          className="w-full max-w-sm rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 disabled:opacity-60">
+          className="w-full max-w-sm rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 disabled:opacity-60">
           <option value="">{t("assignNone")}</option>
           {fosters.map(f => (
             <option key={f.id} value={f.id}>{f.label}</option>

@@ -86,7 +86,7 @@ export default function FollowUpsPage() {
       {!loading && followUps.length > 0 && (
         <div className="mb-6 grid grid-cols-3 gap-3">
           {stats.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
+            <div key={label} className="rounded-xl border border-gray-200 bg-white p-4 text-center">
               <Icon className={`mx-auto mb-1 h-5 w-5 ${color}`} />
               <p className="text-2xl font-bold text-gray-800">{value}</p>
               <p className="text-xs text-gray-500">{label}</p>
@@ -98,11 +98,11 @@ export default function FollowUpsPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl bg-gray-100" />
+            <div key={i} className="h-24 animate-pulse rounded-xl bg-gray-100" />
           ))}
         </div>
       ) : followUps.length === 0 ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
           <ClipboardCheck className="mx-auto mb-3 h-10 w-10 text-gray-300" />
           <p className="font-medium text-gray-500">{t("empty")}</p>
           <p className="mt-1 text-sm text-gray-400">{t("emptyDesc")}</p>

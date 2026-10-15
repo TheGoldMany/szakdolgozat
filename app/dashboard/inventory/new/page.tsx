@@ -10,11 +10,12 @@ import { InventoryItemForm } from "@/components/inventory/inventory-item-form";
 
 export const metadata: Metadata = { title: "Új készlettétel" };
 
-export default async function NewInventoryItemPage({
-  searchParams,
-}: {
-  searchParams: { shelterId?: string };
-}) {
+export default async function NewInventoryItemPage(
+  props: {
+    searchParams: Promise<{ shelterId?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 
@@ -45,7 +46,7 @@ export default async function NewInventoryItemPage({
         {t("inventoryDetailBack")}
       </Link>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-6">
         <h1 className="mb-5 text-lg font-bold text-gray-900">{t("inventoryNewTitle")}</h1>
 
         {isSuperAdmin && !shelterId && shelters.length > 0 ? (

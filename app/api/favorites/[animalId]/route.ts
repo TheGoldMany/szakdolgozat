@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
 
 // DELETE /api/favorites/[animalId] – remove an animal from favorites
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { animalId: string } }
-) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ animalId: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 

@@ -18,7 +18,7 @@ export default async function FeedingPage() {
 
   if (!shelterId) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
+      <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400">
         {acting.canSwitch
           ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval az etetési rend kezeléséhez."
           : "Nincs menhelyhez rendelve fiókod."}

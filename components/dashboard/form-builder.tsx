@@ -171,7 +171,7 @@ export function FormBuilder({
   return (
     <div className="space-y-6">
       {/* Title & Description */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <h2 className="text-base font-semibold text-gray-900">{t("formBuilderSectionTitle")}</h2>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -182,7 +182,7 @@ export function FormBuilder({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("formBuilderNamePlaceholder")}
-            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
             disabled={!isDraft}
           />
         </div>
@@ -193,14 +193,14 @@ export function FormBuilder({
             onChange={(e) => setDescription(e.target.value)}
             placeholder={t("formBuilderDescPlaceholder")}
             rows={3}
-            className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
             disabled={!isDraft}
           />
         </div>
       </div>
 
       {/* Fields */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-900">{t("formBuilderFieldsTitle")}</h2>
           {isDraft && (
@@ -260,7 +260,7 @@ export function FormBuilder({
                     value={field.label}
                     onChange={(e) => updateField(i, { label: e.target.value })}
                     placeholder={t("formBuilderFieldLabelPlaceholder")}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
                     disabled={!isDraft}
                   />
                 </div>
@@ -269,7 +269,7 @@ export function FormBuilder({
                   <select
                     value={field.type}
                     onChange={(e) => updateField(i, { type: e.target.value as FieldType })}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 bg-white"
                     disabled={!isDraft}
                   >
                     {(Object.entries(FIELD_TYPE_LABELS) as [FieldType, string][]).map(([val, label]) => (
@@ -283,7 +283,7 @@ export function FormBuilder({
                       type="checkbox"
                       checked={field.required}
                       onChange={(e) => updateField(i, { required: e.target.checked })}
-                      className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                      className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-200"
                       disabled={!isDraft}
                     />
                     {t("formBuilderFieldRequired")}

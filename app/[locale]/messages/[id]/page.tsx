@@ -8,13 +8,15 @@ import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/chat-window";
 import { InviteSender } from "@/components/messages/invite-sender";
 import { getTranslations } from "next-intl/server";
+import { safeHref } from "@/lib/safe-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("messages");
   return { title: t("title") };
 }
 
-export default async function ConversationPage({ params }: { params: { id: string } }) {
+export default async function ConversationPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const [session, t] = await Promise.all([
     getServerSession(authOptions),
     getTranslations("messages"),
@@ -101,7 +103,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
         <div className="grid gap-4 lg:grid-cols-3">
 
           {/* Chat panel */}
-          <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col" style={{ height: "70vh" }}>
+          <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white overflow-hidden flex flex-col" style={{ height: "70vh" }}>
             <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                 {img ? (
@@ -147,12 +149,12 @@ export default async function ConversationPage({ params }: { params: { id: strin
               />
             )}
             {isShelterAdmin && !canSendInvite && approvedForms.length > 0 && (
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm text-sm text-gray-500">
+              <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">
                 Már létezik aktív kérvény ehhez a felhasználóhoz és állathoz.
               </div>
             )}
             {isConversationUser && (
-              <div className="rounded-2xl border border-brand-100 bg-brand-50 p-4 shadow-sm">
+              <div className="rounded-xl border border-brand-100 bg-brand-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">
                   Hogyan működik?
                 </p>
@@ -161,11 +163,11 @@ export default async function ConversationPage({ params }: { params: { id: strin
                 </p>
               </div>
             )}
-            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link
                 href={`/animals/${conversation.animal.slug}`}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                className="-m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50"
               >
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                   {img ? (
@@ -182,7 +184,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
               </Link>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-4">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterContact")}</h2>
               <Link
                 href={`/shelters/${conversation.shelter.slug}`}
@@ -211,7 +213,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                   </a>
                 )}
                 {conversation.shelter.website && (
-                  <a href={conversation.shelter.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-brand-500 hover:underline">
+                  <a href={safeHref(conversation.shelter.website)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-brand-500 hover:underline">
                     <Globe className="h-4 w-4 shrink-0" />
                     {t("website")}
                   </a>

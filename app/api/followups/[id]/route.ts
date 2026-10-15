@@ -3,18 +3,17 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createNotifications } from "@/lib/notifications";
 import { requireAuthUser } from "@/lib/api-auth";
+import { ownImageUrl } from "@/lib/image-url";
 
 const schema = z.object({
   wellbeing: z.number().int().min(1).max(5),
   notes:     z.string().max(2000).optional(),
-  photoUrl:  z.string().url().optional(),
+  photoUrl:  ownImageUrl.optional(),
 });
 
 // PATCH /api/followups/[id] – user submits a follow-up response
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 

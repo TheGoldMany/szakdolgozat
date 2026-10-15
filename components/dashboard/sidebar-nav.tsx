@@ -121,7 +121,7 @@ export function SidebarNav({ role }: { role: string }) {
         type="button"
         onClick={() => setOpen(v => !v)}
         aria-expanded={open}
-        className="mb-3 flex w-full items-center gap-2.5 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm transition-colors hover:bg-gray-50 lg:hidden"
+        className="mb-3 flex w-full items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 lg:hidden"
       >
         <CurrentIcon className="h-4 w-4 shrink-0 text-brand-500" />
         <span className="min-w-0 flex-1 truncate text-left">
@@ -130,7 +130,7 @@ export function SidebarNav({ role }: { role: string }) {
         <ChevronDown className={cn("h-4 w-4 shrink-0 text-gray-400 transition-transform", open && "rotate-180")} />
       </button>
 
-    <nav className={cn("rounded-2xl border border-gray-200 bg-white p-3 shadow-sm lg:block", !open && "hidden")}>
+    <nav className={cn("rounded-xl border border-gray-200 bg-white p-3 lg:block", !open && "hidden")}>
       {groups.map((group, gi) => (
         <div key={gi} className={cn(gi > 0 && "mt-4")} data-tour={group.tourKey}>
           {group.titleKey && (

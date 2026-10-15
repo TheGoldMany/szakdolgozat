@@ -13,11 +13,12 @@ function formatHUF(amount: number) {
   return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
   // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
   // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
@@ -50,11 +51,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function CampaignDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function CampaignDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 
@@ -97,17 +99,16 @@ export default async function CampaignDetailPage({
     <div className="min-h-screen bg-gray-50">
 
       {/* Campaign image / gradient header */}
-      <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-brand-400 to-brand-700 sm:h-72">
+      <div className="relative h-56 w-full overflow-hidden bg-brand-700 sm:h-72">
         {campaign.imageUrl && (
           <Image
             src={campaign.imageUrl}
             alt={campaign.title}
             fill
-            className="object-cover opacity-80"
+            className="object-cover"
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
@@ -160,7 +161,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Description */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("aboutCampaign")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
                 {campaign.description}
@@ -168,7 +169,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Recent donations */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-4 text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-400" />
                 {t("recentDonations")}
@@ -184,7 +185,7 @@ export default async function CampaignDetailPage({
                           {d.isAnonymous ? t("anonymousDonor") : (d.user?.name ?? t("anonymous"))}
                         </p>
                         {d.message && (
-                          <p className="mt-0.5 text-xs italic text-gray-500 line-clamp-2">
+                          <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">
                             "{d.message}"
                           </p>
                         )}
@@ -205,7 +206,7 @@ export default async function CampaignDetailPage({
 
             {/* Progress card – az állandó gyűjtésnek nincs célösszege, ott csak
                 az eddig összegyűlt összeg jelenik meg, haladásjelző nélkül. */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <div className="mb-1 flex items-end justify-between">
                 <span className="text-2xl font-bold text-brand-600">{formatHUF(campaign.raisedAmount)}</span>
                 {!campaign.isGeneral && (
@@ -231,7 +232,7 @@ export default async function CampaignDetailPage({
             </div>
 
             {/* Donate form */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-4 text-base font-semibold text-gray-900">{t("donateNow")}</h2>
               <DonateForm
                 campaignId={campaign.id}

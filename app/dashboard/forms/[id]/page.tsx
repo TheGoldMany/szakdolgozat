@@ -9,7 +9,8 @@ import { FormBuilder } from "@/components/dashboard/form-builder";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Sablon szerkesztése" };
 
-export default async function EditFormPage({ params }: { params: { id: string } }) {
+export default async function EditFormPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/forms");
   if (session.user.role !== "SHELTER_ADMIN") redirect("/dashboard");

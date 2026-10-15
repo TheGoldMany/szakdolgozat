@@ -39,7 +39,7 @@ export default async function AppointmentsPage() {
         </div>
 
         {serialized.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
             <CalendarDays className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-500">Még nincs időpontod</p>
             <p className="mt-1 text-sm text-gray-400">Látogass meg egy állatot, és kérj időpontot a menhelynél.</p>

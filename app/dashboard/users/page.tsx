@@ -128,13 +128,13 @@ export default function DashboardUsersPage() {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             placeholder={t("usersSearchPlaceholder")}
-            className="w-full rounded-xl border border-gray-200 pl-9 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-gray-200 pl-9 pr-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-          className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         >
           <option value="">{t("usersAllRoles")}</option>
           <option value="USER">{t("usersRoleUser")}</option>
@@ -143,7 +143,7 @@ export default function DashboardUsersPage() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
@@ -205,7 +205,7 @@ export default function DashboardUsersPage() {
                           value={user.role}
                           onChange={(e) => changeRole(user.id, e.target.value)}
                           className={cn(
-                            "cursor-pointer rounded-lg border border-transparent px-2 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500",
+                            "cursor-pointer rounded-lg border border-transparent px-2 py-1 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-200",
                             meta.color
                           )}
                         >
@@ -266,7 +266,7 @@ export default function DashboardUsersPage() {
       {/* Törlés megerősítő dialógus */}
       {confirmDelete && (
         <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="animate-modal w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="animate-modal w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
                 <AlertTriangle className="h-5 w-5 text-red-600" />

@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -84,7 +83,7 @@ export default async function DonatePage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-brand-500 to-brand-700 py-16 px-4 text-center text-white">
+      <div className="bg-brand-700 py-16 px-4 text-center text-white">
         <div className="mx-auto max-w-2xl">
           <Heart className="mx-auto mb-4 h-10 w-10 opacity-90" />
           <h1 className="text-3xl font-bold sm:text-4xl">{t("title")}</h1>
@@ -105,7 +104,7 @@ export default async function DonatePage() {
         <section>
           <h2 className="mb-5 text-xl font-bold text-gray-900">{t("campaigns")}</h2>
           {campaigns.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
               <Heart className="h-10 w-10 text-gray-300" />
               <p className="mt-3 text-sm text-gray-500">{t("noCampaigns")}</p>
               <Link
@@ -116,7 +115,7 @@ export default async function DonatePage() {
               </Link>
             </div>
           ) : (
-            <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {campaigns.map((c) => (
                 <CampaignCard
                   key={c.id}
@@ -126,7 +125,7 @@ export default async function DonatePage() {
                   }}
                 />
               ))}
-            </Reveal>
+            </div>
           )}
         </section>
 

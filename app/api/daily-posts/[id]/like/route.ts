@@ -3,7 +3,8 @@ import { requireAuthUser } from "@/lib/api-auth";
 import { toggleLike } from "@/lib/daily-posts";
 
 /** POST /api/daily-posts/[id]/like – kedvelés be/ki. */
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 

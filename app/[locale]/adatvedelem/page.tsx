@@ -97,7 +97,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         items: [
           `Data controller: ${CONTROLLER_NAME}`,
           `Contact: ${CONTROLLER_EMAIL}`,
-          "Registered in Hungary — Hungarian law applies.",
+          "Registered in Hungary: Hungarian law applies.",
         ],
       },
       {
@@ -106,8 +106,8 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         items: [
           "Account data: email address, display name, profile picture (optional), account creation date.",
           "Google OAuth tokens if you sign in with Google (no password stored in that case).",
-          "Adoption application answers — collected on behalf of the shelter, which acts as data controller for this data.",
-          "Payment transaction IDs, amounts, and statuses — we never store card details (Stripe handles that).",
+          "Adoption application answers: collected on behalf of the shelter, which acts as data controller for this data.",
+          "Payment transaction IDs, amounts, and statuses; we never store card details (Stripe handles that).",
         ],
       },
       {
@@ -115,7 +115,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         heading: "Payment data & Stripe",
         items: [
           "All card data is handled exclusively by Stripe, Inc., which is certified to PCI DSS Level 1.",
-          "We only store the transaction IDs returned by Stripe — never your card number, CVV, or expiry date.",
+          "We only store the transaction IDs returned by Stripe; never your card number, CVV, or expiry date.",
           "Stripe's privacy policy: stripe.com/privacy",
         ],
       },
@@ -144,17 +144,17 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "6",
         heading: "Data processors",
         items: [
-          "Stripe, Inc. — payment processing (USA, EU–US Data Privacy Framework, PCI DSS L1).",
-          "Google LLC — OAuth sign-in (USA, EU–US Data Privacy Framework).",
-          "Vercel Inc. — application hosting (USA, EU–US Data Privacy Framework).",
-          "Shelters — adoption application data (EU, Hungary) — shelters act as independent data controllers.",
+          "Stripe, Inc.: payment processing (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC: OAuth sign-in (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc.: application hosting (USA, EU–US Data Privacy Framework).",
+          "Shelters: adoption application data (EU, Hungary); shelters act as independent data controllers.",
         ],
       },
       {
         number: "7",
         heading: "Supervisory authority",
         items: [
-          "Hungarian authority: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "Hungarian authority: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság): naih.hu / ugyfelszolgalat@naih.hu",
           "EU residents may also lodge a complaint with the data protection authority in their own member state.",
         ],
       },
@@ -192,8 +192,8 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         items: [
           "Kontodaten: E-Mail-Adresse, Anzeigename, Profilbild (optional), Erstellungsdatum des Kontos.",
           "Google-OAuth-Token bei Anmeldung mit Google (kein Passwort wird in diesem Fall gespeichert).",
-          "Antworten auf Adoptionsanträge — im Auftrag des Tierheims erhoben, das als Verantwortlicher für diese Daten gilt.",
-          "Zahlungstransaktions-IDs, Beträge und Status — wir speichern niemals Kartendaten (das übernimmt Stripe).",
+          "Antworten auf Adoptionsanträge: im Auftrag des Tierheims erhoben, das als Verantwortlicher für diese Daten gilt.",
+          "Zahlungstransaktions-IDs, Beträge und Status; wir speichern niemals Kartendaten (das übernimmt Stripe).",
         ],
       },
       {
@@ -201,7 +201,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         heading: "Zahlungsdaten & Stripe",
         items: [
           "Alle Kartendaten werden ausschließlich von Stripe, Inc. verarbeitet, das nach PCI DSS Level 1 zertifiziert ist.",
-          "Wir speichern nur die von Stripe zurückgegebenen Transaktions-IDs — niemals Ihre Kartennummer, CVV oder das Ablaufdatum.",
+          "Wir speichern nur die von Stripe zurückgegebenen Transaktions-IDs; niemals Ihre Kartennummer, CVV oder das Ablaufdatum.",
           "Datenschutzrichtlinie von Stripe: stripe.com/privacy",
         ],
       },
@@ -230,17 +230,17 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "6",
         heading: "Auftragsverarbeiter",
         items: [
-          "Stripe, Inc. — Zahlungsabwicklung (USA, EU–US Data Privacy Framework, PCI DSS L1).",
-          "Google LLC — OAuth-Anmeldung (USA, EU–US Data Privacy Framework).",
-          "Vercel Inc. — Anwendungshosting (USA, EU–US Data Privacy Framework).",
-          "Tierheime — Adoptionsantragsdaten (EU, Ungarn) — Tierheime handeln als eigenständige Verantwortliche.",
+          "Stripe, Inc.: Zahlungsabwicklung (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC: OAuth-Anmeldung (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc.: Anwendungshosting (USA, EU–US Data Privacy Framework).",
+          "Tierheime: Adoptionsantragsdaten (EU, Ungarn); Tierheime handeln als eigenständige Verantwortliche.",
         ],
       },
       {
         number: "7",
         heading: "Aufsichtsbehörde",
         items: [
-          "Ungarische Behörde: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "Ungarische Behörde: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság): naih.hu / ugyfelszolgalat@naih.hu",
           "EU-Einwohner können auch bei der Datenschutzbehörde ihres eigenen Mitgliedstaates Beschwerde einlegen.",
         ],
       },
@@ -269,7 +269,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         items: [
           `Administrator: ${CONTROLLER_NAME}`,
           `Kontakt: ${CONTROLLER_EMAIL}`,
-          "Zarejestrowany na Węgrzech — stosuje się prawo węgierskie.",
+          "Zarejestrowany na Węgrzech: stosuje się prawo węgierskie.",
         ],
       },
       {
@@ -278,8 +278,8 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         items: [
           "Dane konta: adres e-mail, nazwa wyświetlana, zdjęcie profilowe (opcjonalne), data utworzenia konta.",
           "Tokeny Google OAuth przy logowaniu przez Google (w tym przypadku hasło nie jest przechowywane).",
-          "Odpowiedzi we wnioskach adopcyjnych — zbierane w imieniu schroniska, które jest administratorem tych danych.",
-          "Identyfikatory transakcji płatniczych, kwoty i statusy — nigdy nie przechowujemy danych karty (zajmuje się tym Stripe).",
+          "Odpowiedzi we wnioskach adopcyjnych: zbierane w imieniu schroniska, które jest administratorem tych danych.",
+          "Identyfikatory transakcji płatniczych, kwoty i statusy; nigdy nie przechowujemy danych karty (zajmuje się tym Stripe).",
         ],
       },
       {
@@ -287,7 +287,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         heading: "Dane płatnicze i Stripe",
         items: [
           "Wszystkie dane karty są przetwarzane wyłącznie przez Stripe, Inc., certyfikowany na poziomie PCI DSS Level 1.",
-          "Przechowujemy tylko identyfikatory transakcji zwrócone przez Stripe — nigdy numer karty, CVV ani datę ważności.",
+          "Przechowujemy tylko identyfikatory transakcji zwrócone przez Stripe; nigdy numer karty, CVV ani datę ważności.",
           "Polityka prywatności Stripe: stripe.com/privacy",
         ],
       },
@@ -316,17 +316,17 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "6",
         heading: "Podmioty przetwarzające",
         items: [
-          "Stripe, Inc. — przetwarzanie płatności (USA, EU–US Data Privacy Framework, PCI DSS L1).",
-          "Google LLC — logowanie OAuth (USA, EU–US Data Privacy Framework).",
-          "Vercel Inc. — hosting aplikacji (USA, EU–US Data Privacy Framework).",
-          "Schroniska — dane wniosków adopcyjnych (UE, Węgry) — schroniska działają jako niezależni administratorzy.",
+          "Stripe, Inc.: przetwarzanie płatności (USA, EU–US Data Privacy Framework, PCI DSS L1).",
+          "Google LLC: logowanie OAuth (USA, EU–US Data Privacy Framework).",
+          "Vercel Inc.: hosting aplikacji (USA, EU–US Data Privacy Framework).",
+          "Schroniska: dane wniosków adopcyjnych (UE, Węgry); schroniska działają jako niezależni administratorzy.",
         ],
       },
       {
         number: "7",
         heading: "Organ nadzorczy",
         items: [
-          "Organ węgierski: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság) — naih.hu / ugyfelszolgalat@naih.hu",
+          "Organ węgierski: NAIH (Nemzeti Adatvédelmi és Információszabadság Hatóság): naih.hu / ugyfelszolgalat@naih.hu",
           "Mieszkańcy UE mogą również złożyć skargę do organu ochrony danych we własnym państwie członkowskim.",
         ],
       },
@@ -352,10 +352,10 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
               <Shield className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
-                {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
-              </p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{content.title}</h1>
+              {/* Nem nagybetűs „felirat" a cím fölött, hanem tény a cím alatt: az
+                  olvasónak azt kell tudnia, hogy ez kivonat. */}
+              <p className="mt-1 text-sm text-gray-500">{content.legalLabel}, {content.summaryBadge.toLowerCase()}</p>
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-500">
@@ -365,7 +365,7 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
             <span>
@@ -402,7 +402,13 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
   );
 }
 
-export default function AdatvedelemPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function AdatvedelemPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   if (locale !== "hu") {
     return <AdatvedelemSummaryPage locale={locale} />;
   }
@@ -418,7 +424,6 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
               <Shield className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">Jogi dokumentum</p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Adatvédelmi tájékoztató</h1>
             </div>
           </div>
@@ -427,7 +432,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
           </p>
 
           {/* TOC */}
-          <nav className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-4">
+          <nav className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-5 py-4">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Tartalom</p>
             <ol className="space-y-1.5 text-sm text-brand-600">
               {[
@@ -455,7 +460,7 @@ export default function AdatvedelemPage({ params: { locale } }: { params: { loca
 
       {/* Content */}
       <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
-        <div className="rounded-2xl border border-gray-200 bg-white px-6 py-8 shadow-sm sm:px-10">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
 
           <P>
             Az <strong>{CONTROLLER_NAME}</strong> (a továbbiakban: „Platform", „mi") elkötelezett a felhasználók

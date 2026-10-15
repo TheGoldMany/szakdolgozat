@@ -27,14 +27,14 @@ function TourIndex() {
   const tours = listedTours();
 
   return (
-    <section id="bemutatok" className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <section id="bemutatok" className="mt-10 rounded-xl border border-gray-200 bg-white p-6">
       <div className="mb-1 flex items-center gap-2">
         <Compass className="h-5 w-5 text-brand-600" />
         <h2 className="text-lg font-bold text-gray-900">Végigvezető bemutatók</h2>
       </div>
       <p className="mb-5 text-sm text-gray-500">
         Minden fontosabb oldalon indul egy rövid bemutató az első látogatáskor.
-        Itt bármelyiket újranézheted — a fejlécben lévő <HelpCircle className="inline h-3.5 w-3.5 align-text-bottom" />{" "}
+        Itt bármelyiket újranézheted: a fejlécben lévő <HelpCircle className="inline h-3.5 w-3.5 align-text-bottom" />{" "}
         gombbal pedig mindig az éppen nyitott oldalét indíthatod el.
       </p>
 
@@ -125,7 +125,7 @@ function Section({ id, icon: Icon, title, color, children }: {
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <div className={cn("mb-5 flex items-center gap-3 rounded-2xl px-5 py-4", color)}>
+      <div className={cn("mb-5 flex items-center gap-3 rounded-xl px-5 py-4", color)}>
         <Icon className="h-5 w-5 shrink-0" />
         <h2 className="text-lg font-bold">{title}</h2>
       </div>
@@ -164,7 +164,7 @@ function Note({ type = "info", children }: { type?: "info" | "warn" | "tip"; chi
 
 function QuickLink({ icon: Icon, label, href }: { icon: React.ElementType; label: string; href: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm hover:border-brand-200 hover:shadow-md transition-all">
+    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 hover:border-brand-200 hover:shadow-md transition-all">
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50">
           <Icon className="h-4 w-4 text-brand-600" />
@@ -393,7 +393,7 @@ function UserContent() {
           </Step>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Mennyi jut el a menhelyhez?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             <strong>A teljes szánt összeg.</strong> A platform díja és a bankkártyás feldolgozás
@@ -401,9 +401,9 @@ function UserContent() {
             támogató fizeti. Egy 10 000 Ft-os adománynál ez így néz ki:
           </p>
           <ul className="mt-2 space-y-1 text-sm text-gray-600">
-            <li>Adomány a menhelynek — <strong>10 000 Ft</strong></li>
-            <li>Platform díj (5%) — 500 Ft</li>
-            <li>Feldolgozási díj — a bankkártyás tranzakció költsége</li>
+            <li>Adomány a menhelynek: <strong>10 000 Ft</strong></li>
+            <li>Platform díj (5%): 500 Ft</li>
+            <li>Feldolgozási díj: a bankkártyás tranzakció költsége</li>
           </ul>
           <p className="mt-2 text-sm leading-relaxed text-gray-600">
             A menhely mindebből pontosan a <strong>10 000 Ft-ot</strong> kapja meg. A díjakat a
@@ -437,7 +437,7 @@ function UserContent() {
             is megjelenik ez a lehetőség.
           </Step>
         </div>
-        <Note type="info">Ha egy kedvenc állat státusza megváltozik (pl. örökbe fogadták), az továbbra is látható a listában — így mindig nyomon követheted a korábban megjelölt állatokat.</Note>
+        <Note type="info">Ha egy kedvenc állat státusza megváltozik (pl. örökbe fogadták), az továbbra is látható a listában, így mindig nyomon követheted a korábban megjelölt állatokat.</Note>
         <QuickLink icon={Heart} label="Kedvenceim" href="/favorites" />
       </Section>
 
@@ -465,7 +465,7 @@ function UserContent() {
             amit a menhely nyilvántart a visszatérítéshez.
           </Step>
         </div>
-        <Note type="tip">Egy fiókkal több menhelyen is lehetsz ideiglenes befogadó — minden menhelynél külön profil és státusz jön létre.</Note>
+        <Note type="tip">Egy fiókkal több menhelyen is lehetsz ideiglenes befogadó, minden menhelynél külön profil és státusz jön létre.</Note>
         <QuickLink icon={Home} label="Ideiglenes befogadásaim" href="/foster" />
       </Section>
 
@@ -505,18 +505,18 @@ function UserContent() {
           bejelentéseit, a menhelyeket és az <strong>állatorvosi rendelőket</strong> – köztük a
           24 órás ügyeleteket.
         </p>
-        <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Hogyan olvasd a jelölőket?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             Minden jelölő két dolgot mond el egyszerre: a <strong>szín</strong> a kategóriát,
             a benne lévő <strong>ikon</strong> a tartalmat.
           </p>
           <ul className="mt-2 space-y-1 text-sm text-gray-600">
-            <li><strong>Piros / zöld / narancs csepp</strong> — elveszett, megtalált, kóbor bejelentés;
+            <li><strong>Piros / zöld / narancs csepp</strong>: elveszett, megtalált, kóbor bejelentés;
                 az ikon a fajt mutatja (kutya, macska, mancs)</li>
-            <li><strong>Kék ház szívvel</strong> — menhely</li>
-            <li><strong>Lila kereszt</strong> — állatorvosi rendelő</li>
-            <li><strong>Piros EKG-jel</strong> — 24 órás ügyelet</li>
+            <li><strong>Kék ház szívvel</strong>: menhely</li>
+            <li><strong>Lila kereszt</strong>: állatorvosi rendelő</li>
+            <li><strong>Piros EKG-jel</strong>: 24 órás ügyelet</li>
           </ul>
         </div>
         <div className="space-y-4 mt-3">
@@ -629,8 +629,8 @@ function AdminContent() {
           </Step>
           <Step n={5} title="Szerkesztés és törlés">
             Bármely adat (leírás, fotók, egészségügyi adatok) szerkeszthető az állat részletoldalán a <strong>„Szerkesztés”</strong> gombbal.
-            Törléskor az állat eltűnik a publikus listáról és a kapcsolódó kérelmek is törlődnek —
-            örökbe fogadott állatnál inkább archivált státuszt alkalmazz.
+            Törléskor az állat eltűnik a publikus listáról és a kapcsolódó kérelmek is törlődnek.
+            Örökbe fogadott állatnál inkább archivált státuszt alkalmazz.
           </Step>
         </div>
         <Note type="tip">A jó leírás és minőségi fotók szignifikánsan növelik az örökbefogadás esélyét.</Note>
@@ -652,7 +652,7 @@ function AdminContent() {
             (szöveges mezők, fájl feltöltés). A sablon jóváhagyás után rendelhető hozzá állathoz.
           </Step>
           <Step n={4} title="Meghívó link küldése">
-            Kérelem részletesén küldhetsz meghívó linket közvetlenül egy érdeklődőnek —
+            Kérelem részletesén küldhetsz meghívó linket közvetlenül egy érdeklődőnek;
             a link automatikus kérelmet nyit meg a megadott állathoz.
           </Step>
           <Step n={5} title="Kérvény sablon szerkesztése és törlése">
@@ -676,10 +676,10 @@ function AdminContent() {
           </Step>
           <Step n={3} title="Lemondás és lezárás">
             Ha az időpont megtörtént, jelöld <Badge label="Teljesítve" color="bg-blue-100 text-blue-700" /> státuszba.
-            Lemondható az időpont is — ebben az esetben adj indoklást (a felhasználó megkapja üzenetben).
+            Lemondható az időpont is, ebben az esetben adj indoklást (a felhasználó megkapja üzenetben).
           </Step>
         </div>
-        <Note type="warn">A visszaigazolt időpontok után a felhasználó kötelező érvényűnek tekinti — ha le kell mondani, értesítsd időben.</Note>
+        <Note type="warn">A visszaigazolt időpontok után a felhasználó kötelező érvényűnek tekinti. Ha le kell mondani, értesítsd időben.</Note>
       </Section>
 
       {/* Önkéntesek */}
@@ -724,9 +724,9 @@ function AdminContent() {
           <Step n={2} title="Mozgás rögzítése (IN / OUT / ADJUST)">
             A tétel sorában kattints a <strong>„Mozgás”</strong> gombra, vagy nyisd meg a részleteket:
             <ul className="mt-2 ml-3 space-y-1 text-xs text-gray-500 list-disc">
-              <li><span className="flex items-center gap-1 inline-flex"><ArrowDownCircle className="h-3.5 w-3.5 text-green-500" /> <strong>Bevételezés (IN)</strong></span> — készletre vett mennyiség (pl. szállítmány érkezett)</li>
-              <li><span className="flex items-center gap-1 inline-flex"><ArrowUpCircle className="h-3.5 w-3.5 text-red-500" /> <strong>Felhasználás (OUT)</strong></span> — kivett mennyiség (pl. heti adagolás); ha kevesebb a készlet, mint a kivét, a rendszer hibaüzenetet ad</li>
-              <li><span className="flex items-center gap-1 inline-flex"><RotateCcw className="h-3.5 w-3.5 text-blue-500" /> <strong>Leltári korrekció (ADJUST)</strong></span> — beállítja a tényleges darabszámot; a rendszer kiszámolja az eltérést</li>
+              <li><span className="flex items-center gap-1 inline-flex"><ArrowDownCircle className="h-3.5 w-3.5 text-green-500" /> <strong>Bevételezés (IN)</strong></span>: készletre vett mennyiség (pl. szállítmány érkezett)</li>
+              <li><span className="flex items-center gap-1 inline-flex"><ArrowUpCircle className="h-3.5 w-3.5 text-red-500" /> <strong>Felhasználás (OUT)</strong></span>: kivett mennyiség (pl. heti adagolás); ha kevesebb a készlet, mint a kivét, a rendszer hibaüzenetet ad</li>
+              <li><span className="flex items-center gap-1 inline-flex"><RotateCcw className="h-3.5 w-3.5 text-blue-500" /> <strong>Leltári korrekció (ADJUST)</strong></span>: beállítja a tényleges darabszámot; a rendszer kiszámolja az eltérést</li>
             </ul>
           </Step>
           <Step n={3} title="Riasztások értelmezése">
@@ -794,7 +794,7 @@ function AdminContent() {
           </Step>
           <Step n={2} title="Esedékes utánkövetések">
             Dashboard → Utánkövetések. Látod az összes esedékes, teljesített és lejárt utánkövetést.
-            A lejártak piros jelzéssel kiemeltek — emlékeztetheted a felhasználót üzenet küldésével.
+            A lejártak piros jelzéssel kiemeltek; emlékeztetheted a felhasználót üzenet küldésével.
           </Step>
           <Step n={3} title="Kitöltött kérdőívek megtekintése">
             Utánkövetés sorában kattints a részletekre. Látod a közérzet-értékelést (1–5 csillag),
@@ -821,7 +821,7 @@ function AdminContent() {
             <strong>eseményt</strong> vagy <strong>gyűjtést</strong>. A csatolt kártya a cikk végén kattintható.
           </Step>
           <Step n={2} title="Piszkozat, publikálás, szerkesztés">
-            A cikk elmenthető piszkozatként — az még nem látszik a látogatóknak. Publikálás után
+            A cikk elmenthető piszkozatként, ez még nem látszik a látogatóknak. Publikálás után
             bármikor szerkeszthető, visszavonható piszkozatba, vagy törölhető.
           </Step>
           <Step n={3} title="Időzítés">
@@ -889,7 +889,7 @@ function AdminContent() {
           </Step>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Mit kap meg a menhely?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             <strong>A támogató által szánt teljes összeget.</strong> A platform 5%-os díja és a
@@ -941,7 +941,7 @@ function AdminContent() {
             Csatlakoztatás → Stripe onboarding felületen add meg a bankszámlát és cégadatokat.
           </Step>
           <Step n={4} title="Kapacitás beállítás">
-            Add meg a menhely tényleges férőhelyei számát — ez jelenik meg a kapacitáskihasználtság panelen (UC-02).
+            Add meg a menhely tényleges férőhelyei számát, ez jelenik meg a kapacitáskihasználtság panelen (UC-02).
           </Step>
         </div>
         <QuickLink icon={Settings} label="Menhely beállítások" href="/dashboard/settings" />
@@ -995,7 +995,7 @@ function AdminContent() {
           </Step>
           <Step n={4} title="Szerkesztés és törlés">
             A kennel neve, típusa és kapacitása szerkeszthető a kennel részletoldalán.
-            Törlés előtt minden hozzárendelt állatot el kell mozgatni — üres, karbantartáson kívüli kennel törölhető.
+            Törlés előtt minden hozzárendelt állatot el kell mozgatni. Üres, karbantartáson kívüli kennel törölhető.
           </Step>
         </div>
         <Note type="info">A kennelek karbantartásba helyezhetők (maintenance state), ami ideiglenesen kizárja őket a kapacitásból.</Note>
@@ -1054,11 +1054,11 @@ function AdminContent() {
             regisztrált résztvevőt (pl. helyszínváltozás esetén).
           </Step>
           <Step n={4} title="Esemény lezárása">
-            Az esemény után zárhatod le azt — a regisztrációk archiválódnak, a résztvevői lista megmarad.
+            Az esemény után zárhatod le: a regisztrációk archiválódnak, a résztvevői lista megmarad.
           </Step>
           <Step n={5} title="Szerkesztés és törlés">
             Az esemény részletei (leírás, időpont, helyszín, maximális létszám) szerkeszthetők mindaddig,
-            amíg az esemény le nincs zárva. Törlés esetén az összes regisztráció is törlődik —
+            amíg az esemény le nincs zárva. Törlés esetén az összes regisztráció is törlődik,
             a résztvevők automatikus értesítést kapnak a lemondásról.
           </Step>
         </div>
@@ -1122,7 +1122,7 @@ function SuperAdminContent() {
           </Step>
           <Step n={2} title="Kampány jóváhagyása">
             Ha van PENDING kampány, az oldal alján megjelenik a jóváhagyás panel.
-            Olvasd el a leírást és a célösszeget. Kattints az <strong>„Elfogad”</strong> gombra —
+            Olvasd el a leírást és a célösszeget. Kattints az <strong>„Elfogad”</strong> gombra, és
             a kampány ACTIVE státuszba kerül és azonnal megjelenik a nyilvános Támogatás oldalon.
             A menhely adminisztrátor értesítést kap.
           </Step>
@@ -1153,7 +1153,7 @@ function SuperAdminContent() {
       <Section id="s-csomagok" icon={CheckCircle2} title="Előfizetési csomagok áttekintése" color="bg-emerald-50 text-emerald-800">
         <p className="text-sm text-gray-600 leading-relaxed">
           A Super Admin read-only nézetben látja az összes menhely összes havi támogatói csomagját.
-          Ez az oldal nem szerkeszthető — a csomagokat a menhely adminisztrátorok kezelik a saját dashboardjukon.
+          Ez az oldal nem szerkeszthető, a csomagokat a menhely adminisztrátorok kezelik a saját dashboardjukon.
         </p>
         <div className="space-y-4 mt-3">
           <Step n={1} title="Csomagok áttekintése">
@@ -1313,7 +1313,7 @@ export default function HelpPage() {
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12 sm:px-6 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand-600">
             <PawPrint className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Ismerd meg a platformot</h1>
@@ -1322,14 +1322,14 @@ export default function HelpPage() {
           </p>
 
           {/* Tab selector */}
-          <div className="mt-6 inline-flex gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
+          <div className="mt-6 inline-flex gap-2 rounded-xl border border-gray-200 bg-white p-1.5">
             {visibleTabs.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
                   "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all",
-                  activeTab === t.id ? t.color + " border shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  activeTab === t.id ? t.color + " border" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <t.icon className="h-4 w-4" />
@@ -1345,7 +1345,7 @@ export default function HelpPage() {
 
           {/* Sticky TOC */}
           <aside className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Tartalom</p>
               <nav className="space-y-0.5">
                 {toc.map(({ id, label, icon: Icon }) => (
@@ -1370,7 +1370,7 @@ export default function HelpPage() {
             <TourIndex />
 
             {/* Footer CTA */}
-            <div className="mt-10 rounded-2xl bg-brand-600 p-8 text-center text-white">
+            <div className="mt-10 rounded-xl bg-brand-600 p-8 text-center text-white">
               <h3 className="text-xl font-bold">Nem találtad meg a választ?</h3>
               <p className="mt-2 text-sm text-brand-100">Írj nekünk és segítünk!</p>
               <a href="mailto:info@allatimenhelyek.hu"

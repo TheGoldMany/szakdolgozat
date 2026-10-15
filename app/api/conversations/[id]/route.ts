@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/api-auth";
 
 // GET /api/conversations/[id] – get full conversation with messages
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getAuthUser(req);
   if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

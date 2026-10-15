@@ -11,10 +11,8 @@ const schema = z.object({
 });
 
 // POST /api/volunteers/[id]/attendance – admin logs hours
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
@@ -50,10 +48,8 @@ export async function POST(
 }
 
 // GET /api/volunteers/[id]/attendance – list attendance for a volunteer
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

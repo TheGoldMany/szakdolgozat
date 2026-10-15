@@ -13,7 +13,8 @@ const patchSchema = z.object({ action: z.enum(["accept", "decline"]) });
  * Ezért a „nem sikerült" itt 409, nem 403 — vagy nem miénk a jelölés, vagy
  * valaki (akár mi, másik fülön) már válaszolt rá.
  */
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
@@ -39,7 +40,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
  * DELETE /api/connections/[id] – kapcsolat megszüntetése vagy a saját,
  * még el nem fogadott jelölés visszavonása. Mindkét fél kiléphet.
  */
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
