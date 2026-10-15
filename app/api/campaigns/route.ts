@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 import { createNotifications } from "@/lib/notifications";
 import { blockIfSuspended } from "@/lib/account-status";
+import { paymentsDisabled } from "@/lib/payments-guard";
 function slugify(text: string) {
   return text
     .toLowerCase()
@@ -29,6 +30,10 @@ const createSchema = z.object({
 
 // GET /api/campaigns – list ACTIVE campaigns
 export async function GET(_req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   try {
     const campaigns = await prisma.campaign.findMany({
       where:   { status: "ACTIVE", isGeneral: false },
@@ -48,6 +53,10 @@ export async function GET(_req: NextRequest) {
 
 // POST /api/campaigns – create campaign (auth required)
 export async function POST(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

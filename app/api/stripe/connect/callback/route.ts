@@ -3,11 +3,16 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 // GET /api/stripe/connect/callback?type=shelter&shelterId=... | ?type=user
 export async function GET(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.redirect(`${BASE}/auth/login`);

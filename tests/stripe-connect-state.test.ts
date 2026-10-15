@@ -21,6 +21,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  *   nem „inaccessible" — hamis riasztás rosszabb, mint a bizonytalanság.
  */
 
+// Ez a teszt MAGÁT a fizetési funkciót vizsgálja, ezért bekapcsolt
+// kapcsolóval kell futnia — különben a végpontok helyesen 404-et adnának, és
+// a teszt nem a Stripe-logikát mérné, hanem a kapcsolót.
+// A beállítás az import ELŐTT kell: a végpont a modul betöltésekor hozza be a
+// kaput, és a hívás pillanatában olvassa az env-et.
+process.env.NEXT_PUBLIC_PAYMENTS_ENABLED = "true";
+
 const retrieve = vi.fn();
 const createAccount = vi.fn();
 
@@ -304,11 +311,22 @@ describe("createConnectedAccount", () => {
     // 1. A legacy mező NEM mehet: pontosan ezt utasította el a Stripe.
     expect(params).not.toHaveProperty("type");
 
-    // 2. Amit a Stripe követelt: a veszteséget ő viseli, nem a platform.
-    expect(params.controller.losses.payments).toBe("stripe");
+    // 2. Express felülethez a Stripe KÖVETELI, hogy a veszteséget a platform
+    //    viselje: "With a dashboard type of `express`, the Connect application
+    //    must control losses." Ez a projekt eddigi működése is: destination
+    //    charge-nál a visszaterhelés a platform egyenlegét üti.
+    expect(params.controller.losses.payments).toBe("application");
 
-    // 3. A menhely ugyanazt az Express felületet kapja, mint eddig.
+    // 3. A menhely ugyanazt az Express felületet kapja, mint eddig. Ez nem
+    //    kozmetika: a „Stripe fiók kezelése" gomb createLoginLink-je CSAK
+    //    Express felülettel működik.
     expect(params.controller.stripe_dashboard.type).toBe("express");
+
+    // 2+3 együtt: a két mező egymást feltételezi. Ha valaki a jövőben
+    //    `losses: "stripe"`-ra írná át, az Express felülettel együtt a Stripe
+    //    elutasítja — élesben pontosan ez történt.
+    expect([params.controller.stripe_dashboard.type, params.controller.losses.payments])
+      .toEqual(["express", "application"]);
 
     // 4. A Stripe díjait a platform fizeti – ez a MEGLÉVŐ fizetési logika:
     //    az application_fee_amount a platform díját és a feldolgozási díjat is

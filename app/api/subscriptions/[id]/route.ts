@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 /**
  * DELETE /api/subscriptions/[id] – előfizetés rekord végleges törlése (SUPER_ADMIN).
@@ -12,6 +13,10 @@ import { logAudit } from "@/lib/audit";
  * rekord eltűnne, a terhelés viszont folytatódna.
  */
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });

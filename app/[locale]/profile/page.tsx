@@ -20,6 +20,7 @@ import { PawPrint } from "lucide-react";
 import { Role } from "@prisma/client";
 import { connectedAccountState } from "@/lib/stripe";
 import { getTranslations } from "next-intl/server";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("profile");
@@ -65,6 +66,8 @@ export default async function ProfilePage() {
           status:      true,
           createdAt:   true,
           cancelledAt: true,
+          cancelAtPeriodEnd: true,
+          currentPeriodEnd:  true,
           tier: {
             select: {
               name:    true,
@@ -83,6 +86,8 @@ export default async function ProfilePage() {
           isPublic:    true,
           createdAt:   true,
           cancelledAt: true,
+          cancelAtPeriodEnd: true,
+          currentPeriodEnd:  true,
           animal:      { select: { name: true, slug: true } },
         },
       },
@@ -143,6 +148,8 @@ export default async function ProfilePage() {
   ]);
 
   if (!user) redirect("/auth/login");
+
+  const payments = paymentsEnabled();
 
   // A csatolt Stripe fiók VALÓS állapota. A tárolt `stripeOnboardingComplete`
   // csak azt tudja, hogy egyszer végigment a folyamaton — azt nem, hogy a fiók
@@ -226,16 +233,21 @@ export default async function ProfilePage() {
             }}
           />
 
-          <StripeConnectSection
-            stripeAccountId={user.stripeAccountId}
-            stripeOnboardingComplete={user.stripeOnboardingComplete}
-            stripeState={userStripeState}
-          />
+          {/* Fizetés kikapcsolva: a Stripe-bekötés, a saját gyűjtések, az
+              előfizetések és a virtuális örökbefogadások blokkja kimarad.
+              A MEGLÉVŐ ADATOK MEGMARADNAK — csak nem jelennek meg. */}
+          {payments && (
+            <>
+              <StripeConnectSection
+                stripeAccountId={user.stripeAccountId}
+                stripeOnboardingComplete={user.stripeOnboardingComplete}
+                stripeState={userStripeState}
+              />
 
-          {/* Saját gyűjtések */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <MyCampaigns campaigns={myCampaigns} />
-          </div>
+              {/* Saját gyűjtések */}
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <MyCampaigns campaigns={myCampaigns} />
+              </div>
 
           {/* Subscriptions */}
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -243,8 +255,9 @@ export default async function ProfilePage() {
             <SubscriptionsList
               subscriptions={user.subscriptions.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>
@@ -255,11 +268,14 @@ export default async function ProfilePage() {
             <SponsorshipsList
               sponsorships={user.sponsorships.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>
+            </>
+          )}
 
           {/* Adoption history */}
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

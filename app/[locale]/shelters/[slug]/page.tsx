@@ -16,6 +16,7 @@ import { authOptions } from "@/lib/auth";
 import { VolunteerApplyButton } from "@/components/volunteers/volunteer-apply-button";
 import { FosterApplyButton } from "@/components/foster/foster-apply-button";
 import type { FosterStatus } from "@prisma/client";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const [shelter, t] = await Promise.all([
@@ -98,6 +99,8 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
     where:  { shelterId: shelter.id, isGeneral: true, status: "ACTIVE" },
     select: { id: true },
   });
+
+  const payments = paymentsEnabled();
 
   // Fetch which tiers the user is already actively subscribed to
   const activeTierIds = new Set<string>();
@@ -238,7 +241,8 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
               </ul>
             </div>
 
-            {generalCampaign && (
+            {/* Fizetés kikapcsolva: a támogatás gomb és a havi csomagok nem jelennek meg. */}
+            {payments && generalCampaign && (
               <Link
                 href={`/donate/${generalCampaign.id}`}
                 className="flex items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
@@ -248,7 +252,7 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
               </Link>
             )}
 
-            {shelter.tiers.length > 0 && (
+            {payments && shelter.tiers.length > 0 && (
               <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
                 <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("monthlySubscriptions")}</h2>
                 <div className="flex flex-col gap-3">

@@ -7,13 +7,25 @@ import { SubscriptionsList } from "@/components/profile/subscriptions-list";
 import { SponsorshipsList } from "@/components/profile/sponsorships-list";
 import { getTranslations } from "next-intl/server";
 import { Wallet, RefreshCcw, Heart, Receipt } from "lucide-react";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
+  // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
+  // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
+  // „nem található" tartalmat adná vissza 200-as kóddal. A metaadat
+  // ELŐBB fut, innen a státusz még állítható.
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("nav");
   return { title: t("myFinances") };
 }
 
 export default async function FinancesPage() {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("finances");
   const tp = await getTranslations("profile");
 
@@ -42,6 +54,8 @@ export default async function FinancesPage() {
         status:      true,
         createdAt:   true,
         cancelledAt: true,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd:  true,
         tier: {
           select: {
             name:    true,
@@ -61,6 +75,8 @@ export default async function FinancesPage() {
         isPublic:    true,
         createdAt:   true,
         cancelledAt: true,
+        cancelAtPeriodEnd: true,
+        currentPeriodEnd:  true,
         animal:      { select: { name: true, slug: true } },
       },
     }),
@@ -162,8 +178,9 @@ export default async function FinancesPage() {
             <SubscriptionsList
               subscriptions={subscriptions.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>
@@ -177,8 +194,9 @@ export default async function FinancesPage() {
             <SponsorshipsList
               sponsorships={sponsorships.map((s) => ({
                 ...s,
-                createdAt:   s.createdAt.toISOString(),
-                cancelledAt: s.cancelledAt?.toISOString() ?? null,
+                createdAt:        s.createdAt.toISOString(),
+                cancelledAt:      s.cancelledAt?.toISOString() ?? null,
+                currentPeriodEnd: s.currentPeriodEnd?.toISOString() ?? null,
               }))}
             />
           </div>

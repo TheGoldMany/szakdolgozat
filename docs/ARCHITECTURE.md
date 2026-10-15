@@ -426,10 +426,46 @@ Connect-fiókjába kerül, a platformdíj levonásával.
 3. `GET /api/stripe/connect/callback` – visszairányításkor beállítja a
    `stripeOnboardingComplete = true` mezőt a `Shelter`-en vagy `User`-en.
 
+### 7.0 A fizetés kapcsolóval kikapcsolható
+
+A teljes fizetési réteg — adományozás, gyűjtések, havi támogatói csomagok,
+virtuális örökbefogadás és a Stripe Connect bekötés — egyetlen környezeti
+változón múlik: `NEXT_PUBLIC_PAYMENTS_ENABLED`. **Csak a pontos `true`
+kapcsolja be**; a hiányzó vagy elgépelt érték kikapcsolva hagyja. A kapcsoló
+így *zárva bukik*: egy elfelejtett beállítás nem enged be valódi pénzt.
+
+Élesben jelenleg ki van kapcsolva. A kód és az adatbázis érintetlen — a
+`Donation`, `Campaign`, `Subscription` és `Sponsorship` táblák megmaradnak
+(a pénzügyi rekordokat egyébként is nyolc évig őrizni kell), csak nem
+érhetők el. A visszakapcsolás egyetlen változó és egy újradeploy.
+
+A kikapcsolás **három rétegben** valósul meg, és mindháromra szükség van:
+
+| Réteg | Mit véd | Hol |
+|---|---|---|
+| **middleware** | a fizetési oldalak `404`-et adnak | `middleware.ts` → `PAYMENT_PATHS` |
+| **végpontok** | minden fizetési API `404`-et ad | `paymentsDisabled()` a kezelő első soraként |
+| **felület** | a hivatkozások és blokkok el sem készülnek | `paymentsEnabled()` a komponensekben |
+
+Miért nem elég az oldalakban hívott `notFound()`: a `force-dynamic`
+útvonalaknál az már a streamelés megkezdése után fut, így a „nem található"
+tartalom **200-as kóddal** menne ki. A middleware minden renderelés előtt fut,
+ott a 404 valóban 404.
+
+**A webhook SZÁNDÉKOSAN nincs kikapcsolva.** Nem indít fizetést, csak
+rögzíti, ami a Stripe-nál már megtörtént; kikapcsolva egy visszatérítés vagy
+egy lemondás nyomtalanul elveszne. A hiányzó rekord rosszabb, mint a
+felesleges. Az egyeztető cron viszont kihagy — `200`-at ad `skipped`
+jelzéssel, mert egy nem-2xx válasz a Vercelen bukott futásnak látszana.
+
 ### 7.3 Webhook flow (`POST /api/webhooks/stripe`)
 
-1. Raw body + `stripe-signature` fejléc → `webhooks.constructEvent` aláírás-ellenőrzés
-   (`STRIPE_WEBHOOK_SECRET`).
+1. Raw body + `stripe-signature` fejléc → `verifyWebhook` (`lib/stripe-webhook.ts`),
+   ami az **összes** beállított aláíró titokkal próbálkozik (`STRIPE_WEBHOOK_SECRET`
+   + `STRIPE_CONNECT_WEBHOOK_SECRET`, vesszős lista is), és bukáskor nem egy
+   üres „nem sikerült"-et ad, hanem megnevezett okot (`reason`) a válasz
+   törzsében is — mert a Stripe Dashboard azt megőrzi, a futásnaplót viszont a
+   hosting csomag egy óra után eldobja. Titkot nem tartalmaz.
 2. **`checkout.session.completed`** — a `metadata` alapján három ág:
    - `metadata.donationId` → `Donation.paidAt` kitöltése, kampány `raisedAmount`
      növelése, e-mail + in-app értesítés az adminoknak (`DONATION_RECEIVED`).
@@ -437,6 +473,20 @@ Connect-fiókjába kerül, a platformdíj levonásával.
      (`SUBSCRIPTION_STARTED` értesítés, visszaigazoló e-mail).
    - `metadata.sponsorAnimalId + userId` → `Sponsorship` létrehozása
      (`SPONSORSHIP_STARTED`).
+> **Lemondás — miért marad ACTIVE a sor.** A felhasználói lemondás a Stripe-ban
+> `cancel_at_period_end`, tehát a már kifizetett hónap végéig él az előfizetés.
+> A sor ezért `cancelAtPeriodEnd = true` jelzőt kap és **ACTIVE marad**; a
+> `currentPeriodEnd` mondja meg, meddig. A végleges `CANCELLED` a
+> `customer.subscription.deleted` eseményből jön. Ez nem kozmetika: a
+> feliratkozás duplikátum-ellenőrzése `ACTIVE` sort keres, tehát ez zárja ki,
+> hogy a támogató az átfedő, már kifizetett időszakra másodszor is fizessen.
+> A super admin lemondása ettől eltér (`subscriptions.cancel`) — az azonnali,
+> és ott a `CANCELLED` helyes.
+>
+> A periódus végét a `subscriptionPeriodEnd()` adja. **A `current_period_end`
+> ebben az API-verzióban már nincs a `Subscription` objektumon**, a tételeken
+> van — a helper ezt kezeli.
+
 3. **`customer.subscription.deleted`** → a megfelelő `Subscription` és `Sponsorship`
    rekordok `CANCELLED`-re állítása `stripeSubId` alapján.
 
@@ -496,6 +546,52 @@ sémára futtat `prisma generate` + `db push`-t).
 
 ---
 
+## 9.5 Ütemezett feladatok (cron)
+
+A `vercel.json` `crons` tömbje definiálja őket. Mindegyik `GET`, és mindegyik
+ugyanúgy védett: `Authorization: Bearer <CRON_SECRET>` — enélkül `401`.
+
+| Útvonal | Mikor | Mit tesz |
+|---|---|---|
+| `/api/cron/feeding` | `0 6 * * *` | Etetési emlékeztetők. |
+| `/api/cron/purge-accounts` | `0 3 * * *` | A 30 napnál régebben törlésre jelölt fiókok véglegesítése, lejárt tokenek és régi olvasott értesítések takarítása. |
+| `/api/cron/reconcile-stripe` | `0 4 * * *` | **Pénzügyi egyeztetés:** a Stripe eseménylistájából visszamenőleg pótolja, ami a webhookon kimaradt. |
+
+### Miért van szükség a Stripe-egyeztetésre
+
+Az egyszeri adományt és az előfizetés-aktiválást a siker-oldal pótolja, ha a
+webhook elmarad. A **havi megújításnak**, a **visszatérítésnek** és a
+**vitának** viszont semmilyen más útja nincs — azok kizárólag a webhookon
+jönnek. A Stripe körülbelül három napig próbálkozik, majd feladja; sok hiba
+után le is tiltja az endpointot, ami utána *mindent* elvisz. Egy ennél hosszabb
+kiesés tehát véglegesen elveszett könyvelés, valódi pénzről.
+
+A Stripe az eseményeket **30 napig** listázhatóvá teszi. A cron alapból egy
+hétre tekint vissza (ez átfogja a háromnapos újrapróbálási ablakot és egy
+hétvégi kiesést is); hosszabb kiesés után kézzel nagyobb értékkel is hívható:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  "https://<domain>/api/cron/reconcile-stripe?days=30"
+```
+
+A feldolgozás ugyanazt a kódot futtatja, mint a webhook
+(`handleStripeEvent`, `lib/stripe-events.ts`) — nem párhuzamos logika, hanem új
+útvonal a meglévőhöz, ezért nem tud szétcsúszni a kettő. Kétszer lefuttatni
+biztonságos: minden ág idempotens, fölöttük pedig a `ProcessedWebhookEvent`
+tábla a gyors kilépés.
+
+A válasz `recovered` mezője a lényeg. **Ha ez tartósan nem nulla, a webhook nem
+végzi a munkáját** — ilyenkor a napló is hibaszintű sort ír, és a Stripe →
+Developers → Webhooks oldalt kell megnézni.
+
+Korlát: a *platform* eseménylistáját nézi. Destination charge modellben a
+terhelés, a visszatérítés és a vita is a platform fiókján jön létre, tehát a
+pénzügyileg kritikus események mind itt vannak; a csatolt fiókok saját
+eseményeit a Connect webhook endpoint hozza.
+
+---
+
 ## 10. Tesztelés
 
 ### 10.1 Unit tesztek — Vitest (`tests/`)
@@ -536,10 +632,13 @@ funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell
 | `dwh_POSTGRES_PRISMA_URL`, `dwh_POSTGRES_URL_NON_POOLING` | DWH PostgreSQL |
 | `NEXTAUTH_SECRET`, `NEXTAUTH_URL` | NextAuth JWT + URL-ek |
 | `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_CLIENT_ID/SECRET` | OAuth providerek (opcionális) |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe API + webhook aláírás |
+| `NEXT_PUBLIC_PAYMENTS_ENABLED` | A fizetési funkciók kapcsolója (lásd 7.0). Csak `true` kapcsolja be |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe API + webhook aláírás (a titok vesszővel többes is lehet, rotációhoz) |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | A csatolt fiókos („Events from connected accounts") webhook endpoint saját aláíró titka (opcionális) |
 | `NEXT_PUBLIC_APP_URL` | Checkout redirect URL-ek alapja |
 | `SMTP_HOST/PORT/USER/PASS/FROM` | nodemailer e-mail küldés |
 | `ETL_SECRET` | `/api/etl` Bearer-token |
+| `CRON_SECRET` | Az ütemezett feladatok Bearer-tokene (lásd 9.5) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob feltöltés |
 | `EXPO_ACCESS_TOKEN` | Push küldés az Expo nevében (opcionális, de nélküle bárki küldhetne egy megszerzett tokenre) |
 

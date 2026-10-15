@@ -49,32 +49,18 @@ export { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 
 /**
- * Stripe processing fee rates for HUF payments.
- * Used to pass the processing cost through to the payer transparently.
+ * A díjszámítás a `lib/donation-limits.ts`-ben él, mert a FIZETÉSI ŰRLAP is
+ * kiírja a bontást, és onnan a Stripe SDK nélkül importálható. Itt csak
+ * újraexportáljuk, hogy a szerveroldali hívóknak ne kelljen átírni az
+ * importjaikat — és hogy a kiírt meg a levont összeg mögött egy képlet legyen.
  */
-export const STRIPE_PERCENT_FEE      = 1.4;  // % of charge amount
-export const STRIPE_FIXED_FEE_HUF    = 25;   // flat HUF per transaction
+export {
+  STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF,
+  platformFee, stripeProcessingFee, donorTotal,
+} from "@/lib/donation-limits";
+import { platformFee, stripeProcessingFee } from "@/lib/donation-limits";
 
-/**
- * Platform fee for a given amount, in the same whole-currency unit (HUF).
- * Rounded to whole forints so charges stay valid for HUF.
- *
- * The fee is added on top of the donor's intended amount: the donor pays
- * `amount + platformFee(amount)`, the connected account receives the full
- * `amount`, and the platform keeps the fee.
- */
-export function platformFee(amount: number): number {
-  return Math.round((amount * PLATFORM_FEE_PERCENT) / 100);
-}
 
-/**
- * Estimated Stripe processing fee passed through to the payer, in HUF.
- * Applied to the donation/subscription amount (not the grossed-up total)
- * as a transparent approximation.
- */
-export function stripeProcessingFee(amount: number): number {
-  return Math.round(amount * STRIPE_PERCENT_FEE / 100) + STRIPE_FIXED_FEE_HUF;
-}
 
 /**
  * Az előfizetésekre alkalmazott `application_fee_percent`.
@@ -312,17 +298,32 @@ export function isPlatformSetupError(err: unknown): boolean {
  * A `controller` a `type` mai megfelelője, és mezőnként mondja meg ugyanazt,
  * amit az „express" egyben jelentett. A `type`-ot NEM szabad mellé tenni.
  *
+ * ELSŐRE ROSSZUL OLVASTAM az idézett hibát. A „set `losses_collector` to
+ * `stripe`" mondat az ACCOUNTS V2 útra vonatkozik, nem erre; a `controller`-es
+ * v1 úton a Stripe ennek az ellenkezőjét követeli, és második nekifutásra ezt
+ * mondta (`req_fFcj2h5TohLpW1`):
+ *
+ *   "With a dashboard type of `express`, the Connect application must control
+ *    losses."
+ *
+ * A két üzenet együtt olvasva: az ELSŐ a legacy `type` mezőt kifogásolta, nem a
+ * veszteségviselést. Express felülethez a veszteséget a platformnak kell
+ * viselnie — ez amúgy is a projekt eddigi működése.
+ *
  * Amit a három mező jelent (a telepített SDK típusai szerint ellenőrizve):
  *
- * • `losses.payments: "stripe"` — a negatív egyenleget a Stripe viseli, nem a
- *   platform. Ezt a Stripe KÖVETELI, nem mi választottuk; egyben kevesebb
- *   kockázat is nekünk.
- * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez a
+ * • `losses.payments: "application"` — a negatív egyenleget a platform viseli.
+ *   Ezt KÖVETELI a Stripe az Express felület mellé, és ez a MEGLÉVŐ helyzet is:
+ *   destination charge-nál a visszaterhelés eddig is a platform egyenlegét
+ *   ütötte (lásd a `STATEMENT_SUFFIX` magyarázatát).
+ * • `fees.payer: "application"` — a Stripe díjait a platform fizeti. Ez is a
  *   MEGLÉVŐ viselkedés: a fizetési útvonal `application_fee_amount`-ja a
  *   platform díját ÉS a feldolgozási díjat is tartalmazza, hogy a menhelyhez a
  *   teljes felajánlott összeg érkezzen.
  * • `stripe_dashboard.type: "express"` — a menhely az Express felületet kapja,
- *   ugyanazt, mint eddig.
+ *   ugyanazt, mint eddig. Ez azért fontos, mert a „Stripe fiók kezelése" gomb
+ *   `createLoginLink`-je CSAK Express felülettel működik; `"none"` esetén az a
+ *   gomb értelmét vesztené.
  *
  * A `requirement_collection` alapértéke `stripe`, vagyis a Stripe kéri be az
  * adatokat a saját folyamatában — ez is az eddigi Express-viselkedés, ezért
@@ -336,9 +337,32 @@ export function createConnectedAccount(country = "HU") {
   return getStripe().accounts.create({
     country,
     controller: {
-      losses:           { payments: "stripe" },
+      losses:           { payments: "application" },
       fees:             { payer: "application" },
       stripe_dashboard: { type: "express" },
     },
   });
+}
+
+/**
+ * Egy Stripe-előfizetés kifizetett időszakának vége.
+ *
+ * FIGYELEM, API-VERZIÓ: a használt verzióban (2026-03-25.dahlia) a
+ * `current_period_end` MÁR NINCS az `Subscription` objektumon — az adat a
+ * tételeken (`items.data[].current_period_end`) él. Ugyanaz a csapda, ami
+ * korábban az `invoice.subscription` mezővel némán elvitte a sikertelen
+ * fizetések ágát: a mező egyszerűen `undefined`, nem hibázik.
+ *
+ * Elsőként a `cancel_at`-ot nézzük: `cancel_at_period_end: true` beállításakor
+ * a Stripe ezt kitölti az időszak végével, és ez a lemondás szempontjából a
+ * hiteles érték. Tartalékként a tételek legkésőbbi periódusvége.
+ */
+export function subscriptionPeriodEnd(sub: Stripe.Subscription): Date | null {
+  if (sub.cancel_at) return new Date(sub.cancel_at * 1000);
+
+  const ends = (sub.items?.data ?? [])
+    .map((item) => item.current_period_end)
+    .filter((value): value is number => typeof value === "number");
+
+  return ends.length > 0 ? new Date(Math.max(...ends) * 1000) : null;
 }

@@ -9,6 +9,7 @@ import { LocationPicker } from "@/components/ui/location-picker";
 // importálja a Stripe SDK-t, és egy kliens komponensből behúzva a teljes SDK
 // bekerülne a böngésző bundle-jébe.
 import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 interface ShelterDoc {
   id:        string;
@@ -308,7 +309,9 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* Stripe Connect */}
+      {/* Stripe Connect — fizetés kikapcsolva: az egész blokk kimarad.
+          A menhely nem tud bekötni fiókot, amivel úgysem fogadhatna pénzt. */}
+      {paymentsEnabled() && (
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-700">Stripe Connect</h2>
         <p className="mb-4 text-xs text-gray-400">
@@ -439,6 +442,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
           </div>
         )}
       </div>
+      )}
 
       {/* Menhely logó */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

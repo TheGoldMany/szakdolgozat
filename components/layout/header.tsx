@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { TourButton } from "@/components/onboarding/tour-button";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 const LOCALE_LABELS: Record<string, { label: string }> = {
   hu: { label: "Magyar"  },
@@ -47,7 +48,10 @@ export function Header() {
   // hogy a fejléc ne mossa össze a fontosat a ritkán használttal.
   const PRIMARY_LINKS = [
     { href: "/animals", label: t("animals") },
-    { href: "/donate",  label: t("donate")  },
+    // Fizetés kikapcsolva: a Támogatás menüpont nem jelenik meg. A `filter`
+    // azért van, hogy a tömb többi eleme és a "Továbbiak" logika érintetlen
+    // maradjon — így a visszakapcsolás egyetlen env változó.
+    ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate") }] : []),
     { href: "/map",     label: t("map")     },
     { href: "/reports", label: t("reports") },
   ];

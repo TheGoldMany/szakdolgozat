@@ -4,10 +4,16 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Mail, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export function Footer() {
   const t    = useTranslations("footer");
   const tNav = useTranslations("nav");
+
+  // Fizetés kikapcsolva: az adományozáshoz kötődő hivatkozások kimaradnak.
+  // A szűrés a lista ÖSSZEÁLLÍTÁSÁNÁL történik, nem a rendereléskor, hogy
+  // kikapcsolt állapotban ne maradjon utánuk üres hely vagy elválasztó.
+  const payments = paymentsEnabled();
 
   // A lábléc a teljes nyilvános felületet listázza – a kereső innen is
   // felderíti az aloldalakat, és a látogatónak sem tűnik el semmi.
@@ -16,9 +22,9 @@ export function Footer() {
     { label: tNav("shelters"), href: "/shelters" },
     { label: tNav("map"),      href: "/map"      },
     { label: tNav("reports"),  href: "/reports"  },
-    { label: tNav("donate"),   href: "/donate"   },
     { label: tNav("events"),   href: "/events"   },
     { label: tNav("articles"), href: "/articles" },
+    ...(payments ? [{ label: tNav("donate"), href: "/donate" }] : []),
   ];
 
   // A horgonyok a súgó tényleges szakasz-azonosítóira mutatnak (u- előtag),
@@ -26,10 +32,13 @@ export function Footer() {
   const HELP = [
     { label: t("guide"),           href: "/sugo"                 },
     { label: t("adoptionProcess"), href: "/sugo#u-orokbefogadas" },
-    { label: t("donating"),        href: "/sugo#u-adomanyozas"   },
     { label: t("reporting"),       href: "/sugo#u-bejelentes"    },
     { label: t("map"),             href: "/sugo#u-terkep"        },
     { label: t("contact"),         href: "/kapcsolat"            },
+    ...(payments ? [
+      { label: t("donating"),    href: "/sugo#u-adomanyozas" },
+      { label: t("platformFee"), href: "/platformdij"        },
+    ] : []),
   ];
 
   const LEGAL = [

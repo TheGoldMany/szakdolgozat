@@ -17,6 +17,7 @@ import { FavoriteButton } from "@/components/animals/favorite-button";
 import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const animal = await prisma.animal.findUnique({
@@ -394,7 +395,8 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
               animalName={animal.name}
             />
           )}
-          {animal.status !== AnimalStatus.ADOPTED && (
+          {/* Fizetés kikapcsolva: a virtuális örökbefogadás kártya nem jelenik meg. */}
+          {paymentsEnabled() && animal.status !== AnimalStatus.ADOPTED && (
             <VirtualAdoptionCard
               animalId={animal.id}
               animalName={animal.name}

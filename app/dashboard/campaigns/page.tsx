@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { PlusCircle } from "lucide-react";
 import type { CampaignStatus } from "@prisma/client";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Gyűjtések" };
@@ -35,6 +37,9 @@ function formatHUF(n: number) {
 interface PageProps { searchParams: { status?: string } }
 
 export default async function CampaignApprovalsPage({ searchParams }: PageProps) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/dashboard/campaigns");
 

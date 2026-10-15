@@ -138,12 +138,63 @@ ezért sokáig észrevétlen maradt.
 elemen.** A megmaradó `transform` pozicionálási kerete lesz minden
 `position: fixed` gyerekének, és a felugró panelek elcsúsznak.
 
+**A Stripe hibaüzenetét a saját ágára olvasd.** A Connect fiók
+létrehozásánál a Stripe először azt mondta, hogy „Use Accounts v2, remove
+`type`, and set `losses_collector` to `stripe`" — ebből a `losses_collector`
+rész az ACCOUNTS V2 útra vonatkozik. A `controller`-es v1 úton a Stripe ennek
+az ellenkezőjét követeli: „With a dashboard type of `express`, the Connect
+application must control losses." Egy mondatot átvinni a másik ágra egy
+fölösleges kiadási kört ért.
+
 **A Stripe Connect fiók létrehozása NEM `type: "express"`.** A Stripe elzárta
 ezt az utat az olyan platformok elől, ahol a platform a veszteségek viselője;
 élesben `StripeInvalidRequestError`-t ad rá. A mai megfelelő a `controller`
 mező, és a fiókokat kizárólag a `createConnectedAccount()` hozza létre
 (`lib/stripe.ts`) — négy hívási helye volt, ezért van egy helyen. A
 paramétereket teszt rögzíti, mert felelősséget érintenek.
+
+**Egy Stripe-mező eltűnése nem hibázik, csak `undefined` lesz.** Ez a projektet
+már KÉTSZER megfogta ugyanúgy. Az `invoice.subscription` megszűnt a használt
+API-verzióban, ezért a sikertelen fizetések ága soha nem futott le — némán. A
+`current_period_end` ugyanígy nincs már a `Subscription` objektumon, hanem a
+tételeken (`items.data[].current_period_end`). Mindkettőre helper van
+(`invoiceSubscriptionId`, `subscriptionPeriodEnd`), és **mindkettőt teszt
+rögzíti**. Ha egy Stripe-mezőt olvasol, ellenőrizd a `node_modules/stripe`
+típusdefinícióban, hogy tényleg ott van-e, ahol az internetes példák mutatják.
+
+**Egy státusz, ami két dolgot jelent, pénzt visz.** A lemondás a Stripe-ban
+`cancel_at_period_end` — a hónap végéig él. A sor mégis azonnal `CANCELLED`-re
+állt, a duplikátum-ellenőrzés viszont `ACTIVE` sort tilt, tehát a támogató
+azonnal újra elő tudott fizetni egy még élő, kifizetett előfizetés mellé:
+**az átfedő időszakra kétszer fizetett.** Innen a `cancelAtPeriodEnd` jelző.
+A tanulság általános: ha egy állapot a külső rendszerben átmeneti („már
+lemondva, de még él"), nálunk is kell rá hely — különben a legközelebbi
+`where: { status: "ACTIVE" }` dönt helyettünk, és nem biztos, hogy jól.
+
+**Ha a webhook az egyetlen út valamihez, az adat előbb-utóbb elveszik.** Az
+egyszeri adományt és az előfizetés-aktiválást a siker-oldal pótolja; a
+megújításnak, a visszatérítésnek és a vitának semmi nem pótolta. A Stripe
+három nap után feladja. Ezért van `/api/cron/reconcile-stripe`, és ezért él a
+feldolgozás a `lib/stripe-events.ts`-ben, nem a route törzsében: **egy logika,
+két útvonal.** Új ágat írva a `RECONCILED_EVENT_TYPES` listát is bővítsd — ezt
+teszt fogja, mert a hiba működőnek látszik.
+
+**A hibaüzenet, ami minden okra ugyanaz, nem hibaüzenet.** A webhook
+aláírás-ellenőrzése ötféle okból bukhat, és a Stripe SDK mind az ötre ugyanazt
+a mondatot adja; a javítás viszont okonként teljesen más. Ahol egy művelet
+többféleképpen bukhat, és a javítás okonként különbözik, ott **nevezd meg az
+okot** — és ha a napló nem marad meg (Hobby csomag: 1 óra), oda tedd, ahol
+igen: a Stripe Dashboard megőrzi a HTTP-válaszunkat.
+
+**A fizetés kapcsolóval ki van kapcsolva élesben.** Ha fizetéshez nyúlsz, a
+`NEXT_PUBLIC_PAYMENTS_ENABLED`-et is nézd meg (`lib/payments-enabled.ts`). Új
+fizetési végpontnak kell a `paymentsDisabled()` az ELSŐ sorába, új fizetési
+oldalnak pedig bejegyzés a `middleware.ts` `PAYMENT_PATHS` listájába — az
+oldalban hívott `notFound()` a `force-dynamic` útvonalaknál 200-as kóddal
+adná vissza a „nem található" tartalmat, mert a streamelés már elindult.
+A `tests/payments-flag.test.ts` felsorolja a kapuzott fájlokat, és elbukik,
+ha egy új nem kerül be — szándékosan kézi lista, mert pont azt a hibát
+fogja, amit egy automatikus felderítés nem lát.
 
 ## Git és kiadás — ezt olvasd el figyelmesen
 

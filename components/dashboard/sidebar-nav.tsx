@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { startTour } from "@/components/onboarding/tour";
 import { useTranslations } from "next-intl";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 type IconType = typeof LayoutDashboard;
 
@@ -59,7 +60,9 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/messages",   icon: MessageCircle,  labelKey: "navMessages",   roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
   },
-  {
+  // Fizetés kikapcsolva: az egész csoport kimarad. Üres csoportfejléc
+  // rosszabb lenne, mint a hiánya — azt hinné az admin, hogy betöltési hiba.
+  ...(paymentsEnabled() ? [{
     titleKey: "groupDonation",
     tourKey: "group-donation",
     items: [
@@ -67,7 +70,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/campaigns",     icon: ClipboardCheck, labelKey: "navCampaigns",     roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
       { href: "/dashboard/subscriptions", icon: Users,          labelKey: "navSubscriptions", roles: ["SHELTER_ADMIN", "SUPER_ADMIN"] },
     ],
-  },
+  }] : []),
   {
     titleKey: "groupPlatform",
     tourKey: "group-platform",

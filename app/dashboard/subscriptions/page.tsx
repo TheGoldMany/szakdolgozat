@@ -10,6 +10,8 @@ import { SubscriptionCancelButton } from "@/components/dashboard/subscription-ca
 import { SubscriptionDeleteButton } from "@/components/dashboard/subscription-delete-button";
 import { cn } from "@/lib/utils";
 import { resolveActingShelter } from "@/lib/acting-shelter";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Előfizetők" };
 
@@ -18,6 +20,9 @@ interface PageProps {
 }
 
 export default async function SubscriptionsPage({ searchParams }: PageProps) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
@@ -174,15 +179,30 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                       {sub.tier.amount.toLocaleString("hu-HU")} HUF/hó
                     </td>
                     <td className="px-4 py-2.5">
+                      {/* A „lemondva, de még fizet" harmadik állapot: a Stripe-ban
+                          `cancel_at_period_end`, tehát a kifizetett hónap végéig
+                          él. A menhelynek ez a lemorzsolódás jelzése, miközben a
+                          bevétel még befolyik – ezért nem szabad sem aktívnak,
+                          sem lemondottnak látszania. */}
                       <span
                         className={cn(
                           "rounded-full px-2 py-0.5 text-xs font-medium",
-                          sub.status === "ACTIVE"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-500"
+                          sub.status !== "ACTIVE"
+                            ? "bg-gray-100 text-gray-500"
+                            : sub.cancelAtPeriodEnd
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-green-100 text-green-700"
                         )}
                       >
-                        {sub.status === "ACTIVE" ? t("subscriptionsStatusActive") : t("subscriptionsStatusCancelled")}
+                        {sub.status !== "ACTIVE"
+                          ? t("subscriptionsStatusCancelled")
+                          : sub.cancelAtPeriodEnd
+                          ? sub.currentPeriodEnd
+                            ? t("subscriptionsStatusEnding", {
+                                date: new Date(sub.currentPeriodEnd).toLocaleDateString("hu-HU"),
+                              })
+                            : t("subscriptionsStatusEndingSoon")
+                          : t("subscriptionsStatusActive")}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-gray-400">
@@ -193,7 +213,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                       })}
                     </td>
                     <td className="px-4 py-2.5">
-                      {sub.status === "ACTIVE" ? (
+                      {sub.status === "ACTIVE" && !sub.cancelAtPeriodEnd ? (
                         <SubscriptionCancelButton subscriptionId={sub.id} />
                       ) : isSuperAdmin ? (
                         <SubscriptionDeleteButton subscriptionId={sub.id} />

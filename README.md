@@ -192,8 +192,10 @@ npm run dev
 
 | Változó | Leírás |
 |---|---|
+| `NEXT_PUBLIC_PAYMENTS_ENABLED` | **A fizetési funkciók kapcsolója.** Csak a pontos `true` kapcsolja be; minden más érték (és a hiánya) kikapcsolva hagyja. Élesben jelenleg **nincs beállítva**, tehát ki van kapcsolva. Fejlesztéshez és preview-hoz `true`. Mivel `NEXT_PUBLIC_`, a megváltoztatása **újradeployt igényel**. |
 | `STRIPE_SECRET_KEY` | Stripe titkos kulcs (`sk_test_…`) |
-| `STRIPE_WEBHOOK_SECRET` | Webhook aláírási titkos (`whsec_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook aláírási titok (`whsec_…`). Vesszővel több is megadható – titokcseréhez (rotáció) hasznos, mert az átfedő ablakban mindkettő érvényes. |
+| `STRIPE_CONNECT_WEBHOOK_SECRET` | **Opcionális.** A Stripe „Events from connected accounts" endpointja KÜLÖN endpoint, SAJÁT aláíró titokkal. Ha ilyen is be van állítva a Stripe-on, enélkül annak minden kézbesítése aláírás-hibára fut. |
 
 Lokális webhook teszteléshez:
 ```bash
@@ -219,6 +221,7 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 |---|---|
 | `DWH_DATABASE_URL` | Különálló PostgreSQL kapcsolati string (analytics DB) |
 | `ETL_SECRET` | ETL végpont védelmére – `openssl rand -hex 32` |
+| `CRON_SECRET` | Az ütemezett feladatok védelmére – `openssl rand -hex 32`. A Vercel ezt adja a `vercel.json`-ban definiált cronoknak. |
 | `SEED_SECRET` | Seed API végpont védelmére |
 
 ---

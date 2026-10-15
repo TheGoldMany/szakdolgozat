@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 // GET /api/admin/campaigns – list PENDING campaigns (SUPER_ADMIN only)
 export async function GET(_req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });

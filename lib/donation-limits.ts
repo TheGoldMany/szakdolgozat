@@ -37,3 +37,41 @@ export const PLATFORM_FEE_PERCENT = 5;
  * 1 Ft-os célösszegű gyűjtés is létrejöhetett.
  */
 export const MIN_CAMPAIGN_TARGET_HUF = 1000;
+
+/**
+ * A Stripe feldolgozási díjának becslése, amit a támogatóra továbbterhelünk.
+ *
+ * ITT van, és nem a `lib/stripe.ts`-ben, ugyanabból az okból, amiért a
+ * `PLATFORM_FEE_PERCENT` is: a fizetési űrlap KIÍRJA a bontást, mielőtt a
+ * támogató a Stripe-ra lépne. Ha a böngésző a saját képletével számolná, a
+ * kiírt végösszeg és a Stripe-on terhelt összeg szét tudna csúszni — és a
+ * támogató pont abban a pillanatban venné észre, amikor a kártyáját adja meg.
+ * Egy képlet, egy helyen.
+ *
+ * FIGYELEM: ez BECSLÉS. A tényleges Stripe-díj a fiók díjszabásától és a
+ * kártya típusától függ; ha a valóság több, a különbözetet a platform nyeli el
+ * (lásd `docs/18` TC-18-35).
+ */
+export const STRIPE_PERCENT_FEE   = 1.4; // a terhelt összeg százaléka
+export const STRIPE_FIXED_FEE_HUF = 25;  // tranzakciónkénti fix díj
+
+/**
+ * A platform része egy adott összegből, egész forintra kerekítve.
+ *
+ * A díj a felajánlott összegen FELÜL jelenik meg: a támogató
+ * `amount + platformFee(amount) + stripeProcessingFee(amount)`-ot fizet, a
+ * kedvezményezett pedig a teljes `amount`-ot megkapja.
+ */
+export function platformFee(amount: number): number {
+  return Math.round((amount * PLATFORM_FEE_PERCENT) / 100);
+}
+
+/** A támogatóra továbbterhelt, becsült Stripe-díj forintban. */
+export function stripeProcessingFee(amount: number): number {
+  return Math.round((amount * STRIPE_PERCENT_FEE) / 100) + STRIPE_FIXED_FEE_HUF;
+}
+
+/** Amit a támogató összesen fizet egy `amount` forintos felajánlásért. */
+export function donorTotal(amount: number): number {
+  return amount + platformFee(amount) + stripeProcessingFee(amount);
+}

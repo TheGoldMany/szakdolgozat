@@ -6,6 +6,7 @@ import { logAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
 import { createNotification, createNotifications } from "@/lib/notifications";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 const patchSchema = z.object({
   // Jóváhagyás / elutasítás
@@ -27,6 +28,10 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });
@@ -146,6 +151,10 @@ export async function PATCH(
 
 // DELETE /api/admin/campaigns/[id] – gyűjtés végleges törlése (SUPER_ADMIN)
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });

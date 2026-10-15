@@ -8,6 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // A megadott márkapaletta. Külön tokenek, nem a `brand` skála
+        // felülírása: azt több száz meglévő osztály használja, és az
+        // átszínezésük nem ennek a feladatnak a dolga.
+        forest:   "#187f3b", // fő zöld
+        mint:     "#b9e6c9",
+        cream:    "#fff8ee",
+        graphite: "#202522",
+        apricot:  "#ff9b61", // csak kis akcentus
         brand: {
           50:  "#f0fdf4",
           100: "#dcfce7",

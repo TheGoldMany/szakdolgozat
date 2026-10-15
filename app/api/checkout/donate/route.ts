@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, MIN_DONATION_HUF, toStatementSuffix } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { blockIfSuspended } from "@/lib/account-status";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -21,6 +22,10 @@ const donateSchema = z.object({
 
 // POST /api/checkout/donate – create a Stripe Checkout session for a one-time donation
 export async function POST(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const ip = getClientIp(req);
   if (!checkRateLimit(`donate:${ip}`, 10, 60_000)) {
     return NextResponse.json({ error: "Túl sok kísérlet. Próbáld újra 1 perc múlva." }, { status: 429 });
@@ -151,6 +156,21 @@ export async function POST(req: NextRequest) {
       success_url: `${BASE}/donate/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE}/donate/${campaign.id}`,
       metadata:    { donationId: donation.id },
+      // A magyarázat a Stripe oldalára is átmegy, mert a három díjsor ITT
+      // látszik először teljes összegként. A saját űrlapunk már kiírta a
+      // bontást, de a fizetőoldal az a pillanat, amikor a támogató a kártyáját
+      // adja meg — ha ott magyarázat nélkül állna egy nagyobb szám, az a
+      // legdrágább helyen keltene bizalmatlanságot.
+      ...(connectedAccountId && {
+        custom_text: {
+          submit: {
+            message:
+              `A ${amount.toLocaleString("hu-HU")} Ft teljes egészében a kedvezményezetthez kerül. ` +
+              `A platformdíjból tartjuk fenn a menhelyek nyilvántartó rendszerét: ` +
+              `${BASE}/hu/platformdij`,
+          },
+        },
+      }),
       ...(connectedAccountId && {
         payment_intent_data: {
           // A bankkivonaton felismerhető legyen, kire költött a támogató.

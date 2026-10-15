@@ -7,6 +7,7 @@ import {
   getStripe, isStaleAccountError, isPlatformSetupError, stripeErrorInfo,
   createConnectedAccount,
 } from "@/lib/stripe";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -17,6 +18,10 @@ const bodySchema = z.discriminatedUnion("type", [
 
 // POST /api/stripe/connect/onboard
 export async function POST(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

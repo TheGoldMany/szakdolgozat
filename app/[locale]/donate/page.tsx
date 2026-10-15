@@ -8,15 +8,27 @@ import { Heart, PlusCircle } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
+  // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
+  // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
+  // „nem található" tartalmat adná vissza 200-as kóddal. A metaadat
+  // ELŐBB fut, innen a státusz még állítható.
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("donate");
   return { title: t("title") };
 }
 
 export default async function DonatePage() {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const [t, session] = await Promise.all([
     getTranslations("donate"),
     getServerSession(authOptions),
