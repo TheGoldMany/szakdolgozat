@@ -64,11 +64,11 @@ export function FosterAdmin({ initialFosters, inventory }: {
       )}
 
       {fosters.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
+        <p className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
           {t("adminNoFosters")}
         </p>
       ) : fosters.map(f => (
-        <div key={f.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div key={f.id} className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">

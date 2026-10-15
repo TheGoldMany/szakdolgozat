@@ -48,7 +48,7 @@ export default async function ApplyPage(props: { params: Promise<{ token: string
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
 
         {/* Animal info */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center gap-4">
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 flex items-center gap-4">
           {data.animalImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -68,7 +68,7 @@ export default async function ApplyPage(props: { params: Promise<{ token: string
         </div>
 
         {/* Form */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
           <h2 className="mb-1 text-lg font-bold text-gray-900">{data.formTitle}</h2>
           {data.formDescription && (
             <p className="mb-5 text-sm text-gray-600">{data.formDescription}</p>

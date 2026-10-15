@@ -62,7 +62,7 @@ function Rail({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       <div className="flex items-center justify-between border-b border-gray-50 px-4 py-3">
         <div className="flex items-center gap-2">
           <span className={cn("flex h-7 w-7 items-center justify-center rounded-lg", iconColor)}>
@@ -214,7 +214,7 @@ function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="h-px flex-1 bg-gray-200" />
-      <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 shadow-sm">
+      <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1">
         <Newspaper className="h-3 w-3 text-gray-400" />
         <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{label}</span>
       </div>
@@ -308,7 +308,7 @@ export function FeedClient({
             type="button"
             onClick={loadMore}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {tCommon("loadMore")}

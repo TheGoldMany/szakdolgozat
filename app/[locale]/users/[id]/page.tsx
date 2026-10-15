@@ -70,13 +70,13 @@ export default async function PublicUserProfilePage(props: Props) {
       <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
 
         {/* Profil kártya */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
           {/* Banner */}
           <div className="h-24 bg-brand-700" />
 
           <div className="px-6 pb-6">
             {/* Avatar */}
-            <div className="relative -mt-12 mb-4 h-20 w-20 overflow-hidden rounded-2xl border-4 border-white shadow-md">
+            <div className="relative -mt-12 mb-4 h-20 w-20 overflow-hidden rounded-xl border-4 border-white shadow-md">
               {user.image ? (
                 <Image src={user.image} alt={user.name ?? ""} fill className="object-cover" />
               ) : (

@@ -35,27 +35,27 @@ export default async function SettingsPage() {
 
           {/* Change password – only for password-based accounts */}
           {user.password && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-6">
               <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("changePassword")}</h2>
               <ChangePasswordForm />
             </div>
           )}
 
           {/* Notification preferences */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">{t("notificationSettings")}</h2>
             <EmailNotificationsToggle enabled={user.emailNotifications} />
           </div>
 
           {/* GDPR data portability */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white p-6">
             <h2 className="mb-1 text-sm font-semibold text-gray-700">{t("myData")}</h2>
             <p className="mb-4 text-xs text-gray-500">{t("myDataDesc")}</p>
             <DownloadDataButton />
           </div>
 
           {/* Danger zone – account deletion */}
-          <div className="rounded-2xl border border-red-100 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-red-100 bg-white p-6">
             <h2 className="mb-1 text-sm font-semibold text-red-700">{t("dangerZone")}</h2>
             <p className="mb-4 text-xs text-gray-500">{t("deleteAccountDesc")}</p>
             <DeleteAccountButton />

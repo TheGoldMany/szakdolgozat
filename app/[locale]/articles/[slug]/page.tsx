@@ -89,7 +89,7 @@ function RelatedCard({
   return (
     <Link
       href={href}
-      className="press-card group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+      className="press-card group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50">
         <Icon className="h-5 w-5 text-brand-500" />
@@ -210,7 +210,7 @@ export default async function ArticleDetailPage(props: { params: Promise<{ slug:
           {t("back")}
         </Link>
 
-        <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="relative h-44 w-full overflow-hidden bg-brand-100 sm:h-72">
             {article.imageUrl ? (
               <Image

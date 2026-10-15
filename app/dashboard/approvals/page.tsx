@@ -79,7 +79,7 @@ export default async function ApprovalsPage() {
       </div>
 
       {total === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-green-100 bg-green-50 py-14 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-green-100 bg-green-50 py-14 text-center">
           <CheckCircle2 className="h-10 w-10 text-green-500" />
           <p className="font-medium text-green-800">Nincs jóváhagyásra váró tétel.</p>
           <p className="text-sm text-green-700/70">Minden kérelmet elbíráltál.</p>
@@ -123,7 +123,7 @@ export default async function ApprovalsPage() {
           <SectionHeader icon={FileText} title="Jóváhagyásra váró kérvényűrlapok" count={pendingForms.length} />
           <div className="space-y-3">
             {pendingForms.map((form) => (
-              <div key={form.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div key={form.id} className="rounded-xl border border-gray-200 bg-white p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-gray-900">{form.title}</p>

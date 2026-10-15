@@ -97,7 +97,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
 
   if (submitted) {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
+      <div className="rounded-xl border border-green-200 bg-green-50 p-8 text-center">
         <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
         <h2 className="text-xl font-bold text-green-800 mb-2">{t("fillerSubmitted")}</h2>
         <p className="text-sm text-green-700 mb-6">
@@ -128,7 +128,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
               value={values[field.id] ?? ""}
               onChange={(e) => setValue(field.id, e.target.value)}
               required={field.required}
-              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
           )}
 
@@ -138,7 +138,7 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
               onChange={(e) => setValue(field.id, e.target.value)}
               required={field.required}
               rows={4}
-              className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
           )}
 

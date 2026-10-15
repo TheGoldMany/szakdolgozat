@@ -86,7 +86,7 @@ function VolunteerCard({ vol }: { vol: VolunteerEntry }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white">
       <div className="flex items-start gap-3 p-5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-500">
           {(vol.user.name ?? vol.user.email)[0].toUpperCase()}
@@ -122,7 +122,7 @@ function VolunteerCard({ vol }: { vol: VolunteerEntry }) {
             <label className="mb-1 block text-xs font-semibold text-gray-500">Admin megjegyzés</label>
             <textarea value={adminNote} onChange={e => setAdminNote(e.target.value)}
               rows={2} maxLength={500}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:border-brand-400 resize-none" />
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:border-brand-600 resize-none" />
           </div>
 
           {/* Status actions */}
@@ -155,13 +155,13 @@ function VolunteerCard({ vol }: { vol: VolunteerEntry }) {
               <p className="text-xs font-semibold text-gray-600">Jelenlét naplózása</p>
               <div className="flex flex-wrap gap-2">
                 <input type="date" value={atDate} onChange={e => setAtDate(e.target.value)}
-                  className="flex-1 min-w-[130px] rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-400" />
+                  className="flex-1 min-w-[130px] rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-600" />
                 <input type="number" value={hours} onChange={e => setHours(e.target.value)}
                   min="0.5" max="24" step="0.5" placeholder="Óra"
-                  className="w-20 rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-400" />
+                  className="w-20 rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-600" />
                 <input value={atNote} onChange={e => setAtNote(e.target.value)} maxLength={200}
                   placeholder="Megjegyzés"
-                  className="flex-1 min-w-[130px] rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-400" />
+                  className="flex-1 min-w-[130px] rounded-xl border border-gray-200 px-3 py-1.5 text-xs outline-none focus:border-brand-600" />
                 <button onClick={logAttendance} disabled={loading}
                   className="flex items-center gap-1 rounded-xl bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600 disabled:opacity-50">
                   <Plus className="h-3.5 w-3.5" /> Naplóz
@@ -201,7 +201,7 @@ function TaskCard({ task }: { task: TaskEntry }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -274,27 +274,27 @@ function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: (
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-brand-100 bg-brand-50 p-5 space-y-3">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-brand-100 bg-brand-50 p-5 space-y-3">
       <p className="text-sm font-semibold text-gray-800">{t('createNewTask')}</p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <input required value={title} onChange={e => setTitle(e.target.value)} maxLength={200}
             placeholder="Feladat neve *"
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
         </div>
         <div>
           <input required type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
         </div>
         <div>
           <input type="number" value={maxVolunteers} onChange={e => setMaxVolunteers(e.target.value)}
             min="1" max="100" placeholder="Max önkéntes"
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
         </div>
         <div className="sm:col-span-2">
           <textarea value={description} onChange={e => setDescription(e.target.value)}
             rows={2} maxLength={2000} placeholder="Leírás (opcionális)"
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 resize-none" />
         </div>
       </div>
       {error && <p className="text-sm text-red-500">{error}</p>}
@@ -333,7 +333,7 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
           {TABS.map(tabKey => (
             <button key={tabKey} onClick={() => setTab(tabKey)}
               className={`flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-sm font-medium transition-colors ${
-                tab === tabKey ? "bg-brand-500 text-white shadow-sm" : "bg-white border border-gray-200 text-gray-600 hover:border-brand-200"
+                tab === tabKey ? "bg-brand-500 text-white" : "bg-white border border-gray-200 text-gray-600 hover:border-brand-200"
               }`}>
               {tabKey === "volunteers" ? <HandHeart className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
               {tDash(tabKey)}
@@ -367,7 +367,7 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
           </div>
 
           {filteredVols.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center">
+            <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center">
               <HandHeart className="mx-auto mb-3 h-10 w-10 text-gray-300" />
               <p className="text-sm text-gray-400">Nincs önkéntes ebben a kategóriában.</p>
             </div>
@@ -385,7 +385,7 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
             <NewTaskForm shelterId={shelterId} onCreated={() => setShowNewTask(false)} />
           )}
           {tasks.length === 0 && !showNewTask ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center">
+            <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center">
               <ClipboardList className="mx-auto mb-3 h-10 w-10 text-gray-300" />
               <p className="text-sm text-gray-400">Még nincs feladat. Hozz létre egyet!</p>
             </div>

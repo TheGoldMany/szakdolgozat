@@ -79,7 +79,7 @@ export default async function FavoritesPage(
         {totalCount > 0 && <FavoritesFilter />}
 
         {animals.length === 0 && totalCount === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-16 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
             <Heart className="mx-auto mb-3 h-10 w-10 text-gray-300" />
             <p className="font-medium text-gray-500">{t("emptyTitle")}</p>
             <p className="mt-1 text-sm text-gray-400">{t("emptyDesc")}</p>
@@ -91,7 +91,7 @@ export default async function FavoritesPage(
             </Link>
           </div>
         ) : animals.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-12 text-center">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-white py-12 text-center">
             <p className="text-gray-400">{t("noFavoritesForFilter")}</p>
           </div>
         ) : (

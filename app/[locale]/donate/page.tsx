@@ -104,7 +104,7 @@ export default async function DonatePage() {
         <section>
           <h2 className="mb-5 text-xl font-bold text-gray-900">{t("campaigns")}</h2>
           {campaigns.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
               <Heart className="h-10 w-10 text-gray-300" />
               <p className="mt-3 text-sm text-gray-500">{t("noCampaigns")}</p>
               <Link

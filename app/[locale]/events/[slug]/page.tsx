@@ -84,7 +84,7 @@ export default async function EventDetailPage(props: { params: Promise<{ slug: s
               </div>
             )}
 
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
               <h2 className="mb-2 text-sm font-semibold text-gray-700">{t("aboutEvent")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">{event.description}</p>
             </div>
@@ -92,7 +92,7 @@ export default async function EventDetailPage(props: { params: Promise<{ slug: s
 
           {/* Sidebar */}
           <div className="space-y-5">
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <ul className="space-y-3 text-sm text-gray-600">
                 <li className="flex items-start gap-2.5">
                   <CalendarHeart className="mt-0.5 h-4 w-4 shrink-0 text-brand-400" />
@@ -131,7 +131,7 @@ export default async function EventDetailPage(props: { params: Promise<{ slug: s
                 initialGuests={myReg?.guests ?? 0}
               />
             ) : isPast ? (
-              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5 text-center text-sm font-medium text-gray-500">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 text-center text-sm font-medium text-gray-500">
                 {t("pastNotice")}
               </div>
             ) : null}

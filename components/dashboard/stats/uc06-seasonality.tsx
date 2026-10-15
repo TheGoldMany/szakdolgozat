@@ -37,7 +37,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
   const total = byQuarter.reduce((s, r) => s + r.count, 0);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-gray-700">UC-06 &middot; Szezonalitás és adatfrissesség</h2>

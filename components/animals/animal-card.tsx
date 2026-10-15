@@ -69,7 +69,7 @@ export async function AnimalCard({ animal, isFavorited = false }: AnimalCardProp
 
   return (
     <div className="press-card group relative flex flex-col">
-      <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Image */}
         <div className="relative h-52 w-full overflow-hidden bg-gray-100">
@@ -150,7 +150,7 @@ export async function AnimalCard({ animal, isFavorited = false }: AnimalCardProp
       <Link
         href={`/animals/${animal.slug}`}
         aria-label={animal.name}
-        className="absolute inset-0 z-10 rounded-2xl"
+        className="absolute inset-0 z-10 rounded-xl"
       />
     </div>
   );

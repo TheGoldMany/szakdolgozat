@@ -48,7 +48,7 @@ export function EmailNotificationsToggle({ enabled }: EmailNotificationsTogglePr
         onClick={toggle}
         disabled={isPending}
         aria-pressed={isEnabled}
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 ${
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus:ring-2 focus:ring-brand-200 focus:ring-offset-2 disabled:opacity-50 ${
           isEnabled ? "bg-brand-500" : "bg-gray-200"
         }`}
       >

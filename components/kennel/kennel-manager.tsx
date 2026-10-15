@@ -125,18 +125,18 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
         </button>
 
         {showForm && (
-          <form onSubmit={handleCreate} className="mt-4 rounded-2xl border border-brand-100 bg-brand-50 p-5">
+          <form onSubmit={handleCreate} className="mt-4 rounded-xl border border-brand-100 bg-brand-50 p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Megnevezés *</label>
                 <input required value={name} onChange={e => setName(e.target.value)}
                   placeholder="pl. A-1 kennel, Karantén 2, Macskaszoba"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Típus *</label>
                 <select value={type} onChange={e => setType(e.target.value as KennelType)}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200">
                   {ALL_KENNEL_TYPES.map(t => <option key={t} value={t}>{KENNEL_TYPE_LABELS[t]}</option>)}
                 </select>
               </div>
@@ -144,13 +144,13 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Maximális kapacitás *</label>
                 <input required type="number" min={1} value={capacity}
                   onChange={e => setCapacity(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
               <div className="sm:col-span-2">
                 <label className="mb-1 block text-xs font-semibold text-gray-600">Megjegyzés</label>
                 <input value={note} onChange={e => setNote(e.target.value)}
                   placeholder="Opcionális"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200" />
               </div>
             </div>
 
@@ -189,7 +189,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
 
       {/* Kennelek rácsa */}
       {kennels.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
+        <p className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
           Még nincs létrehozott férőhely.
         </p>
       ) : (
@@ -200,7 +200,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
             const pct  = Math.min(100, Math.round((used / k.capacity) * 100));
             const here = animals.filter(a => a.kennelId === k.id);
             return (
-              <div key={k.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div key={k.id} className="rounded-xl border border-gray-200 bg-white p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <h3 className="font-bold text-gray-900">{k.name}</h3>
@@ -277,7 +277,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
       )}
 
       {/* Férőhely nélküli állatok */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
         <div className="mb-3 flex items-center gap-2">
           <DoorOpen className="h-4 w-4 text-gray-400" />
           <h3 className="font-bold text-gray-900">Férőhely nélküli állatok</h3>

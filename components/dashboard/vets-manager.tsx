@@ -26,7 +26,7 @@ export interface VetClinic {
   lng:          number | null;
 }
 
-const cls = "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100";
+const cls = "w-full rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200";
 
 /** Az importban felismert oszlopnevek – a fejléc magyarul és angolul is jó lehet. */
 const KNOWN_COLUMNS: Record<string, string[]> = {
@@ -251,7 +251,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       </div>
 
       {showImport && (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="h-4 w-4 text-brand-600" />
             <h3 className="text-sm font-bold text-gray-900">Rendelők importálása CSV fájlból</h3>
@@ -385,7 +385,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       )}
 
       {showForm && (
-        <form onSubmit={create} className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
+        <form onSubmit={create} className="rounded-xl border border-brand-100 bg-brand-50 p-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-gray-600">Rendelő neve *</label>
@@ -444,13 +444,13 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       )}
 
       {vets.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
+        <p className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
           Még nincs felvett állatorvosi rendelő.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {vets.map((v) => (
-            <div key={v.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div key={v.id} className="rounded-xl border border-gray-200 bg-white p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">

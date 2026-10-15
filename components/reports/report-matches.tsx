@@ -113,7 +113,7 @@ export function ReportMatches({ matches, canManage }: Props) {
           return (
             <div
               key={m.id}
-              className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white"
             >
               <div className="flex items-center justify-between gap-3 border-b border-gray-50 px-4 py-2.5">
                 <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold", style.badge)}>

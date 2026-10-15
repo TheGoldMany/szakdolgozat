@@ -54,7 +54,7 @@ export default async function SheltersPage() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {shelters.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
             <Building2 className="h-12 w-12 text-gray-300" />
             <p className="mt-4 text-lg font-medium text-gray-700">{t("noShelters")}</p>
           </div>

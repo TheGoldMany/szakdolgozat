@@ -76,7 +76,7 @@ export default async function ApplicationsPage() {
         </div>
 
         {applications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
             <ClipboardList className="h-14 w-14 text-gray-300" />
             <p className="mt-4 text-lg font-medium text-gray-700">{t("none")}</p>
             <p className="mt-1 text-sm text-gray-400">{t("noneDesc")}</p>
@@ -99,7 +99,7 @@ export default async function ApplicationsPage() {
               return (
                 <div
                   key={app.id}
-                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                  className="overflow-hidden rounded-xl border border-gray-200 bg-white"
                 >
                   <div className="flex gap-4 p-4">
                     <Link href={`/animals/${app.animal.slug}`} className="shrink-0">

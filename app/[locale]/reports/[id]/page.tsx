@@ -154,7 +154,7 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
           <span className="text-gray-800">{typeLabel}</span>
         </nav>
 
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           {/* Header */}
           <div className={cn("px-6 py-5 flex items-center justify-between gap-3", typeColor.bg)}>
             <div className="flex items-center gap-3">

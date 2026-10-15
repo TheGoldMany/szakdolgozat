@@ -65,7 +65,7 @@ export function DailyCalendar() {
       .format(new Date(2024, 0, 1 + i)));
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <section className="rounded-xl border border-gray-200 bg-white p-4">
       <header className="mb-3 flex items-center justify-between gap-2">
         <button
           type="button" onClick={() => shift(-1)} aria-label={t("calendarPrev")}
@@ -146,7 +146,7 @@ export function DailyCalendar() {
           onClick={() => setOpen(null)}
         >
           <div
-            className="animate-modal relative max-h-full w-full max-w-md overflow-hidden rounded-2xl bg-white"
+            className="animate-modal relative max-h-full w-full max-w-md overflow-hidden rounded-xl bg-white"
             onClick={(e) => e.stopPropagation()}
           >
             <button

@@ -76,7 +76,7 @@ export default async function UserApplicationDetailPage(
         </Link>
 
         {/* Animal + status */}
-        <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
           <div className="flex gap-4 p-5">
             <Link href={`/animals/${app.animal.slug}`} className="shrink-0">
               <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
@@ -133,7 +133,7 @@ export default async function UserApplicationDetailPage(
 
         {/* Submitted form responses */}
         {app.responses.length > 0 ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-5">
             <h2 className="font-semibold text-gray-900">
               {t("filledForm")}
               {app.form && (
@@ -179,7 +179,7 @@ export default async function UserApplicationDetailPage(
             </div>
           </div>
         ) : app.formId ? (
-          <div className="rounded-2xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
+          <div className="rounded-xl border border-dashed border-yellow-200 bg-yellow-50 p-6 text-center">
             <p className="text-sm text-yellow-700">{t("formNotSubmitted")}</p>
             {app.inviteToken && (
               <Link

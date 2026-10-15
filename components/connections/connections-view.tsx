@@ -64,7 +64,7 @@ function Section({
   title, count, empty, children,
 }: { title: string; count: number; empty: string; children: React.ReactNode }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       <h2 className="flex items-center justify-between border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-700">
         {title}
         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-500">
@@ -131,7 +131,7 @@ export function ConnectionsView() {
   return (
     <div className="space-y-6">
       {/* Kereső */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
         <label htmlFor="user-search" className="mb-1.5 block text-sm font-medium text-gray-700">
           {t("searchLabel")}
         </label>
@@ -146,7 +146,7 @@ export function ConnectionsView() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="w-full rounded-xl border border-gray-200 pl-9 pr-9 py-2 text-sm outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+            className="w-full rounded-xl border border-gray-200 pl-9 pr-9 py-2 text-sm outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-200"
           />
         </div>
         <p className={cn("mt-1.5 text-xs", short ? "text-amber-600" : "text-gray-400")}>

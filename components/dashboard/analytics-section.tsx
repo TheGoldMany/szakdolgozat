@@ -7,7 +7,7 @@ import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-
 
 // A recharts-alapú panelek lazy-load-dal (a ~100KB chart bundle csak igény szerint töltődik)
 const chartFallback = (
-  <div className="h-72 animate-pulse rounded-2xl border border-gray-200 bg-white shadow-sm" />
+  <div className="h-72 animate-pulse rounded-xl border border-gray-200 bg-white" />
 );
 const Uc01AdoptionsTrend = dynamic(() => import("./stats/uc01-adoptions-trend").then((m) => m.Uc01AdoptionsTrend), { loading: () => chartFallback });
 const Uc02CapacityPanel  = dynamic(() => import("./stats/uc02-capacity-panel").then((m) => m.Uc02CapacityPanel),   { loading: () => chartFallback });
@@ -149,7 +149,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
           {isSuperAdmin && (
             <button
               onClick={() => setFilterOpen((o) => !o)}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
             >
               {t("analyticsSheltersFilter", { selected: selectedIds.size, total: shelters.length })}
               {filterOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -158,7 +158,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             {t("analyticsRefresh")}
@@ -167,7 +167,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
             <button
               onClick={runEtl}
               disabled={etlRunning}
-              className="flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 shadow-sm hover:bg-brand-100 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-50 transition-colors"
             >
               {etlRunning
                 ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -186,7 +186,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
 
       {/* Shelter filter panel — super admin only */}
       {isSuperAdmin && filterOpen && (
-        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex items-center gap-3 mb-3">
             <button
               onClick={selectAll}
@@ -228,7 +228,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
       {loading && !data && (
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-64 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={i} className="h-64 rounded-xl bg-gray-100 animate-pulse" />
           ))}
         </div>
       )}
@@ -257,7 +257,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
       )}
 
       {!loading && !data && !error && (
-        <div className="rounded-2xl border border-dashed border-gray-200 p-12 text-center text-gray-400 text-sm">
+        <div className="rounded-xl border border-dashed border-gray-200 p-12 text-center text-gray-400 text-sm">
           {t("analyticsNoData")}
         </div>
       )}

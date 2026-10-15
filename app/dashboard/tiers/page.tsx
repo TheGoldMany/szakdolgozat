@@ -49,7 +49,7 @@ export default async function TiersPage() {
           <h1 className="text-2xl font-bold text-gray-900">{t("tiersTitle")}</h1>
           <PageInfo page="tiers" />
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white">
           {tiers.length === 0 ? (
             <p className="px-5 py-8 text-sm text-gray-400">Nincs még előfizetési csomag a platformon.</p>
           ) : (
@@ -101,7 +101,7 @@ export default async function TiersPage() {
   // Egy konkrét menhely csomagjai
   if (!shelterId) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <p className="text-sm text-gray-500">{t("tiersNoShelter")}</p>
       </div>
     );

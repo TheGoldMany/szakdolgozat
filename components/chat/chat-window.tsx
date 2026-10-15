@@ -56,7 +56,7 @@ function InviteMessageBubble({ token, own }: { token: string; own: boolean }) {
   return (
     <div
       className={cn(
-        "rounded-2xl px-4 py-3 text-sm",
+        "rounded-xl px-4 py-3 text-sm",
         own
           ? "bg-brand-500 text-white rounded-br-sm"
           : "bg-gray-100 text-gray-800 rounded-bl-sm"
@@ -289,7 +289,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                   ) : (msg.content || msg.attachmentUrl) ? (
                     <div
                       className={cn(
-                        "rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
+                        "rounded-xl px-3.5 py-2 text-sm leading-relaxed",
                         isOwn
                           ? "bg-brand-500 text-white rounded-br-sm"
                           : "bg-gray-100 text-gray-800 rounded-bl-sm"
@@ -368,7 +368,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
             onKeyDown={handleKeyDown}
             placeholder={t("inputPlaceholder")}
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 max-h-32 overflow-y-auto"
+            className="flex-1 resize-none rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 max-h-32 overflow-y-auto"
             style={{ minHeight: "42px" }}
           />
           <button

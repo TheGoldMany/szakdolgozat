@@ -50,7 +50,7 @@ export function DailyComposer({ onPosted }: { onPosted: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-2xl border border-gray-200 bg-white p-4">
+    <form onSubmit={submit} className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
       <h3 className="text-sm font-semibold text-gray-800">{t("composeTitle")}</h3>
 
       <ImageUpload value={imageUrl} onChange={setImageUrl} label={t("composeOpen")} />
@@ -66,7 +66,7 @@ export function DailyComposer({ onPosted }: { onPosted: () => void }) {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder={t("composeCaptionPlaceholder")}
-          className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+          className="w-full resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-200"
         />
       </div>
 

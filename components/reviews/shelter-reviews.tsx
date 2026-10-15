@@ -52,7 +52,7 @@ export async function ShelterReviews({ shelterId }: Props) {
       )}
 
       {reviews.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
+        <p className="rounded-xl border border-dashed border-gray-200 py-10 text-center text-sm text-gray-400">
           Még nincs értékelés. Légy az első!
         </p>
       ) : (

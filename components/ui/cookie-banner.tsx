@@ -42,7 +42,7 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label={t("title")}
-      className="animate-sheet-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-50 border-t border-gray-200 bg-white shadow-lg sm:left-4 sm:right-auto sm:max-w-sm sm:rounded-2xl sm:border md:bottom-4"
+      className="animate-sheet-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-50 border-t border-gray-200 bg-white shadow-lg sm:left-4 sm:right-auto sm:max-w-sm sm:rounded-xl sm:border md:bottom-4"
     >
       <div className="p-4 sm:p-5">
         <div className="mb-3 flex items-center gap-2">

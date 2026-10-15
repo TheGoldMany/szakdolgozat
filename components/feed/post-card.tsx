@@ -34,7 +34,7 @@ export function PostCard({ post }: { post: FeedPost }) {
   const lead = post.excerpt ?? (post.content.length > 220 ? `${post.content.slice(0, 220)}…` : post.content);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       {/* Fejléc: szerző, illetve a kapcsolódó menhely, ha van */}
       <div className="flex items-center gap-3 px-4 pt-4">
         {post.shelter ? (

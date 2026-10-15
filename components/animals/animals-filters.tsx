@@ -117,7 +117,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
             placeholder={t("filterSearchPlaceholder")}
             value={localQ}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
         </div>
 
@@ -153,7 +153,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
           <select
             value={size}
             onChange={(e) => update("size", e.target.value)}
-            className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
           >
             {SIZES.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
@@ -194,7 +194,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
             <select
               value={city}
               onChange={(e) => update("city", e.target.value)}
-              className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-400"
+              className="h-10 w-full rounded-xl border border-gray-200 px-3 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
             >
               <option value="">{t("filterAllAreas")}</option>
               {cities.map((c) => (
@@ -240,7 +240,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
   return (
     <>
       {/* ── Desktop: oldalsáv (lg+) ─────────────────────────── */}
-      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:block">
+      <div className="hidden overflow-hidden rounded-xl border border-gray-200 bg-white lg:block">
         <div className="space-y-5 p-5">
           <h2 className="text-sm font-bold text-gray-800">{t("filterLabel")}</h2>
           {controls}
@@ -251,7 +251,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
       {/* ── Mobil: „Szűrők" gomb (lg alatt) ─────────────────── */}
       <button
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm lg:hidden"
+        className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 lg:hidden"
       >
         <span className="flex items-center gap-2 font-semibold text-gray-800">
           <SlidersHorizontal className="h-4 w-4 text-brand-500" />
@@ -268,7 +268,7 @@ export function AnimalsFilters({ cities = [] }: { cities?: string[] }) {
       {open && createPortal(
         <div className="fixed inset-0 z-[9999] lg:hidden">
           <div className="animate-fade-in absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="animate-sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-3xl bg-white shadow-2xl">
+          <div className="animate-sheet-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col rounded-t-2xl bg-white shadow-2xl">
             {/* Fejléc */}
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="flex items-center gap-2 text-base font-bold text-gray-900">

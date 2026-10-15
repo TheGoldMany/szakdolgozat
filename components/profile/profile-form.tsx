@@ -73,7 +73,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </label>
         <input
           {...register("name")}
-          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
         {errors.name && (
           <p className="mt-1 text-xs text-red-500">{t("nameMinError")}</p>
@@ -86,7 +86,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         <input
           {...register("phone")}
           placeholder="+36 30 123 4567"
-          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
       </div>
 
@@ -96,7 +96,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         <input
           {...register("city")}
           placeholder="Budapest"
-          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         <input
           {...register("address")}
           placeholder="Példa utca 1."
-          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
       </div>
 

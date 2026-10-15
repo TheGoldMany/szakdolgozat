@@ -161,7 +161,7 @@ export default function DashboardSheltersPage() {
 
       {/* Jóváhagyásra váró menhelyek bannere */}
       {!loading && pending.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4">
+        <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100">
             <Clock className="h-5 w-5 text-blue-600" />
           </div>
@@ -179,7 +179,7 @@ export default function DashboardSheltersPage() {
 
       {/* Hozzáadás panel */}
       {showForm && (
-        <div className="rounded-2xl border border-brand-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-brand-200 bg-white p-6">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">{t("sheltersNewTitle")}</h2>
           </div>
@@ -190,7 +190,7 @@ export default function DashboardSheltersPage() {
       {/* Törlés megerősítő dialóg */}
       {confirmDelete && (
         <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="animate-modal w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+          <div className="animate-modal w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
                 <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -223,11 +223,11 @@ export default function DashboardSheltersPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl bg-gray-100" />
+            <div key={i} className="h-20 animate-pulse rounded-xl bg-gray-100" />
           ))}
         </div>
       ) : shelters.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-16 text-center">
           <Building2 className="mx-auto h-10 w-10 text-gray-300" />
           <p className="mt-3 text-gray-500">{t("sheltersEmpty")}</p>
           <button
@@ -238,7 +238,7 @@ export default function DashboardSheltersPage() {
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-400">
               <tr>

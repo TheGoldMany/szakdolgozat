@@ -48,7 +48,7 @@ export default async function ShelterSettingsPage() {
 
   if (!shelter) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
         {acting.canSwitch
           ? "Válassz menhelyt a bal oldali „Kezelt menhely” választóval a beállítások szerkesztéséhez."
           : t("settingsNoShelter")}
@@ -83,7 +83,7 @@ export default async function ShelterSettingsPage() {
           href={`/shelters/${shelter.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 shadow-sm transition-colors hover:bg-gray-50"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
         >
           <ExternalLink className="h-4 w-4" />
           {t("settingsPublicPage")}

@@ -84,7 +84,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Info kártya */}
-        <div className="lg:col-span-1 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm space-y-4">
+        <div className="lg:col-span-1 rounded-xl border border-gray-200 bg-white p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-700">Adatok</h2>
             <button
@@ -146,7 +146,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
         </div>
 
         {/* Mozgástörténet */}
-        <div className="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="mb-4 text-sm font-semibold text-gray-700">
             Mozgástörténet
             <span className="ml-2 text-xs font-normal text-gray-400">({item.transactions.length} bejegyzés)</span>
@@ -204,7 +204,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
       {/* Edit modal */}
       {showEdit && (
         <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="animate-modal w-full max-w-lg rounded-2xl bg-white shadow-xl">
+          <div className="animate-modal w-full max-w-lg rounded-xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-900">Tétel szerkesztése</h2>
               <button onClick={() => setShowEdit(false)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 transition-colors">✕</button>

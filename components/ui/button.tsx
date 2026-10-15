@@ -12,18 +12,22 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
+// A gombkészlet a márkapalettából épül, nem a szokásos szürke sablonból:
+// a másodlagos gomb halványzöld, a fókuszgyűrű mindenhol márkazöld, a
+// veszélyes művelet pedig olyan piros, amin a fehér szöveg is olvasható
+// (a red-500 csak 3,8:1 kontrasztot ad).
 const variants: Record<Variant, string> = {
-  primary:   "bg-brand-700 text-white hover:bg-brand-800 focus-visible:ring-brand-700",
-  secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-400",
-  outline:   "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400",
-  ghost:     "text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-400",
-  danger:    "bg-red-500 text-white hover:bg-red-600 focus-visible:ring-red-500",
+  primary:   "bg-brand-700 text-white hover:bg-brand-800",
+  secondary: "bg-brand-50 text-forest hover:bg-brand-100",
+  outline:   "border border-gray-300 bg-white text-graphite hover:border-brand-600 hover:text-brand-700",
+  ghost:     "text-graphite hover:bg-gray-100",
+  danger:    "bg-red-600 text-white hover:bg-red-700",
 };
 
 const sizes: Record<Size, string> = {
   sm: "h-8 px-3 text-xs",
   md: "h-10 px-4 text-sm",
-  lg: "h-11 px-6 text-base",
+  lg: "h-12 px-6 text-base",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -33,8 +37,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled={disabled || loading}
       className={cn(
         "press",
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
         sizes[size],

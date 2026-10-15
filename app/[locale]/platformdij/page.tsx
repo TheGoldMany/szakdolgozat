@@ -83,7 +83,7 @@ export default async function PlatformFeePage() {
 
         {/* A számok elöl: aki ide kattintott, azt elsősorban az érdekli, hogy
             mennyi megy a menhelyhez. A magyarázat csak utána jön. */}
-        <section className="mt-10 overflow-hidden rounded-2xl border border-mint bg-white">
+        <section className="mt-10 overflow-hidden rounded-xl border border-mint bg-white">
           <div className="border-b border-mint bg-mint/30 px-5 py-3">
             <h2 className="text-sm font-semibold text-graphite">
               {t("exampleHeading", { amount: `${fmt(EXAMPLE_AMOUNT)} Ft` })}
@@ -121,7 +121,7 @@ export default async function PlatformFeePage() {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {groups.map(({ Icon, title, items }) => (
-              <div key={title} className="rounded-2xl border border-mint bg-white p-5">
+              <div key={title} className="rounded-xl border border-mint bg-white p-5">
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-mint/50">
                     <Icon className="h-4 w-4 text-forest" />
@@ -141,7 +141,7 @@ export default async function PlatformFeePage() {
           </div>
         </section>
 
-        <section className="mt-12 rounded-2xl border border-mint bg-white p-6">
+        <section className="mt-12 rounded-xl border border-mint bg-white p-6">
           <h2 className="text-xl font-bold text-graphite">{t("whyHeading")}</h2>
           <p className="mt-3 leading-relaxed text-graphite/80">{t("whyBody1")}</p>
           <p className="mt-3 leading-relaxed text-graphite/80">{t("whyBody2")}</p>
@@ -149,7 +149,7 @@ export default async function PlatformFeePage() {
 
         {/* A feldolgozási díj nem a miénk. Ha ezt elhallgatnánk, a támogató azt
             hinné, hogy a teljes különbözetet a platform teszi zsebre. */}
-        <section className="mt-6 rounded-2xl border border-graphite/10 bg-white p-6">
+        <section className="mt-6 rounded-xl border border-graphite/10 bg-white p-6">
           <h2 className="text-base font-semibold text-graphite">{t("detailsHeading")}</h2>
           <dl className="mt-4 space-y-4">
             {["platform", "processing", "free"].map((key) => (

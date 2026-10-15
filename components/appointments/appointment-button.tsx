@@ -14,7 +14,7 @@ export function AppointmentButton({ shelterId, animalId, animalName }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
       {!open ? (
         <button
           onClick={() => setOpen(true)}

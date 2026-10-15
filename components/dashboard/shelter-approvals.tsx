@@ -47,7 +47,7 @@ export function ShelterApprovals({ shelters: initial }: { shelters: PendingShelt
   }
 
   if (shelters.length === 0) {
-    return <p className="rounded-2xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
+    return <p className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
       Nincs hitelesítésre váró menhely.
     </p>;
   }
@@ -55,7 +55,7 @@ export function ShelterApprovals({ shelters: initial }: { shelters: PendingShelt
   return (
     <div className="space-y-3">
       {shelters.map((s) => (
-        <div key={s.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div key={s.id} className="rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-gray-900">{s.name}</p>

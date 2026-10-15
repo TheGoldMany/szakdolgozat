@@ -136,7 +136,7 @@ export default async function AnimalsPage(props: PageProps) {
 
           <main className="flex-1" data-tour="animal-list">
             {animals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
                 <PawPrint className="h-12 w-12 text-gray-300" />
                 <p className="mt-4 text-lg font-medium text-gray-700">{t("noResults")}</p>
                 <p className="mt-1 text-sm text-gray-400">{t("noResultsDesc")}</p>
@@ -191,13 +191,13 @@ function Pagination({
         className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
           page <= 1
             ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
-            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
         }`}
       >
         ← {t("prevPage")}
       </a>
 
-      <span className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-500 shadow-sm">
+      <span className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-500">
         {t("page", { current: page, total: totalPages })}
       </span>
 
@@ -207,7 +207,7 @@ function Pagination({
         className={`rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors ${
           page >= totalPages
             ? "pointer-events-none border-gray-100 bg-gray-50 text-gray-300"
-            : "border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50"
+            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
         }`}
       >
         {t("nextPage")} →

@@ -48,7 +48,7 @@ type FormData = {
   imageUrls?:   string[];
 };
 
-const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+const inputCls = "h-9 w-full rounded-xl border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200";
 const inputWhiteCls = `${inputCls} bg-white`;
 
 export function ReportForm() {
@@ -187,7 +187,7 @@ export function ReportForm() {
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("formGender")}</label>
           <select {...register("gender")}
-            className="h-9 w-full rounded-xl border border-gray-200 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            className="h-9 w-full rounded-xl border border-gray-200 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200">
             <option value="">{t("genderUnknown")}</option>
             <option value="MALE">{t("genderMale")}</option>
             <option value="FEMALE">{t("genderFemale")}</option>
@@ -202,7 +202,7 @@ export function ReportForm() {
         </label>
         <textarea {...register("description")} rows={4}
           placeholder={t("formDescriptionPlaceholder")}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none" />
+          className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none" />
         {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}
       </div>
 
@@ -249,7 +249,7 @@ export function ReportForm() {
       </div>
 
       {/* Kapcsolattartó */}
-      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-4">
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-4">
         <p className="text-sm font-semibold text-gray-700">{t("formContactSection")}</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>

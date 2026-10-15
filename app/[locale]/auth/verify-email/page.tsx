@@ -50,7 +50,7 @@ function VerifyEmailInner() {
         ÁllatiMenhelyek.hu
       </Link>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-8">
         {status === "loading" && (
           <>
             <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-brand-500" />

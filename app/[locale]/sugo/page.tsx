@@ -27,7 +27,7 @@ function TourIndex() {
   const tours = listedTours();
 
   return (
-    <section id="bemutatok" className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <section id="bemutatok" className="mt-10 rounded-xl border border-gray-200 bg-white p-6">
       <div className="mb-1 flex items-center gap-2">
         <Compass className="h-5 w-5 text-brand-600" />
         <h2 className="text-lg font-bold text-gray-900">Végigvezető bemutatók</h2>
@@ -125,7 +125,7 @@ function Section({ id, icon: Icon, title, color, children }: {
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <div className={cn("mb-5 flex items-center gap-3 rounded-2xl px-5 py-4", color)}>
+      <div className={cn("mb-5 flex items-center gap-3 rounded-xl px-5 py-4", color)}>
         <Icon className="h-5 w-5 shrink-0" />
         <h2 className="text-lg font-bold">{title}</h2>
       </div>
@@ -164,7 +164,7 @@ function Note({ type = "info", children }: { type?: "info" | "warn" | "tip"; chi
 
 function QuickLink({ icon: Icon, label, href }: { icon: React.ElementType; label: string; href: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm hover:border-brand-200 hover:shadow-md transition-all">
+    <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3.5 hover:border-brand-200 hover:shadow-md transition-all">
       <div className="flex items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50">
           <Icon className="h-4 w-4 text-brand-600" />
@@ -393,7 +393,7 @@ function UserContent() {
           </Step>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Mennyi jut el a menhelyhez?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             <strong>A teljes szánt összeg.</strong> A platform díja és a bankkártyás feldolgozás
@@ -505,7 +505,7 @@ function UserContent() {
           bejelentéseit, a menhelyeket és az <strong>állatorvosi rendelőket</strong> – köztük a
           24 órás ügyeleteket.
         </p>
-        <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Hogyan olvasd a jelölőket?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             Minden jelölő két dolgot mond el egyszerre: a <strong>szín</strong> a kategóriát,
@@ -889,7 +889,7 @@ function AdminContent() {
           </Step>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4">
           <h3 className="mb-2 text-sm font-semibold text-gray-800">Mit kap meg a menhely?</h3>
           <p className="text-sm leading-relaxed text-gray-600">
             <strong>A támogató által szánt teljes összeget.</strong> A platform 5%-os díja és a
@@ -1313,7 +1313,7 @@ export default function HelpPage() {
       {/* Hero */}
       <div className="bg-white border-b border-gray-100">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12 sm:px-6 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand-600">
             <PawPrint className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Ismerd meg a platformot</h1>
@@ -1322,14 +1322,14 @@ export default function HelpPage() {
           </p>
 
           {/* Tab selector */}
-          <div className="mt-6 inline-flex gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm">
+          <div className="mt-6 inline-flex gap-2 rounded-xl border border-gray-200 bg-white p-1.5">
             {visibleTabs.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
                   "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all",
-                  activeTab === t.id ? t.color + " border shadow-sm" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  activeTab === t.id ? t.color + " border" : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                 )}
               >
                 <t.icon className="h-4 w-4" />
@@ -1345,7 +1345,7 @@ export default function HelpPage() {
 
           {/* Sticky TOC */}
           <aside className="lg:col-span-1">
-            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Tartalom</p>
               <nav className="space-y-0.5">
                 {toc.map(({ id, label, icon: Icon }) => (
@@ -1370,7 +1370,7 @@ export default function HelpPage() {
             <TourIndex />
 
             {/* Footer CTA */}
-            <div className="mt-10 rounded-2xl bg-brand-600 p-8 text-center text-white">
+            <div className="mt-10 rounded-xl bg-brand-600 p-8 text-center text-white">
               <h3 className="text-xl font-bold">Nem találtad meg a választ?</h3>
               <p className="mt-2 text-sm text-brand-100">Írj nekünk és segítünk!</p>
               <a href="mailto:info@allatimenhelyek.hu"

@@ -68,7 +68,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
 
   return (
     <div className={cn(
-      "rounded-2xl border bg-white shadow-sm overflow-hidden",
+      "rounded-xl border bg-white overflow-hidden",
       followUp.status === "OVERDUE" ? "border-red-200" : "border-gray-200"
     )}>
       {/* Header */}
@@ -165,7 +165,7 @@ export function FollowUpCard({ followUp, onUpdate }: Props) {
               rows={3}
               maxLength={2000}
               placeholder={t("notesPlaceholder")}
-              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-400 resize-none"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-200 resize-none"
             />
           </div>
 

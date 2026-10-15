@@ -42,7 +42,7 @@ export function ApplicationReview({ applicationId, currentStatus }: ApplicationR
           onChange={(e) => setNotes(e.target.value)}
           placeholder={t("appsReviewNoteplaceholder")}
           rows={2}
-          className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+          className="w-full rounded-lg border border-gray-200 px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none"
         />
       )}
 

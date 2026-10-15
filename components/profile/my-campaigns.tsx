@@ -43,7 +43,7 @@ export function MyCampaigns({ campaigns }: { campaigns: MyCampaign[] }) {
       </div>
 
       {campaigns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 py-10 text-center">
+        <div className="rounded-xl border border-dashed border-gray-200 py-10 text-center">
           <p className="text-sm text-gray-400">{t("noCampaigns")}</p>
           <Link href="/campaigns/new" className="mt-2 inline-block text-sm font-medium text-brand-500 hover:underline">
             {t("startCampaignNow")}
@@ -56,7 +56,7 @@ export function MyCampaigns({ campaigns }: { campaigns: MyCampaign[] }) {
             const pct    = Math.min(100, Math.round((raised / c.targetAmount) * 100));
             const st     = STATUS_STYLE[c.status];
             return (
-              <li key={c.id} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <li key={c.id} className="rounded-xl border border-gray-200 bg-white p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex flex-wrap items-center gap-2">

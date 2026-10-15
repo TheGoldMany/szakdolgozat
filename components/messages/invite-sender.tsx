@@ -54,7 +54,7 @@ export function InviteSender({ conversationId, approvedForms }: InviteSenderProp
   }
 
   return (
-    <div className="rounded-2xl border border-brand-100 bg-brand-50 p-4 space-y-3">
+    <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 space-y-3">
       <p className="text-sm font-semibold text-brand-700">Kérvény meghívó küldése</p>
       {approvedForms.length === 0 ? (
         <p className="text-xs text-gray-500">
@@ -65,7 +65,7 @@ export function InviteSender({ conversationId, approvedForms }: InviteSenderProp
           <select
             value={formId}
             onChange={(e) => setFormId(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
           >
             {approvedForms.map((f) => (
               <option key={f.id} value={f.id}>{f.title}</option>

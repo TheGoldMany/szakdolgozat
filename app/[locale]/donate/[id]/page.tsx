@@ -161,7 +161,7 @@ export default async function CampaignDetailPage(
             </div>
 
             {/* Description */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("aboutCampaign")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
                 {campaign.description}
@@ -169,7 +169,7 @@ export default async function CampaignDetailPage(
             </div>
 
             {/* Recent donations */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-4 text-sm font-semibold text-gray-700 flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-400" />
                 {t("recentDonations")}
@@ -206,7 +206,7 @@ export default async function CampaignDetailPage(
 
             {/* Progress card – az állandó gyűjtésnek nincs célösszege, ott csak
                 az eddig összegyűlt összeg jelenik meg, haladásjelző nélkül. */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <div className="mb-1 flex items-end justify-between">
                 <span className="text-2xl font-bold text-brand-600">{formatHUF(campaign.raisedAmount)}</span>
                 {!campaign.isGeneral && (
@@ -232,7 +232,7 @@ export default async function CampaignDetailPage(
             </div>
 
             {/* Donate form */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="mb-4 text-base font-semibold text-gray-900">{t("donateNow")}</h2>
               <DonateForm
                 campaignId={campaign.id}

@@ -50,7 +50,7 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 className="mb-4 text-sm font-bold text-gray-900">Értékelés írása</h3>
 
       <div className="mb-4">
@@ -69,7 +69,7 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
           maxLength={1000}
           rows={3}
           placeholder="Oszd meg tapasztalataidat…"
-          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-200"
         />
         <p className="mt-1 text-right text-xs text-gray-400">{comment.length}/1000</p>
       </div>

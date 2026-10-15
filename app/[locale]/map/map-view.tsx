@@ -114,7 +114,7 @@ export default function MapView() {
       </button>
 
       {/* Control panel – top left */}
-      <div data-tour="map-filters" className={`absolute left-3 top-3 z-[1000] w-64 rounded-2xl border border-gray-200 bg-white shadow-lg transition-transform md:translate-y-0 ${
+      <div data-tour="map-filters" className={`absolute left-3 top-3 z-[1000] w-64 rounded-xl border border-gray-200 bg-white shadow-lg transition-transform md:translate-y-0 ${
         panelOpen ? "translate-y-12" : "hidden md:block"
       }`}>
         {/* Header */}

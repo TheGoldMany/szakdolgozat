@@ -37,7 +37,7 @@ export default async function NewCampaignPage(props: { searchParams: Promise<{ s
         <p className="mb-8 text-sm text-gray-500">
           Töltsd ki az alábbi mezőket. A gyűjtésed admin jóváhagyás után kerül nyilvánosságra.
         </p>
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white p-6">
           <NewCampaignForm
             stripeConnected={stripeConnected}
             defaultShelterId={searchParams.shelter ?? ""}

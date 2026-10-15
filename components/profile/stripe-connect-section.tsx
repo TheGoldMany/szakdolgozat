@@ -58,7 +58,7 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-6">
       <div className="mb-1 flex items-center gap-2">
         <CreditCard className="h-4 w-4 text-gray-500" />
         <h2 className="text-sm font-semibold text-gray-700">{t("stripeTitle")}</h2>

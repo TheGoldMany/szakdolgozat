@@ -36,7 +36,7 @@ function PostCard({ post, onToggle }: { post: Post; onToggle: (id: string) => vo
   const ago = useAgo();
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       <header className="flex items-center gap-2.5 px-3 py-2.5">
         {post.author.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -269,7 +269,7 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
             vagy ha valaki egy zárt fülre koppint. Nem az első képernyőn:
             előbb lássa, mi ez, és csak utána döntsön a kiterjesztésről. */}
         {(askConsent || (tab === "friends" && !expanded && posts?.length === 0)) && (
-          <div className="animate-fade-in-up rounded-2xl border border-brand-200 bg-brand-50/60 p-4">
+          <div className="animate-fade-in-up rounded-xl border border-brand-200 bg-brand-50/60 p-4">
             <h4 className="text-sm font-bold text-gray-900">{t("consentTitle")}</h4>
             <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{t("consentBody")}</p>
             <div className="mt-3 flex gap-2">

@@ -87,7 +87,7 @@ function TermInput({
             // Enter ne küldje be a cikk-űrlapot, csak a címkét adja hozzá
             if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); }
           }}
-          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
         />
         <button
           type="button"
@@ -150,7 +150,7 @@ export function ArticleSeoPanel({
   const todo = checks.filter((c) => c.status !== "ok");
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-gray-200 bg-white p-5">
       <div className="mb-1 flex items-center gap-2">
         <Search className="h-4 w-4 text-brand-500" />
         <h2 className="text-sm font-bold text-gray-900">Keresőoptimalizálás</h2>
@@ -187,7 +187,7 @@ export function ArticleSeoPanel({
             value={value.seoTitle}
             placeholder={title || "Üresen a cikk címe jelenik meg"}
             onChange={(e) => set("seoTitle", e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
           />
         </div>
 
@@ -201,7 +201,7 @@ export function ArticleSeoPanel({
             value={value.metaDescription}
             placeholder="Egy-két mondat arról, miről szól a cikk – ez jelenik meg a találat alatt."
             onChange={(e) => set("metaDescription", e.target.value)}
-            className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+            className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
           />
         </div>
 
@@ -212,7 +212,7 @@ export function ArticleSeoPanel({
             value={value.focusKeyword}
             placeholder="pl. kutya örökbefogadás"
             onChange={(e) => set("focusKeyword", e.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-400"
+            className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
           />
           <p className="mt-1 text-[11px] leading-snug text-gray-400">
             Amire keresve meg kellene találni a cikket. Ez alapján készül az alábbi ellenőrzőlista.

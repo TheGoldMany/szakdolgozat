@@ -91,7 +91,7 @@ export default async function ArticlesByTagPage(props: { params: Promise<{ tag: 
             <li key={post.id}>
               <Link
                 href={post.slug ? `/articles/${post.slug}` : "/articles"}
-                className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+                className="flex gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
               >
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-brand-50 sm:h-24 sm:w-32">
                   {post.imageUrl ? (

@@ -53,7 +53,7 @@ export default function ShelterRegisterPage() {
   }
 
   const inputCls =
-    "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500";
+    "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200";
 
   return (
     <div className="flex min-h-screen">
@@ -74,7 +74,7 @@ export default function ShelterRegisterPage() {
         ))}
 
         <div className="relative z-10 text-center text-white">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/20 shadow-xl">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 shadow-xl">
             <Building2 className="h-10 w-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold sm:text-3xl tracking-tight">{t("shelterBrandTitle")}</h2>
@@ -114,7 +114,7 @@ export default function ShelterRegisterPage() {
           </div>
 
           {registeredEmail ? (
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+            <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
               <MailCheck className="mx-auto mb-4 h-12 w-12 text-brand-500" />
               <h2 className="text-xl font-bold text-gray-900">{t("shelterVerifyTitle")}</h2>
               <p className="mt-2 text-sm text-gray-500">
@@ -161,7 +161,7 @@ export default function ShelterRegisterPage() {
                 A bal oldali márkapanel `lg:` alatt rejtett, ezért ez NEM oda
                 került — telefonon a menhelyek fele ott sem látná.
               */}
-              <div className="mb-5 rounded-2xl border border-mint bg-cream p-5">
+              <div className="mb-5 rounded-xl border border-mint bg-cream p-5">
                 <p className="text-sm font-semibold text-graphite">{t("shelterCostTitle")}</p>
                 <p className="mt-1.5 text-sm leading-relaxed text-graphite/75">
                   {t("shelterCostBody")}
@@ -177,7 +177,7 @@ export default function ShelterRegisterPage() {
                 </Link>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+              <div className="rounded-xl border border-gray-200 bg-white p-8">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                   {/* Menhely adatok */}
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t("shelterSection")}</p>

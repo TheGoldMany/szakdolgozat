@@ -40,7 +40,7 @@ export function AnimalStatusSelect({
       defaultValue={currentStatus}
       onChange={onChange}
       disabled={saving}
-      className="rounded-lg border border-gray-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
+      className="rounded-lg border border-gray-200 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:opacity-50"
     >
       {OPTIONS.map((o) => (
         <option key={o.value} value={o.value}>{t(o.labelKey)}</option>

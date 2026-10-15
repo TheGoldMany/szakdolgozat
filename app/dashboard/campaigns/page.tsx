@@ -120,7 +120,7 @@ export default async function CampaignApprovalsPage(props: PageProps) {
 
       {/* All campaigns table */}
       <div>
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white">
           {allCampaigns.length === 0 ? (
             <p className="px-5 py-8 text-sm text-gray-400">Nincs ilyen gyűjtés.</p>
           ) : (
