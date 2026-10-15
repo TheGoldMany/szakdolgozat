@@ -7,8 +7,6 @@ import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
 import { HeroSlideshow } from "@/components/home/hero-slideshow";
 import { HomeSidebar } from "@/components/home/home-sidebar";
-import { CountUp } from "@/components/ui/count-up";
-import { Reveal } from "@/components/ui/reveal";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
@@ -160,7 +158,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     <main className="min-h-screen bg-white">
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-brand-50 via-white to-white">
+      <section className="bg-white">
         <div className="mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8 lg:pb-10 lg:pt-10">
           <div className="grid items-center gap-10 lg:grid-cols-2">
 
@@ -196,7 +194,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                   { href: "/animals?type=OTHER",  Icon: PawPrint, label: tAnimals("other")  },
                 ].map(({ href, Icon, label }) => (
                   <Link key={href} href={href}
-                    className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white/80 px-3.5 py-1.5 text-sm font-medium text-gray-600 backdrop-blur-sm transition-colors hover:border-brand-300 hover:bg-white hover:text-brand-600">
+                    className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-brand-300 hover:bg-white hover:text-brand-600">
                     <Icon className="h-3.5 w-3.5 shrink-0" />
                     {label}
                   </Link>
@@ -229,7 +227,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             ].map(({ value, label, Icon }) => (
               <div key={label}>
                 <Icon className="mx-auto mb-1 h-5 w-5 text-white/75" />
-                <p className="text-2xl font-bold sm:text-3xl"><CountUp value={value} /></p>
+                <p className="text-2xl font-bold sm:text-3xl">{value.toLocaleString("hu-HU")}</p>
                 <p className="mt-0.5 text-xs text-white/75 sm:text-sm">{label}</p>
               </div>
             ))}
@@ -301,7 +299,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       <section className="bg-white py-14">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <h2 className="mb-10 text-center text-2xl font-bold text-gray-900">{t("howTitle")}</h2>
-          <Reveal stagger className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {[
               { Icon: Search,        title: t("step1Title"), desc: t("step1Desc"), step: "1" },
               { Icon: ClipboardList, title: t("step2Title"), desc: t("step2Desc"), step: "2" },
@@ -316,7 +314,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                 <p className="mt-1.5 text-sm leading-relaxed text-gray-500">{desc}</p>
               </div>
             ))}
-          </Reveal>
+          </div>
         </div>
       </section>
 

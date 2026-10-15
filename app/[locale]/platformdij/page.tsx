@@ -167,7 +167,7 @@ export default async function PlatformFeePage() {
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <Link
             href="/donate"
-            className="inline-flex items-center gap-2 rounded-xl bg-forest px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-xl bg-forest px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
           >
             <Heart className="h-4 w-4" />
             {t("ctaDonate")}

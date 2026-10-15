@@ -73,7 +73,7 @@ function Section({
       </h2>
       {count === 0
         ? <p className="px-4 py-8 text-center text-sm text-gray-400">{empty}</p>
-        : <ul className="stagger">{children}</ul>}
+        : <ul className="">{children}</ul>}
     </section>
   );
 }

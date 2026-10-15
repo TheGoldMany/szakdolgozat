@@ -56,9 +56,8 @@ export default async function EventDetailPage(props: { params: Promise<{ slug: s
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="relative h-52 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-64">
-        {event.imageUrl && <Image src={event.imageUrl} alt={event.title} fill className="object-cover opacity-60" priority />}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="relative h-52 w-full overflow-hidden bg-brand-700 sm:h-64">
+        {event.imageUrl && <Image src={event.imageUrl} alt={event.title} fill className="object-cover" priority />}
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">

@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
@@ -84,7 +83,7 @@ export default async function DonatePage() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-brand-500 to-brand-700 py-16 px-4 text-center text-white">
+      <div className="bg-brand-700 py-16 px-4 text-center text-white">
         <div className="mx-auto max-w-2xl">
           <Heart className="mx-auto mb-4 h-10 w-10 opacity-90" />
           <h1 className="text-3xl font-bold sm:text-4xl">{t("title")}</h1>
@@ -116,7 +115,7 @@ export default async function DonatePage() {
               </Link>
             </div>
           ) : (
-            <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {campaigns.map((c) => (
                 <CampaignCard
                   key={c.id}
@@ -126,7 +125,7 @@ export default async function DonatePage() {
                   }}
                 />
               ))}
-            </Reveal>
+            </div>
           )}
         </section>
 

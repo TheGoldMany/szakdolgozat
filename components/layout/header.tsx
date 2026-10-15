@@ -153,8 +153,10 @@ export function Header() {
   return (
     <header
       className={cn(
-        "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-100 backdrop-blur-sm",
-        scrolled ? "site-header--scrolled bg-white/95" : "bg-white/90",
+        // Tömör háttér: az áttetsző + elmosott „üveg" fejléc a sablonos kinézet
+        // egyik legismertebb jele, és a mögötte átsejlő tartalom zavarja a menüt.
+        "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white",
+        scrolled && "site-header--scrolled",
       )}
     >
 

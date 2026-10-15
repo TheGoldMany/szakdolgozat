@@ -88,7 +88,7 @@ export default function ShelterRegisterPage() {
               { icon: Users,      title: t("shelterPerk2Title"), desc: t("shelterPerk2Desc") },
               { icon: BadgeCheck, title: t("shelterPerk3Title"), desc: t("shelterPerk3Desc") },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-start gap-3 rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
+              <div key={title} className="flex items-start gap-3 rounded-xl border border-white/20 p-4">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
                   <Icon className="h-4 w-4 text-white" />
                 </div>

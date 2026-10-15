@@ -118,7 +118,7 @@ function CampaignCard({ c, locale }: { c: CampaignRailItem; locale: string }) {
   return (
     <div className="flex w-48 shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
       <Link href={`/donate/${c.id}`} className="block">
-        <div className="relative h-28 w-full bg-gradient-to-br from-pink-400 to-rose-600">
+        <div className="relative h-28 w-full bg-brand-100">
           {c.imageUrl
             ? <Image src={c.imageUrl} alt={c.title} fill className="object-cover" sizes="192px" />
             : <span className="flex h-full items-center justify-center"><HandHeart className="h-8 w-8 text-white/50" /></span>}

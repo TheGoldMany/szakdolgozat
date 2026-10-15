@@ -132,11 +132,10 @@ export default async function ShelterDetailPage(props: { params: Promise<{ slug:
         )}
       />
 
-      <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-52">
+      <div className="relative h-40 w-full overflow-hidden bg-brand-700 sm:h-52">
         {shelter.coverUrl && (
-          <Image src={shelter.coverUrl} alt="" fill className="object-cover opacity-50" priority />
+          <Image src={shelter.coverUrl} alt="" fill className="object-cover" priority />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
       <div className="border-b border-gray-100 bg-white shadow-sm">

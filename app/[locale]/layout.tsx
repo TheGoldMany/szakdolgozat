@@ -63,11 +63,6 @@ export default async function LocaleLayout(
   return (
     <html lang={locale} className={fontVariables}>
       <body>
-        {/* JavaScript nélkül a görgetésre megjelenő blokkok sosem kapnának
-            jelzést, hogy láthatóvá váljanak – ilyenkor egyszerűen látszanak. */}
-        <noscript>
-          <style>{".reveal-pending{opacity:1!important}"}</style>
-        </noscript>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <Suspense><Header /></Suspense>

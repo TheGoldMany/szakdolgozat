@@ -211,7 +211,7 @@ export default async function ArticleDetailPage(props: { params: Promise<{ slug:
         </Link>
 
         <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300 sm:h-72">
+          <div className="relative h-44 w-full overflow-hidden bg-brand-100 sm:h-72">
             {article.imageUrl ? (
               <Image
                 src={article.imageUrl}

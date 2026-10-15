@@ -31,7 +31,7 @@ export async function ShelterCard({ shelter }: ShelterCardProps) {
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
 
         {/* Gradient top bar */}
-        <div className="relative flex h-20 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">
+        <div className="relative flex h-20 shrink-0 items-center justify-center overflow-hidden bg-brand-50">
           <PawPrint className="absolute -left-2 -top-2 h-12 w-12 rotate-[-20deg] text-white/10" />
           <PawPrint className="absolute bottom-0 right-2 h-10 w-10 rotate-[15deg] text-white/10" />
         </div>

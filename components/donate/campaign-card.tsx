@@ -41,7 +41,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
       className="press-card group flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md overflow-hidden"
     >
       {/* Image / gradient placeholder */}
-      <div className="relative h-40 w-full shrink-0 overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600">
+      <div className="relative h-40 w-full shrink-0 overflow-hidden bg-brand-100">
         {campaign.imageUrl && (
           <Image
             src={campaign.imageUrl}

@@ -99,17 +99,16 @@ export default async function CampaignDetailPage(
     <div className="min-h-screen bg-gray-50">
 
       {/* Campaign image / gradient header */}
-      <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-brand-400 to-brand-700 sm:h-72">
+      <div className="relative h-56 w-full overflow-hidden bg-brand-700 sm:h-72">
         {campaign.imageUrl && (
           <Image
             src={campaign.imageUrl}
             alt={campaign.title}
             fill
-            className="object-cover opacity-80"
+            className="object-cover"
             priority
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">

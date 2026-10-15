@@ -381,7 +381,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
 
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("shelterSection")}</h2>
-              <Link href={`/shelters/${animal.shelter.slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <Link href={`/shelters/${animal.shelter.slug}`} className="-m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50">
                 <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-brand-50 flex items-center justify-center">
                   {animal.shelter.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element

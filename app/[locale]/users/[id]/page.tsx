@@ -72,7 +72,7 @@ export default async function PublicUserProfilePage(props: Props) {
         {/* Profil kártya */}
         <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           {/* Banner */}
-          <div className="h-24 bg-gradient-to-r from-brand-400 to-brand-600" />
+          <div className="h-24 bg-brand-700" />
 
           <div className="px-6 pb-6">
             {/* Avatar */}

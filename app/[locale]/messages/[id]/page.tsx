@@ -167,7 +167,7 @@ export default async function ConversationPage(props: { params: Promise<{ id: st
               <h2 className="mb-3 text-sm font-semibold text-gray-700">{t("animalInfo")}</h2>
               <Link
                 href={`/animals/${conversation.animal.slug}`}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                className="-m-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50"
               >
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                   {img ? (

@@ -266,7 +266,7 @@ export default function LoginPage() {
               { value: "7 000+", label: t("loginStatAnimals")  },
               { value: "500+",   label: t("loginStatAdoptions") },
             ].map(({ value, label }) => (
-              <div key={label} className="rounded-2xl bg-white/15 px-4 py-4 backdrop-blur-sm">
+              <div key={label} className="rounded-xl border border-white/20 px-4 py-4">
                 <div className="text-2xl font-bold">{value}</div>
                 <div className="mt-0.5 text-xs text-white/70">{label}</div>
               </div>

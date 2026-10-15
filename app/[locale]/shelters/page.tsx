@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ShelterCard } from "@/components/shelters/shelter-card";
@@ -60,11 +59,11 @@ export default async function SheltersPage() {
             <p className="mt-4 text-lg font-medium text-gray-700">{t("noShelters")}</p>
           </div>
         ) : (
-          <Reveal stagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {shelters.map((shelter) => (
               <ShelterCard key={shelter.id} shelter={shelter} />
             ))}
-          </Reveal>
+          </div>
         )}
       </div>
     </div>

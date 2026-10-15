@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/ui/reveal";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -60,14 +59,14 @@ export default async function ArticlesListPage() {
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
                 className="press-card group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-brand-100 to-brand-300">
+                <div className="relative h-40 w-full overflow-hidden bg-brand-100">
                   {article.imageUrl ? (
                     <Image
                       src={article.imageUrl}
@@ -110,7 +109,7 @@ export default async function ArticlesListPage() {
                 </div>
               </Link>
             ))}
-          </Reveal>
+          </div>
         )}
       </div>
     </div>

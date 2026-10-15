@@ -91,7 +91,7 @@ export async function AnimalCard({ animal, isFavorited = false }: AnimalCardProp
           </span>
 
           {/* Type badge */}
-          <span className="absolute left-3 bottom-3 z-20 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-700 shadow-sm backdrop-blur-sm">
+          <span className="absolute left-3 bottom-3 z-20 rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold text-gray-700 shadow-sm">
             {TYPE_LABEL[animal.type]}
           </span>
 
