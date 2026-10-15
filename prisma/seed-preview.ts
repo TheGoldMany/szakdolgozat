@@ -11,8 +11,9 @@
  *   1. `VERCEL_ENV === "preview"` (helyben csak kifejezett kapcsolóval és
  *      localhost adatbázissal fut).
  *   2. Az adatbázisban már bemutató-adat van: legalább 20 `@example.com`
- *      felhasználó. Valódi (éles) adatbázisban ilyen nincs, így ha egy
- *      preview véletlenül az éles adatbázisra mutatna, a script nem nyúl hozzá.
+ *      felhasználó, vagy legalább 5 menhely a régi seed névlistájából.
+ *      Valódi (éles) adatbázisban ilyen nincs, így ha egy preview véletlenül
+ *      az éles adatbázisra mutatna, a script nem nyúl hozzá.
  *   3. Csak hozzáad és bemutató-képet cserél. Semmit nem töröl, valódi
  *      feltöltésekhez (Vercel Blob) nem nyúl.
  *
@@ -40,6 +41,20 @@ function guardEnvironment(): string | null {
 }
 
 const prisma = new PrismaClient();
+
+/** Az /api/seed menhelynevei: ezek alapján ismerhető fel a bemutató-adatbázis. */
+const DEMO_SHELTER_NAMES = [
+  "Mancs és Szív Állatvédők", "Boldog Tappancs Menhely", "Négy Láb Alapítvány",
+  "Gazdira Vár Állatmenház", "Állati Jó Hely", "Hűséges Pata Menhely",
+  "Szőrös Barátok Egyesület", "Kapaszkodó Mancs Alapítvány", "Örömtanya Állatvédők",
+  "Kis Gömböc Menhely", "Vidám Farok Állatvédelem", "Remény Sziget Menhely",
+  "Szerető Otthon Állatmentők", "Talpalapítvány", "Kóbor Kedvencek Menhelye",
+  "Bundás Barátok Egyesület", "Mancsok Háza", "Állati Szerencse Alapítvány",
+  "Boldog Ugatás Menhely", "Cicás Kaland Állatvédők", "Fürge Farkú Menhely",
+  "Doromboló Mancs Egyesület", "Mentő Karom Alapítvány", "Kutyabarát Sziget",
+  "Macskabarát Menedék", "Tündér Mancs Menhely", "Szabad Lélek Állatvédők",
+  "Gondoskodó Kéz Menhely", "Kedves Ugatás Alapítvány", "Arany Mancs Egyesület",
+];
 
 // ── Segédek ────────────────────────────────────────────────────────────────
 
@@ -492,10 +507,20 @@ async function main() {
   const skip = guardEnvironment();
   if (skip) return console.log(`  kihagyva: ${skip}`);
 
-  const demoUsers = await prisma.user.count({ where: { email: { endsWith: "@example.com" } } });
-  if (demoUsers < 20) {
-    return console.log(`  kihagyva: az adatbázisban nincs bemutató-adat (${demoUsers} @example.com felhasználó), nem nyúlok hozzá`);
+  // Bemutató-adatbázis-e? A két régi seed más-más nyomot hagy: a
+  // prisma/seed.ts sok @example.com felhasználót, az /api/seed kevesebbet,
+  // de a saját menhelynév-listájából dolgozik. Az éles adatbázisban egyik sincs.
+  const [demoUsers, demoShelters] = await Promise.all([
+    prisma.user.count({ where: { email: { endsWith: "@example.com" } } }),
+    prisma.shelter.count({ where: { name: { in: DEMO_SHELTER_NAMES } } }),
+  ]);
+  if (demoUsers < 20 && demoShelters < 5) {
+    return console.log(
+      `  kihagyva: az adatbázisban nincs bemutató-adat (${demoUsers} @example.com felhasználó, ` +
+      `${demoShelters} bemutató-menhely), nem nyúlok hozzá`,
+    );
   }
+  console.log(`  bemutató-adatbázis: ${demoUsers} @example.com felhasználó, ${demoShelters} bemutató-menhely`);
 
   const pool = await verifiedPool();
   await fixImages(pool);
