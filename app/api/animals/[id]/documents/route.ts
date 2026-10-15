@@ -21,10 +21,23 @@ async function canManageAnimal(animalId: string, userId: string, role: string) {
 }
 
 // GET /api/animals/[id]/documents
+//
+// Eddig BEJELENTKEZÉS NÉLKÜL bárkinek kiadta az állat hivatalos papírjait
+// (oltási könyv, chip-regisztráció, szerződés). A nyilvános állatoldal ezeket
+// nem is mutatja — ott a menhely általános dokumentumai vannak —, tehát ez
+// nem egy szándékosan nyitott adat volt, hanem egy nyitva felejtett ajtó.
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
+  }
+  if (!(await canManageAnimal(params.id, session.user.id, session.user.role ?? ""))) {
+    return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+  }
+
   try {
     const docs = await prisma.animalDocument.findMany({
       where:   { animalId: params.id },

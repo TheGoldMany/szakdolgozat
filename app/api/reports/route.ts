@@ -5,6 +5,7 @@ import { AnimalType, ReportType } from "@prisma/client";
 import { blockIfSuspended } from "@/lib/account-status";
 import { getAuthUser } from "@/lib/api-auth";
 import { optionalOwnImageUrl, ownImageUrl } from "@/lib/image-url";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
@@ -31,7 +32,23 @@ export async function POST(req: NextRequest) {
     const suspended = await blockIfSuspended(authUser.id);
     if (suspended) return suspended;
   }
+  // Bejelentés bejelentkezés nélkül is tehető, és a nyilvános listán meg a
+  // térképen jelenik meg — ez a botok első célpontja. Két védelem:
+  //  • korlát: anonim IP-nként óránként 5, bejelentkezve 20 (egy valódi
+  //    bejelentő ennyit soha nem ér el);
+  //  • csali mező: az űrlapon egy látogató számára láthatatlan `_hp` mező. Ember
+  //    nem tölti ki, az űrlapokat vakon kitöltő bot igen. Ilyenkor SIKERT
+  //    válaszolunk, de nem mentünk semmit — a bot így nem tanulja meg, hogy
+  //    lebukott, és nem próbálkozik tovább másképp.
+  const rateKey = authUser ? `report-user:${authUser.id}` : `report-anon:${getClientIp(req)}`;
+  if (!checkRateLimit(rateKey, authUser ? 20 : 5, 60 * 60_000)) {
+    return NextResponse.json({ error: "Túl sok bejelentés rövid idő alatt. Próbáld újra később." }, { status: 429 });
+  }
+
   const body = await req.json();
+  if (typeof body?._hp === "string" && body._hp.trim() !== "") {
+    return NextResponse.json({ report: { id: "ok" } }, { status: 201 });
+  }
   const parsed = schema.safeParse(body);
 
   if (!parsed.success) {

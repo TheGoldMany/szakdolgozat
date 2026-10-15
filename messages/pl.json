@@ -549,7 +549,8 @@
     "resolveError": "Nie udało się oznaczyć, spróbuj ponownie",
     "formSuccess": "Zgłoszenie wysłane pomyślnie",
     "sendingMessage": "Wysyłanie...",
-    "sendMessage": "Wyślij wiadomość"
+    "sendMessage": "Wyślij wiadomość",
+    "contactHiddenClosed": "Sprawa jest zamknięta; dane kontaktowe zgłaszającego nie są już publiczne."
   },
   "help": {
     "title": "Podręcznik użytkownika",

@@ -549,7 +549,8 @@
     "resolveError": "Konnte nicht markiert werden, bitte erneut versuchen",
     "formSuccess": "Meldung erfolgreich gesendet",
     "sendingMessage": "Senden...",
-    "sendMessage": "Nachricht senden"
+    "sendMessage": "Nachricht senden",
+    "contactHiddenClosed": "Der Fall ist abgeschlossen; die Kontaktdaten der meldenden Person sind nicht mehr öffentlich."
   },
   "help": {
     "title": "Benutzerhandbuch",

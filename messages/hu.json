@@ -549,7 +549,8 @@
     "resolveError": "Nem sikerült megjelölni, próbáld újra",
     "formSuccess": "Bejelentés sikeresen elküldve",
     "sendingMessage": "Küldés...",
-    "sendMessage": "Üzenet küldése"
+    "sendMessage": "Üzenet küldése",
+    "contactHiddenClosed": "Az ügy lezárult, a bejelentő elérhetősége már nem nyilvános."
   },
   "help": {
     "title": "Útmutató",

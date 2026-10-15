@@ -30,9 +30,10 @@ export interface MatchCounterpart {
   imageUrl: string | null;
   city: string;
   createdAt: string;
-  contactName: string;
+  /** `null`, ha a nézőnek nem jár (lásd a bejelentés-oldal szabályát). */
+  contactName: string | null;
   contactPhone: string | null;
-  contactEmail: string;
+  contactEmail: string | null;
 }
 
 export interface MatchView {
@@ -196,9 +197,11 @@ export function ReportMatches({ matches, canManage }: Props) {
                         <Phone className="h-3.5 w-3.5" /> {cp.contactPhone}
                       </a>
                     )}
-                    <a href={`mailto:${cp.contactEmail}`} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition-colors">
-                      <Mail className="h-3.5 w-3.5" /> {t("matchContact")}
-                    </a>
+                    {cp.contactEmail && (
+                      <a href={`mailto:${cp.contactEmail}`} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition-colors">
+                        <Mail className="h-3.5 w-3.5" /> {t("matchContact")}
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>

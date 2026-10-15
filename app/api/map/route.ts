@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ReportStatus, ReportType } from "@prisma/client";
 
 // GET /api/map  – jelentések + menhelyek + állatorvosi rendelők koordinátákkal
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const type   = searchParams.get("type");    // LOST | FOUND | STRAY
-  const status = searchParams.get("status") ?? "ACTIVE";
+  // A paraméterek eddig `as never`-rel, ellenőrzés nélkül kerültek a
+  // lekérdezésbe: egy ismeretlen érték 500-at adott. Csak létező enum-érték.
+  const rawType   = searchParams.get("type");
+  const rawStatus = searchParams.get("status") ?? "ACTIVE";
+  const type   = (Object.values(ReportType) as string[]).includes(rawType ?? "")
+    ? (rawType as ReportType) : null;
+  const status = rawStatus === "ALL" ? "ALL"
+    : (Object.values(ReportStatus) as string[]).includes(rawStatus) ? (rawStatus as ReportStatus)
+    : ReportStatus.ACTIVE;
 
   try {
     const [reports, shelters, vets] = await Promise.all([
@@ -13,8 +21,8 @@ export async function GET(req: NextRequest) {
         where: {
           lat:    { not: null },
           lng:    { not: null },
-          ...(status !== "ALL" && { status: status as never }),
-          ...(type   && { type: type as never }),
+          ...(status !== "ALL" && { status }),
+          ...(type   && { type }),
         },
         select: {
           id:          true,
@@ -69,7 +77,15 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    return NextResponse.json({ reports, shelters, vets });
+    // A bejelentő neve és telefonszáma azért nyilvános, hogy aki megtalálta az
+    // állatot, fel tudja hívni. LEZÁRT ügynél erre már nincs ok: a `?status=ALL`
+    // paraméterrel eddig az összes valaha leadott bejelentés telefonszáma
+    // egyben lekérhető volt — egy évekig gyűjthető névsor.
+    const safeReports = reports.map((r) =>
+      r.status === ReportStatus.ACTIVE ? r : { ...r, contactPhone: null, contactName: null }
+    );
+
+    return NextResponse.json({ reports: safeReports, shelters, vets });
   } catch (error) {
     console.error('[api/map GET]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

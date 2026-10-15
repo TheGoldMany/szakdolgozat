@@ -14,6 +14,25 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // A viselkedési napló belső személyzeti jegyzet (pl. „megharapta az
+  // önkéntest"), a nyilvános állatoldal nem is mutatja. Eddig mégis
+  // bejelentkezés nélkül bárki lekérhette, a jegyzetíró nevével együtt.
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
+  }
+  if (session.user.role !== "SUPER_ADMIN") {
+    const animal = await prisma.animal.findUnique({
+      where: { id: params.id }, select: { shelterId: true },
+    });
+    const member = animal && await prisma.shelterAdmin.findFirst({
+      where: { userId: session.user.id, shelterId: animal.shelterId },
+    });
+    if (!member) {
+      return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
+    }
+  }
+
   try {
     const records = await prisma.behaviorLog.findMany({
       where:   { animalId: params.id },

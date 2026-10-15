@@ -549,7 +549,8 @@
     "resolveError": "Could not mark as resolved, please try again",
     "formSuccess": "Report submitted successfully",
     "sendingMessage": "Sending...",
-    "sendMessage": "Send message"
+    "sendMessage": "Send message",
+    "contactHiddenClosed": "This case is closed; the reporter's contact details are no longer public."
   },
   "help": {
     "title": "User guide",

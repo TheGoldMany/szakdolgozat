@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,12 +90,15 @@ export function ReportForm() {
   const lat = watch("lat");
   const lng = watch("lng");
 
+  const honeypotRef = useRef<HTMLInputElement>(null);
+
   async function onSubmit(data: FormData) {
     setServerError(null);
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      // A csali mező értéke — embernél mindig üres (lásd az API-t).
+      body: JSON.stringify({ ...data, _hp: honeypotRef.current?.value ?? "" }),
     });
     const json = await res.json();
     if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
@@ -115,6 +118,19 @@ export function ReportForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Csali mező botoknak. Képernyőn kívül, nem fókuszálható, a
+          képernyőolvasó elől is rejtve — ember nem tölti ki. A „website" név
+          szándékos: az automatikus kitöltők erre ugranak a legszívesebben. */}
+      <input
+        ref={honeypotRef}
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        defaultValue=""
+        style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
+      />
       {serverError && (
         <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {serverError}
