@@ -31,7 +31,7 @@ export function isOwnImageUrl(value: string): boolean {
   }
 }
 
-const MESSAGE = "A képet a feltöltővel add meg — külső hivatkozás nem fogadható el.";
+const MESSAGE = "A képet a feltöltővel add meg, külső hivatkozás nem fogadható el.";
 
 /** Kötelező saját kép. */
 export const ownImageUrl = z.string().max(2000).refine(isOwnImageUrl, MESSAGE);

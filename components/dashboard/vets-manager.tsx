@@ -99,7 +99,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       toast.success(
         data.lat != null
           ? "Rendelő hozzáadva és elhelyezve a térképen."
-          : "Rendelő hozzáadva, de a cím nem volt beazonosítható — add meg a koordinátát.",
+          : "Rendelő hozzáadva, de a cím nem volt beazonosítható. Add meg a koordinátát.",
       );
       router.refresh();
     } finally {
@@ -190,7 +190,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
       if (listRes.ok) setVets(await listRes.json());
 
       if (data.created > 0) toast.success(`${data.created} rendelő importálva.`);
-      else toast.error("Egy rendelő sem került be — nézd meg a részleteket.");
+      else toast.error("Egy rendelő sem került be. Nézd meg a részleteket.");
       router.refresh();
     } finally {
       setImporting(false);
@@ -263,7 +263,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
             Az angol fejlécnevek (name, address, city…) is működnek. Az elválasztó lehet pontosvessző vagy vessző.
           </p>
           <p className="mt-1 text-xs text-gray-500">
-            Egyszerre legfeljebb 500 sor tölthető fel. Import közben nem számolunk koordinátát — ha nincs lat/lng
+            Egyszerre legfeljebb 500 sor tölthető fel. Import közben nem számolunk koordinátát: ha nincs lat/lng
             az oszlopokban, a listában az „Elhelyezés” gombbal teheted rá a rendelőt a térképre.
           </p>
 

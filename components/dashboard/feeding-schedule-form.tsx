@@ -224,7 +224,7 @@ export function FeedingScheduleForm({ shelterId, inventoryItems, schedule, onClo
                 onChange={(e) => setInventoryItemId(e.target.value)}
                 className={inputCls}
               >
-                <option value="">— Válassz cikket —</option>
+                <option value="">Válassz cikket…</option>
                 {inventoryItems.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name} ({item.quantity} {item.unit})

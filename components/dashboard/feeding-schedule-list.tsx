@@ -135,7 +135,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
                 <p className="mt-0.5 text-sm text-gray-500">
                   {formatFrequency(schedule.frequency, schedule.weekDays)}
                   {schedule.times.length > 0 && (
-                    <span className="ml-1 text-gray-400">— {schedule.times.join(", ")}</span>
+                    <span className="ml-1 text-gray-400">· {schedule.times.join(", ")}</span>
                   )}
                 </p>
                 <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-400">

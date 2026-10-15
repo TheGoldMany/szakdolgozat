@@ -38,12 +38,12 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: '[data-tour="nav-animals"]',
         title: "Állatok",
-        body:  "Az összes örökbefogadható állat, szűrhetően faj, méret, nem, település és tulajdonságok szerint — például oltott-e, vagy kijön-e gyerekkel.",
+        body:  "Az összes örökbefogadható állat, szűrhetően faj, méret, nem, település és tulajdonságok szerint, például oltott-e, vagy kijön-e gyerekkel.",
       },
       {
         selector: '[data-tour="nav-map"]',
         title: "Térkép",
-        body:  "Menhelyek, elveszett és talált állatok bejelentései, valamint állatorvosi rendelők — mind egy térképen.",
+        body:  "Menhelyek, elveszett és talált állatok bejelentései, valamint állatorvosi rendelők, mind egy térképen.",
       },
       {
         selector: '[data-tour="nav-reports"]',
@@ -89,7 +89,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: '[data-tour="animal-health"]',
         title: "Egészségügyi jelzők",
-        body:  "Oltott, ivartalanított, chipezett — és hogy kijön-e gyerekkel, kutyával, macskával. A menhely tölti ki; ami nincs kiírva, arról nincs adat.",
+        body:  "Oltott, ivartalanított, chipezett, és hogy kijön-e gyerekkel, kutyával, macskával. A menhely tölti ki; ami nincs kiírva, arról nincs adat.",
       },
       {
         selector: '[data-tour="adopt"]',
@@ -186,7 +186,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Ha megkerült",
-        body:  "A saját bejelentésedet lezárhatod, ha az állat megkerült — így nem marad fönn fölöslegesen, és nem keresik mások is.",
+        body:  "A saját bejelentésedet lezárhatod, ha az állat megkerült. Így nem marad fönn fölöslegesen, és nem keresik mások is.",
       },
     ],
   },
@@ -240,7 +240,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Visszavonás",
-        body:  "Amíg a menhely nem kezdte el elbírálni, a kérelmedet visszavonhatod — például ha időközben másik állatot választottál.",
+        body:  "Amíg a menhely nem kezdte el elbírálni, a kérelmedet visszavonhatod, például ha időközben másik állatot választottál.",
       },
     ],
   },
@@ -253,7 +253,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Kérés, nem foglalás",
-        body:  "Az időpont akkor él, ha a menhely visszaigazolta. A kért és a visszaigazolt időpont eltérhet — a visszaigazolásról értesítést kapsz.",
+        body:  "Az időpont akkor él, ha a menhely visszaigazolta. A kért és a visszaigazolt időpont eltérhet; a visszaigazolásról értesítést kapsz.",
       },
       {
         selector: null,
@@ -276,7 +276,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Értesítés",
-        body:  "Új üzenetről értesítést kapsz, és ha telepítetted a mobilalkalmazást, oda push értesítést is — hacsak ki nem kapcsoltad.",
+        body:  "Új üzenetről értesítést kapsz, és ha telepítetted a mobilalkalmazást, oda push értesítést is, hacsak ki nem kapcsoltad.",
       },
     ],
   },
@@ -299,7 +299,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "A többi adatod",
-        body:  "Lejjebb a támogatásaid, virtuális örökbefogadásaid és az örökbefogadási előzményed. A jelszóváltás, az adataid letöltése és a fióktörlés is itt van, a lap alján — és ugyanezek a Beállítások oldalon is.",
+        body:  "Lejjebb a támogatásaid, virtuális örökbefogadásaid és az örökbefogadási előzményed. A jelszóváltás, az adataid letöltése és a fióktörlés is itt van, a lap alján. Ugyanezek a Beállítások oldalon is.",
       },
     ],
   },
@@ -312,7 +312,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "A jelölt állataid",
-        body:  "Itt gyűlnek a szívvel megjelölt állatok. A jelölés csak neked látszik — a menhely nem kap róla értesítést.",
+        body:  "Itt gyűlnek a szívvel megjelölt állatok. A jelölés csak neked látszik, a menhely nem kap róla értesítést.",
       },
     ],
   },
@@ -330,7 +330,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Hova visznek",
-        body:  "Az értesítésre kattintva oda jutsz, amiről szól — a kérelemhez, az időponthoz vagy a beszélgetéshez.",
+        body:  "Az értesítésre kattintva oda jutsz, amiről szól: a kérelemhez, az időponthoz vagy a beszélgetéshez.",
       },
     ],
   },
@@ -361,7 +361,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Mi ez pontosan",
-        body:  "Az ideiglenes befogadó átmenetileg otthont ad egy állatnak, amíg gazdára talál. Hogy a menhely mit biztosít hozzá (eledel, állatorvos), azt velük kell egyeztetni — menhelyenként eltér.",
+        body:  "Az ideiglenes befogadó átmenetileg otthont ad egy állatnak, amíg gazdára talál. Hogy a menhely mit biztosít hozzá (eledel, állatorvos), azt velük kell egyeztetni, mert menhelyenként eltér.",
       },
       {
         selector: null,
@@ -384,7 +384,7 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Mit kell csinálni",
-        body:  "Egy csillagos értékelés és pár mondat elég. Fotót is feltölthetsz — a menhelyeknek ez szokott a legnagyobb öröm lenni.",
+        body:  "Egy csillagos értékelés és pár mondat elég. Fotót is feltölthetsz; a menhelyeknek ez szokott a legnagyobb öröm lenni.",
       },
     ],
   },
@@ -415,12 +415,12 @@ export const TOURS: Record<string, Tour> = {
       {
         selector: null,
         title: "Napi kép",
-        body:  "Képek az állataidról vagy a menhely lakóiról. A képfolyam 24 órás: ami ennél régebbi, kikerül belőle — de a naptárban bármikor visszanézhető.",
+        body:  "Képek az állataidról vagy a menhely lakóiról. A képfolyam 24 órás: ami ennél régebbi, kikerül belőle, de a naptárban bármikor visszanézhető.",
       },
       {
         selector: null,
         title: "Kit látsz",
-        body:  "Alapból csak az ismerőseidet. Ha kéred, a rendszer ajánlott és felkapott képeket is mutat — ezt bármikor visszavonhatod.",
+        body:  "Alapból csak az ismerőseidet. Ha kéred, a rendszer ajánlott és felkapott képeket is mutat, ezt bármikor visszavonhatod.",
       },
     ],
   },

@@ -150,7 +150,7 @@ export function CampaignAdminActions({ campaign, hasDonations }: Props) {
           disabled={deleting}
           title={
             hasDonations
-              ? "A gyűjtéshez adomány tartozik — a törlés helyett zárd le."
+              ? "A gyűjtéshez adomány tartozik, ezért a törlés helyett zárd le."
               : "Gyűjtés törlése"
           }
           className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"

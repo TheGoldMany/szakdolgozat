@@ -488,7 +488,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
           <h2 className="text-sm font-semibold text-gray-700">Helyszín a térképen</h2>
         </div>
         <p className="mb-4 text-xs text-gray-400">
-          Jelöld ki a menhely pontos helyét a térképen — ez alapján jelenik meg a nyilvános térképen.
+          Jelöld ki a menhely pontos helyét a térképen. Ez alapján jelenik meg a nyilvános térképen.
           Kattints a térképre a pozíció beállításához.
         </p>
 

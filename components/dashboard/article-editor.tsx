@@ -364,7 +364,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
           />
           <p className="mt-1 text-[11px] text-gray-400">
             Hagyd üresen az azonnali publikáláshoz. Jövőbeli időpontnál a cikk csak
-            akkor jelenik meg a látogatóknak — addig itt marad, „Időzítve" jelöléssel.
+            akkor jelenik meg a látogatóknak, addig itt marad, „Időzítve" jelöléssel.
           </p>
         </div>
 

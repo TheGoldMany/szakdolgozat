@@ -69,7 +69,7 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
                   onChange={e => setToShelterId(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <option value="">— Válassz menhelyet —</option>
+                  <option value="">Válassz menhelyet…</option>
                   {shelters.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}

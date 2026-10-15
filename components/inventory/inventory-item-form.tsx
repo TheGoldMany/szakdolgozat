@@ -145,7 +145,7 @@ export function InventoryItemForm({ shelterId, item, onClose }: Props) {
       {/* Minimum készlet + lejárat */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Minimum ({effectiveUnit}) — riasztáshoz</label>
+          <label className={labelCls}>Riasztási minimum ({effectiveUnit})</label>
           <input
             type="number" min={0} step="any"
             value={minQty}

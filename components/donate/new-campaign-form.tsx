@@ -173,7 +173,7 @@ export function NewCampaignForm({
         <p className="text-xs text-gray-500">
           Menhely adminként a menhelyed Stripe fiókját a{" "}
           <a href="/dashboard/settings" className="font-medium text-brand-600 hover:underline">Menhely beállításoknál</a>{" "}
-          kötheted be — onnantól a menhelyedért indíthatsz gyűjtést.
+          kötheted be. Onnantól a menhelyedért indíthatsz gyűjtést.
         </p>
         {error && <p className="text-sm text-red-600">{error}</p>}
       </div>

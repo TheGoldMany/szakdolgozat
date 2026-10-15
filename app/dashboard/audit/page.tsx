@@ -126,7 +126,7 @@ export default async function AuditPage(
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-800">
                     {meta.label}
-                    {e.targetName && <span className="text-gray-500"> — {e.targetName}</span>}
+                    {e.targetName && <span className="text-gray-500"> · {e.targetName}</span>}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">
                     {e.actor?.name ?? e.actor?.email ?? "ismeretlen admin"}

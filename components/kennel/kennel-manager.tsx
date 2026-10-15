@@ -262,7 +262,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                       <span className="truncate text-xs font-medium text-gray-700">{a.name}</span>
                       <select value={a.kennelId ?? ""} onChange={e => handleMove(a.id, e.target.value || null)}
                         className="shrink-0 rounded-md border border-gray-200 bg-white px-1.5 py-1 text-xs outline-none">
-                        <option value="">— Kivesz —</option>
+                        <option value="">Kivesz a kennelből</option>
                         {kennels.map(opt => (
                           <option key={opt.id} value={opt.id}>{opt.name}</option>
                         ))}

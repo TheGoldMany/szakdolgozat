@@ -102,7 +102,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
         heading: "What is ÁllatiMenhelyek.hu?",
         items: [
           "ÁllatiMenhelyek.hu is a digital intermediary platform connecting animal shelters with people looking to adopt a pet.",
-          "The platform does not own any animals — adoption decisions are made solely by the individual shelters.",
+          "The platform does not own any animals; adoption decisions are made solely by the individual shelters.",
         ],
       },
       {
