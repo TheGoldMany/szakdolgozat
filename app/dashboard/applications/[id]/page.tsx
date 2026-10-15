@@ -19,11 +19,12 @@ function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
 
-export default async function ApplicationDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function ApplicationDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 

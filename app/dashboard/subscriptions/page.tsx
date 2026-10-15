@@ -16,10 +16,11 @@ import { notFound } from "next/navigation";
 export const metadata: Metadata = { title: "Előfizetők" };
 
 interface PageProps {
-  searchParams: { status?: string };
+  searchParams: Promise<{ status?: string }>;
 }
 
-export default async function SubscriptionsPage({ searchParams }: PageProps) {
+export default async function SubscriptionsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 

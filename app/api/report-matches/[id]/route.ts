@@ -12,7 +12,8 @@ const schema = z.object({
  * Egy párosítás visszajelzése ("ez nem az" / mégis releváns).
  * Csak a két érintett bejelentés gazdája vagy admin módosíthatja.
  */
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   const body = await req.json().catch(() => ({}));
   const parsed = schema.safeParse(body);

@@ -10,11 +10,12 @@ import { InventoryItemForm } from "@/components/inventory/inventory-item-form";
 
 export const metadata: Metadata = { title: "Új készlettétel" };
 
-export default async function NewInventoryItemPage({
-  searchParams,
-}: {
-  searchParams: { shelterId?: string };
-}) {
+export default async function NewInventoryItemPage(
+  props: {
+    searchParams: Promise<{ shelterId?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 

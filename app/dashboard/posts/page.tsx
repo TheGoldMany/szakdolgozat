@@ -15,11 +15,12 @@ function formatDate(d: Date): string {
   return d.toLocaleDateString("hu-HU", { year: "numeric", month: "short", day: "numeric" });
 }
 
-export default async function DashboardArticlesPage({
-  searchParams,
-}: {
-  searchParams: { edit?: string };
-}) {
+export default async function DashboardArticlesPage(
+  props: {
+    searchParams: Promise<{ edit?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 

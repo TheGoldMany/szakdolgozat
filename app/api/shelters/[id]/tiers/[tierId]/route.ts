@@ -26,8 +26,9 @@ async function checkShelterAdmin(shelterId: string, userId: string, role: string
 // PATCH /api/shelters/[id]/tiers/[tierId] – update tier
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string; tierId: string } }
+  props: { params: Promise<{ id: string; tierId: string }> }
 ) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
@@ -60,8 +61,9 @@ export async function PATCH(
 // DELETE /api/shelters/[id]/tiers/[tierId] – delete tier
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string; tierId: string } }
+  props: { params: Promise<{ id: string; tierId: string }> }
 ) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

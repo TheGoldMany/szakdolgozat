@@ -26,10 +26,8 @@ async function checkShelterAdmin(shelterId: string, userId: string, role: string
 }
 
 // GET /api/shelters/[id]/tiers – public: list active tiers with subscription count
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const tiers = await prisma.donationTier.findMany({
       where:   { shelterId: params.id, isActive: true },
@@ -44,10 +42,8 @@ export async function GET(
 }
 
 // POST /api/shelters/[id]/tiers – shelter admin creates a tier
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

@@ -34,9 +34,10 @@ function formatHUF(n: number) {
   return new Intl.NumberFormat("hu-HU").format(n) + " Ft";
 }
 
-interface PageProps { searchParams: { status?: string } }
+interface PageProps { searchParams: Promise<{ status?: string }> }
 
-export default async function CampaignApprovalsPage({ searchParams }: PageProps) {
+export default async function CampaignApprovalsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 

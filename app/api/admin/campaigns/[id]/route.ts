@@ -25,10 +25,8 @@ const patchSchema = z.object({
 );
 
 // PATCH /api/admin/campaigns/[id] – approve or reject a campaign (SUPER_ADMIN only)
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;
@@ -151,7 +149,8 @@ export async function PATCH(
 
 
 // DELETE /api/admin/campaigns/[id] – gyűjtés végleges törlése (SUPER_ADMIN)
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;

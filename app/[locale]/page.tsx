@@ -26,9 +26,8 @@ export const dynamic = "force-dynamic";
  * illeszkedik. Ez a legfontosabb oldal, és az `absolute` cím azért kell, hogy
  * a márkanév ne kerüljön rá kétszer a sablon miatt.
  */
-export async function generateMetadata(
-  { params }: { params: { locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations("seo");
   return {
     ...pageMetadata({
@@ -43,7 +42,8 @@ export async function generateMetadata(
 
 const POSTS_PER_PAGE = 10;
 
-export default async function HomePage({ params }: { params: { locale: string } }) {
+export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   const t        = await getTranslations("home");
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);

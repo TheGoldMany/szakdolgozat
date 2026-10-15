@@ -15,10 +15,8 @@ const schema = z.object({
 });
 
 // POST /api/conversations/[id]/messages – send a message
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
@@ -145,10 +143,8 @@ export async function POST(
 }
 
 // GET /api/conversations/[id]/messages – fetch messages (for polling)
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const authUser = await getAuthUser(req);
   if (!authUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

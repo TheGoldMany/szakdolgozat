@@ -10,10 +10,8 @@ const schema = z.object({
 });
 
 // GET /api/animals/[id]/behavior – viselkedési napló bejegyzések
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // A viselkedési napló belső személyzeti jegyzet (pl. „megharapta az
   // önkéntest"), a nyilvános állatoldal nem is mutatja. Eddig mégis
   // bejelentkezés nélkül bárki lekérhette, a jegyzetíró nevével együtt.
@@ -25,9 +23,9 @@ export async function GET(
     const animal = await prisma.animal.findUnique({
       where: { id: params.id }, select: { shelterId: true },
     });
-    const member = animal && await prisma.shelterAdmin.findFirst({
+    const member = animal && (await prisma.shelterAdmin.findFirst({
       where: { userId: session.user.id, shelterId: animal.shelterId },
-    });
+    }));
     if (!member) {
       return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
     }
@@ -47,10 +45,8 @@ export async function GET(
 }
 
 // POST /api/animals/[id]/behavior – csak a menhely adminja / önkéntese
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

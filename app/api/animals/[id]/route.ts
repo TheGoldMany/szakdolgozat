@@ -13,7 +13,8 @@ import { publicAnimal } from "@/lib/public-shapes";
  * elérhető. Az azonosító lehet cuid vagy slug — a mobil id-t ad át, a web
  * slugot használ.
  */
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const animal = await publicAnimal(params.id);
     if (!animal) {

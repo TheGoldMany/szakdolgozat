@@ -402,7 +402,13 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
   );
 }
 
-export default function AdatvedelemPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function AdatvedelemPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   if (locale !== "hu") {
     return <AdatvedelemSummaryPage locale={locale} />;
   }

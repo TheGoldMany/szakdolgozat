@@ -360,7 +360,13 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
   );
 }
 
-export default function ASZFPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function ASZFPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   if (locale !== "hu") {
     return <ASZFSummaryPage locale={locale} />;
   }

@@ -29,7 +29,8 @@ const patchSchema = z.object({
 });
 
 // PATCH /api/posts/[id] – cikk szerkesztése (kizárólag SUPER_ADMIN)
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
   if (user!.role !== "SUPER_ADMIN") {
@@ -97,7 +98,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE /api/posts/[id] – cikk törlése (kizárólag SUPER_ADMIN)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
   if (user!.role !== "SUPER_ADMIN") {

@@ -20,11 +20,12 @@ const STATUS_MAP: Record<string, AnimalStatus> = {
   AVAILABLE: "AVAILABLE", PENDING: "PENDING", ADOPTED: "ADOPTED",
 };
 
-export default async function FavoritesPage({
-  searchParams,
-}: {
-  searchParams: { type?: string; status?: string };
-}) {
+export default async function FavoritesPage(
+  props: {
+    searchParams: Promise<{ type?: string; status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const [session, t] = await Promise.all([
     getServerSession(authOptions),
     getTranslations("favorites"),

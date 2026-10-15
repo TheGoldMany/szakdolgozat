@@ -25,11 +25,12 @@ const STATUS_COLOR: Record<AnimalStatus, string> = {
   MEDICAL_HOLD: "bg-red-100 text-red-700",
 };
 
-export default async function DashboardAnimalsPage({
-  searchParams,
-}: {
-  searchParams: { status?: string };
-}) {
+export default async function DashboardAnimalsPage(
+  props: {
+    searchParams: Promise<{ status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 

@@ -41,9 +41,8 @@ async function findByTagSlug(slug: string) {
   return { posts: matching, label };
 }
 
-export async function generateMetadata(
-  { params }: { params: { tag: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ tag: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations("articles");
   const { label, posts } = await findByTagSlug(params.tag);
   if (!label) return { title: t("notFound") };
@@ -55,7 +54,8 @@ export async function generateMetadata(
   };
 }
 
-export default async function ArticlesByTagPage({ params }: { params: { tag: string } }) {
+export default async function ArticlesByTagPage(props: { params: Promise<{ tag: string }> }) {
+  const params = await props.params;
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

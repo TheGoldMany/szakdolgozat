@@ -4,9 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { pageMetadata } from "@/lib/page-metadata";
 
 // A cím eddig beégetett magyar szöveg volt, a másik három nyelven is.
-export async function generateMetadata(
-  { params }: { params: { locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations("seo");
   return pageMetadata({
     locale:      params.locale,

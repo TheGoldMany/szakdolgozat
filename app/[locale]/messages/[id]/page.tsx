@@ -15,7 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function ConversationPage({ params }: { params: { id: string } }) {
+export default async function ConversationPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const [session, t] = await Promise.all([
     getServerSession(authOptions),
     getTranslations("messages"),

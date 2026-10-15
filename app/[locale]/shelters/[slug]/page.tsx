@@ -22,9 +22,8 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { shelterJsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 import { safeHref } from "@/lib/safe-url";
 
-export async function generateMetadata(
-  { params }: { params: { slug: string; locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const [shelter, t] = await Promise.all([
     prisma.shelter.findUnique({
       where:  { slug: params.slug },
@@ -47,9 +46,8 @@ export async function generateMetadata(
   });
 }
 
-export default async function ShelterDetailPage(
-  { params }: { params: { slug: string; locale: string } }
-) {
+export default async function ShelterDetailPage(props: { params: Promise<{ slug: string; locale: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
 
   const [shelter, t] = await Promise.all([

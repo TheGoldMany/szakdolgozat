@@ -13,7 +13,8 @@ import { publicEvent } from "@/lib/public-shapes";
  * Bejelentkezve a saját jelentkezés állapota is jön: a részletező ebből tudja,
  * hogy a „Jelentkezem" vagy a „Lemondom" gombot kell mutatnia.
  */
-export async function GET(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   try {
     const event = await publicEvent(params.slug);
     if (!event) {

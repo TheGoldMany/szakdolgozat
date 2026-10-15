@@ -13,11 +13,12 @@ function formatHUF(amount: number) {
   return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
   // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
   // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
@@ -50,11 +51,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function CampaignDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function CampaignDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 

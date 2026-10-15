@@ -12,7 +12,8 @@ import { paymentsDisabled } from "@/lib/payments-guard";
  * kell mondani, mert a törlés a Stripe-nál futó fizetést nem állítja le — a
  * rekord eltűnne, a terhelés viszont folytatódna.
  */
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;

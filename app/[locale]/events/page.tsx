@@ -14,9 +14,8 @@ import { pageMetadata } from "@/lib/page-metadata";
  * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
  * változat duplikátumnak látszott.
  */
-export async function generateMetadata(
-  { params }: { params: { locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations("seo");
   return pageMetadata({
     locale:      params.locale,

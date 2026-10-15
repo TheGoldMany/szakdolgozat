@@ -20,11 +20,12 @@ function isImage(url: string) {
   return /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url);
 }
 
-export default async function UserApplicationDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function UserApplicationDetailPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getTranslations("applications");
 
   const STATUS_LABELS: Record<string, { label: string; color: string }> = {

@@ -9,9 +9,8 @@ import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Új gyűjtés indítása" };
 
-export default async function NewCampaignPage(
-  { searchParams }: { searchParams: { shelter?: string } }
-) {
+export default async function NewCampaignPage(props: { searchParams: Promise<{ shelter?: string }> }) {
+  const searchParams = await props.searchParams;
   // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
   if (!paymentsEnabled()) notFound();
 

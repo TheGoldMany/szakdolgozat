@@ -16,11 +16,12 @@ import { resolveActingShelter } from "@/lib/acting-shelter";
 
 export const metadata: Metadata = { title: "Kérelmek" };
 
-export default async function DashboardApplicationsPage({
-  searchParams,
-}: {
-  searchParams: { status?: string };
-}) {
+export default async function DashboardApplicationsPage(
+  props: {
+    searchParams: Promise<{ status?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 

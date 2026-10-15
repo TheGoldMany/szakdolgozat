@@ -18,9 +18,8 @@ import { pageMetadata } from "@/lib/page-metadata";
  * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
  * változat duplikátumnak látszott.
  */
-export async function generateMetadata(
-  { params }: { params: { locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations("seo");
   return pageMetadata({
     locale:      params.locale,
@@ -31,7 +30,7 @@ export async function generateMetadata(
 }
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     type?: string;
     size?: string;
@@ -43,12 +42,13 @@ interface PageProps {
     goodWithDogs?: string;
     goodWithCats?: string;
     page?: string;
-  };
+  }>;
 }
 
 const PAGE_SIZE = 12;
 
-export default async function AnimalsPage({ searchParams }: PageProps) {
+export default async function AnimalsPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   const t      = await getTranslations("animals");
   const locale = await getLocale();
   const basePath = locale === routing.defaultLocale ? "/animals" : `/${locale}/animals`;

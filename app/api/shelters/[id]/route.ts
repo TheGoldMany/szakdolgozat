@@ -10,7 +10,8 @@ import { publicShelter } from "@/lib/public-shapes";
  * Inaktív menhelyet nem ad ki: az a listából is kimarad, tehát ha itt
  * kiadnánk, a közvetlen hivatkozás megkerülné a szűrést.
  */
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const shelter = await publicShelter(params.id);
     if (!shelter) {

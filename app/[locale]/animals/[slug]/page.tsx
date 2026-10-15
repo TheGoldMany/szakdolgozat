@@ -22,9 +22,8 @@ import { pageMetadata } from "@/lib/page-metadata";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbJsonLd } from "@/lib/structured-data";
 
-export async function generateMetadata(
-  { params }: { params: { slug: string; locale: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const animal = await prisma.animal.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -62,9 +61,8 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
   );
 }
 
-export default async function AnimalDetailPage(
-  { params }: { params: { slug: string; locale: string } }
-) {
+export default async function AnimalDetailPage(props: { params: Promise<{ slug: string; locale: string }> }) {
+  const params = await props.params;
   const [animal, session, t] = await Promise.all([
     prisma.animal.findUnique({
       where: { slug: params.slug },

@@ -18,7 +18,8 @@ import { ensureShelterDefaults } from "@/lib/shelter-defaults";
  * szabványos csomagokat és a rendszer-gyűjtést hozza létre, semmi szabadon
  * megadhatót.
  */
-export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

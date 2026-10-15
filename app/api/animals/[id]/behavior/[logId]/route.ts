@@ -6,8 +6,9 @@ import { prisma } from "@/lib/prisma";
 // DELETE /api/animals/[id]/behavior/[logId]
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string; logId: string } }
+  props: { params: Promise<{ id: string; logId: string }> }
 ) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

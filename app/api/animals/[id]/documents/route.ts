@@ -26,10 +26,8 @@ async function canManageAnimal(animalId: string, userId: string, role: string) {
 // (oltási könyv, chip-regisztráció, szerződés). A nyilvános állatoldal ezeket
 // nem is mutatja — ott a menhely általános dokumentumai vannak —, tehát ez
 // nem egy szándékosan nyitott adat volt, hanem egy nyitva felejtett ajtó.
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });
@@ -51,10 +49,8 @@ export async function GET(
 }
 
 // POST /api/animals/[id]/documents
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

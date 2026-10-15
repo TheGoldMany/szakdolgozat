@@ -23,7 +23,8 @@ import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -102,7 +103,8 @@ function RelatedCard({
   );
 }
 
-export default async function ArticleDetailPage({ params }: { params: { slug: string } }) {
+export default async function ArticleDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

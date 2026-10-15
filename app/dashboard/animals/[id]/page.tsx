@@ -14,11 +14,12 @@ import { FosterAssign } from "@/components/foster/foster-assign";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const animal = await prisma.animal.findUnique({
     where:  { id: params.id },
     select: { name: true },
@@ -26,11 +27,12 @@ export async function generateMetadata({
   return { title: animal ? `${animal.name} – Iratok` : "Állat" };
 }
 
-export default async function AnimalDocumentsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function AnimalDocumentsPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login");
 

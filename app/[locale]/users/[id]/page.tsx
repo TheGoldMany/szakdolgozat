@@ -9,9 +9,10 @@ import { connectionState } from "@/lib/connections";
 import { UserReviews } from "@/components/reviews/user-reviews";
 import { ConnectButton } from "@/components/connections/connect-button";
 
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     select: { name: true },
@@ -19,7 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: user?.name ?? "Felhasználó" };
 }
 
-export default async function PublicUserProfilePage({ params }: Props) {
+export default async function PublicUserProfilePage(props: Props) {
+  const params = await props.params;
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     select: {

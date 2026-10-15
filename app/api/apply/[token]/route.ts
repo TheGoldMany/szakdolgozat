@@ -5,10 +5,8 @@ import { createNotifications } from "@/lib/notifications";
 import { ownImageUrl } from "@/lib/image-url";
 
 // GET /api/apply/[token] – get form and animal info for the token
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { token: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   try {
     const application = await prisma.adoptionApplication.findUnique({
       where: { inviteToken: params.token },
@@ -62,10 +60,8 @@ const responseSchema = z.object({
 });
 
 // POST /api/apply/[token] – submit the form
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { token: string } }
-) {
+export async function POST(req: NextRequest, props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   try {
     const application = await prisma.adoptionApplication.findUnique({
       where: { inviteToken: params.token },

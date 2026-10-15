@@ -9,7 +9,8 @@ const schema = z.object({
 });
 
 // PATCH /api/animals/[id]/kennel – állat áthelyezése férőhelyek között
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Bejelentkezés szükséges" }, { status: 401 });

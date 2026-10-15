@@ -34,11 +34,12 @@ const ACTION_META: Record<AuditAction, { label: string; icon: LucideIcon; color:
  * Audit napló – az adminisztrátori műveletek visszakövethető listája.
  * Csak olvasható, kizárólag SUPER_ADMIN számára.
  */
-export default async function AuditPage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) {
+export default async function AuditPage(
+  props: {
+    searchParams: Promise<{ page?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/audit");
   if (session.user.role !== "SUPER_ADMIN") redirect("/dashboard");

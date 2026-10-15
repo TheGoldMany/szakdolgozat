@@ -6,10 +6,8 @@ import { paymentsDisabled } from "@/lib/payments-guard";
 
 // GET /api/campaigns/[id] – get single campaign
 // Accessible if: status=ACTIVE, or the requesting user is the owner, or SUPER_ADMIN
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
   const paymentsOff = paymentsDisabled();
   if (paymentsOff) return paymentsOff;

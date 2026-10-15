@@ -30,7 +30,8 @@ const STATUS_COLOR: Record<ReportStatus, string> = {
   CLOSED:   "bg-gray-100 text-gray-400",
 };
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const [r, t] = await Promise.all([
     prisma.animalReport.findUnique({ where: { id: params.id }, select: { type: true, city: true } }),
     getTranslations("reports"),
@@ -46,7 +47,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function ReportDetailPage({ params }: { params: { id: string } }) {
+export default async function ReportDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const [report, session, t] = await Promise.all([
     prisma.animalReport.findUnique({
       where: { id: params.id },

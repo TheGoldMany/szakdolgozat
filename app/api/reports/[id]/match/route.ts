@@ -29,7 +29,8 @@ export const maxDuration = 60;
  * Bejelentés lehet anonim, ezért auth nélkül is hívható – a visszaélést a
  * fenti időablak és a korlát zárja ki; adatot nem ad vissza.
  */
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   if (!checkRateLimit(`report-match-ip:${getClientIp(req)}`, 10, MATCH_WINDOW_MS)) {
     return NextResponse.json({ error: "Túl sok kérés" }, { status: 429 });
   }

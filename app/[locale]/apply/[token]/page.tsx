@@ -38,7 +38,8 @@ async function getApplyData(token: string): Promise<ApplyData | null> {
   }
 }
 
-export default async function ApplyPage({ params }: { params: { token: string; locale: string } }) {
+export default async function ApplyPage(props: { params: Promise<{ token: string; locale: string }> }) {
+  const params = await props.params;
   const data = await getApplyData(params.token);
   if (!data) notFound();
 

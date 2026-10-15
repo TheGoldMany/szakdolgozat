@@ -33,7 +33,8 @@ async function canManage(user: AuthUser, shelterId: string): Promise<boolean> {
  * dönteni csak a válaszok ismeretében lehet. A webes felület ezt eddig
  * szerverkomponensből olvasta, tehát végpont nem létezett hozzá.
  */
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
@@ -71,10 +72,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // `requireAuthUser`, nem `getServerSession`: az utóbbi csak böngésző-
   // munkamenetet fogad el, tehát a mobil admin képernyő nem tudott dönteni.
   const { user: authUser, error: authError } = await requireAuthUser(req);

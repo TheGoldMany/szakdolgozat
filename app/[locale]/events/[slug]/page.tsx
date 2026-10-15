@@ -11,14 +11,16 @@ import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { EventRegisterButton } from "@/components/events/event-register-button";
 import { ShareButton } from "@/components/ui/share-button";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const event = await prisma.event.findUnique({ where: { slug: params.slug }, select: { title: true } });
   return { title: event ? event.title : "Esemény" };
 }
 
 export const dynamic = "force-dynamic";
 
-export default async function EventDetailPage({ params }: { params: { slug: string } }) {
+export default async function EventDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await getServerSession(authOptions);
   const t = await getTranslations("events");
 

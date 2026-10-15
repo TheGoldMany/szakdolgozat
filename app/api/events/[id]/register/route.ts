@@ -11,7 +11,8 @@ const schema = z.object({
 });
 
 // POST /api/events/[id]/register – user registers (or re-activates) for an event
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // `authUser` néven, hogy ne ütközzön a lentebbi Prisma `user` változóval
   const { user: authUser, error: authError } = await requireAuthUser(req);
   if (authError) return authError;
@@ -100,7 +101,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 // DELETE /api/events/[id]/register – user cancels their registration
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { user, error } = await requireAuthUser(req);
   if (error) return error;
 
