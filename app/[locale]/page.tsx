@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { ArrowRight, PawPrint, Building2, Heart, Search, ClipboardList, HandHeart, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
+import { ArrowRight, PawPrint, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -150,6 +150,12 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     .map((a) => ({ url: a.images[0]?.url ?? "", name: a.name, slug: a.slug, shelterName: a.shelter.name }))
     .filter((s) => s.url);
 
+  const facts = [
+    { key: "animals", value: availableCount, label: t("factAnimals", { count: availableCount }) },
+    { key: "shelters", value: shelterCount,  label: t("factShelters", { count: shelterCount }) },
+    { key: "adopted",  value: adoptedCount,  label: t("factAdopted",  { count: adoptedCount }) },
+  ].filter((f) => f.value > 0);
+
   return (
     <>
       {/* A kereső innen tudja meg, mi ez az oldal, és innen kínálhat
@@ -163,22 +169,34 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           <div className="grid items-center gap-10 lg:grid-cols-2">
 
             <div className="max-w-xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-semibold text-brand-700 shadow-sm">
-                <PawPrint className="h-3.5 w-3.5" />
-                {t("badge", { count: availableCount })}
-              </div>
-
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-                {t("heroTitle")}{" "}
-                <span className="text-brand-700">{t("heroTitleHighlight")}</span>
+              {/* Nincs cédula a cím fölött és nincs kiemelt színű szó a címben:
+                  mindkettő a sablonos kezdőlapok jele. A cím maga mondja meg,
+                  mi ez az oldal. */}
+              <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+                {t("heroTitle")}
               </h1>
-              <p className="mt-4 text-base leading-relaxed text-gray-500">
+              <p className="mt-4 text-base leading-relaxed text-gray-600">
                 {t("heroDesc")}
               </p>
 
               <div className="mt-6 w-full">
                 <HomeSearch />
               </div>
+
+              {/* A számok egy mondatban, nem három ikonos dobozban egy színes
+                  sávon. A nullás tényt nem írjuk ki: indulás után egy nagy „0"
+                  az első képernyőn bizalmat rombol, információt nem ad. */}
+              {facts.length > 0 && (
+                <p className="mt-4 text-sm text-gray-600">
+                  {facts.map((fact, i) => (
+                    <span key={fact.key}>
+                      {i > 0 && <span className="mx-2 text-gray-300" aria-hidden>·</span>}
+                      <span className="font-semibold text-gray-900 tabular-nums">{fact.value.toLocaleString("hu-HU")}</span>{" "}
+                      {fact.label}
+                    </span>
+                  ))}
+                </p>
+              )}
 
               {/* Quick-nav: type links + report */}
               <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -212,25 +230,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             <div className="relative h-64 sm:h-80 lg:h-[22rem]">
               <HeroSlideshow slides={heroSlides} />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats band ───────────────────────────────────── */}
-      <section className="bg-brand-600 py-6 text-white">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            {[
-              { value: availableCount, label: t("statsAvailable"), Icon: PawPrint  },
-              { value: shelterCount,   label: t("statsShelters"),  Icon: Building2 },
-              { value: adoptedCount,   label: t("statsAdopted"),   Icon: Heart     },
-            ].map(({ value, label, Icon }) => (
-              <div key={label}>
-                <Icon className="mx-auto mb-1 h-5 w-5 text-white/75" />
-                <p className="text-2xl font-bold sm:text-3xl">{value.toLocaleString("hu-HU")}</p>
-                <p className="mt-0.5 text-xs text-white/75 sm:text-sm">{label}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -295,40 +294,49 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────── */}
-      <section className="bg-white py-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <h2 className="mb-10 text-center text-2xl font-bold text-gray-900">{t("howTitle")}</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              { Icon: Search,        title: t("step1Title"), desc: t("step1Desc"), step: "1" },
-              { Icon: ClipboardList, title: t("step2Title"), desc: t("step2Desc"), step: "2" },
-              { Icon: HandHeart,     title: t("step3Title"), desc: t("step3Desc"), step: "3" },
-            ].map(({ Icon, title, desc, step }) => (
-              <div key={step} className="relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <span className="absolute right-4 top-4 text-3xl font-black text-gray-100">{step}</span>
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
-                  <Icon className="h-5 w-5 text-brand-500" />
-                </div>
-                <h3 className="font-semibold text-gray-900">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-gray-500">{desc}</p>
-              </div>
-            ))}
+      {/* ── Az örökbefogadás menete ─────────────────────────
+          Kétoszlopos szakasz számozott listával. A korábbi három egyforma
+          ikonos kártya a sarokban halvány óriás-sorszámmal a sablonos
+          kezdőlapok legfelismerhetőbb eleme volt. */}
+      <section className="border-t border-gray-200 bg-white py-16">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("howTitle")}</h2>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-600">{t("howIntro")}</p>
           </div>
+          <ol className="divide-y divide-gray-200 border-y border-gray-200">
+            {[
+              { title: t("step1Title"), desc: t("step1Desc") },
+              { title: t("step2Title"), desc: t("step2Desc") },
+              { title: t("step3Title"), desc: t("step3Desc") },
+            ].map(({ title, desc }, i) => (
+              <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-x-4 py-5">
+                <span className="font-display text-xl font-bold text-brand-600 tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-semibold text-gray-900">{title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-600">{desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* ── CTA Banner ───────────────────────────────────── */}
-      <section className="bg-brand-600 py-14 text-center text-white">
-        <div className="mx-auto max-w-xl px-4">
-          <PawPrint className="mx-auto mb-4 h-10 w-10 text-brand-300" />
-          <h2 className="text-2xl font-bold">{t("ctaTitle")}</h2>
-          <p className="mt-2 text-sm text-white/75">{t("ctaDesc")}</p>
+      {/* ── Bejelentés ──────────────────────────────────── */}
+      <section className="bg-brand-50">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div className="max-w-xl">
+            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{t("ctaTitle")}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-gray-600">{t("ctaDesc")}</p>
+          </div>
           <Link
             href="/reports/new"
-            className="mt-6 inline-block rounded-xl bg-white px-6 py-3 text-sm font-semibold text-brand-700 shadow transition-colors hover:bg-brand-50"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-brand-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800"
           >
             {t("submitReport")}
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>

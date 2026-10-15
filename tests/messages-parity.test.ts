@@ -36,9 +36,21 @@ function flatKeys(obj: Json, prefix = ""): Set<string> {
   return out;
 }
 
-/** A `{placeholder}` nevek egy szövegben. */
+/**
+ * A `{placeholder}` nevek egy szövegben.
+ *
+ * Előbb levágjuk az ICU többes-szám/választó ágakat (`one {állat}`,
+ * `other {állatok}`): ezek SZÖVEGEK, nem helyőrzők, és nyelvenként mások —
+ * a lengyelnek `few` és `many` ága is van. Enélkül egy egyszavas ág
+ * (`one {shelter}`) helyőrzőnek látszana.
+ */
 function placeholders(text: string): Set<string> {
-  return new Set([...text.matchAll(/\{(\w+)[^}]*\}/g)].map((m) => m[1]));
+  let t = text;
+  for (let prev = ""; prev !== t; ) {
+    prev = t;
+    t = t.replace(/(?:zero|one|two|few|many|other|=\d+)\s*\{[^{}]*\}/g, "");
+  }
+  return new Set([...t.matchAll(/\{(\w+)\s*[,}]/g)].map((m) => m[1]));
 }
 
 function flatStrings(obj: Json, prefix = ""): Map<string, string> {

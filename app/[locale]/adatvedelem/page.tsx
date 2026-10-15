@@ -352,10 +352,10 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
               <Shield className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">
-                {content.legalLabel} &nbsp;·&nbsp; {content.summaryBadge}
-              </p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">{content.title}</h1>
+              {/* Nem nagybetűs „felirat" a cím fölött, hanem tény a cím alatt: az
+                  olvasónak azt kell tudnia, hogy ez kivonat. */}
+              <p className="mt-1 text-sm text-gray-500">{content.legalLabel}, {content.summaryBadge.toLowerCase()}</p>
             </div>
           </div>
           <p className="mt-4 text-sm text-gray-500">
@@ -424,7 +424,6 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
               <Shield className="h-6 w-6 text-brand-600" />
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-500">Jogi dokumentum</p>
               <h1 className="text-2xl font-bold sm:text-3xl text-gray-900">Adatvédelmi tájékoztató</h1>
             </div>
           </div>

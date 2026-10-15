@@ -73,10 +73,7 @@ export default async function PlatformFeePage() {
       <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
 
         <header>
-          <p className="text-sm font-semibold uppercase tracking-wide text-forest">
-            {t("eyebrow")}
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+          <h1 className="text-3xl font-bold text-graphite sm:text-4xl">
             {t("title")}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-graphite/80">
