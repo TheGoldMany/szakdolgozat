@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeHref } from "@/lib/safe-url";
 
 const MAX_ROWS = 500;
 
@@ -141,7 +142,8 @@ export async function POST(req: NextRequest) {
             zipCode:      cut(pick(row, "zipCode"), 20),
             phone:        cut(pick(row, "phone"), 40),
             email:        cut(pick(row, "email"), 200),
-            website:      cut(pick(row, "website"), 300),
+            // Az import eddig ellenőrzés nélkül vette át — lásd `lib/safe-url.ts`.
+            website:      safeHref(cut(pick(row, "website"), 300)) ?? null,
             openingHours: cut(pick(row, "openingHours"), 500),
             note:         cut(pick(row, "note"), 1000),
             isEmergency:  toBool(pick(row, "isEmergency")),

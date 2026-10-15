@@ -21,6 +21,7 @@ const SITE_URL = siteUrl();
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await prisma.post.findUnique({
@@ -190,11 +191,9 @@ export default async function ArticleDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <script
-        type="application/ld+json"
-        // Saját, gépelt objektumból származó JSON – nem felhasználói HTML.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* A cikk címe és leírása adatbázisból jön: egy `</script>` a címben a
+          nyers JSON.stringify mellett kitörne a blokkból. A JsonLd ezt szökteti. */}
+      <JsonLd data={jsonLd} />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="flex justify-center gap-6">
 

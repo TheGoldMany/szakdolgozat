@@ -20,6 +20,7 @@ import { paymentsEnabled } from "@/lib/payments-enabled";
 import { pageMetadata } from "@/lib/page-metadata";
 import { JsonLd } from "@/components/seo/json-ld";
 import { shelterJsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
+import { safeHref } from "@/lib/safe-url";
 
 export async function generateMetadata(
   { params }: { params: { slug: string; locale: string } }
@@ -247,7 +248,7 @@ export default async function ShelterDetailPage(
                 {shelter.website && (
                   <li className="flex items-center gap-2.5">
                     <Globe className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={shelter.website} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate hover:text-brand-500 transition-colors">
+                    <a href={safeHref(shelter.website)} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate hover:text-brand-500 transition-colors">
                       {shelter.website.replace(/^https?:\/\//, "")}
                     </a>
                   </li>

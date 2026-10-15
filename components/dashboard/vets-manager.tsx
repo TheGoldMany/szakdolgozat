@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { parseCsv } from "@/lib/csv";
+import { safeHref } from "@/lib/safe-url";
 
 export interface VetClinic {
   id:           string;
@@ -475,7 +476,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
                 {v.website && (
                   <p className="flex items-center gap-1.5 truncate">
                     <Globe className="h-3 w-3 shrink-0" />
-                    <a href={v.website} target="_blank" rel="noopener noreferrer" className="truncate text-brand-600 hover:underline">
+                    <a href={safeHref(v.website)} target="_blank" rel="noopener noreferrer" className="truncate text-brand-600 hover:underline">
                       {v.website}
                     </a>
                   </p>

@@ -25,6 +25,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           "image/gif",
         ],
         maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB
+        // Kitalálhatatlan cím: dokumentumoknál (szerződés, orvosi papír) különösen fontos.
+        addRandomSuffix: true,
         tokenPayload: JSON.stringify({ userId: authUser.id }),
       }),
       onUploadCompleted: async () => {},

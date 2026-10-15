@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/chat-window";
 import { InviteSender } from "@/components/messages/invite-sender";
 import { getTranslations } from "next-intl/server";
+import { safeHref } from "@/lib/safe-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("messages");
@@ -211,7 +212,7 @@ export default async function ConversationPage({ params }: { params: { id: strin
                   </a>
                 )}
                 {conversation.shelter.website && (
-                  <a href={conversation.shelter.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-brand-500 hover:underline">
+                  <a href={safeHref(conversation.shelter.website)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-brand-500 hover:underline">
                     <Globe className="h-4 w-4 shrink-0" />
                     {t("website")}
                   </a>

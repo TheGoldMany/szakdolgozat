@@ -21,6 +21,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ],
         maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB
+        // Kitalálhatatlan cím: dokumentumoknál (szerződés, orvosi papír) különösen fontos.
+        addRandomSuffix: true,
         tokenPayload: JSON.stringify({ userId: authUser.id }),
       }),
       onUploadCompleted: async ({ blob }) => {
