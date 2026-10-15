@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { DonateForm } from "@/components/donate/donate-form";
 import { ShareButton } from "@/components/ui/share-button";
 import { getTranslations } from "next-intl/server";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 function formatHUF(amount: number) {
   return new Intl.NumberFormat("hu-HU").format(amount) + " Ft";
@@ -17,6 +18,13 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
+  // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
+  // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
+  // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
+  // „nem található" tartalmat adná vissza 200-as kóddal. A metaadat
+  // ELŐBB fut, innen a státusz még állítható.
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("donate");
   const campaign = await prisma.campaign.findUnique({
     where:  { id: params.id },
@@ -47,6 +55,9 @@ export default async function CampaignDetailPage({
 }: {
   params: { id: string };
 }) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("donate");
   const campaign = await prisma.campaign.findUnique({
     where: { id: params.id },

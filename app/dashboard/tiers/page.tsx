@@ -9,6 +9,8 @@ import { ALLOWED_TIER_AMOUNTS } from "@/lib/donation-tiers";
 import { TiersManager } from "@/components/dashboard/tiers-manager";
 import { cn } from "@/lib/utils";
 import { resolveActingShelter } from "@/lib/acting-shelter";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Előfizetési csomagok" };
 
@@ -17,6 +19,9 @@ function formatHUF(n: number) {
 }
 
 export default async function TiersPage() {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/auth/login?callbackUrl=/dashboard/tiers");
 

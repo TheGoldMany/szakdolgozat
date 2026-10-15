@@ -4,9 +4,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, subscriptionPeriodEnd } from "@/lib/stripe";
 import { sendSponsorshipCancelledEmail } from "@/lib/email";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 // POST /api/sponsorships/[id]/cancel – virtuális örökbefogadás lemondása
 export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

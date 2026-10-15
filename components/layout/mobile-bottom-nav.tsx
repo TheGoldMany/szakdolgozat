@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { PawPrint, HandHeart, MapPin, FileWarning, User, LogIn, type LucideIcon } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 interface Tab {
   href:  string;
@@ -30,7 +31,8 @@ export function MobileBottomNav() {
 
   const tabs: Tab[] = [
     { href: "/animals", label: t("animals"), icon: PawPrint },
-    { href: "/donate",  label: t("donate"),  icon: HandHeart },
+    // Fizetés kikapcsolva: a sáv négy fülre szűkül, nem marad üres hely.
+    ...(paymentsEnabled() ? [{ href: "/donate", label: t("donate"), icon: HandHeart }] : []),
     { href: "/map",     label: t("map"),     icon: MapPin },
     { href: "/reports", label: t("reports"), icon: FileWarning },
     loggedIn

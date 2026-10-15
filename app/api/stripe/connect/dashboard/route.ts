@@ -3,10 +3,15 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, isStaleAccountError } from "@/lib/stripe";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 // POST /api/stripe/connect/dashboard
 // Returns a Stripe Express dashboard login link for the shelter's connected account.
 export async function POST(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {

@@ -8,6 +8,8 @@ import {
   PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF,
   platformFee, stripeProcessingFee, donorTotal,
 } from "@/lib/donation-limits";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 /**
  * A platformdíj részletes magyarázata.
@@ -30,6 +32,13 @@ import {
 const EXAMPLE_AMOUNT = 10_000;
 
 export async function generateMetadata(): Promise<Metadata> {
+  // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
+  // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
+  // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
+  // „nem található" tartalmat adná vissza 200-as kóddal. A metaadat
+  // ELŐBB fut, innen a státusz még állítható.
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("platformFee");
   return { title: t("title"), description: t("metaDescription") };
 }
@@ -38,6 +47,9 @@ export async function generateMetadata(): Promise<Metadata> {
 const GROUP_ICONS = [PawPrint, ClipboardList, HandHeart, BarChart3] as const;
 
 export default async function PlatformFeePage() {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("platformFee");
 
   const fmt = (n: number) => new Intl.NumberFormat("hu-HU").format(n);

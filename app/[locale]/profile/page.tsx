@@ -20,6 +20,7 @@ import { PawPrint } from "lucide-react";
 import { Role } from "@prisma/client";
 import { connectedAccountState } from "@/lib/stripe";
 import { getTranslations } from "next-intl/server";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("profile");
@@ -148,6 +149,8 @@ export default async function ProfilePage() {
 
   if (!user) redirect("/auth/login");
 
+  const payments = paymentsEnabled();
+
   // A csatolt Stripe fiók VALÓS állapota. A tárolt `stripeOnboardingComplete`
   // csak azt tudja, hogy egyszer végigment a folyamaton — azt nem, hogy a fiók
   // ma is elérhető-e. Lásd a `lib/stripe.ts` `connectedAccountState` leírását.
@@ -230,16 +233,21 @@ export default async function ProfilePage() {
             }}
           />
 
-          <StripeConnectSection
-            stripeAccountId={user.stripeAccountId}
-            stripeOnboardingComplete={user.stripeOnboardingComplete}
-            stripeState={userStripeState}
-          />
+          {/* Fizetés kikapcsolva: a Stripe-bekötés, a saját gyűjtések, az
+              előfizetések és a virtuális örökbefogadások blokkja kimarad.
+              A MEGLÉVŐ ADATOK MEGMARADNAK — csak nem jelennek meg. */}
+          {payments && (
+            <>
+              <StripeConnectSection
+                stripeAccountId={user.stripeAccountId}
+                stripeOnboardingComplete={user.stripeOnboardingComplete}
+                stripeState={userStripeState}
+              />
 
-          {/* Saját gyűjtések */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <MyCampaigns campaigns={myCampaigns} />
-          </div>
+              {/* Saját gyűjtések */}
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <MyCampaigns campaigns={myCampaigns} />
+              </div>
 
           {/* Subscriptions */}
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -266,6 +274,8 @@ export default async function ProfilePage() {
               }))}
             />
           </div>
+            </>
+          )}
 
           {/* Adoption history */}
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

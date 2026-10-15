@@ -4,12 +4,17 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NewCampaignForm } from "@/components/donate/new-campaign-form";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Új gyűjtés indítása" };
 
 export default async function NewCampaignPage(
   { searchParams }: { searchParams: { shelter?: string } }
 ) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth/login?callbackUrl=/campaigns/new");
 

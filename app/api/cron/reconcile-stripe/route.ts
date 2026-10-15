@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reconcileStripeEvents, MAX_LOOKBACK_DAYS } from "@/lib/stripe-reconcile";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export const dynamic = "force-dynamic";
 // Az egyeztetés több tucat Stripe-hívást és adatbázis-írást végezhet.
@@ -20,6 +21,13 @@ export const maxDuration = 60;
  * (`STRIPE_CONNECT_WEBHOOK_SECRET`).
  */
 export async function GET(req: NextRequest) {
+  // Fizetés kikapcsolva: nincs mit egyeztetni. SZÁNDÉKOSAN 200-at adunk, nem
+  // 404-et: egy ütemezett feladat nem-2xx válasza a Vercelen bukott futásnak
+  // látszik, és naponta egy hamis riasztást termelne.
+  if (!paymentsEnabled()) {
+    return NextResponse.json({ ok: true, skipped: "payments_disabled" });
+  }
+
   const secret = req.headers.get("authorization")?.replace("Bearer ", "");
   if (!secret || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

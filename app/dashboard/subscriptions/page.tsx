@@ -10,6 +10,8 @@ import { SubscriptionCancelButton } from "@/components/dashboard/subscription-ca
 import { SubscriptionDeleteButton } from "@/components/dashboard/subscription-delete-button";
 import { cn } from "@/lib/utils";
 import { resolveActingShelter } from "@/lib/acting-shelter";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Előfizetők" };
 
@@ -18,6 +20,9 @@ interface PageProps {
 }
 
 export default async function SubscriptionsPage({ searchParams }: PageProps) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 

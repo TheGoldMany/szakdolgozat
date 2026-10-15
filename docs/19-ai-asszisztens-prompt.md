@@ -186,6 +186,16 @@ többféleképpen bukhat, és a javítás okonként különbözik, ott **nevezd 
 okot** — és ha a napló nem marad meg (Hobby csomag: 1 óra), oda tedd, ahol
 igen: a Stripe Dashboard megőrzi a HTTP-válaszunkat.
 
+**A fizetés kapcsolóval ki van kapcsolva élesben.** Ha fizetéshez nyúlsz, a
+`NEXT_PUBLIC_PAYMENTS_ENABLED`-et is nézd meg (`lib/payments-enabled.ts`). Új
+fizetési végpontnak kell a `paymentsDisabled()` az ELSŐ sorába, új fizetési
+oldalnak pedig bejegyzés a `middleware.ts` `PAYMENT_PATHS` listájába — az
+oldalban hívott `notFound()` a `force-dynamic` útvonalaknál 200-as kóddal
+adná vissza a „nem található" tartalmat, mert a streamelés már elindult.
+A `tests/payments-flag.test.ts` felsorolja a kapuzott fájlokat, és elbukik,
+ha egy új nem kerül be — szándékosan kézi lista, mert pont azt a hibát
+fogja, amit egy automatikus felderítés nem lát.
+
 ## Git és kiadás — ezt olvasd el figyelmesen
 
 A repóban **két, egymással nem rokon történetű ág** van:

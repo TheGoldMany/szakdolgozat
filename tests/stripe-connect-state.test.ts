@@ -21,6 +21,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  *   nem „inaccessible" — hamis riasztás rosszabb, mint a bizonytalanság.
  */
 
+// Ez a teszt MAGÁT a fizetési funkciót vizsgálja, ezért bekapcsolt
+// kapcsolóval kell futnia — különben a végpontok helyesen 404-et adnának, és
+// a teszt nem a Stripe-logikát mérné, hanem a kapcsolót.
+// A beállítás az import ELŐTT kell: a végpont a modul betöltésekor hozza be a
+// kaput, és a hívás pillanatában olvassa az env-et.
+process.env.NEXT_PUBLIC_PAYMENTS_ENABLED = "true";
+
 const retrieve = vi.fn();
 const createAccount = vi.fn();
 

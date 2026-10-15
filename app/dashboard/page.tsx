@@ -19,6 +19,7 @@ import { AnimalsDonut } from "@/components/dashboard/stats/animals-donut";
 import { ApplicationsBar } from "@/components/dashboard/stats/applications-bar";
 import { AdoptionsLine } from "@/components/dashboard/stats/adoptions-line";
 import { AnalyticsSection } from "@/components/dashboard/analytics-section";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 
 export const metadata: Metadata = { title: "Áttekintés" };
 export const dynamic = "force-dynamic";
@@ -259,6 +260,11 @@ export default async function DashboardPage() {
 
           {/* Donations + subs */}
           <div className="space-y-4">
+            {/* Fizetés kikapcsolva: a bevételi és előfizetői KPI kimarad.
+                A nulla forint kiírása rosszabb lenne a hiányánál — azt
+                sugallná, hogy van adományozás, csak nem jött be semmi. */}
+            {paymentsEnabled() && (
+            <>
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <p className="text-xs font-medium text-gray-500">{t("donationsCollectedLabel")}</p>
               <p className="mt-2 text-2xl font-bold text-emerald-700">
@@ -274,6 +280,8 @@ export default async function DashboardPage() {
                 {t("detailsLink")}
               </Link>
             </div>
+            </>
+            )}
             <Link href="/dashboard/appointments"
               className={cn(
                 "flex items-center justify-between rounded-2xl border p-5 shadow-sm transition-colors",

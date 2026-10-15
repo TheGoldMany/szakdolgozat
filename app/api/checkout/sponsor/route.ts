@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getStripe, resolveTransferDestination, platformFee, stripeProcessingFee, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF, subscriptionFeePercent } from "@/lib/stripe";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { blockIfSuspended } from "@/lib/account-status";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -18,6 +19,10 @@ const schema = z.object({
 
 // POST /api/checkout/sponsor – virtuális örökbefogadás (havi rendszeres) Stripe checkout
 export async function POST(req: NextRequest) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const ip = getClientIp(req);
   if (!checkRateLimit(`sponsor:${ip}`, 10, 60_000)) {
     return NextResponse.json({ error: "Túl sok kísérlet. Próbáld újra 1 perc múlva." }, { status: 429 });

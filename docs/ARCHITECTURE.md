@@ -426,6 +426,38 @@ Connect-fiókjába kerül, a platformdíj levonásával.
 3. `GET /api/stripe/connect/callback` – visszairányításkor beállítja a
    `stripeOnboardingComplete = true` mezőt a `Shelter`-en vagy `User`-en.
 
+### 7.0 A fizetés kapcsolóval kikapcsolható
+
+A teljes fizetési réteg — adományozás, gyűjtések, havi támogatói csomagok,
+virtuális örökbefogadás és a Stripe Connect bekötés — egyetlen környezeti
+változón múlik: `NEXT_PUBLIC_PAYMENTS_ENABLED`. **Csak a pontos `true`
+kapcsolja be**; a hiányzó vagy elgépelt érték kikapcsolva hagyja. A kapcsoló
+így *zárva bukik*: egy elfelejtett beállítás nem enged be valódi pénzt.
+
+Élesben jelenleg ki van kapcsolva. A kód és az adatbázis érintetlen — a
+`Donation`, `Campaign`, `Subscription` és `Sponsorship` táblák megmaradnak
+(a pénzügyi rekordokat egyébként is nyolc évig őrizni kell), csak nem
+érhetők el. A visszakapcsolás egyetlen változó és egy újradeploy.
+
+A kikapcsolás **három rétegben** valósul meg, és mindháromra szükség van:
+
+| Réteg | Mit véd | Hol |
+|---|---|---|
+| **middleware** | a fizetési oldalak `404`-et adnak | `middleware.ts` → `PAYMENT_PATHS` |
+| **végpontok** | minden fizetési API `404`-et ad | `paymentsDisabled()` a kezelő első soraként |
+| **felület** | a hivatkozások és blokkok el sem készülnek | `paymentsEnabled()` a komponensekben |
+
+Miért nem elég az oldalakban hívott `notFound()`: a `force-dynamic`
+útvonalaknál az már a streamelés megkezdése után fut, így a „nem található"
+tartalom **200-as kóddal** menne ki. A middleware minden renderelés előtt fut,
+ott a 404 valóban 404.
+
+**A webhook SZÁNDÉKOSAN nincs kikapcsolva.** Nem indít fizetést, csak
+rögzíti, ami a Stripe-nál már megtörtént; kikapcsolva egy visszatérítés vagy
+egy lemondás nyomtalanul elveszne. A hiányzó rekord rosszabb, mint a
+felesleges. Az egyeztető cron viszont kihagy — `200`-at ad `skipped`
+jelzéssel, mert egy nem-2xx válasz a Vercelen bukott futásnak látszana.
+
 ### 7.3 Webhook flow (`POST /api/webhooks/stripe`)
 
 1. Raw body + `stripe-signature` fejléc → `verifyWebhook` (`lib/stripe-webhook.ts`),
@@ -600,6 +632,7 @@ funkció fejlesztésekor a megfelelő teszteset-dokumentumot is frissíteni kell
 | `dwh_POSTGRES_PRISMA_URL`, `dwh_POSTGRES_URL_NON_POOLING` | DWH PostgreSQL |
 | `NEXTAUTH_SECRET`, `NEXTAUTH_URL` | NextAuth JWT + URL-ek |
 | `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_CLIENT_ID/SECRET` | OAuth providerek (opcionális) |
+| `NEXT_PUBLIC_PAYMENTS_ENABLED` | A fizetési funkciók kapcsolója (lásd 7.0). Csak `true` kapcsolja be |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe API + webhook aláírás (a titok vesszővel többes is lehet, rotációhoz) |
 | `STRIPE_CONNECT_WEBHOOK_SECRET` | A csatolt fiókos („Events from connected accounts") webhook endpoint saját aláíró titka (opcionális) |
 | `NEXT_PUBLIC_APP_URL` | Checkout redirect URL-ek alapja |

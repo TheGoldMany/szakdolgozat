@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { paymentsDisabled } from "@/lib/payments-guard";
 
 // GET /api/campaigns/[id] – get single campaign
 // Accessible if: status=ACTIVE, or the requesting user is the owner, or SUPER_ADMIN
@@ -9,6 +10,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Fizetés kikapcsolva: a végpont nem létezik (lásd `lib/payments-enabled.ts`).
+  const paymentsOff = paymentsDisabled();
+  if (paymentsOff) return paymentsOff;
+
   const session = await getServerSession(authOptions);
 
   try {

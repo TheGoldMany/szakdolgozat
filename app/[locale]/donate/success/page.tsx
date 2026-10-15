@@ -8,10 +8,19 @@ import {
   activateSponsorship,  notifySponsorshipStarted,
 } from "@/lib/subscription-activation";
 import { getTranslations } from "next-intl/server";
+import { paymentsEnabled } from "@/lib/payments-enabled";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // A kapu a METAADAT-generálásban is kell, nem csak a komponensben: a
+  // `force-dynamic` oldalaknál a komponens már a streamelés megkezdése
+  // után fut, és akkor a 404-es státusz nem küldhető ki — az oldal a
+  // „nem található" tartalmat adná vissza 200-as kóddal. A metaadat
+  // ELŐBB fut, innen a státusz még állítható.
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("donate");
   return { title: t("successTitle") };
 }
@@ -88,6 +97,9 @@ export default async function DonateSuccessPage({
 }: {
   searchParams: { session_id?: string };
 }) {
+  // Fizetés kikapcsolva: az oldal nem létezik (lásd `lib/payments-enabled.ts`).
+  if (!paymentsEnabled()) notFound();
+
   const t = await getTranslations("donate");
 
   if (searchParams.session_id) {
