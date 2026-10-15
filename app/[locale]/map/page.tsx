@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
 import MapView from "./map-view";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = { title: "Térkép – Elveszett állatok & Menhelyek" };
+// A cím eddig beégetett magyar szöveg volt, a másik három nyelven is.
+export async function generateMetadata(
+  { params }: { params: { locale: string } }
+): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/map",
+    title:       t("mapTitle"),
+    description: t("mapDescription"),
+  });
+}
 
 export default function MapPage() {
   return (

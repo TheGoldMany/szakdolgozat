@@ -17,8 +17,13 @@ import { VolunteerApplyButton } from "@/components/volunteers/volunteer-apply-bu
 import { FosterApplyButton } from "@/components/foster/foster-apply-button";
 import type { FosterStatus } from "@prisma/client";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { pageMetadata } from "@/lib/page-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import { shelterJsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: { slug: string; locale: string } }
+): Promise<Metadata> {
   const [shelter, t] = await Promise.all([
     prisma.shelter.findUnique({
       where:  { slug: params.slug },
@@ -32,22 +37,18 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const description = shelter.description?.slice(0, 160) ?? `${shelter.name} (${shelter.city}) – nézd meg az örökbefogadható állatokat.`;
   const image       = shelter.coverUrl ?? shelter.logoUrl ?? undefined;
 
-  return {
+  return pageMetadata({
+    locale:      params.locale,
+    path:        `/shelters/${params.slug}`,
     title,
     description,
-    openGraph: {
-      title, description, type: "website",
-      ...(image ? { images: [{ url: image, alt: shelter.name }] } : {}),
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title, description,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
+    image,
+  });
 }
 
-export default async function ShelterDetailPage({ params }: { params: { slug: string } }) {
+export default async function ShelterDetailPage(
+  { params }: { params: { slug: string; locale: string } }
+) {
   const session = await getServerSession(authOptions);
 
   const [shelter, t] = await Promise.all([
@@ -118,6 +119,19 @@ export default async function ShelterDetailPage({ params }: { params: { slug: st
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Az `AnimalShelter` a schema.org saját típusa erre. Ettől kerülhet a
+          menhely a helyi és térképes találatok közé — ez a „menhely + város"
+          keresésnél a legtöbbet érő megjelenés. */}
+      <JsonLd data={shelterJsonLd(shelter, params.locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: t("title"), path: "/shelters" },
+            { name: shelter.name, path: `/shelters/${shelter.slug}` },
+          ],
+          params.locale
+        )}
+      />
 
       <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-brand-400 to-brand-600 sm:h-52">
         {shelter.coverUrl && (

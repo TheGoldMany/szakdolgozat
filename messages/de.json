@@ -1948,5 +1948,19 @@
     "details_free_a": "Angeschlossene Tierheime nutzen die hier aufgeführten Funktionen in der Grundstufe kostenlos, und wir stellen ihnen dafür nichts in Rechnung. Der Dienst ist jung: Sollte später eine Zusatzfunktion kostenpflichtig werden, sagen wir das vorher und verständlich.",
     "ctaDonate": "Spendenaktionen ansehen",
     "ctaShelter": "Tierheim registrieren"
+  },
+  "seo": {
+    "homeTitle": "Hunde und Katzen aus dem Tierheim adoptieren",
+    "homeDescription": "Entdecke Hunde, Katzen, Kaninchen und Vögel, die in ungarischen Tierheimen auf ein Zuhause warten. Vermisste oder gefundene Tiere melden, Tierheime auf der Karte finden.",
+    "animalsTitle": "Tiere zur Adoption – Hunde, Katzen, Kaninchen",
+    "animalsDescription": "Suche nach einem Hund, einer Katze oder einem anderen Tier nach Art, Größe, Alter und Stadt. Alle Tiere stammen aus ungarischen Tierheimen.",
+    "sheltersTitle": "Tierheime in Ungarn",
+    "sheltersDescription": "Ungarische Tierheime nach Stadt: Kontaktdaten, Vorstellung und die Tiere, die dort auf ein Zuhause warten.",
+    "reportsTitle": "Vermisstes oder gefundenes Tier melden",
+    "reportsDescription": "Hund oder Katze vermisst? Melde es in wenigen Minuten oder sieh dir die Fundmeldungen aus deiner Umgebung an.",
+    "mapTitle": "Tierheime und vermisste Tiere auf der Karte",
+    "mapDescription": "Finde Tierheime in deiner Nähe auf der Karte, zusammen mit Meldungen zu vermissten und gefundenen Tieren.",
+    "eventsTitle": "Tierheim-Veranstaltungen und Adoptionstage",
+    "eventsDescription": "Adoptionstage, Spendenaktionen und Ehrenamtsprogramme in ungarischen Tierheimen."
   }
 }

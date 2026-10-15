@@ -1948,5 +1948,19 @@
     "details_free_a": "Schroniska, które dołączą, korzystają z wymienionych funkcji bezpłatnie w zakresie podstawowym i nie wystawiamy im za to faktur. Usługa jest młoda: gdyby w przyszłości jakaś dodatkowa funkcja stała się płatna, powiemy o tym wcześniej i zrozumiale.",
     "ctaDonate": "Zobacz zbiórki",
     "ctaShelter": "Zarejestruj schronisko"
+  },
+  "seo": {
+    "homeTitle": "Psy i koty do adopcji ze schronisk",
+    "homeDescription": "Przeglądaj psy, koty, króliki i ptaki czekające na dom w węgierskich schroniskach. Zgłoś zaginione lub znalezione zwierzę, znajdź schroniska na mapie.",
+    "animalsTitle": "Zwierzęta do adopcji – psy, koty, króliki",
+    "animalsDescription": "Szukaj psa, kota lub innego zwierzęcia według gatunku, wielkości, wieku i miasta. Wszystkie zwierzęta pochodzą z węgierskich schronisk.",
+    "sheltersTitle": "Schroniska dla zwierząt na Węgrzech",
+    "sheltersDescription": "Węgierskie schroniska według miast: dane kontaktowe, opis i zwierzęta czekające tam na dom.",
+    "reportsTitle": "Zgłoś zaginione lub znalezione zwierzę",
+    "reportsDescription": "Zaginął ci pies albo kot? Zgłoś to w kilka minut lub sprawdź zgłoszenia znalezionych zwierząt w twojej okolicy.",
+    "mapTitle": "Schroniska i zaginione zwierzęta na mapie",
+    "mapDescription": "Zobacz na mapie pobliskie schroniska oraz zgłoszenia zaginionych i znalezionych zwierząt.",
+    "eventsTitle": "Wydarzenia schronisk i dni adopcyjne",
+    "eventsDescription": "Dni adopcyjne, zbiórki i programy wolontariatu w węgierskich schroniskach."
   }
 }

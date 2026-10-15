@@ -1948,5 +1948,19 @@
     "details_free_a": "Shelters that join get free basic use of the features listed here, and we do not invoice them for it. The service is young: if some additional feature were to become paid later, we would say so clearly and in advance.",
     "ctaDonate": "Browse the fundraisers",
     "ctaShelter": "Register a shelter"
+  },
+  "seo": {
+    "homeTitle": "Dogs and cats for adoption from shelters",
+    "homeDescription": "Browse dogs, cats, rabbits and birds waiting for a home at Hungarian animal shelters. Report a lost or found animal, and find shelters on the map.",
+    "animalsTitle": "Animals for adoption – dogs, cats, rabbits",
+    "animalsDescription": "Search for a dog, cat or other animal waiting for a home by species, size, age and city. Every animal comes from a Hungarian shelter.",
+    "sheltersTitle": "Animal shelters in Hungary",
+    "sheltersDescription": "Hungarian animal shelters by city: contact details, introductions and the animals waiting for a home there.",
+    "reportsTitle": "Report a lost or found animal",
+    "reportsDescription": "Lost your dog or cat? File a report in minutes, or check reports of animals found in your area.",
+    "mapTitle": "Shelters and lost animals on the map",
+    "mapDescription": "See nearby animal shelters on the map, along with reports of lost and found animals.",
+    "eventsTitle": "Shelter events and adoption days",
+    "eventsDescription": "Adoption days, fundraisers and volunteer programmes at Hungarian animal shelters."
   }
 }

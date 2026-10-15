@@ -1948,5 +1948,19 @@
     "details_free_a": "A felsorolt funkciókat alapszinten ingyenesen használják a csatlakozó menhelyek, és ezért nem számlázunk nekik semmit. A szolgáltatás még fiatal: ha később valamilyen kiegészítő funkció fizetőssé válna, azt előre és érthetően közöljük.",
     "ctaDonate": "Megnézem a gyűjtéseket",
     "ctaShelter": "Menhelyet regisztrálok"
+  },
+  "seo": {
+    "homeTitle": "Örökbefogadható kutyák és macskák menhelyekről",
+    "homeDescription": "Böngéssz örökbefogadható kutyák, macskák, nyulak és madarak között magyarországi állatmenhelyekről. Elveszett vagy megtalált állat bejelentése, menhelyek térképen.",
+    "animalsTitle": "Örökbefogadható állatok – kutya, macska, nyúl",
+    "animalsDescription": "Keress gazdira váró kutyát, macskát vagy más állatot faj, méret, kor és város szerint. Minden állat egy magyarországi menhelyről.",
+    "sheltersTitle": "Állatmenhelyek Magyarországon",
+    "sheltersDescription": "Magyarországi állatmenhelyek listája városonként: elérhetőség, bemutatkozás és a náluk gazdira váró állatok.",
+    "reportsTitle": "Elveszett és megtalált állatok bejelentése",
+    "reportsDescription": "Elveszett a kutyád vagy a macskád? Jelentsd be pár perc alatt, vagy nézd meg a környékeden megtalált állatok bejelentéseit.",
+    "mapTitle": "Menhelyek és elveszett állatok térképen",
+    "mapDescription": "Nézd meg térképen a közeli állatmenhelyeket, valamint az elveszett és megtalált állatok bejelentéseit.",
+    "eventsTitle": "Menhelyi események és örökbefogadó napok",
+    "eventsDescription": "Örökbefogadó napok, adománygyűjtések és önkéntes programok magyarországi állatmenhelyeknél."
   }
 }

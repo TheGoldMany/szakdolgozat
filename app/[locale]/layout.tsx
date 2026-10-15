@@ -14,6 +14,7 @@ import { PageTour } from "@/components/onboarding/page-tour";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import "../globals.css";
+import { siteUrl } from "@/lib/site-url";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -23,7 +24,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * A `metadataBase` nélkül a Next a relatív OG- és kanonikus címeket nem tudja
+ * teljes URL-lé alakítani: a közösségi megosztás kép nélkül jelenik meg, és a
+ * kanonikus megjelölés is hiányos marad. Egy helyről, a `siteUrl()`-ből jön,
+ * hogy a sitemapban és az oldalakon ugyanaz a cím szerepeljen.
+ */
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "ÁllatiMenhelyek.hu",
     template: "%s | ÁllatiMenhelyek.hu",

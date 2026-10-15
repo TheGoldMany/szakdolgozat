@@ -8,10 +8,24 @@ import { ReportCard } from "@/components/reports/report-card";
 import { ReportType, ReportStatus } from "@prisma/client";
 import { getTranslations, getLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("reports");
-  return { title: t("title") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(
+  { params }: { params: { locale: string } }
+): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/reports",
+    title:       t("reportsTitle"),
+    description: t("reportsDescription"),
+  });
 }
 
 interface PageProps {

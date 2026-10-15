@@ -6,10 +6,24 @@ import { CalendarHeart, MapPin, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("nav");
-  return { title: t("events") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(
+  { params }: { params: { locale: string } }
+): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/events",
+    title:       t("eventsTitle"),
+    description: t("eventsDescription"),
+  });
 }
 // ISR: az eseménylista 5 percenként frissül (gyors betöltés cache-ből)
 export const revalidate = 300;

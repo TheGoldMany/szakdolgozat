@@ -5,10 +5,24 @@ import { ShelterCard } from "@/components/shelters/shelter-card";
 import { AnimalStatus } from "@prisma/client";
 import { Building2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("shelters");
-  return { title: t("title") };
+/**
+ * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
+ * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
+ * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi
+ * változat duplikátumnak látszott.
+ */
+export async function generateMetadata(
+  { params }: { params: { locale: string } }
+): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale:      params.locale,
+    path:        "/shelters",
+    title:       t("sheltersTitle"),
+    description: t("sheltersDescription"),
+  });
 }
 
 // ISR: a menhelylista ritkán változik, 2 percenként frissül (gyors betöltés cache-ből)

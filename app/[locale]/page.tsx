@@ -13,12 +13,37 @@ import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
 import { getTranslations } from "next-intl/server";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
+import { websiteJsonLd } from "@/lib/structured-data";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * A kezdőlapnak eddig egyáltalán nem volt saját metaadata: a találati listában
+ * a puszta „ÁllatiMenhelyek.hu" cím jelent meg, ami semmilyen keresésre nem
+ * illeszkedik. Ez a legfontosabb oldal, és az `absolute` cím azért kell, hogy
+ * a márkanév ne kerüljön rá kétszer a sablon miatt.
+ */
+export async function generateMetadata(
+  { params }: { params: { locale: string } }
+): Promise<Metadata> {
+  const t = await getTranslations("seo");
+  return {
+    ...pageMetadata({
+      locale:      params.locale,
+      path:        "/",
+      title:       t("homeTitle"),
+      description: t("homeDescription"),
+    }),
+    title: { absolute: `${t("homeTitle")} | ÁllatiMenhelyek.hu` },
+  };
+}
+
 const POSTS_PER_PAGE = 10;
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params: { locale: string } }) {
   const t        = await getTranslations("home");
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
@@ -128,6 +153,10 @@ export default async function HomePage() {
     .filter((s) => s.url);
 
   return (
+    <>
+      {/* A kereső innen tudja meg, mi ez az oldal, és innen kínálhat
+          saját keresődobozt a találat alatt. */}
+      <JsonLd data={websiteJsonLd(params.locale)} />
     <main className="min-h-screen bg-white">
 
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -307,5 +336,6 @@ export default async function HomePage() {
       </section>
 
     </main>
+    </>
   );
 }

@@ -18,8 +18,13 @@ import { AnimalStatus, AnimalType } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { pageMetadata } from "@/lib/page-metadata";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: { slug: string; locale: string } }
+): Promise<Metadata> {
   const animal = await prisma.animal.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -33,19 +38,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const description = animal.description?.slice(0, 160) ?? `Ismerd meg ${animal.name} állatot, aki gazdira vár.`;
   const image       = animal.images[0]?.url;
 
-  return {
+  // Kanonikus cím és hreflang: enélkül a négy nyelvi változat ugyanazt az
+  // állatot mutatta külön oldalként, és a kereső kiválasztott közülük egyet.
+  return pageMetadata({
+    locale:      params.locale,
+    path:        `/animals/${params.slug}`,
     title,
     description,
-    openGraph: {
-      title, description, type: "article",
-      ...(image ? { images: [{ url: image, alt: animal.name }] } : {}),
-    },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title, description,
-      ...(image ? { images: [image] } : {}),
-    },
-  };
+    image,
+    type:        "article",
+  });
 }
 
 function Trait({ ok, label }: { ok: boolean | null; label: string }) {
@@ -60,7 +62,9 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
   );
 }
 
-export default async function AnimalDetailPage({ params }: { params: { slug: string } }) {
+export default async function AnimalDetailPage(
+  { params }: { params: { slug: string; locale: string } }
+) {
   const [animal, session, t] = await Promise.all([
     prisma.animal.findUnique({
       where: { slug: params.slug },
@@ -221,6 +225,17 @@ export default async function AnimalDetailPage({ params }: { params: { slug: str
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* A látható morzsasor mellé a gépi változat: ettől a keresőtalálatban
+          a puszta URL helyett olvasható útvonal jelenik meg. */}
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: t("breadcrumb"), path: "/animals" },
+            { name: animal.name, path: `/animals/${animal.slug}` },
+          ],
+          params.locale
+        )}
+      />
       <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
 
         <nav className="mb-6 text-sm text-gray-500">
