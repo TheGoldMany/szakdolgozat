@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { hashToken } from "@/lib/password";
 
-const schema = z.object({ token: z.string().min(1) });
+const schema = z.object({ token: z.string().min(1).max(200) });
 
 // POST /api/auth/verify-email – confirm an email address with a token
 export async function POST(req: NextRequest) {
@@ -12,7 +13,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Érvénytelen kérés" }, { status: 400 });
   }
 
-  const { token } = parsed.data;
+  // Az adatbázisban a token hash-e áll.
+  const token = hashToken(parsed.data.token);
 
   try {
     const record = await prisma.verificationToken.findUnique({ where: { token } });

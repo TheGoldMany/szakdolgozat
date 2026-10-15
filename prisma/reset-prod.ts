@@ -26,11 +26,32 @@ for (const envFile of [".env", ".env.local", ".env.production.local"]) {
 
 const prisma = new PrismaClient();
 
-const ADMIN_EMAIL    = "terrarisztika1@gmail.com";
+/**
+ * A belépési adatok KÖRNYEZETI VÁLTOZÓBÓL jönnek, nem a forrásból.
+ *
+ * Korábban itt nyílt szövegben állt az éles SUPER_ADMIN jelszó — egy publikus
+ * repóban. Ezért a jelszónak nincs alapértéke: hiányában a script nem fut le.
+ * Egy „kényelmes" alapérték pontosan ugyanazt a hibát hozná vissza.
+ *
+ *   RESET_ADMIN_EMAIL=… RESET_ADMIN_PASSWORD=… CONFIRM_RESET=TÖRLÉS npm run db:reset-prod
+ */
+const ADMIN_EMAIL    = process.env.RESET_ADMIN_EMAIL?.trim() ?? "";
 const ADMIN_NAME     = "Admin";
-const ADMIN_PASSWORD = "HE4N%dXMu6vDH7b&";
+const ADMIN_PASSWORD = process.env.RESET_ADMIN_PASSWORD ?? "";
 
 async function main() {
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+    throw new Error("RESET_ADMIN_EMAIL és RESET_ADMIN_PASSWORD kötelező.");
+  }
+  if (ADMIN_PASSWORD.length < 14) {
+    throw new Error("A RESET_ADMIN_PASSWORD legalább 14 karakter legyen.");
+  }
+  // A teljes adatbázist törli. Egy elgépelt npm-parancs nem lehet elég hozzá:
+  // szándékos, kimondott megerősítés kell.
+  if (process.env.CONFIRM_RESET !== "TÖRLÉS") {
+    throw new Error("Megerősítés hiányzik: CONFIRM_RESET=TÖRLÉS");
+  }
+
   console.log("⚠️  Production reset started — deleting all data...");
 
   // Truncate all user-generated tables at once; CASCADE handles FK order.
@@ -107,10 +128,8 @@ async function main() {
   console.log("╔══════════════════════════════════════╗");
   console.log("║  Production admin credentials        ║");
   console.log(`║  Email:    ${ADMIN_EMAIL.padEnd(26)}║`);
-  console.log(`║  Password: ${ADMIN_PASSWORD.padEnd(26)}║`);
+  console.log("║  Password: (a RESET_ADMIN_PASSWORD)  ║");
   console.log("╚══════════════════════════════════════╝");
-  console.log("");
-  console.log("⚠️  Save this password — it will not be shown again.");
 }
 
 main()

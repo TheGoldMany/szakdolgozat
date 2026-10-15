@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { shelterRegisterSchema } from "@/lib/validations/auth";
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     const count = await prisma.shelter.count({ where: { slug: { startsWith: slug } } });
     if (count > 0) slug = `${slug}-${count + 1}`;
 
-    const hashed = await hash(d.password, 10);
+    const hashed = await hashPassword(d.password);
 
     // Cím → koordináta, hogy a menhely megjelenjen a térképen (hibatűrő)
     const coords = await geocodeAddress({

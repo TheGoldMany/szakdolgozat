@@ -89,6 +89,8 @@ function LoginForm() {
       if (res.error.includes("EMAIL_NOT_VERIFIED")) {
         setUnverifiedEmail(data.email);
         setServerError(t("loginErrorUnverified"));
+      } else if (res.error.includes("TOO_MANY_ATTEMPTS")) {
+        setServerError(t("loginErrorTooMany"));
       } else {
         setServerError(t("loginErrorCredentials"));
       }

@@ -462,7 +462,8 @@
     "shelterSubmit": "Register shelter",
     "asIndividual": "Registering as an individual?",
     "plainRegister": "Standard registration",
-    "registerError": "Something went wrong during registration."
+    "registerError": "Something went wrong during registration.",
+    "loginErrorTooMany": "Too many failed attempts. Please try again in 15 minutes."
   },
   "reports": {
     "title": "Lost and found animals",

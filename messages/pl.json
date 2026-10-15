@@ -462,7 +462,8 @@
     "shelterSubmit": "Zarejestruj schronisko",
     "asIndividual": "Rejestrujesz się jako osoba prywatna?",
     "plainRegister": "Zwykła rejestracja",
-    "registerError": "Wystąpił błąd podczas rejestracji."
+    "registerError": "Wystąpił błąd podczas rejestracji.",
+    "loginErrorTooMany": "Zbyt wiele nieudanych prób. Spróbuj ponownie za 15 minut."
   },
   "reports": {
     "title": "Zagubione i znalezione zwierzęta",

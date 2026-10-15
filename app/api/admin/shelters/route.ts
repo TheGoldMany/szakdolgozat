@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { hash } from "bcryptjs";
+import { hashPassword } from "@/lib/password";
 import { z } from "zod";
 import { Role } from "@prisma/client";
 import { sendShelterAdminInviteEmail } from "@/lib/email";
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
 
     // Tranzakcióban hozzuk létre a menhelyt és az admin usert
     const result = await prisma.$transaction(async (tx) => {
-      const hashed = await hash(d.adminPassword, 10);
+      const hashed = await hashPassword(d.adminPassword);
 
       const adminUser = existing
         ? await tx.user.update({

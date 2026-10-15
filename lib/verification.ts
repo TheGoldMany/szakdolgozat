@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { newOneTimeToken } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
 
@@ -12,12 +12,15 @@ export async function issueVerificationToken(email: string, name?: string | null
   // A cím korábbi tokenjeinek törlése
   await prisma.verificationToken.deleteMany({ where: { identifier: email } });
 
-  const token   = randomBytes(32).toString("hex");
+  // E-mailben a nyers token megy, az adatbázisba a hash-e — lásd
+  // `lib/password.ts`. (A NextAuth e-mail-szolgáltatója nincs bekapcsolva,
+  // tehát ezt a táblát csak mi írjuk és olvassuk.)
+  const { raw, hashed } = newOneTimeToken();
   const expires = new Date(Date.now() + TOKEN_TTL_MS);
 
   await prisma.verificationToken.create({
-    data: { identifier: email, token, expires },
+    data: { identifier: email, token: hashed, expires },
   });
 
-  await sendVerificationEmail(email, token, name);
+  await sendVerificationEmail(email, raw, name);
 }

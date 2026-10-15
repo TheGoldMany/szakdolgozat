@@ -462,7 +462,8 @@
     "shelterSubmit": "Tierheim registrieren",
     "asIndividual": "Als Privatperson registrieren?",
     "plainRegister": "Normale Registrierung",
-    "registerError": "Bei der Registrierung ist ein Fehler aufgetreten."
+    "registerError": "Bei der Registrierung ist ein Fehler aufgetreten.",
+    "loginErrorTooMany": "Zu viele fehlgeschlagene Versuche. Bitte versuche es in 15 Minuten erneut."
   },
   "reports": {
     "title": "Verlorene und gefundene Tiere",

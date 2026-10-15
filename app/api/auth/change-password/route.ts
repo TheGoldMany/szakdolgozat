@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { compare, hash } from "bcryptjs";
+import { hashPassword, verifyPassword, passwordTooLong, PASSWORD_MIN } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordChangedEmail } from "@/lib/email";
 import { requireAuthUser } from "@/lib/api-auth";
 
 const schema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword:     z.string().min(8, "Legalább 8 karakter szükséges"),
+  currentPassword: z.string().min(1).max(200),
+  newPassword:     z.string()
+    .min(PASSWORD_MIN, "Legalább 8 karakter szükséges")
+    .refine((p) => !passwordTooLong(p), "A jelszó túl hosszú (legfeljebb 72 bájt)."),
 });
 
 /**
@@ -44,12 +46,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const valid = await compare(parsed.data.currentPassword, user.password);
+    const valid = await verifyPassword(parsed.data.currentPassword, user.password);
     if (!valid) {
       return NextResponse.json({ error: "A jelenlegi jelszó helytelen." }, { status: 400 });
     }
 
-    const hashed = await hash(parsed.data.newPassword, 12);
+    const hashed = await hashPassword(parsed.data.newPassword);
     await prisma.user.update({
       where: { id: authUser!.id },
       data:  { password: hashed },

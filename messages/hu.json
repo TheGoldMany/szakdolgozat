@@ -462,7 +462,8 @@
     "shelterSubmit": "Menhely regisztrálása",
     "asIndividual": "Magánszemélyként regisztrálnál?",
     "plainRegister": "Sima regisztráció",
-    "registerError": "Hiba történt a regisztráció során."
+    "registerError": "Hiba történt a regisztráció során.",
+    "loginErrorTooMany": "Túl sok sikertelen próbálkozás. Próbáld újra 15 perc múlva."
   },
   "reports": {
     "title": "Elveszett és megtalált állatok",

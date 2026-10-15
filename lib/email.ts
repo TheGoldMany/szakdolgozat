@@ -1,5 +1,6 @@
 import { createHmac } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { requireSecret } from "@/lib/secrets";
 
 const FROM = process.env.RESEND_FROM ?? "ÁllatiMenhelyek.hu <onboarding@resend.dev>";
 const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
@@ -26,7 +27,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function unsubscribeToken(email: string): string {
-  return createHmac("sha256", process.env.NEXTAUTH_SECRET ?? "secret")
+  return createHmac("sha256", requireSecret("NEXTAUTH_SECRET"))
     .update(email.toLowerCase())
     .digest("hex")
     .slice(0, 32);
