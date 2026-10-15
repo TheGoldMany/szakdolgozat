@@ -62,7 +62,8 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-gray-700">{displayLabel}</label>
+      {/* Üres címke: a hívó saját szakaszcímet ad, ne legyen kettő. */}
+      {displayLabel && <label className="mb-2 block text-sm font-medium text-gray-700">{displayLabel}</label>}
 
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
         {value.map((url, idx) => (

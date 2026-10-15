@@ -4,6 +4,9 @@ const config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Közös osztálylisták (pl. lib/report-style.ts). Csak a legfelső szint:
+    // a lib/generated alatti Prisma-kliens óriási, és nincs benne osztálynév.
+    "./lib/*.{ts,tsx}",
   ],
   theme: {
     extend: {
