@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -32,9 +33,10 @@ export function ResolveButton({ reportId }: { reportId: string }) {
     <button
       onClick={handleResolve}
       disabled={loading}
-      className="w-full rounded-xl bg-green-500 py-2.5 text-sm font-semibold text-white hover:bg-green-600 disabled:opacity-60 transition-colors"
+      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white text-sm font-semibold text-graphite transition-colors hover:border-brand-600 hover:text-brand-700 disabled:opacity-60"
     >
-      {loading ? "..." : `✓ ${t("resolveButton")}`}
+      <CheckCircle2 className="h-4 w-4" />
+      {loading ? "…" : t("resolveButton")}
     </button>
   );
 }

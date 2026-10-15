@@ -1,3 +1,4 @@
+import { DEMO_IMAGE_POOL, pickFrom } from "../lib/demo-images";
 import {
   PrismaClient,
   AnimalType,
@@ -193,16 +194,10 @@ const ANIMAL_DESCRIPTIONS = [
 
 const COLORS = ["fekete", "fehér", "barna", "szürke", "tarka", "arany", "vörös", "tricolor", "krém"];
 
-const IMG_KEYWORDS: Record<AnimalType, string> = {
-  DOG:    "dog",
-  CAT:    "cat",
-  RABBIT: "rabbit",
-  BIRD:   "parrot",
-  OTHER:  "hamster",
-};
-
+// A loremflickr képeit a Vercel képoptimalizálója nem tudja letölteni,
+// ezért a bemutató-képek az ellenőrzött Unsplash listából jönnek.
 function imgUrl(type: AnimalType, seed: number) {
-  return `https://loremflickr.com/640/480/${IMG_KEYWORDS[type]}?lock=${seed}`;
+  return pickFrom(DEMO_IMAGE_POOL[type], String(seed))!;
 }
 
 // ── Main ──────────────────────────────────────────────

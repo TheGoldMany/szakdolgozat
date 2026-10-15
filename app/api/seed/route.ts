@@ -10,6 +10,7 @@ import {
   InventoryCategory, InventoryTxType, FollowUpStatus, NotificationType,
 } from "@prisma/client";
 import { seedNewModules } from "@/lib/seed-extras";
+import { DEMO_IMAGE_POOL, pickFrom } from "@/lib/demo-images";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -409,12 +410,9 @@ async function runSeed() {
   });
 
   // ── 6b. Állat képek (1 kép / állat) ──────────────────────────────────────
-  const IMG_KEYWORDS: Record<AnimalType, string> = {
-    DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "parrot", OTHER: "hamster",
-  };
   const imgRows = allAnimals.map((a, i) => ({
     animalId:  a.id,
-    url:       `https://loremflickr.com/640/480/${IMG_KEYWORDS[a.type]}?lock=${i + 1}`,
+    url:       pickFrom(DEMO_IMAGE_POOL[a.type], String(i + 1))!,
     alt:       "Állat fotó",
     isPrimary: true,
     order:     0,
