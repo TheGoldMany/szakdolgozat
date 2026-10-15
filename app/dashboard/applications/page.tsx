@@ -181,7 +181,7 @@ export default async function DashboardApplicationsPage(
                     </div>
 
                     {app.message && (
-                      <p className="text-xs text-gray-500 italic line-clamp-3">"{app.message}"</p>
+                      <p className="text-xs text-gray-500 line-clamp-3">"{app.message}"</p>
                     )}
 
                     {app.reviewNotes && (

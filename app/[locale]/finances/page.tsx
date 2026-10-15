@@ -154,7 +154,7 @@ export default async function FinancesPage() {
                         )}
                       </p>
                       {d.message && (
-                        <p className="mt-0.5 text-xs italic text-gray-400">&ldquo;{d.message}&rdquo;</p>
+                        <p className="mt-0.5 text-xs text-gray-400">&ldquo;{d.message}&rdquo;</p>
                       )}
                       <p className="mt-0.5 text-xs text-gray-400">
                         {d.paidAt ? new Date(d.paidAt).toLocaleDateString("hu-HU") : ""}

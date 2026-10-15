@@ -190,7 +190,7 @@ export default async function ApplicationDetailPage(
             </div>
 
             {app.message && (
-              <p className="text-xs text-gray-500 italic">"{app.message}"</p>
+              <p className="text-xs text-gray-500">"{app.message}"</p>
             )}
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
@@ -259,7 +259,7 @@ export default async function ApplicationDetailPage(
                 ) : resp.value ? (
                   <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                 ) : (
-                  <p className="text-sm text-gray-400 italic">{t("appDetailNotFilled")}</p>
+                  <p className="text-sm text-gray-400">{t("appDetailNotFilled")}</p>
                 )}
               </div>
             ))}

@@ -19,6 +19,15 @@
     @apply bg-white text-gray-900 antialiased;
     overflow-x: hidden;
   }
+
+  /* Címsorok a karakteres betűtípussal. Globálisan, mert több száz címsor
+     van az oldalon — egyenként `font-display` osztályt adni rájuk biztosan
+     kihagyna néhányat, és a két betűtípus keveredése rosszabb a semminél. */
+  h1, h2, h3 {
+    font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+  }
 }
 
 /* Bottom sheet felcsúszó animáció (mobil) */
@@ -328,4 +337,14 @@ input[type="radio"]:checked {
     scroll-behavior: auto !important;
   }
   .animate-spin { animation: spin 1s linear infinite !important; }
+}
+
+/* ─── Ikonok ──────────────────────────────────────────────
+   A Lucide gyári 2px-es vonala a „sablonos" kinézet egyik legfelismerhetőbb
+   jele, és a karakteres címsor-betű mellett túl nehéz. Csak az ALAPÉRTELMEZETT
+   vastagságú ikonokat vékonyítjuk: ahol a kód szándékosan mást állított be
+   (pl. a mobil alsó sáv aktív füle 2.4-et), az érintetlen marad. A CSS-tulajdonság
+   erősebb a `stroke-width` attribútumnál, ezért nem kell 174 fájlt átírni. */
+svg.lucide[stroke-width="2"] {
+  stroke-width: 1.6px;
 }

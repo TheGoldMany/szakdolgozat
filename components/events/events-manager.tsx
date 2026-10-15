@@ -305,7 +305,7 @@ export function EventsManager({ shelterId, events }: Props) {
                             <div className="min-w-0">
                               <p className="font-medium text-gray-700">{r.user.name ?? r.user.email}</p>
                               <p className="text-gray-400">{r.user.email}</p>
-                              {r.note && <p className="mt-0.5 text-gray-500 italic">„{r.note}"</p>}
+                              {r.note && <p className="mt-0.5 text-gray-500">„{r.note}"</p>}
                             </div>
                             <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-gray-500">
                               {1 + r.guests} fő

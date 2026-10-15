@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { fontVariables } from "@/lib/fonts";
 import { getServerSession } from "next-auth/next";
 import { NextIntlClientProvider } from "next-intl";
 import { cookies } from "next/headers";
@@ -17,7 +17,6 @@ import { resolveActingShelter } from "@/lib/acting-shelter";
 import { DashboardTourLauncher } from "@/components/onboarding/dashboard-tour-launcher";
 import "../globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const SUPPORTED_LOCALES = ["hu", "en", "de", "pl"] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -59,7 +58,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const acting = await resolveActingShelter(session.user.id!, role);
 
   return (
-    <html lang={locale} className={inter.variable}>
+    <html lang={locale} className={fontVariables}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>

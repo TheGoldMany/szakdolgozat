@@ -30,7 +30,7 @@ export function ApplicationReview({ applicationId, currentStatus }: ApplicationR
 
   if (currentStatus === "APPROVED" || currentStatus === "REJECTED") {
     return (
-      <span className="text-xs text-gray-400 italic">{t("appsReviewClosed")}</span>
+      <span className="text-xs text-gray-400">{t("appsReviewClosed")}</span>
     );
   }
 

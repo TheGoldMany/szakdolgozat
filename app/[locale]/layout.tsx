@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { fontVariables } from "@/lib/fonts";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -16,10 +16,9 @@ import { Suspense } from "react";
 import "../globals.css";
 import { siteUrl } from "@/lib/site-url";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const viewport: Viewport = {
-  themeColor: "#166534",
+  themeColor: "#187f3b",
   width: "device-width",
   initialScale: 1,
 };
@@ -62,7 +61,7 @@ export default async function LocaleLayout(
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={inter.variable}>
+    <html lang={locale} className={fontVariables}>
       <body>
         {/* JavaScript nélkül a görgetésre megjelenő blokkok sosem kapnának
             jelzést, hogy láthatóvá váljanak – ilyenkor egyszerűen látszanak. */}

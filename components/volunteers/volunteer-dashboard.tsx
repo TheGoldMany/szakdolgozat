@@ -144,7 +144,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
           {/* Admin note */}
           {vol.adminNote && (
             <div className="px-4 py-3">
-              <p className="text-xs text-gray-500 italic">{t("adminNote", { note: vol.adminNote })}</p>
+              <p className="text-xs text-gray-500">{t("adminNote", { note: vol.adminNote })}</p>
             </div>
           )}
 

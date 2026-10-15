@@ -172,7 +172,7 @@ export default async function UserApplicationDetailPage(
                   ) : resp.value ? (
                     <p className="whitespace-pre-wrap text-sm text-gray-700">{resp.value}</p>
                   ) : (
-                    <p className="text-sm text-gray-400 italic">{t("notFilled")}</p>
+                    <p className="text-sm text-gray-400">{t("notFilled")}</p>
                   )}
                 </div>
               ))}

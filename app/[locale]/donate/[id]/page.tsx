@@ -186,7 +186,7 @@ export default async function CampaignDetailPage(
                           {d.isAnonymous ? t("anonymousDonor") : (d.user?.name ?? t("anonymous"))}
                         </p>
                         {d.message && (
-                          <p className="mt-0.5 text-xs italic text-gray-500 line-clamp-2">
+                          <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">
                             "{d.message}"
                           </p>
                         )}
