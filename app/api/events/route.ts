@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugifyEvent } from "@/lib/event";
+import { permittedShelterIds } from "@/lib/acting-shelter";
 
 const createSchema = z.object({
   shelterId:   z.string().min(1),
@@ -27,18 +28,8 @@ export async function GET(req: NextRequest) {
 
   const shelterId = req.nextUrl.searchParams.get("shelterId");
 
-  let shelterIds: string[] = [];
-  if (shelterId) {
-    shelterIds = [shelterId];
-  } else if (session.user.role === "SUPER_ADMIN") {
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    shelterIds = all.map(s => s.id);
-  } else {
-    const admins = await prisma.shelterAdmin.findMany({
-      where: { userId: session.user.id }, select: { shelterId: true },
-    });
-    shelterIds = admins.map(a => a.shelterId);
-  }
+  // A kért menhely csak akkor, ha a kérő tagja — lásd `permittedShelterIds`.
+  const shelterIds = await permittedShelterIds(session.user.id, session.user.role, shelterId);
 
   const events = await prisma.event.findMany({
     where:   { shelterId: { in: shelterIds } },

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { InventoryCategory } from "@prisma/client";
+import { permittedShelterIds } from "@/lib/acting-shelter";
 
 const createSchema = z.object({
   shelterId:   z.string().min(1),
@@ -16,17 +17,6 @@ const createSchema = z.object({
   note:        z.string().max(1000).nullable().optional(),
 });
 
-async function resolveShelterIds(userId: string, role: string): Promise<string[]> {
-  if (role === "SUPER_ADMIN") {
-    const all = await prisma.shelter.findMany({ select: { id: true } });
-    return all.map((s) => s.id);
-  }
-  const admins = await prisma.shelterAdmin.findMany({
-    where: { userId }, select: { shelterId: true },
-  });
-  return admins.map((a) => a.shelterId);
-}
-
 // GET /api/inventory?shelterId=xxx
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -34,7 +24,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const paramId    = req.nextUrl.searchParams.get("shelterId");
-    const shelterIds = paramId ? [paramId] : await resolveShelterIds(session.user.id, session.user.role);
+    // A kért menhely csak akkor, ha a kérő tagja — lásd `permittedShelterIds`.
+    const shelterIds = await permittedShelterIds(session.user.id, session.user.role, paramId);
 
     const items = await prisma.inventoryItem.findMany({
       where:   { shelterId: { in: shelterIds } },
