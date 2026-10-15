@@ -63,7 +63,9 @@ const nextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "platform-lookaside.fbsbx.com" },
       { protocol: "https", hostname: "*.fbcdn.net" },
-      // Bemutató-adatok képei (prisma/seed*.ts)
+      // Bemutató-adatok képei (prisma/seed*.ts, lib/demo-images.ts). A
+      // loremflickr a régi adatbázisok miatt marad, újat már nem írunk vele.
+      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "loremflickr.com" },
     ],
     // AVIF SZÁNDÉKOSAN NINCS. A Next.js 15.5.24 előtti verzióiban az AVIF

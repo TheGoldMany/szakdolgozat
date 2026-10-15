@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && (prisma db push --accept-data-loss || DATABASE_URL=\"${POSTGRES_URL_NON_POOLING:-$DATABASE_URL}\" prisma db push --accept-data-loss || echo '⚠️  DB push skipped (unreachable) — continuing build') && (prisma db push --schema=prisma/dwh.prisma --accept-data-loss || echo '⚠️  DWH db push skipped (unreachable) — continuing build') && next build",
+    "build": "prisma generate && prisma generate --schema=prisma/dwh.prisma && (prisma db push --accept-data-loss || DATABASE_URL=\"${POSTGRES_URL_NON_POOLING:-$DATABASE_URL}\" prisma db push --accept-data-loss || echo '⚠️  DB push skipped (unreachable) — continuing build') && (prisma db push --schema=prisma/dwh.prisma --accept-data-loss || echo '⚠️  DWH db push skipped (unreachable) — continuing build') && (node -e \"process.exit(process.env.VERCEL_ENV==='preview'?0:1)\" && npm run seed:preview || echo 'Előnézeti adatfeltöltés kihagyva') && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
@@ -17,6 +17,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "seed:preview": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-preview.ts",
     "prisma:seed:demo": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-demo.ts",
     "db:reset": "prisma migrate reset --force && npm run prisma:seed",
     "db:reset-prod": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/reset-prod.ts",
