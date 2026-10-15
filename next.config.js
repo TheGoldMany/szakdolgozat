@@ -66,7 +66,11 @@ const nextConfig = {
       // Bemutató-adatok képei (prisma/seed*.ts)
       { protocol: "https", hostname: "loremflickr.com" },
     ],
-    formats: ["image/avif", "image/webp"],
+    // AVIF SZÁNDÉKOSAN NINCS. A Next.js 15.5.24 előtti verzióiban az AVIF
+    // feldolgozása a képoptimalizálóban hitelesítés nélküli távoli
+    // kódfuttatást enged (GHSA-2xp9-vwfh-vxw4, kritikus). A WebP a legtöbb
+    // böngészőben hasonló méretet ad, a különbség nem éri meg ezt a felületet.
+    formats: ["image/webp"],
     // Optimalizált képek cache-elése 1 napig (kevesebb ismételt optimalizálás)
     minimumCacheTTL: 86400,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
