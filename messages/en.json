@@ -634,7 +634,7 @@
     "makePrimary": "Set as primary",
     "addImage": "Add image",
     "close": "Close",
-    "multiImageHint": "Max {max} images · Max 5 MB/image · JPEG, PNG, WebP · First image is the main photo (hover → star)",
+    "multiImageHint": "Up to {max} photos. The first one is the main photo; use the star to pick another. Large photos are resized automatically before upload.",
     "all": "All",
     "loadMore": "Load more",
     "view": "View",
@@ -652,7 +652,8 @@
     "uploadFailedRetry": "Upload failed, please try again.",
     "optional": "optional",
     "sending": "Sending…",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "takePhoto": "Take a photo"
   },
   "applications": {
     "title": "My applications",

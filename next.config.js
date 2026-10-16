@@ -16,8 +16,8 @@ const withNextIntl = require("next-intl/plugin")("./i18n/request.ts");
  *    képnek álcázott HTML-fájl nem fut le szkriptként.
  *  • Referrer-Policy — más oldalra kattintva csak a domain megy át, a teljes
  *    URL (benne pl. egy jelszó-visszaállító token) nem.
- *  • Permissions-Policy — a kamera, mikrofon és helymeghatározás tiltva; az
- *    oldal egyiket sem használja, így egy esetleges beinjektált szkript sem.
+ *  • Permissions-Policy — a mikrofon és a helymeghatározás tiltva, a kamera
+ *    csak a saját oldalunknak (fotófeltöltés telefonon).
  *
  * MIÉRT NINCS `script-src` a CSP-ben: a Next 14 inline szkripteket ír a
  * lapra, nonce nélkül tehát csak `'unsafe-inline'`-nal működne — az pedig
@@ -31,7 +31,11 @@ const SECURITY_HEADERS = [
   { key: "X-Content-Type-Options",    value: "nosniff" },
   { key: "X-Frame-Options",           value: "DENY" },
   { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy",        value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+  // A kamera a saját oldalunknak engedélyezett (self): a fotófeltöltés
+  // telefonon a kamerát nyitja meg, és egyes böngészők (Android Chrome) a
+  // tiltott kamera mellett a fájlválasztóból is kiveszik a fotózást.
+  // Idegen, beágyazott tartalom továbbra sem érheti el.
+  { key: "Permissions-Policy",        value: "camera=(self), microphone=(), geolocation=(), browsing-topics=()" },
   {
     key: "Content-Security-Policy",
     value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests",

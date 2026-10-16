@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { upload } from "@vercel/blob/client";
+import { prepareImage } from "@/lib/prepare-image";
 import { Camera, Loader2 } from "lucide-react";
 
 interface Props {
@@ -18,8 +19,11 @@ export function AvatarUpload({ currentImage, name }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = e.target.files?.[0];
+    e.target.value = "";
+    if (!picked) return;
+    // Telefonos fotó: feltöltés előtt kicsinyítjük (5 MB-os korlát).
+    const file = await prepareImage(picked);
 
     // Local preview
     setPreview(URL.createObjectURL(file));
@@ -83,7 +87,7 @@ export function AvatarUpload({ currentImage, name }: Props) {
         <input
           ref={fileRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
+          accept="image/*"
           className="sr-only"
           disabled={uploading}
           onChange={handleFile}

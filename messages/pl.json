@@ -634,7 +634,7 @@
     "makePrimary": "Ustaw jako główne",
     "addImage": "Dodaj zdjęcie",
     "close": "Zamknij",
-    "multiImageHint": "Maks. {max} zdjęć · Maks. 5 MB/zdjęcie · JPEG, PNG, WebP · Pierwsze zdjęcie będzie głównym (hover → gwiazdka)",
+    "multiImageHint": "Maksymalnie {max} zdjęć. Pierwsze jest zdjęciem głównym, gwiazdką możesz wybrać inne. Duże zdjęcia są automatycznie zmniejszane przed wysłaniem.",
     "all": "Wszystkie",
     "loadMore": "Załaduj więcej",
     "view": "Zobacz",
@@ -652,7 +652,8 @@
     "uploadFailedRetry": "Przesyłanie nie powiodło się, spróbuj ponownie.",
     "optional": "opcjonalnie",
     "sending": "Wysyłanie…",
-    "unknown": "Nieznany"
+    "unknown": "Nieznany",
+    "takePhoto": "Zrób zdjęcie"
   },
   "applications": {
     "title": "Moje wnioski",

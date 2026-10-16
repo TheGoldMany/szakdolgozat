@@ -634,7 +634,7 @@
     "makePrimary": "Beállítás elsődlegesnek",
     "addImage": "Kép hozzáadása",
     "close": "Bezárás",
-    "multiImageHint": "Max {max} kép · Max 5 MB/kép · JPEG, PNG, WebP · Az első kép lesz a főkép (hover → csillag)",
+    "multiImageHint": "Legfeljebb {max} kép. Az első lesz a főkép, a csillaggal másikat is választhatsz. A nagy fotókat feltöltés előtt automatikusan kicsinyítjük.",
     "all": "Összes",
     "loadMore": "Több betöltése",
     "view": "Megtekintés",
@@ -652,7 +652,8 @@
     "uploadFailedRetry": "Feltöltés sikertelen, próbáld újra.",
     "optional": "opcionális",
     "sending": "Küldés…",
-    "unknown": "Ismeretlen"
+    "unknown": "Ismeretlen",
+    "takePhoto": "Fotó készítése"
   },
   "applications": {
     "title": "Kérelmeim",
