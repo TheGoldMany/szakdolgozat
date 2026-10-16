@@ -66,6 +66,14 @@
   }
 }
 
+/* A viewport `cover` módban a képernyő széléig rajzol (lásd [locale]/layout).
+   Fekvő nézetben az iPhone kivágása alá ne csússzon be a tartalom. A fix
+   elemek (fejléc, alsó sáv) ezt maguk kezelik. */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 /* A fejléc fix és 4rem magas, a főtartalom ezért pt-16-tal indul.
    A teljes képernyős oldalak (min-h-screen) így pontosan a maradék helyet
    töltsék ki, különben a fejléc magasságával túlcsordulnának (fölösleges
