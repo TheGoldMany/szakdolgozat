@@ -653,7 +653,15 @@
     "optional": "optional",
     "sending": "Sending…",
     "unknown": "Unknown",
-    "takePhoto": "Take a photo"
+    "takePhoto": "Take a photo",
+    "cameraHelpTitle": "Camera didn't start?",
+    "cameraHelpIosSafari": "Your phone isn't letting this site use the camera. Tap aA in the address bar, then Website Settings, Camera, Allow. If that doesn't help: Settings, Apps, Safari, Camera should be set to Ask.",
+    "cameraHelpIosOther": "Your phone isn't letting this browser use the camera. Open Settings, Apps, choose your browser (e.g. Chrome) and turn on Camera.",
+    "cameraHelpAndroid": "The browser doesn't have camera permission. Tap the lock (or settings) icon in the address bar, then Permissions, Camera, Allow.",
+    "cameraHelpInApp": "You opened this page inside an app's built-in browser (e.g. Facebook, Messenger, Instagram), which often can't use the camera. Use the menu in the top corner to open it in Safari or Chrome.",
+    "cameraHelpOther": "The browser doesn't have camera permission. Allow the camera for this site in your browser settings, or pick a photo from your gallery.",
+    "cameraHelpGallery": "Choose from gallery",
+    "cameraHelpRetry": "Try again"
   },
   "applications": {
     "title": "My applications",

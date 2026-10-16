@@ -653,7 +653,15 @@
     "optional": "opcionális",
     "sending": "Küldés…",
     "unknown": "Ismeretlen",
-    "takePhoto": "Fotó készítése"
+    "takePhoto": "Fotó készítése",
+    "cameraHelpTitle": "Nem indult el a kamera?",
+    "cameraHelpIosSafari": "A telefon nem engedi a kamerát ennek az oldalnak. Koppints a címsorban az aA ikonra, majd Webhelybeállítások, Kamera, Engedélyezés. Ha ez nem segít: Beállítások, Appok, Safari, Kamera legyen Kérdezés.",
+    "cameraHelpIosOther": "A telefon nem engedi a kamerát ennek a böngészőnek. Nyisd meg a Beállítások, Appok menüt, válaszd a böngésződet (pl. Chrome), és kapcsold be a Kamerát.",
+    "cameraHelpAndroid": "A böngésző nem kapott kamera-engedélyt. Koppints a címsorban a lakat (vagy beállítás) ikonra, majd Engedélyek, Kamera, Engedélyezés.",
+    "cameraHelpInApp": "Az oldalt egy alkalmazás (pl. Facebook, Messenger, Instagram) belső böngészőjében nyitottad meg, ami sokszor nem kap kamerát. A jobb felső menüből nyisd meg Safariban vagy Chrome-ban.",
+    "cameraHelpOther": "A böngésző nem kapott kamera-engedélyt. Engedélyezd a kamerát ennek az oldalnak a böngésző beállításaiban, vagy válassz képet a galériából.",
+    "cameraHelpGallery": "Választás a galériából",
+    "cameraHelpRetry": "Újrapróbálom"
   },
   "applications": {
     "title": "Kérelmeim",
