@@ -231,6 +231,12 @@ export function Header() {
         "site-header fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white",
         scrolled && "site-header--scrolled",
       )}
+      // Fekvő nézetben az iPhone kivágása mellett is bent maradjon a logó és a
+      // menü (a viewport `cover` módban a képernyő széléig rajzol).
+      style={{
+        paddingLeft:  "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
+      }}
     >
 
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
