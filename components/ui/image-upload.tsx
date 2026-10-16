@@ -2,8 +2,9 @@
 
 import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
-import { ImageIcon, X, Loader2, Upload } from "lucide-react";
+import { ImageIcon, X, Loader2, Upload, Camera } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { prepareImage } from "@/lib/prepare-image";
 
 interface ImageUploadProps {
   value: string;
@@ -15,22 +16,28 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
   const t = useTranslations("common");
   const [uploading, setUploading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+  // Külön mező a kamerához: a `capture` a telefonon közvetlenül a kamerát
+  // nyitja meg, a sima fájlmező pedig a galériát/fájlokat.
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   const displayLabel = label ?? t("photo");
 
-  async function handleFile(file: File) {
-    if (!file.type.startsWith("image/")) {
+  async function handleFile(original: File) {
+    if (!original.type.startsWith("image/") && !/\.(heic|heif)$/i.test(original.name)) {
       setError(t("uploadOnlyImages"));
       return;
     }
+    setError(null);
+    setUploading(true);
+    // A telefonos fotó gyakran 5 MB fölötti: feltöltés előtt kicsinyítjük.
+    const file = await prepareImage(original);
     if (file.size > 5 * 1024 * 1024) {
+      setUploading(false);
       setError(t("uploadMaxSize"));
       return;
     }
 
-    setError(null);
-    setUploading(true);
     try {
       const ext = file.name.split(".").pop() ?? "jpg";
       const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -55,6 +62,8 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) handleFile(file);
+    // Ugyanaz a kép újra kiválasztható legyen (különben nincs change esemény).
+    e.target.value = "";
   }
 
   function handleRemove() {
@@ -108,9 +117,21 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
                 </p>
                 <p className="mt-1 text-xs text-gray-400">{t("uploadFormats")}</p>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-medium text-brand-600">
-                <Upload className="h-3.5 w-3.5" />
-                {t("uploadSelectImage")}
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="flex items-center gap-2 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-xs font-medium text-brand-700">
+                  <Upload className="h-3.5 w-3.5" />
+                  {t("uploadSelectImage")}
+                </span>
+                {/* Csak érintőképernyőn: asztali gépen a capture-t a böngésző
+                    figyelmen kívül hagyná, és ugyanaz a fájlválasztó nyílna. */}
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); cameraRef.current?.click(); }}
+                  className="hidden items-center gap-2 rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-semibold text-white [@media(pointer:coarse)]:flex"
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                  {t("takePhoto")}
+                </button>
               </div>
             </>
           )}
@@ -120,7 +141,15 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/*"
+        className="hidden"
+        onChange={handleChange}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         className="hidden"
         onChange={handleChange}
       />

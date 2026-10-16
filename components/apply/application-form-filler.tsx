@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { upload } from "@vercel/blob/client";
+import { prepareImage } from "@/lib/prepare-image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { CheckCircle } from "lucide-react";
@@ -35,7 +36,9 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
     setValues((prev) => ({ ...prev, [fieldId]: val }));
   }
 
-  async function handleFileChange(fieldId: string, file: File, isImage: boolean) {
+  async function handleFileChange(fieldId: string, picked: File, isImage: boolean) {
+    // Kép mezőnél a telefonos fotót kicsinyítjük (5 MB-os korlát).
+    const file = isImage ? await prepareImage(picked) : picked;
     setUploadErrors((prev) => ({ ...prev, [fieldId]: "" }));
     setUploading((prev) => ({ ...prev, [fieldId]: true }));
     try {

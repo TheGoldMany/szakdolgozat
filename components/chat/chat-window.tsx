@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { upload } from "@vercel/blob/client";
+import { prepareImage } from "@/lib/prepare-image";
 import { Send, Paperclip, X, FileText, Image as ImageIcon, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations, useLocale } from "next-intl";
@@ -176,8 +177,11 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
   }, [poll]);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = e.target.files?.[0];
+    e.target.value = "";
+    if (!picked) return;
+    // A fotót kicsinyítjük (a dokumentumokhoz nem nyúl a prepareImage).
+    const file = picked.type.startsWith("image/") ? await prepareImage(picked) : picked;
     setUploadError("");
     setUploading(true);
     try {

@@ -3,8 +3,9 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { upload } from "@vercel/blob/client";
-import { Plus, X, Star } from "lucide-react";
+import { Plus, X, Star, Camera } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { prepareImage } from "@/lib/prepare-image";
 
 interface Props {
   value:    string[];
@@ -18,6 +19,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
   const [uploading, setUploading] = useState<number | null>(null);
   const [error, setError]         = useState("");
   const inputRef                  = useRef<HTMLInputElement>(null);
+  const cameraRef                 = useRef<HTMLInputElement>(null);
 
   const displayLabel = label ?? t("photos");
 
@@ -27,12 +29,18 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
     const toUpload  = Array.from(files).slice(0, remaining);
     setError("");
 
+    // A feltöltött címeket itt gyűjtjük: a `value` a ciklus alatt nem frissül,
+    // így a korábbi `[...value, url]` több kép esetén csak az utolsót tartotta meg.
+    let urls = [...value];
     for (let i = 0; i < toUpload.length; i++) {
-      const file = toUpload[i];
-      if (!file.type.startsWith("image/")) { setError(t("uploadOnlyImages")); continue; }
-      if (file.size > 5 * 1024 * 1024)     { setError(t("uploadMaxSizePerImage")); continue; }
-
-      setUploading(value.length + i);
+      const original = toUpload[i];
+      if (!original.type.startsWith("image/") && !/\.(heic|heif)$/i.test(original.name)) {
+        setError(t("uploadOnlyImages")); continue;
+      }
+      setUploading(urls.length);
+      // A telefonos fotó gyakran 5 MB fölötti: feltöltés előtt kicsinyítjük.
+      const file = await prepareImage(original);
+      if (file.size > 5 * 1024 * 1024) { setError(t("uploadMaxSizePerImage")); setUploading(null); continue; }
       try {
         const ext        = file.name.split(".").pop() ?? "jpg";
         const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -40,7 +48,8 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
           access: "public",
           handleUploadUrl: "/api/upload",
         });
-        onChange([...value, blob.url]);
+        urls = [...urls, blob.url];
+        onChange(urls);
       } catch {
         setError(t("uploadFailed"));
       } finally {
@@ -76,7 +85,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
               </span>
             )}
 
-            <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 [@media(hover:none)]:items-end [@media(hover:none)]:justify-end [@media(hover:none)]:bg-transparent [@media(hover:none)]:p-1.5 [@media(hover:none)]:opacity-100">
               {idx !== 0 && (
                 <button
                   type="button"
@@ -116,15 +125,35 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
             )}
           </button>
         )}
+
+        {/* Kamera közvetlenül: csak érintőképernyőn (lásd ImageUpload). */}
+        {value.length < max && uploading === null && (
+          <button
+            type="button"
+            onClick={() => cameraRef.current?.click()}
+            className="hidden aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-brand-700 text-white [@media(pointer:coarse)]:flex"
+          >
+            <Camera className="h-5 w-5" />
+            <span className="text-xs font-semibold">{t("takePhoto")}</span>
+          </button>
+        )}
       </div>
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/*"
         multiple
         className="sr-only"
-        onChange={(e) => handleFiles(e.target.files)}
+        onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="sr-only"
+        onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
       />
 
       {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}

@@ -634,7 +634,7 @@
     "makePrimary": "Als Hauptbild festlegen",
     "addImage": "Bild hinzufügen",
     "close": "Schließen",
-    "multiImageHint": "Max. {max} Bilder · Max. 5 MB/Bild · JPEG, PNG, WebP · Das erste Bild wird das Hauptbild (Hover → Stern)",
+    "multiImageHint": "Bis zu {max} Fotos. Das erste ist das Hauptbild, mit dem Stern kannst du ein anderes wählen. Große Fotos werden vor dem Hochladen automatisch verkleinert.",
     "all": "Alle",
     "loadMore": "Mehr laden",
     "view": "Ansehen",
@@ -652,7 +652,8 @@
     "uploadFailedRetry": "Upload fehlgeschlagen, bitte versuche es erneut.",
     "optional": "optional",
     "sending": "Wird gesendet…",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "takePhoto": "Foto aufnehmen"
   },
   "applications": {
     "title": "Meine Anträge",
