@@ -653,7 +653,15 @@
     "optional": "opcjonalnie",
     "sending": "Wysyłanie…",
     "unknown": "Nieznany",
-    "takePhoto": "Zrób zdjęcie"
+    "takePhoto": "Zrób zdjęcie",
+    "cameraHelpTitle": "Aparat się nie uruchomił?",
+    "cameraHelpIosSafari": "Telefon nie pozwala tej stronie używać aparatu. Stuknij aA na pasku adresu, potem Ustawienia witryny, Aparat, Pozwalaj. Jeśli to nie pomoże: Ustawienia, Aplikacje, Safari, Aparat ustaw na Pytaj.",
+    "cameraHelpIosOther": "Telefon nie pozwala tej przeglądarce używać aparatu. Otwórz Ustawienia, Aplikacje, wybierz przeglądarkę (np. Chrome) i włącz Aparat.",
+    "cameraHelpAndroid": "Przeglądarka nie ma uprawnienia do aparatu. Stuknij ikonę kłódki (lub ustawień) na pasku adresu, potem Uprawnienia, Aparat, Zezwól.",
+    "cameraHelpInApp": "Strona jest otwarta we wbudowanej przeglądarce aplikacji (np. Facebook, Messenger, Instagram), która często nie ma dostępu do aparatu. Otwórz ją z menu u góry w Safari lub Chrome.",
+    "cameraHelpOther": "Przeglądarka nie ma uprawnienia do aparatu. Zezwól na aparat dla tej strony w ustawieniach przeglądarki albo wybierz zdjęcie z galerii.",
+    "cameraHelpGallery": "Wybierz z galerii",
+    "cameraHelpRetry": "Spróbuj ponownie"
   },
   "applications": {
     "title": "Moje wnioski",

@@ -6,6 +6,7 @@ import { upload } from "@vercel/blob/client";
 import { Plus, X, Star, Camera } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { prepareImage } from "@/lib/prepare-image";
+import { useCameraCapture } from "@/components/ui/use-camera-capture";
 
 interface Props {
   value:    string[];
@@ -19,7 +20,6 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
   const [uploading, setUploading] = useState<number | null>(null);
   const [error, setError]         = useState("");
   const inputRef                  = useRef<HTMLInputElement>(null);
-  const cameraRef                 = useRef<HTMLInputElement>(null);
 
   const displayLabel = label ?? t("photos");
 
@@ -57,6 +57,13 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
       }
     }
   }
+
+  // A kamera külön mezőt használ (`capture`), súgóval arra az esetre, ha a
+  // telefon nem engedi a kamerát (lásd use-camera-capture).
+  const camera = useCameraCapture(
+    (files) => { void handleFiles(files); },
+    () => inputRef.current?.click(),
+  );
 
   function remove(idx: number) {
     onChange(value.filter((_, i) => i !== idx));
@@ -130,7 +137,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
         {value.length < max && uploading === null && (
           <button
             type="button"
-            onClick={() => cameraRef.current?.click()}
+            onClick={() => void camera.open()}
             className="hidden aspect-square flex-col items-center justify-center gap-1 rounded-xl bg-brand-700 text-white [@media(pointer:coarse)]:flex"
           >
             <Camera className="h-5 w-5" />
@@ -147,14 +154,8 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
         className="sr-only"
         onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
       />
-      <input
-        ref={cameraRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="sr-only"
-        onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
-      />
+      {camera.input}
+      {camera.helpPanel}
 
       {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}
       <p className="mt-1.5 text-xs text-gray-400">

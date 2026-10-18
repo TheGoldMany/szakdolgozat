@@ -5,6 +5,7 @@ import { upload } from "@vercel/blob/client";
 import { ImageIcon, X, Loader2, Upload, Camera } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { prepareImage } from "@/lib/prepare-image";
+import { useCameraCapture } from "@/components/ui/use-camera-capture";
 
 interface ImageUploadProps {
   value: string;
@@ -17,9 +18,12 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const inputRef  = useRef<HTMLInputElement>(null);
-  // Külön mező a kamerához: a `capture` a telefonon közvetlenül a kamerát
-  // nyitja meg, a sima fájlmező pedig a galériát/fájlokat.
-  const cameraRef = useRef<HTMLInputElement>(null);
+  // A kamera külön mezőt használ (`capture`), súgóval arra az esetre, ha a
+  // telefon nem engedi a kamerát (lásd use-camera-capture).
+  const camera = useCameraCapture(
+    (files) => { if (files[0]) handleFile(files[0]); },
+    () => inputRef.current?.click(),
+  );
 
   const displayLabel = label ?? t("photo");
 
@@ -126,7 +130,7 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
                     figyelmen kívül hagyná, és ugyanaz a fájlválasztó nyílna. */}
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); cameraRef.current?.click(); }}
+                  onClick={(e) => { e.stopPropagation(); void camera.open(); }}
                   className="hidden items-center gap-2 rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-semibold text-white [@media(pointer:coarse)]:flex"
                 >
                   <Camera className="h-3.5 w-3.5" />
@@ -145,14 +149,8 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
         className="hidden"
         onChange={handleChange}
       />
-      <input
-        ref={cameraRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="hidden"
-        onChange={handleChange}
-      />
+      {camera.input}
+      {camera.helpPanel}
 
       {error && (
         <p className="mt-1.5 text-xs text-red-500">{error}</p>

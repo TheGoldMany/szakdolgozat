@@ -653,7 +653,15 @@
     "optional": "optional",
     "sending": "Wird gesendet…",
     "unknown": "Unbekannt",
-    "takePhoto": "Foto aufnehmen"
+    "takePhoto": "Foto aufnehmen",
+    "cameraHelpTitle": "Kamera startet nicht?",
+    "cameraHelpIosSafari": "Dein Telefon erlaubt dieser Seite die Kamera nicht. Tippe in der Adressleiste auf aA, dann Website-Einstellungen, Kamera, Erlauben. Falls das nicht hilft: Einstellungen, Apps, Safari, Kamera auf Fragen stellen.",
+    "cameraHelpIosOther": "Dein Telefon erlaubt diesem Browser die Kamera nicht. Öffne Einstellungen, Apps, wähle deinen Browser (z. B. Chrome) und schalte Kamera ein.",
+    "cameraHelpAndroid": "Der Browser hat keine Kameraberechtigung. Tippe in der Adressleiste auf das Schloss- (oder Einstellungs-)Symbol, dann Berechtigungen, Kamera, Zulassen.",
+    "cameraHelpInApp": "Du hast die Seite im integrierten Browser einer App (z. B. Facebook, Messenger, Instagram) geöffnet, der oft keine Kamera nutzen darf. Öffne sie über das Menü oben in Safari oder Chrome.",
+    "cameraHelpOther": "Der Browser hat keine Kameraberechtigung. Erlaube die Kamera für diese Seite in den Browsereinstellungen oder wähle ein Foto aus der Galerie.",
+    "cameraHelpGallery": "Aus der Galerie wählen",
+    "cameraHelpRetry": "Erneut versuchen"
   },
   "applications": {
     "title": "Meine Anträge",
