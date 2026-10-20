@@ -165,8 +165,10 @@ export function Footer() {
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} ÁllatiMenhelyek.hu – {t("copyright")}
           </p>
-          <p className="flex items-center gap-1 text-xs text-gray-500">
-            Készült <Heart className="h-3 w-3 text-brand-500" /> {t("madeWith")}
+          <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-xs text-gray-500">
+            {t("made")} <Heart className="h-3 w-3 text-brand-500" /> {t("madeWith")}
+            <span aria-hidden className="mx-1.5 text-gray-300">·</span>
+            {t("madeBy")} <span className="font-semibold text-gray-700">Lunda Software</span>
           </p>
         </div>
 
