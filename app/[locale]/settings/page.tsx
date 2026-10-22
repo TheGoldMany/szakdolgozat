@@ -10,7 +10,7 @@ import { DeleteAccountButton } from "@/components/profile/delete-account-button"
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: "Beállítások" };
+  return { title: "Beállítások", robots: { index: false, follow: true } };
 }
 
 export default async function SettingsPage() {

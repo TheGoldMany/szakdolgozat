@@ -93,7 +93,7 @@ export async function publicShelter(idOrSlugValue: string) {
  * Miért kell ez a mobilnak: a `/api/events` végpont NEM ezt adja — az a
  * menhely admin saját eseményeit listázza, vázlatokkal együtt, és böngésző-
  * munkamenetet vár. A publikus eseménylista eddig csak szerverkomponensként
- * létezett (`app/[locale]/events/page.tsx`), tehát az appnak nem volt mit
+ * létezett (`app/[locale]/events/(list)/page.tsx`), tehát az appnak nem volt mit
  * hívnia.
  *
  * A `_count.registrations` csak az AKTÍV jelentkezéseket számolja, mert a

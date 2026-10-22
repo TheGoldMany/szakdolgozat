@@ -50,6 +50,17 @@ export function alternates(locale: string, path: string): Metadata["alternates"]
   return { canonical: localeUrl(locale, path), languages };
 }
 
+/**
+ * Csak magyarul megírt oldal (jogi szövegek, súgó) kanonikus címe.
+ *
+ * Ezek a `/en`, `/de`, `/pl` alatt is elérhetők, de ugyanazzal a magyar
+ * szöveggel: hreflang helyett mind a magyar változatot jelöli kanonikusnak,
+ * különben a Google gazdátlan duplikátumként sorolja be őket.
+ */
+export function huOnlyAlternates(path: string): Metadata["alternates"] {
+  return { canonical: localeUrl(routing.defaultLocale, path) };
+}
+
 /** A next-intl nyelvkódjai OpenGraph alakban (`hu_HU`). */
 const OG_LOCALE: Record<string, string> = {
   hu: "hu_HU", en: "en_GB", de: "de_DE", pl: "pl_PL",

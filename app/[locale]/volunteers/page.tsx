@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { VolunteerDashboard } from "@/components/volunteers/volunteer-dashboard";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Önkéntességem" };
+export const metadata: Metadata = { title: "Önkéntességem", robots: { index: false, follow: true } };
 export const dynamic = "force-dynamic";
 
 export default async function VolunteersPage() {
