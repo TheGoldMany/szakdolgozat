@@ -17,7 +17,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     where: { id: params.id },
     select: { name: true },
   });
-  return { title: user?.name ?? "Felhasználó" };
+  // Magánszemély profilja: nem keresőbe való.
+  return { title: user?.name ?? "Felhasználó", robots: { index: false, follow: true } };
 }
 
 export default async function PublicUserProfilePage(props: Props) {

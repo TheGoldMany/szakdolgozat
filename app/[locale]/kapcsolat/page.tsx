@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { alternates } from "@/lib/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("contact");
   return {
     title: t("title"),
     description: t("desc"),
+    alternates: alternates(await getLocale(), "/kapcsolat"),
   };
 }
 

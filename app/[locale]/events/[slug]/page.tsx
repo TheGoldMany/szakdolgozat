@@ -4,7 +4,8 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { CalendarHeart, MapPin, Users, Clock, Building2 } from "lucide-react";
 import { getServerSession } from "next-auth/next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { alternates } from "@/lib/page-metadata";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
@@ -14,7 +15,8 @@ import { ShareButton } from "@/components/ui/share-button";
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
   const event = await prisma.event.findUnique({ where: { slug: params.slug }, select: { title: true } });
-  return { title: event ? event.title : "Esemény" };
+  if (!event) return { title: "Esemény" };
+  return { title: event.title, alternates: alternates(await getLocale(), `/events/${params.slug}`) };
 }
 
 export const dynamic = "force-dynamic";

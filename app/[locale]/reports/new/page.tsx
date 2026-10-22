@@ -5,11 +5,12 @@ import { ArrowLeft, Camera, Clock, MapPinned, ScanEye } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ReportForm } from "@/components/reports/report-form";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { alternates } from "@/lib/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("reports");
-  return { title: t("newTitle") };
+  return { title: t("newTitle"), alternates: alternates(await getLocale(), "/reports/new") };
 }
 
 export default async function NewReportPage() {

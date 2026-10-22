@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { Shield, Cookie, Lock, Eye, Trash2, Download, Mail, ExternalLink, AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Adatvédelmi tájékoztató",
   description: "Az ÁllatiMenhelyek.hu adatvédelmi és cookie tájékoztatója – GDPR megfelelőség",
+  alternates: huOnlyAlternates("/adatvedelem"),
 };
 
 const EFFECTIVE_DATE = "2024. január 1.";

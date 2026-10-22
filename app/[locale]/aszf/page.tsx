@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { FileText, AlertTriangle, CreditCard, Users, ShieldCheck, Scale } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Általános Szerződési Feltételek",
   description: "Az ÁllatiMenhelyek.hu általános szerződési feltételei",
+  alternates: huOnlyAlternates("/aszf"),
 };
 
 const EFFECTIVE_DATE = "2026. június 21.";

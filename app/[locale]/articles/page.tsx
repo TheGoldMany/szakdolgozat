@@ -5,11 +5,13 @@ import { Clock, Newspaper, User } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
+import { alternates } from "@/lib/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("articles");
   return {
     title:       t("title"),
+    alternates:  alternates(await getLocale(), "/articles"),
     description: t("metaDescription"),
   };
 }
