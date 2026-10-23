@@ -228,7 +228,10 @@ A kapcsolók (Profil → Értesítési beállítások) három kategóriát adnak
 **Fotózás a kódban:** a `lib/photo.ts` intézi a választást, az engedélykérést és
 a feltöltést, a `components/ui/PhotoField.tsx` pedig a felületet. Ne írj újat.
 A `/api/upload` NEM multipart űrlapot fogad, hanem a Vercel Blob kliens-token
-folyamatát — ezért kell a `@vercel/blob` a mobilban is.
+folyamatát. A két lépés (token a saját szerverünktől, majd `PUT` a tárolóba) a
+`lib/photo.ts`-ben **kézzel** van megírva. **A `@vercel/blob` csomagot ne vedd
+vissza:** böngészőre és Node-ra készült, betöltéskor `ReadableStream`-et hív és
+Node-os `crypto`-t importál, ezért vele az Android-csomag le sem fordul.
 
 ## Menhelyi admin — mi van az appban
 

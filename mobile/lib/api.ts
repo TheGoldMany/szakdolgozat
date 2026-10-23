@@ -131,6 +131,11 @@ async function request<T>(
   }
 }
 
+/** JSON-törzsű POST a saját API-nkra, ugyanazzal a hitelesítéssel és hibakezeléssel. */
+export function postJson<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, { method: "POST", body: JSON.stringify(body) });
+}
+
 // ── Lekérdezés és lapozás ──────────────────────────────
 
 export type QueryParams = Record<string, string | number | boolean | undefined | null>;
