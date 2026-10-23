@@ -1,0 +1,83 @@
+# Android teszt-APK: a mobilapp minden változásakor lefordul, és a
+# „mobil-teszt" kiadásban mindig ugyanazon a linken tölthető le:
+#   https://github.com/TheGoldMany/szakdolgozat/releases/download/mobil-teszt/allatimenhelyek-teszt.apk
+#
+# Expo-fiók és EAS nélkül megy: az `expo prebuild` legenerálja a natív
+# Android projektet, a Gradle pedig a GitHub gépén fordít. Az APK a sablon
+# debug-kulcsával van aláírva — tesztelésre telepíthető, áruházba nem tölthető
+# fel (ahhoz az EAS `production` profil kell, lásd docs/20-mobil-kiadas.md).
+name: Mobil teszt-APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-apk.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: npm ci
+
+      - name: Natív Android projekt generálása
+        run: npx expo prebuild --platform android --no-install
+        env:
+          # Ha nincs beállítva, a térkép szürke marad, minden más működik.
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+      - name: APK fordítása
+        working-directory: mobile/android
+        # Csak arm64: ez fut a mai Android-telefonokon, és fele annyi idő.
+        run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+        env:
+          GRADLE_OPTS: -Xmx4g
+
+      - name: APK átnevezése
+        run: cp android/app/build/outputs/apk/release/app-release.apk allatimenhelyek-teszt.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: allatimenhelyek-teszt-apk
+          path: mobile/allatimenhelyek-teszt.apk
+          retention-days: 30
+
+      - name: Kiadás frissítése (állandó letöltési link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mobil-teszt
+          name: Mobil teszt-APK
+          prerelease: true
+          make_latest: false
+          files: mobile/allatimenhelyek-teszt.apk
+          body: |
+            Androidos teszt-APK, automatikusan fordítva.
+            Utolsó build: ${{ github.sha }} (ág: ${{ github.ref_name }}).
+            Telepítés: töltsd le telefonon, és engedélyezd az „ismeretlen forrásból” telepítést a böngészőnek.
