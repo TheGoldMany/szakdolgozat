@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ReportStatus, ReportType } from "@prisma/client";
+import { backfillReportCoords } from "@/lib/report-location";
 
 // GET /api/map  – jelentések + menhelyek + állatorvosi rendelők koordinátákkal
 export async function GET(req: NextRequest) {
@@ -14,6 +15,10 @@ export async function GET(req: NextRequest) {
   const status = rawStatus === "ALL" ? "ALL"
     : (Object.values(ReportStatus) as string[]).includes(rawStatus) ? (rawStatus as ReportStatus)
     : ReportStatus.ACTIVE;
+
+  // A korábban koordináta nélkül mentett bejelentések pótlása, a válasz
+  // elküldése UTÁN: ez a lekérés még nem várja meg, a következő már látja.
+  after(() => backfillReportCoords().catch((err) => console.error("[api/map backfill]", err)));
 
   try {
     const [reports, shelters, vets] = await Promise.all([

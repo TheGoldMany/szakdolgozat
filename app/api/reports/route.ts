@@ -6,6 +6,7 @@ import { blockIfSuspended } from "@/lib/account-status";
 import { getAuthUser } from "@/lib/api-auth";
 import { optionalOwnImageUrl, ownImageUrl } from "@/lib/image-url";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { geocodeReportLocation } from "@/lib/report-location";
 
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
@@ -64,10 +65,16 @@ export async function POST(req: NextRequest) {
   const gallery = (imageUrls ?? []).filter(Boolean);
   const primaryUrl = gallery[0] || data.imageUrl || null;
 
+  // Ha a bejelentő nem jelölte meg a helyet a térképen, a település alapján
+  // pótoljuk: nélküle a bejelentés nem jelenne meg a térképen, és a közeli
+  // menhelyek sem kapnának róla értesítést.
+  const coords = await geocodeReportLocation(data);
+
   try {
     const report = await prisma.animalReport.create({
       data: {
         ...data,
+        ...(coords && { lat: coords.lat, lng: coords.lng }),
         imageUrl: primaryUrl,
         userId: authUser?.id ?? null,
         ...(gallery.length && {

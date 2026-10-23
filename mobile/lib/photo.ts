@@ -1,7 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { Alert, Linking, Platform } from "react-native";
-import { upload } from "@vercel/blob/client";
-import { ApiError, BASE_URL } from "./api";
+import { ApiError, postJson } from "./api";
 
 /**
  * Fotózás és feltöltés.
@@ -12,8 +11,13 @@ import { ApiError, BASE_URL } from "./api";
  * A FELTÖLTÉS PROTOKOLLJA: a `/api/upload` NEM multipart űrlapot fogad, hanem a
  * Vercel Blob kliens-token folyamatát (`handleUpload`). Vagyis nincs „mezőnév":
  * a kliens előbb tokent kér a saját szerverünktől, majd a fájlt közvetlenül a
- * tárolóba tölti. Ezért kell a mobilnak is a `@vercel/blob` csomag — nem lehet
- * kézzel összerakott POST-tal helyettesíteni.
+ * tárolóba tölti.
+ *
+ * MIÉRT NEM A `@vercel/blob` CSOMAG: a kliense böngészőre és Node-ra készült.
+ * Betöltéskor `new ReadableStream()`-et hív, és Node-os `crypto`-t importál —
+ * React Native-ben egyik sincs, így az Android-csomag le sem fordult, és az
+ * import az appot induláskor összeomlasztotta volna. A két lépés ezért itt van
+ * kézzel megírva, a csomag 2.x-es `upload()` hívásával megegyező kérésekkel.
  *
  * A szerver oldali korlátok (app/api/upload/route.ts):
  *   • engedélyezett típusok: image/jpeg, image/png, image/webp, image/gif
@@ -24,6 +28,10 @@ import { ApiError, BASE_URL } from "./api";
 /** A szerver által elfogadott képtípusok. */
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_BYTES = 5 * 1024 * 1024;
+
+/** A Vercel Blob API címe és a `@vercel/blob` 2.x által küldött protokollverzió. */
+const BLOB_API_URL     = "https://vercel.com/api/blob";
+const BLOB_API_VERSION = "12";
 
 /**
  * Tömörítés: a telefonok kamerája 5 MB fölötti képeket is készít, a szerver
@@ -143,23 +151,54 @@ export async function uploadPhoto(
       `A kép túl nagy (${mb} MB). A feltölthető méret legfeljebb 5 MB.`);
   }
 
+  // A szerver véletlen utótagot fűz a névhez; itt csak a tároló számára
+  // biztonságos karakterek maradnak (a `//` például tiltott).
+  const pathname = photo.fileName.replace(/[^A-Za-z0-9._-]/g, "_") || `kep-${Date.now()}.jpg`;
+
+  // 1. Feltöltési token a saját szerverünktől. Ez az ApiError-t már a
+  //    megszokott módon dobja (offline, jogosultság, rate limit üzenete).
+  const { clientToken } = await postJson<{ clientToken: string }>(endpoint, {
+    type:    "blob.generate-client-token",
+    payload: { pathname, clientPayload: null, multipart: false },
+  });
+
+  // 2. A fájl közvetlenül a tárolóba. A korlátokat (típus, méret) a token
+  //    hordozza, a tároló azok alapján fogadja el vagy utasítja el.
+  let res: Response;
   try {
-    const result = await upload(photo.fileName, blob, {
-      access:          "public",
-      handleUploadUrl: `${BASE_URL}${endpoint}`,
-      contentType:     photo.mimeType,
+    res = await fetch(`${BLOB_API_URL}/?pathname=${encodeURIComponent(pathname)}`, {
+      method:  "PUT",
+      body:    blob,
+      headers: {
+        authorization:          `Bearer ${clientToken}`,
+        "x-api-version":        BLOB_API_VERSION,
+        "x-vercel-blob-access": "public",
+        "x-content-type":       photo.mimeType,
+      },
     });
-    return result.url;
-  } catch (err) {
-    // A feltöltés a tárolóval beszél, nem a saját szerverünkkel, ezért a
-    // hibája nem ApiError – egységes alakra hozzuk, hogy a felület ugyanúgy
-    // tudja kezelni, mint bármely más hibát.
-    throw new ApiError("server", null,
-      err instanceof Error && err.message
-        ? `A feltöltés nem sikerült: ${err.message}`
-        : "A feltöltés nem sikerült.");
+  } catch {
+    throw new ApiError("offline", null, "Nincs internetkapcsolat.");
   }
+
+  if (!res.ok) {
+    // A tároló hibája nem a saját API-nk hibája, de egységes alakra hozzuk,
+    // hogy a felület ugyanúgy tudja kezelni, mint bármely más hibát.
+    let detail = "";
+    try {
+      const body = await res.json();
+      detail = body?.error?.message ?? "";
+    } catch {
+      // nem JSON a válasz
+    }
+    throw new ApiError("server", res.status,
+      detail ? `A feltöltés nem sikerült: ${detail}` : "A feltöltés nem sikerült.");
+  }
+
+  const result = (await res.json()) as { url?: string };
+  if (!result.url) throw new ApiError("server", res.status, "A feltöltés nem sikerült.");
+  return result.url;
 }
+
 
 /**
  * Egy lépésben: választás és feltöltés.
