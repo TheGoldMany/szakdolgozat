@@ -2,7 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
-import { Mail, Heart } from "lucide-react";
+import { Mail, Heart, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { paymentsEnabled } from "@/lib/payments-enabled";
 
@@ -160,8 +160,15 @@ export function Footer() {
 
         </div>
 
+        {/* Mik NEM vagyunk: a bejelentők gyakran hatóságnak vagy sintértelepnek
+            hiszik az oldalt, és arra várnak, hogy valaki kimegy az állatért. */}
+        <p className="mt-10 flex gap-2 rounded-xl bg-gray-50 px-4 py-3 text-xs leading-relaxed text-gray-600">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-gray-500" aria-hidden />
+          {t("disclaimer")}
+        </p>
+
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-gray-200 pt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
+        <div className="mt-6 border-t border-gray-200 pt-6 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-xs text-gray-500">
             © {new Date().getFullYear()} ÁllatiMenhelyek.hu – {t("copyright")}
           </p>
