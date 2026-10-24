@@ -6,7 +6,7 @@ import {
 import { useRouter } from "expo-router";
 import { useAuth } from "@/lib/auth";
 import {
-  ApiError, deleteAccount, getMyApplications, PRIVACY_URL, TERMS_URL,
+  ApiError, deleteAccount, getMyApplications, PRIVACY_URL, TERMS_URL, DEVELOPER_URL,
   type MyApplication,
 } from "@/lib/api";
 
@@ -222,6 +222,12 @@ export default function ProfileScreen() {
           ? <ActivityIndicator color="#B91C1C" />
           : <Text style={styles.deleteText}>Fiók törlése</Text>}
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.creditRow} onPress={() => Linking.openURL(DEVELOPER_URL)}>
+        <Text style={styles.creditText}>
+          Fejlesztette: <Text style={styles.creditLink}>Lunda Software</Text>
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -264,4 +270,7 @@ const styles = StyleSheet.create({
   linkText: { color: "#2563EB", fontSize: 15, fontWeight: "500" },
   deleteBtn:  { marginTop: 14, paddingVertical: 14, alignItems: "center" },
   deleteText: { color: "#B91C1C", fontSize: 14, textDecorationLine: "underline" },
+  creditRow:  { marginTop: 24, paddingVertical: 8, alignItems: "center" },
+  creditText: { color: "#9CA3AF", fontSize: 12 },
+  creditLink: { color: "#6B7280", fontWeight: "600" },
 });

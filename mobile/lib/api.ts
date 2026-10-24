@@ -1137,6 +1137,9 @@ export const PRIVACY_URL = `${BASE_URL}/adatvedelem`;
 /** Általános szerződési feltételek. */
 export const TERMS_URL = `${BASE_URL}/aszf`;
 
+/** Az alkalmazás fejlesztője. */
+export const DEVELOPER_URL = "https://www.lundasoftware.hu";
+
 // ── Menhely admin áttekintő ────────────────────────────
 export interface AdminApplication {
   id: string; status: string; createdAt: string;
