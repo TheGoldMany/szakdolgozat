@@ -606,6 +606,10 @@
     "shelterCta": "Send shelter registration request"
   },
   "common": {
+    "imageOpen": "Enlarge image",
+    "imageClose": "Close",
+    "imagePrev": "Previous image",
+    "imageNext": "Next image",
     "loading": "Loading...",
     "error": "An error occurred",
     "save": "Save",

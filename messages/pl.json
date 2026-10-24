@@ -606,6 +606,10 @@
     "shelterCta": "Wyślij wniosek o rejestrację schroniska"
   },
   "common": {
+    "imageOpen": "Powiększ zdjęcie",
+    "imageClose": "Zamknij",
+    "imagePrev": "Poprzednie zdjęcie",
+    "imageNext": "Następne zdjęcie",
     "loading": "Ładowanie...",
     "error": "Wystąpił błąd",
     "save": "Zapisz",

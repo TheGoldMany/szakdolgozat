@@ -606,6 +606,10 @@
     "shelterCta": "Tierheim-Registrierungsanfrage senden"
   },
   "common": {
+    "imageOpen": "Bild vergrößern",
+    "imageClose": "Schließen",
+    "imagePrev": "Vorheriges Bild",
+    "imageNext": "Nächstes Bild",
     "loading": "Laden...",
     "error": "Ein Fehler ist aufgetreten",
     "save": "Speichern",

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
+import { LightboxProvider, LightboxTrigger } from "@/components/ui/image-lightbox";
 import { getServerSession } from "next-auth/next";
 import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
 import { authOptions } from "@/lib/auth";
@@ -34,7 +35,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
 
 export default async function ReportDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const [report, session, t, ta, locale] = await Promise.all([
+  const [report, session, t, ta, tc, locale] = await Promise.all([
     prisma.animalReport.findUnique({
       where: { id: params.id },
       include: { images: { orderBy: [{ isPrimary: "desc" }, { order: "asc" }] } },
@@ -42,6 +43,7 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
     getServerSession(authOptions),
     getTranslations("reports"),
     getTranslations("animals"),
+    getTranslations("common"),
     getLocale(),
   ]);
 
@@ -183,27 +185,33 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
 
           <div className="min-w-0 lg:col-start-1">
             {gallery.length > 0 ? (
+              <LightboxProvider images={gallery.map((url, i) => ({ url, alt: i === 0 ? title : `${title} ${i + 1}` }))}>
               <div className="space-y-2">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-gray-100">
-                  <Image
-                    src={gallery[0]}
-                    alt={title}
-                    fill
-                    priority
-                    className={cn("object-cover", !active && "grayscale")}
-                    sizes="(min-width: 1024px) 700px, 100vw"
-                  />
+                  <LightboxTrigger index={0} label={tc("imageOpen")} hint>
+                    <Image
+                      src={gallery[0]}
+                      alt={title}
+                      fill
+                      priority
+                      className={cn("object-cover", !active && "grayscale")}
+                      sizes="(min-width: 1024px) 700px, 100vw"
+                    />
+                  </LightboxTrigger>
                 </div>
                 {gallery.length > 1 && (
                   <div className="grid grid-cols-4 gap-2">
                     {gallery.slice(1, 5).map((url, i) => (
                       <div key={url} className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-                        <Image src={url} alt={`${title} ${i + 2}`} fill className="object-cover" sizes="170px" />
+                        <LightboxTrigger index={i + 1} label={tc("imageOpen")}>
+                          <Image src={url} alt={`${title} ${i + 2}`} fill className="object-cover" sizes="170px" />
+                        </LightboxTrigger>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
+              </LightboxProvider>
             ) : (
               <div className={cn("flex aspect-[16/9] items-center justify-center rounded-xl", style.tint)}>
                 <SpeciesIcon className={cn("h-20 w-20 opacity-50", style.ink)} strokeWidth={1.25} />

@@ -606,6 +606,10 @@
     "shelterCta": "Menhely regisztrációs igény küldése"
   },
   "common": {
+    "imageOpen": "Kép nagyítása",
+    "imageClose": "Bezárás",
+    "imagePrev": "Előző kép",
+    "imageNext": "Következő kép",
     "loading": "Betöltés...",
     "error": "Hiba történt",
     "save": "Mentés",
