@@ -115,7 +115,18 @@ export async function geocodeAddress(parts: {
     if (hit) return hit;
   }
 
-  // 3) Tartalék: város középpontja
+  // 3) Csak a település (és irányítószám). Ha az utca nincs benne az
+  //    OpenStreetMapben (pl. „Bene szél utca, Lajosmizse”), a 2. lépés üres
+  //    marad, a település viszont megtalálható. Enélkül a beégetett
+  //    nagyváros-lista volt az egyetlen tartalék, és minden más település
+  //    koordináta nélkül maradt.
+  if (street && parts.city?.trim()) {
+    const cityOnly = [parts.zipCode, parts.city, country].filter(Boolean).join(", ");
+    const hit = await queryNominatim(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityOnly)}&format=json&limit=1`);
+    if (hit) return hit;
+  }
+
+  // 4) Tartalék: város középpontja
   return cityCentroid(parts.city);
 }
 

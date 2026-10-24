@@ -22,6 +22,9 @@ export async function geocodeReportLocation(input: {
   return geocodeAddress({ city: input.city, address: input.address });
 }
 
+let lastBackfill = 0;
+const BACKFILL_INTERVAL_MS = 10 * 60_000;
+
 /**
  * A már elmentett, koordináta nélküli bejelentések pótlása.
  *
@@ -30,6 +33,12 @@ export async function geocodeReportLocation(input: {
  * csak a `lat`/`lng` változik, semmi más.
  */
 export async function backfillReportCoords(limit = 5): Promise<number> {
+  // Egy példányon legfeljebb 10 percenként: ami nem azonosítható, az minden
+  // térkép-megnyitáskor újra a Nominatimot terhelné.
+  const now = Date.now();
+  if (now - lastBackfill < BACKFILL_INTERVAL_MS) return 0;
+  lastBackfill = now;
+
   const missing = await prisma.animalReport.findMany({
     where:   { OR: [{ lat: null }, { lng: null }], city: { not: "" } },
     select:  { id: true, city: true, address: true },

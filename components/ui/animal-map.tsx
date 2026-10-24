@@ -32,6 +32,7 @@ export interface MapLabels {
   unknownAnimal: string;
   shelterAnimals: (count: number) => string;
   shelterPage: string;
+  reportPage:  string;
   emergency: string;
   website: string;
 }
@@ -127,6 +128,9 @@ export default function AnimalMap({
     layerRef.current.clearLayers();
 
     const typeLabel   = (t: string) => ({ LOST: labels.lost, FOUND: labels.found, STRAY: labels.stray }[t] ?? t);
+    // A popup sima HTML, nem next-intl `Link`: a nyelvi előtagot kézzel
+    // tesszük elé, különben az angol látogató a magyar oldalon kötne ki.
+    const prefix = locale === "hu" ? "" : `/${locale}`;
     const animalLabel = (a: string) =>
       ({ DOG: labels.animalDog, CAT: labels.animalCat, OTHER: labels.animalOther }[a] ?? a);
 
@@ -150,8 +154,12 @@ export default function AnimalMap({
             <div style="font-weight:700;font-size:14px;color:#111827">${esc(r.name ?? labels.unknownAnimal)}</div>
             ${r.breed ? `<div style="font-size:12px;color:#6B7280">${esc(r.breed)}</div>` : ""}
             <div style="font-size:12px;color:#374151;margin-top:4px">${esc(r.city)}</div>
-            ${r.contactPhone ? `<div style="font-size:12px;color:#2563EB;margin-top:4px">${esc(r.contactName)}: ${esc(r.contactPhone)}</div>` : ""}
+            ${r.contactPhone ? `<div style="font-size:12px;margin-top:4px">${esc(r.contactName)}: <a href="tel:${esc(r.contactPhone.replace(/[^+\d]/g, ""))}" style="color:#2563EB">${esc(r.contactPhone)}</a></div>` : ""}
             <div style="font-size:11px;color:#9CA3AF;margin-top:4px">${new Date(r.createdAt).toLocaleDateString(locale)}</div>
+            <a href="${prefix}/reports/${encodeURIComponent(r.id)}"
+              style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;color:${TYPE_COLOR[r.type] ?? "#374151"};text-decoration:underline">
+              ${esc(labels.reportPage)} &rarr;
+            </a>
           </div>
         `);
         marker.addTo(layerRef.current!);
@@ -170,7 +178,7 @@ export default function AnimalMap({
             <div style="font-size:12px;color:#6B7280">${esc(s.city)}${s.address ? `, ${esc(s.address)}` : ""}</div>
             <div style="font-size:12px;color:${SHELTER_COLOR};margin-top:2px">${esc(labels.shelterAnimals(s._count.animals))}</div>
             ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(s.phone)}</div>` : ""}
-            <a href="/shelters/${encodeURIComponent(s.slug)}" target="_blank"
+            <a href="${prefix}/shelters/${encodeURIComponent(s.slug)}" target="_blank"
               style="display:inline-block;margin-top:6px;font-size:12px;color:${SHELTER_COLOR};text-decoration:underline">
               ${esc(labels.shelterPage)} &rarr;
             </a>

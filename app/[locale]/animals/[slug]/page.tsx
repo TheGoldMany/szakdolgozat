@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { LightboxProvider, LightboxTrigger } from "@/components/ui/image-lightbox";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
@@ -63,7 +64,7 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
 
 export default async function AnimalDetailPage(props: { params: Promise<{ slug: string; locale: string }> }) {
   const params = await props.params;
-  const [animal, session, t] = await Promise.all([
+  const [animal, session, t, tc] = await Promise.all([
     prisma.animal.findUnique({
       where: { slug: params.slug },
       include: {
@@ -73,6 +74,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
     }),
     getServerSession(authOptions),
     getTranslations("animals"),
+    getTranslations("common"),
   ]);
 
   if (!animal) notFound();
@@ -245,6 +247,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
         <div className="grid gap-8 lg:grid-cols-5">
 
           {/* Images */}
+          <LightboxProvider images={animal.images.map((img) => ({ url: img.url, alt: img.alt ?? animal.name }))}>
           <div className="lg:col-span-3 space-y-3">
 
             {/* Mobil: swipe-elhető galéria (minden kép) */}
@@ -253,7 +256,9 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
                 <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {animal.images.map((img, i) => (
                     <div key={img.id} className="relative aspect-[4/3] w-[88%] shrink-0 snap-center overflow-hidden rounded-xl bg-gray-100">
-                      <Image src={img.url} alt={img.alt ?? animal.name} fill className="object-cover" priority={i === 0} sizes="88vw" />
+                      <LightboxTrigger index={i} label={tc("imageOpen")}>
+                        <Image src={img.url} alt={img.alt ?? animal.name} fill className="object-cover" priority={i === 0} sizes="88vw" />
+                      </LightboxTrigger>
                       {i === 0 && (
                         <span className={cn("absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-semibold", statusColor)}>
                           {statusLabel}
@@ -271,7 +276,9 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
             <div className="hidden space-y-3 lg:block">
               <div className="relative overflow-hidden rounded-xl bg-gray-100 aspect-[4/3]">
                 {primaryImage ? (
-                  <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="60vw" />
+                  <LightboxTrigger index={0} label={tc("imageOpen")} hint>
+                    <Image src={primaryImage.url} alt={primaryImage.alt ?? animal.name} fill className="object-cover" priority sizes="60vw" />
+                  </LightboxTrigger>
                 ) : (
                   <div className="flex h-full items-center justify-center"><PawPrint className="h-16 w-16 text-gray-300" /></div>
                 )}
@@ -281,9 +288,11 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
               </div>
               {extraImages.length > 0 && (
                 <div className="grid grid-cols-4 gap-2">
-                  {extraImages.slice(0, 4).map((img) => (
+                  {extraImages.slice(0, 4).map((img, i) => (
                     <div key={img.id} className="relative aspect-square overflow-hidden rounded-xl bg-gray-100">
-                      <Image src={img.url} alt={img.alt ?? ""} fill className="object-cover" sizes="25vw" />
+                      <LightboxTrigger index={i + 1} label={tc("imageOpen")}>
+                        <Image src={img.url} alt={img.alt ?? ""} fill className="object-cover" sizes="25vw" />
+                      </LightboxTrigger>
                     </div>
                   ))}
                 </div>
@@ -298,6 +307,8 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
               </div>
             )}
           </div>
+
+          </LightboxProvider>
 
           {/* Details */}
           <div className="lg:col-span-2 space-y-6">
