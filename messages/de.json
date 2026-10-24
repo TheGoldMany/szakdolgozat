@@ -2003,5 +2003,29 @@
     "mapDescription": "Finde Tierheime in deiner Nähe auf der Karte, zusammen mit Meldungen zu vermissten und gefundenen Tieren.",
     "eventsTitle": "Tierheim-Veranstaltungen und Adoptionstage",
     "eventsDescription": "Adoptionstage, Spendenaktionen und Ehrenamtsprogramme in ungarischen Tierheimen."
+  },
+  "feedback": {
+    "trigger": "Fehler gefunden? Sag uns Bescheid",
+    "title": "Feedback zur Website",
+    "intro": "Einen Fehler gefunden oder eine Idee? Schreib uns, wir lesen jede Nachricht.",
+    "categoryLabel": "Worum geht es?",
+    "categoryBUG": "Fehler",
+    "categoryIDEA": "Idee",
+    "categoryOTHER": "Sonstiges",
+    "messageLabel": "Nachricht",
+    "messagePlaceholder": "Was ist passiert, und was hast du erwartet? Beschreib bei einem Fehler, was du davor gemacht hast.",
+    "emailLabel": "Deine E-Mail (optional)",
+    "emailPlaceholder": "du@beispiel.de",
+    "emailHint": "Wenn du sie angibst, können wir antworten.",
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "successTitle": "Danke!",
+    "successDesc": "Wir haben deine Nachricht erhalten und sehen sie uns bald an.",
+    "error": "Senden fehlgeschlagen. Bitte versuch es später erneut.",
+    "unavailable": "Senden ist gerade nicht möglich. Schreib uns direkt:",
+    "pageNote": "Die Adresse der aktuellen Seite wird angehängt, damit wir den Fehler finden.",
+    "mailSubject": "Feedback zur Website"
   }
 }

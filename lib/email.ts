@@ -7,7 +7,7 @@ const BASE = process.env.NEXTAUTH_URL ?? "https://allatimenhelyek.hu";
 
 // ── Core transport (Resend REST API) ─────────────────────────────────────────
 
-async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+async function sendEmail(to: string, subject: string, html: string, replyTo?: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn("[email] RESEND_API_KEY nincs beállítva – email kihagyva:", subject);
@@ -16,7 +16,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   const res = await fetch("https://api.resend.com/emails", {
     method:  "POST",
     headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body:    JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body:    JSON.stringify({ from: FROM, to: [to], subject, html, ...(replyTo && { reply_to: replyTo }) }),
   });
   if (!res.ok) {
     const err = await res.text();
@@ -1078,4 +1078,54 @@ export async function sendPasswordResetEmail(email: string, token: string) {
         ${SYSTEM_FOOTER}
       </div>
     `);
+}
+
+// ── Visszajelzés az üzemeltetőnek ────────────────────────────────────────────
+
+/** Ide érkeznek a látogatók hibajelzései és ötletei. */
+export const FEEDBACK_INBOX = "info@allatimenhelyek.hu";
+
+/**
+ * Van-e beállított levélküldő. A `sendEmail` kulcs nélkül csendben kihagyja a
+ * küldést, ami értesítéseknél rendben van; egy visszajelzésnél viszont a
+ * látogató azt hinné, hogy elküldte, ezért a végpont előre megkérdezi.
+ */
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
+
+export async function sendSiteFeedbackEmail(opts: {
+  category:  string;
+  message:   string;
+  email?:    string | null;
+  userId?:   string | null;
+  pageUrl?:  string | null;
+  userAgent?: string | null;
+}) {
+  const rows: [string, string | null | undefined][] = [
+    ["Típus",       opts.category],
+    ["Oldal",       opts.pageUrl],
+    ["Válaszcím",   opts.email],
+    ["Felhasználó", opts.userId],
+    ["Böngésző",    opts.userAgent],
+  ];
+  const meta = rows
+    .filter(([, v]) => v)
+    .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#6b7280">${k}</td><td style="color:#111827">${escapeHtml(String(v))}</td></tr>`)
+    .join("");
+
+  await sendEmail(FEEDBACK_INBOX, `Visszajelzés (${opts.category}) – ÁllatiMenhelyek.hu`, `
+      <div style="font-family:sans-serif;max-width:560px;margin:auto;padding:24px">
+        <h1 style="font-size:18px;font-weight:700;color:#166534;margin:0 0 12px">Új visszajelzés az oldalról</h1>
+        <blockquote style="border-left:3px solid #22c55e;margin:0 0 16px;padding:12px 16px;background:#f0fdf4;
+                           color:#111827;font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(opts.message)}</blockquote>
+        <table style="font-size:12px">${meta}</table>
+        ${SYSTEM_FOOTER}
+      </div>
+    `, opts.email ?? undefined);
 }

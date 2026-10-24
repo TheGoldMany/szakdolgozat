@@ -2003,5 +2003,29 @@
     "mapDescription": "Nézd meg térképen a közeli állatmenhelyeket, valamint az elveszett és megtalált állatok bejelentéseit.",
     "eventsTitle": "Menhelyi események és örökbefogadó napok",
     "eventsDescription": "Örökbefogadó napok, adománygyűjtések és önkéntes programok magyarországi állatmenhelyeknél."
+  },
+  "feedback": {
+    "trigger": "Hibát találtál? Jelezd nekünk",
+    "title": "Visszajelzés az oldalról",
+    "intro": "Hibát találtál, vagy van egy ötleted? Írd meg, minden üzenetet elolvasunk.",
+    "categoryLabel": "Miről szól?",
+    "categoryBUG": "Hiba",
+    "categoryIDEA": "Ötlet",
+    "categoryOTHER": "Egyéb",
+    "messageLabel": "Üzenet",
+    "messagePlaceholder": "Mi történt, és mit vártál volna? Ha hibáról van szó, írd le, mit csináltál előtte.",
+    "emailLabel": "E-mail-címed (nem kötelező)",
+    "emailPlaceholder": "pelda@email.hu",
+    "emailHint": "Ha megadod, tudunk válaszolni.",
+    "send": "Küldés",
+    "sending": "Küldés…",
+    "cancel": "Mégse",
+    "close": "Bezárás",
+    "successTitle": "Köszönjük!",
+    "successDesc": "Megkaptuk az üzenetedet, hamarosan ránézünk.",
+    "error": "Nem sikerült elküldeni. Próbáld újra később.",
+    "unavailable": "Most nem sikerült elküldeni. Írj nekünk közvetlenül:",
+    "pageNote": "Az üzenethez csatoljuk az aktuális oldal címét, hogy megtaláljuk a hibát.",
+    "mailSubject": "Visszajelzés az oldalról"
   }
 }

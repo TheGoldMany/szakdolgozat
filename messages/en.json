@@ -2003,5 +2003,29 @@
     "mapDescription": "See nearby animal shelters on the map, along with reports of lost and found animals.",
     "eventsTitle": "Shelter events and adoption days",
     "eventsDescription": "Adoption days, fundraisers and volunteer programmes at Hungarian animal shelters."
+  },
+  "feedback": {
+    "trigger": "Found a problem? Let us know",
+    "title": "Feedback about the site",
+    "intro": "Found a bug or have an idea? Tell us, we read every message.",
+    "categoryLabel": "What is it about?",
+    "categoryBUG": "Bug",
+    "categoryIDEA": "Idea",
+    "categoryOTHER": "Other",
+    "messageLabel": "Message",
+    "messagePlaceholder": "What happened, and what did you expect? For a bug, describe what you did before it.",
+    "emailLabel": "Your email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "emailHint": "If you add it, we can reply.",
+    "send": "Send",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "successTitle": "Thank you!",
+    "successDesc": "We got your message and will look into it soon.",
+    "error": "Could not send it. Please try again later.",
+    "unavailable": "Sending failed right now. Write to us directly:",
+    "pageNote": "The address of the current page is attached so we can find the problem.",
+    "mailSubject": "Feedback about the site"
   }
 }

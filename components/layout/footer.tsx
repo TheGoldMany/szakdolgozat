@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Mail, Heart, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { FeedbackDialog } from "@/components/layout/feedback-dialog";
 
 export function Footer() {
   const t    = useTranslations("footer");
@@ -112,6 +113,7 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li><FeedbackDialog /></li>
             </ul>
           </div>
 

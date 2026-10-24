@@ -2003,5 +2003,29 @@
     "mapDescription": "Zobacz na mapie pobliskie schroniska oraz zgłoszenia zaginionych i znalezionych zwierząt.",
     "eventsTitle": "Wydarzenia schronisk i dni adopcyjne",
     "eventsDescription": "Dni adopcyjne, zbiórki i programy wolontariatu w węgierskich schroniskach."
+  },
+  "feedback": {
+    "trigger": "Znalazłeś błąd? Daj nam znać",
+    "title": "Opinia o stronie",
+    "intro": "Znalazłeś błąd lub masz pomysł? Napisz, czytamy każdą wiadomość.",
+    "categoryLabel": "Czego dotyczy?",
+    "categoryBUG": "Błąd",
+    "categoryIDEA": "Pomysł",
+    "categoryOTHER": "Inne",
+    "messageLabel": "Wiadomość",
+    "messagePlaceholder": "Co się stało i czego się spodziewałeś? Przy błędzie opisz, co robiłeś wcześniej.",
+    "emailLabel": "Twój e-mail (opcjonalnie)",
+    "emailPlaceholder": "ty@przyklad.pl",
+    "emailHint": "Jeśli go podasz, będziemy mogli odpowiedzieć.",
+    "send": "Wyślij",
+    "sending": "Wysyłanie…",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "successTitle": "Dziękujemy!",
+    "successDesc": "Otrzymaliśmy wiadomość i wkrótce się nią zajmiemy.",
+    "error": "Nie udało się wysłać. Spróbuj ponownie później.",
+    "unavailable": "Wysłanie teraz się nie powiodło. Napisz do nas bezpośrednio:",
+    "pageNote": "Dołączamy adres bieżącej strony, aby łatwiej znaleźć błąd.",
+    "mailSubject": "Opinia o stronie"
   }
 }
