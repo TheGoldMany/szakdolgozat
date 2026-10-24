@@ -160,6 +160,16 @@ const PAGE_INFO: Record<string, InfoContent> = {
     ],
     tip: "Egyszerre csak egy aktív (várakozó) kérelem lehet egy állathoz.",
   },
+  reports: {
+    title: "Bejelentések (Platform)",
+    intro: "Super Admin nézet: az összes elveszett, talált és kóbor állat bejelentése a platformon.",
+    points: [
+      { label: "Keresés és szűrés", desc: "Név, település, bejelentő vagy leírás szerint kereshetsz, típus és állapot szerint szűrhetsz." },
+      { label: "Szerkesztés", desc: "Javíthatod a bejelentés adatait (pl. elírt cím, rossz fajta), és a címből újra kerestetheted a térképes helyet." },
+      { label: "Törlés", desc: "A törlés végleges: a képek és a párosítások is törlődnek. Az adminnaplóba bekerül, ki és mikor törölte." },
+    ],
+    tip: "Ha csak a térképes pötty rossz helyen van, a bejelentés oldalán a „Helyszín pontosítása” gombbal pontosan a helyére teheted.",
+  },
   shelters: {
     title: "Menhelyek (Platform)",
     intro: "Super Admin nézet: az összes menhely kezelése a platformon.",

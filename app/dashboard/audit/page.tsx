@@ -28,6 +28,8 @@ const ACTION_META: Record<AuditAction, { label: string; icon: LucideIcon; color:
   SUBSCRIPTION_DELETED:   { label: "Előfizetés törölve",    icon: Trash2,     color: "bg-red-50 text-red-700" },
   FORM_APPROVED:      { label: "Űrlap jóváhagyva",          icon: FileText,   color: "bg-green-50 text-green-700" },
   FORM_REJECTED:      { label: "Űrlap elutasítva",          icon: FileText,   color: "bg-red-50 text-red-700" },
+  REPORT_EDITED:      { label: "Bejelentés szerkesztve",    icon: FileText,   color: "bg-amber-50 text-amber-700" },
+  REPORT_DELETED:     { label: "Bejelentés törölve",        icon: Trash2,     color: "bg-red-50 text-red-700" },
 };
 
 /**

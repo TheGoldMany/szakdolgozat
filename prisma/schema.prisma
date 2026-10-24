@@ -1535,6 +1535,8 @@ enum AuditAction {
   SUBSCRIPTION_DELETED
   FORM_APPROVED
   FORM_REJECTED
+  REPORT_EDITED
+  REPORT_DELETED
 }
 
 /// Állatorvosi rendelő – a nyilvános térképen jelenik meg.
