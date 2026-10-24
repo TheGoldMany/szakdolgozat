@@ -8,6 +8,7 @@ import { ArrowLeft, Mail, MapPin, Phone } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ResolveButton } from "@/components/reports/resolve-button";
+import { ReportLocationEditor } from "@/components/reports/location-editor";
 import { ReportMatches, type MatchView } from "@/components/reports/report-matches";
 import { StaticMap } from "@/components/ui/static-map";
 import { ShareButton } from "@/components/ui/share-button";
@@ -276,6 +277,9 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
                   {report.city}{report.address ? `, ${report.address}` : ""}
                 </p>
               </section>
+            )}
+            {isOwnerOrAdmin && (
+              <ReportLocationEditor reportId={report.id} lat={report.lat} lng={report.lng} />
             )}
           </aside>
 

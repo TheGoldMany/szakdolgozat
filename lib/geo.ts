@@ -115,7 +115,16 @@ export async function geocodeAddress(parts: {
     if (hit) return hit;
   }
 
-  // 3) Csak a település (és irányítószám). Ha az utca nincs benne az
+  // 3) Az utcanév más írásmóddal. Az OpenStreetMap betű szerint keres: a
+  //    „Bene szél utca” nem találja a „Beneszél utca”-t. A közterület
+  //    jellege előtti szavakat egybeírva és kötőjellel is megpróbáljuk.
+  for (const variant of streetVariants(street)) {
+    const q = [variant, parts.zipCode, parts.city, country].filter(Boolean).join(", ");
+    const hit = await queryNominatim(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
+    if (hit) return hit;
+  }
+
+  // 4) Csak a település (és irányítószám). Ha az utca nincs benne az
   //    OpenStreetMapben (pl. „Bene szél utca, Lajosmizse”), a 2. lépés üres
   //    marad, a település viszont megtalálható. Enélkül a beégetett
   //    nagyváros-lista volt az egyetlen tartalék, és minden más település
@@ -126,8 +135,26 @@ export async function geocodeAddress(parts: {
     if (hit) return hit;
   }
 
-  // 4) Tartalék: város középpontja
+  // 5) Tartalék: város középpontja
   return cityCentroid(parts.city);
+}
+
+const STREET_TYPES = /\s(utca|út|útja|köz|tér|sor|sétány|körút|dűlő|fasor|liget|park|lakótelep|tanya|major|telep|lejtő|lépcső|rakpart|határút|dűlőút)(?=\s|$)(.*)$/i;
+
+/**
+ * Az utcanév többszavas előtagjának írásmód-változatai: „Bene szél utca 5”
+ * → „Beneszél utca 5”, „Bene-szél utca 5”. Egyszavas névnél nincs mit
+ * variálni, és csak az első két változat kell, hogy a Nominatimot kíméljük.
+ */
+export function streetVariants(street: string): string[] {
+  const m = street.match(STREET_TYPES);
+  if (!m || m.index === undefined) return [];
+  const name = street.slice(0, m.index).trim();
+  if (!/\s/.test(name)) return [];
+  const rest = street.slice(m.index);
+  const words = name.split(/\s+/);
+  const joined = words[0] + words.slice(1).map((w) => w.toLowerCase()).join("");
+  return [`${joined}${rest}`, `${words.join("-")}${rest}`];
 }
 
 /**

@@ -468,6 +468,12 @@
     "loginErrorTooMany": "Too many failed attempts. Please try again in 15 minutes."
   },
   "reports": {
+    "editLocation": "Adjust location",
+    "editLocationHint": "Tap the map where the animal was last seen. The written address stays the same, only the map pin moves.",
+    "editLocationSave": "Save",
+    "editLocationCancel": "Cancel",
+    "locationSaved": "Location updated.",
+    "locationError": "Could not save the location.",
     "title": "Lost and found animals",
     "desc": "Help lost pets find their way home!",
     "newReport": "New report",

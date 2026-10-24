@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { geocodeAddress } from "@/lib/geo";
+import { geocodeAddress, streetVariants } from "@/lib/geo";
 
 /**
  * Geokódolás: ha az utca nincs meg az OpenStreetMapben, a település még igen.
@@ -29,5 +29,24 @@ describe("geocodeAddress", () => {
   it("ha a település sem található és nincs a listán, null", async () => {
     vi.stubGlobal("fetch", async () => new Response("[]", { status: 200 }));
     expect(await geocodeAddress({ city: "Nemlétezőfalva", address: "Fő utca 1" })).toBeNull();
+  });
+});
+
+describe("streetVariants", () => {
+  it("a többszavas utcanevet egybeírva és kötőjellel is kipróbálja", () => {
+    expect(streetVariants("Bene szél utca")).toEqual(["Beneszél utca", "Bene-szél utca"]);
+    expect(streetVariants("Kis rét dűlő 3")).toEqual(["Kisrét dűlő 3", "Kis-rét dűlő 3"]);
+  });
+
+  it("egyszavas utcanévnél nincs változat", () => {
+    expect(streetVariants("Fő utca 1")).toEqual([]);
+  });
+
+  it("a „Bene szél utca, Lajosmizse” címet az egybeírt változattal találja meg", async () => {
+    vi.stubGlobal("fetch", async (url: string) => {
+      const hit = decodeURIComponent(url).includes("Beneszél utca");
+      return new Response(JSON.stringify(hit ? [{ lat: "47.016", lon: "19.556" }] : []), { status: 200 });
+    });
+    expect(await geocodeAddress({ city: "Lajosmizse", address: "Bene szél utca" })).toEqual({ lat: 47.016, lng: 19.556 });
   });
 });

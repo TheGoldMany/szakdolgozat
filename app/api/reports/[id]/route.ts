@@ -5,8 +5,14 @@ import { ReportStatus } from "@prisma/client";
 import { createNotification } from "@/lib/notifications";
 import { requireAuthUser } from "@/lib/api-auth";
 
+// Magyarország környéke, kis ráhagyással: egy elcsúszott kattintás ne tegye
+// a pöttyöt az óceán közepére.
 const schema = z.object({
-  status: z.nativeEnum(ReportStatus),
+  status: z.nativeEnum(ReportStatus).optional(),
+  lat:    z.number().min(44).max(50).optional(),
+  lng:    z.number().min(15).max(24).optional(),
+}).refine((d) => d.status !== undefined || (d.lat !== undefined && d.lng !== undefined), {
+  message: "Nincs mit módosítani",
 });
 
 export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -30,11 +36,14 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
   try {
     const updated = await prisma.animalReport.update({
       where: { id: params.id },
-      data:  { status: parsed.data.status },
+      data:  {
+        ...(parsed.data.status !== undefined && { status: parsed.data.status }),
+        ...(parsed.data.lat !== undefined && parsed.data.lng !== undefined && { lat: parsed.data.lat, lng: parsed.data.lng }),
+      },
     });
 
     // Notify reporter if logged-in user reported it
-    if (report.userId && report.userId !== user!.id) {
+    if (parsed.data.status && report.userId && report.userId !== user!.id) {
       const statusLabel: Record<string, string> = {
         RESOLVED:   "megoldva",
         DISMISSED:  "elutasítva",
@@ -44,7 +53,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
         userId: report.userId,
         type:   "REPORT_RESOLVED",
         title:  "Bejelentésed státusza frissítve",
-        body:   `Állapot: ${statusLabel[parsed.data.status] ?? parsed.data.status}`,
+        body:   `Állapot: ${statusLabel[parsed.data.status!] ?? parsed.data.status}`,
         href:   "/reports",
       }).catch(() => {});
     }
