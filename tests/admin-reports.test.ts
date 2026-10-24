@@ -31,7 +31,7 @@ vi.mock("@/lib/prisma", () => ({
 const { PATCH, DELETE } = await import("@/app/api/admin/reports/[id]/route");
 const params = (id = "r1") => ({ params: Promise.resolve({ id }) });
 const req = (method: string, body?: unknown, qs = "") =>
-  new NextRequest(`http://localhost/api/admin/reports/r1${qs}`, { method, ...(body && { body: JSON.stringify(body) }) });
+  new NextRequest(`http://localhost/api/admin/reports/r1${qs}`, { method, ...(body !== undefined ? { body: JSON.stringify(body) } : {}) });
 
 beforeEach(() => { role = "SUPER_ADMIN"; audits.length = 0; updates.length = 0; deletes.length = 0; });
 

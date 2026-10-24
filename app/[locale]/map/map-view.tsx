@@ -67,6 +67,7 @@ export default function MapView() {
     shelterAnimals: (count: number) => t("shelterAnimals", { count }),
     shelterPage: t("shelterPage"),
     reportPage:  t("reportPage"),
+    reportsHere: (count: number) => t("reportsHere", { count }),
     emergency:   t("emergency"),
     website:     t("website"),
   }), [t]);
