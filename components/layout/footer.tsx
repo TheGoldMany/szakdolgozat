@@ -177,7 +177,11 @@ export function Footer() {
           <p className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1 text-xs text-gray-500">
             {t("made")} <Heart className="h-3 w-3 text-brand-500" /> {t("madeWith")}
             <span aria-hidden className="mx-1.5 text-gray-300">·</span>
-            {t("madeBy")} <span className="font-semibold text-gray-700">Lunda Software</span>
+            {t("madeBy")}{" "}
+            <a href="https://www.lundasoftware.hu" target="_blank" rel="noopener"
+              className="font-semibold text-gray-700 underline-offset-2 hover:text-brand-700 hover:underline">
+              Lunda Software
+            </a>
           </p>
         </div>
 

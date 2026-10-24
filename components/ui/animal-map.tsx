@@ -33,6 +33,7 @@ export interface MapLabels {
   shelterAnimals: (count: number) => string;
   shelterPage: string;
   reportPage:  string;
+  reportsHere: (count: number) => string;
   emergency: string;
   website: string;
 }
@@ -41,6 +42,7 @@ import {
   SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
 } from "@/components/ui/map-colors";
 import { safeHref } from "@/lib/safe-url";
+import { groupByLocation } from "@/lib/map-groups";
 
 // Külön modulból jönnek, hogy a jelmagyarázat ne ezen a fájlon keresztül
 // férjen hozzájuk – lásd a map-colors.ts fejlécét.
@@ -80,6 +82,27 @@ function makeBadgeIcon(color: string, glyph: MapGlyph, radius: string, size: num
 }
 
 const SHELTER_ICON = makeBadgeIcon(SHELTER_COLOR, "SHELTER", "9px", 34);
+
+/**
+ * Több bejelentés egy ponton: a szokásos csepp, rajta a darabszám. Ha mind
+ * egy típusú (pl. mind elveszett), annak a színe, különben semleges szürke.
+ */
+function makeGroupIcon(group: MapReport[]) {
+  const sameType   = group.every(r => r.type === group[0].type);
+  const sameAnimal = group.every(r => r.animalType === group[0].animalType);
+  const color = sameType ? (TYPE_COLOR[group[0].type] ?? "#6B7280") : "#374151";
+  const glyph = glyphForAnimal(sameAnimal ? group[0].animalType : "OTHER");
+  return L.divIcon({
+    className: "",
+    html: `<div style="position:relative">${pinHtml(color, glyph, 34)}
+      <span style="position:absolute;top:-6px;right:-8px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;
+        display:flex;align-items:center;justify-content:center;background:#111827;color:#fff;border:2px solid #fff;
+        border-radius:999px;font:700 11px/1 system-ui,sans-serif">${group.length}</span></div>`,
+    iconSize:   [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor:[0, -34],
+  });
+}
 
 function makeVetIcon(isEmergency: boolean) {
   return isEmergency
@@ -136,7 +159,36 @@ export default function AnimalMap({
 
     if (showReports) {
       const filtered = typeFilter ? reports.filter(r => r.type === typeFilter) : reports;
-      filtered.forEach(r => {
+      groupByLocation(filtered).forEach(group => {
+        // Egy helyen több bejelentés: egy jelölő, darabszámmal, listás buborékkal.
+        if (group.length > 1) {
+          const { lat, lng } = group[0];
+          const marker = L.marker([lat, lng], { icon: makeGroupIcon(group), zIndexOffset: 500 });
+          const rows = group.map(r => `
+            <a href="${prefix}/reports/${encodeURIComponent(r.id)}"
+              style="display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #F3F4F6;text-decoration:none;color:inherit">
+              ${r.imageUrl
+                ? `<img src="${esc(r.imageUrl)}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex:none" />`
+                : `<span style="width:40px;height:40px;border-radius:6px;flex:none;display:inline-flex;align-items:center;justify-content:center;background:${TYPE_COLOR[r.type] ?? "#6B7280"}">${glyphSvg(glyphForAnimal(r.animalType), 18)}</span>`}
+              <span style="min-width:0;flex:1">
+                <span style="display:inline-block;background:${TYPE_COLOR[r.type] ?? "#6B7280"};color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700">${esc(typeLabel(r.type))}</span>
+                <span style="display:block;font-weight:700;font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name ?? labels.unknownAnimal)}${r.breed ? ` <span style="font-weight:400;color:#6B7280">· ${esc(r.breed)}</span>` : ""}</span>
+                <span style="display:block;font-size:11px;color:#9CA3AF">${new Date(r.createdAt).toLocaleDateString(locale)}</span>
+              </span>
+              <span style="color:#9CA3AF;font-size:14px">&rsaquo;</span>
+            </a>`).join("");
+          marker.bindPopup(`
+            <div style="min-width:220px">
+              <div style="font-weight:700;font-size:13px;color:#111827">${esc(labels.reportsHere(group.length))}</div>
+              <div style="font-size:12px;color:#6B7280;margin-bottom:4px">${esc(group[0].city)}</div>
+              <div style="max-height:260px;overflow-y:auto">${rows}</div>
+            </div>
+          `, { maxWidth: 280 });
+          marker.addTo(layerRef.current!);
+          return;
+        }
+
+        const r = group[0];
         const marker = L.marker([r.lat, r.lng], { icon: makeReportIcon(r.type, r.animalType) });
         const img = r.imageUrl
           ? `<img src="${esc(r.imageUrl)}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px" />`

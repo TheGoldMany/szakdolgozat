@@ -7,7 +7,7 @@ import {
   LayoutDashboard, ClipboardList, PawPrint, MessageCircle, Building2,
   Settings, Heart, ClipboardCheck, FileText, Users, CalendarDays, HandHeart,
   ListChecks, Package, DoorOpen, Home, CalendarHeart, ArrowRightLeft, UtensilsCrossed,
-  UserCog, Newspaper, Sparkles, ShieldCheck, ScrollText, Stethoscope,
+  UserCog, Newspaper, Sparkles, ShieldCheck, ScrollText, Stethoscope, Megaphone,
   Menu, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -78,6 +78,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/approvals", icon: ShieldCheck, labelKey: "navApprovals", roles: ["SUPER_ADMIN"] },
       { href: "/dashboard/shelters",  icon: Building2,   labelKey: "navShelters",  roles: ["SUPER_ADMIN"] },
       { href: "/dashboard/users",     icon: Users,       labelKey: "navUsers",     roles: ["SUPER_ADMIN"] },
+      { href: "/dashboard/reports",   icon: Megaphone,   labelKey: "navReportsAdmin", roles: ["SUPER_ADMIN"] },
       { href: "/dashboard/vets",      icon: Stethoscope, labelKey: "navVets",      roles: ["SUPER_ADMIN"] },
       { href: "/dashboard/audit",     icon: ScrollText,  labelKey: "navAudit",     roles: ["SUPER_ADMIN"] },
     ],

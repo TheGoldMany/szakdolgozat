@@ -468,6 +468,12 @@
     "loginErrorTooMany": "Zbyt wiele nieudanych prób. Spróbuj ponownie za 15 minut."
   },
   "reports": {
+    "editLocation": "Popraw lokalizację",
+    "editLocationHint": "Dotknij na mapie miejsca, gdzie zwierzę widziano ostatnio. Wpisany adres się nie zmieni, przesunie się tylko znacznik.",
+    "editLocationSave": "Zapisz",
+    "editLocationCancel": "Anuluj",
+    "locationSaved": "Lokalizacja zaktualizowana.",
+    "locationError": "Nie udało się zapisać lokalizacji.",
     "title": "Zagubione i znalezione zwierzęta",
     "desc": "Pomóż zgubionym zwierzakom wrócić do domu!",
     "newReport": "Nowe zgłoszenie",
@@ -1500,6 +1506,7 @@
     "navApprovals": "Zatwierdzenia",
     "navAudit": "Dziennik audytu",
     "navVets": "Weterynarze",
+    "navReportsAdmin": "Zgłoszenia",
     "createNewTask": "Utwórz nowe zadanie",
     "createTask": "Utwórz zadanie",
     "newTask": "Nowe zadanie",
@@ -1638,6 +1645,7 @@
     "shelterAnimals": "zwierząt do adopcji: {count}",
     "shelterPage": "Strona schroniska",
     "reportPage": "Otwórz zgłoszenie",
+    "reportsHere": "{count} zgłoszeń w tym miejscu",
     "website": "Strona internetowa",
     "animalDog": "Pies",
     "animalCat": "Kot",

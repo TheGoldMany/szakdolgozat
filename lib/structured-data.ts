@@ -62,6 +62,7 @@ export function websiteJsonLd(locale: string) {
         url:        localeUrl(locale, "/"),
         name:       "ÁllatiMenhelyek.hu",
         publisher:  { "@id": `${BASE}/#organization` },
+        creator:    { "@type": "Organization", name: "Lunda Software", url: "https://www.lundasoftware.hu" },
         inLanguage: locale,
         potentialAction: {
           "@type": "SearchAction",

@@ -468,6 +468,12 @@
     "loginErrorTooMany": "Túl sok sikertelen próbálkozás. Próbáld újra 15 perc múlva."
   },
   "reports": {
+    "editLocation": "Helyszín pontosítása",
+    "editLocationHint": "Kattints a térképen arra a pontra, ahol az állatot utoljára látták. A beírt cím nem változik, csak a térképes pötty.",
+    "editLocationSave": "Mentés",
+    "editLocationCancel": "Mégse",
+    "locationSaved": "A helyszín frissült.",
+    "locationError": "Nem sikerült menteni a helyszínt.",
     "title": "Elveszett és megtalált állatok",
     "desc": "Segíts visszatalálni az elveszett kedvenceknek!",
     "newReport": "Új bejelentés",
@@ -1503,6 +1509,7 @@
     "navApprovals": "Jóváhagyások",
     "navAudit": "Audit napló",
     "navVets": "Állatorvosok",
+    "navReportsAdmin": "Bejelentések",
     "subsRevenueThisMonth": "Havi bevétel (e hónap)",
     "subsRevenueTotal": "Összes visszatérő bevétel",
     "subsPaymentsCount": "Terhelések száma",
@@ -1638,6 +1645,7 @@
     "shelterAnimals": "{count} állat örökbefogadható",
     "shelterPage": "Menhely oldala",
     "reportPage": "Bejelentés megnyitása",
+    "reportsHere": "{count} bejelentés ezen a helyen",
     "website": "Weboldal",
     "animalDog": "Kutya",
     "animalCat": "Macska",
