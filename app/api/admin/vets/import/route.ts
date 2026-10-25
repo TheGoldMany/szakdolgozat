@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAudit } from "@/lib/audit";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -160,6 +161,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    logAudit({
+      actorId: session.user.id, action: "VETS_IMPORTED", targetType: "VetClinic", targetId: "import",
+      targetName: `${created} új rendelő`, reason: `kihagyva: ${skipped}, duplikált: ${duplicates}, hibás: ${errors.length}`,
+    });
     return NextResponse.json({ created, skipped, duplicates, errors });
   } catch (error) {
     console.error("[api/admin/vets/import]", error);

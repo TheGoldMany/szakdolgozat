@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ScrollText, Ban, RotateCcw, Trash2, UserCog, BadgeCheck, BadgeX, HandHeart, FileText, AlertTriangle, type LucideIcon } from "lucide-react";
+import { ScrollText, Ban, RotateCcw, Trash2, UserCog, BadgeCheck, BadgeX, HandHeart, FileText, AlertTriangle, Building2, Stethoscope, Newspaper, Database, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AuditAction } from "@prisma/client";
 
@@ -30,6 +30,18 @@ const ACTION_META: Record<AuditAction, { label: string; icon: LucideIcon; color:
   FORM_REJECTED:      { label: "Űrlap elutasítva",          icon: FileText,   color: "bg-red-50 text-red-700" },
   REPORT_EDITED:      { label: "Bejelentés szerkesztve",    icon: FileText,   color: "bg-amber-50 text-amber-700" },
   REPORT_DELETED:     { label: "Bejelentés törölve",        icon: Trash2,     color: "bg-red-50 text-red-700" },
+  SHELTER_CREATED:     { label: "Menhely létrehozva",        icon: Building2,  color: "bg-brand-50 text-brand-800" },
+  SHELTER_SUSPENDED:   { label: "Menhely felfüggesztve",     icon: Ban,        color: "bg-amber-50 text-amber-700" },
+  SHELTER_REACTIVATED: { label: "Menhely újraaktiválva",     icon: RotateCcw,  color: "bg-brand-50 text-brand-800" },
+  SHELTER_DELETED:     { label: "Menhely törölve",           icon: Trash2,     color: "bg-red-50 text-red-700" },
+  VET_CREATED:         { label: "Állatorvos felvéve",        icon: Stethoscope, color: "bg-brand-50 text-brand-800" },
+  VET_UPDATED:         { label: "Állatorvos módosítva",      icon: Stethoscope, color: "bg-amber-50 text-amber-700" },
+  VET_DELETED:         { label: "Állatorvos törölve",        icon: Trash2,     color: "bg-red-50 text-red-700" },
+  VETS_IMPORTED:       { label: "Állatorvosok importálva",   icon: Stethoscope, color: "bg-brand-50 text-brand-800" },
+  POST_CREATED:        { label: "Cikk létrehozva",           icon: Newspaper,  color: "bg-brand-50 text-brand-800" },
+  POST_UPDATED:        { label: "Cikk módosítva",            icon: Newspaper,  color: "bg-amber-50 text-amber-700" },
+  POST_DELETED:        { label: "Cikk törölve",              icon: Trash2,     color: "bg-red-50 text-red-700" },
+  ETL_RUN:             { label: "Adattárház frissítve (ETL)", icon: Database,  color: "bg-gray-100 text-gray-700" },
 };
 
 /**
@@ -118,7 +130,8 @@ export default async function AuditPage(
       ) : (
         <ul className="space-y-2">
           {entries.map((e) => {
-            const meta = ACTION_META[e.action];
+            // Tartalék: egy újabb művelettípus ne döntse le az egész oldalt.
+            const meta = ACTION_META[e.action] ?? { label: e.action, icon: ScrollText, color: "bg-gray-100 text-gray-700" };
             const Icon = meta.icon;
             return (
               <li key={e.id} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-4">
@@ -131,7 +144,7 @@ export default async function AuditPage(
                     {e.targetName && <span className="text-gray-500"> · {e.targetName}</span>}
                   </p>
                   <p className="mt-0.5 text-xs text-gray-400">
-                    {e.actor?.name ?? e.actor?.email ?? "ismeretlen admin"}
+                    {e.actorId ? (e.actor?.name ?? e.actor?.email ?? "törölt admin") : "automatikus futás"}
                     {" · "}
                     {new Date(e.createdAt).toLocaleString("hu-HU", {
                       year: "numeric", month: "short", day: "numeric",

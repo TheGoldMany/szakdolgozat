@@ -75,6 +75,15 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     }
 
     // Send notifications when isActive changes
+    if (parsed.data.isActive !== undefined && parsed.data.isActive !== shelter.isActive) {
+      logAudit({
+        actorId:    session.user.id,
+        action:     parsed.data.isActive ? "SHELTER_REACTIVATED" : "SHELTER_SUSPENDED",
+        targetType: "Shelter",
+        targetId:   updated.id,
+        targetName: shelter.name,
+      });
+    }
     if (parsed.data.isActive !== undefined) {
       const suspended  = !parsed.data.isActive;
       const notifType  = suspended ? "SHELTER_SUSPENDED" : "SHELTER_REACTIVATED";
@@ -171,6 +180,10 @@ export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: s
 
     // Delete the shelter (cascade deletes ShelterAdmin, animals, etc.)
     await prisma.shelter.delete({ where: { id: params.id } });
+    logAudit({
+      actorId: session.user.id, action: "SHELTER_DELETED",
+      targetType: "Shelter", targetId: shelter.id, targetName: shelter.name,
+    });
 
     // Demote admins who no longer manage any shelter
     for (const u of adminUsers) {

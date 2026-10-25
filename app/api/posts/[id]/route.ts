@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
@@ -90,6 +91,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
               }),
       },
     });
+    logAudit({ actorId: user!.id, action: "POST_UPDATED", targetType: "Post", targetId: post.id, targetName: post.title || existing.title });
     return NextResponse.json(post);
   } catch (err) {
     console.error("[api/posts/[id] PATCH]", err);
@@ -106,11 +108,12 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     return NextResponse.json({ error: "Nincs jogosultságod" }, { status: 403 });
   }
 
-  const post = await prisma.post.findUnique({ where: { id: params.id }, select: { id: true } });
+  const post = await prisma.post.findUnique({ where: { id: params.id }, select: { id: true, title: true } });
   if (!post) {
     return NextResponse.json({ error: "A cikk nem található" }, { status: 404 });
   }
 
   await prisma.post.delete({ where: { id: params.id } });
+  logAudit({ actorId: user!.id, action: "POST_DELETED", targetType: "Post", targetId: post.id, targetName: post.title });
   return NextResponse.json({ ok: true });
 }
