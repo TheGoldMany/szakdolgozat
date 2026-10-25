@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAudit } from "@/lib/audit";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAuthUser } from "@/lib/api-auth";
@@ -141,6 +142,7 @@ export async function POST(req: NextRequest) {
       include: postInclude,
     });
 
+    logAudit({ actorId: user!.id, action: "POST_CREATED", targetType: "Post", targetId: post.id, targetName: post.title });
     return NextResponse.json({ post: { ...post, likedByMe: false } }, { status: 201 });
   } catch (err) {
     console.error("[api/posts POST]", err);

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geocodeAddress } from "@/lib/geo";
 import { safeHttpUrl } from "@/lib/safe-url";
+import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   name:         z.string().min(1).max(200).optional(),
@@ -60,6 +61,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
         ...(coords ?? {}),
       },
     });
+    logAudit({ actorId: session.user.id, action: "VET_UPDATED", targetType: "VetClinic", targetId: vet.id, targetName: `${vet.name} (${vet.city})` });
     return NextResponse.json(vet);
   } catch (error) {
     console.error("[api/admin/vets/[id] PATCH]", error);
@@ -75,7 +77,8 @@ export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: s
   }
 
   try {
-    await prisma.vetClinic.delete({ where: { id: params.id } });
+    const vet = await prisma.vetClinic.delete({ where: { id: params.id } });
+    logAudit({ actorId: session.user.id, action: "VET_DELETED", targetType: "VetClinic", targetId: vet.id, targetName: `${vet.name} (${vet.city})` });
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/vets/[id] DELETE]", error);

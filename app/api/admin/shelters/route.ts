@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 import { sendShelterAdminInviteEmail } from "@/lib/email";
 import { ensureShelterDefaults } from "@/lib/shelter-defaults";
 import { geocodeAddress } from "@/lib/geo";
+import { logAudit } from "@/lib/audit";
 
 const schema = z.object({
   // Menhely adatok
@@ -138,6 +139,12 @@ export async function POST(req: NextRequest) {
       shelterName: d.shelterName,
       password:    d.adminPassword,
     }).catch((err) => console.error("[shelter invite email]", err));
+
+    logAudit({
+      actorId: session.user.id, action: "SHELTER_CREATED",
+      targetType: "Shelter", targetId: result.shelter.id, targetName: result.shelter.name,
+      reason: `Admin: ${result.adminUser.email}`,
+    });
 
     return NextResponse.json({
       shelter: { id: result.shelter.id, name: result.shelter.name, slug: result.shelter.slug },

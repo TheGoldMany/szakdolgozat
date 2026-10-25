@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAudit } from "@/lib/audit";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
         lat, lng,
       },
     });
+    logAudit({ actorId: session.user.id, action: "VET_CREATED", targetType: "VetClinic", targetId: vet.id, targetName: `${vet.name} (${vet.city})` });
     return NextResponse.json(vet, { status: 201 });
   } catch (error) {
     console.error("[api/admin/vets POST]", error);

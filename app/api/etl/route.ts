@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAudit } from "@/lib/audit";
 import { ApplicationStatus } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
@@ -18,11 +19,14 @@ export async function POST(req: NextRequest) {
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
   const validBearer = token && token === process.env.ETL_SECRET;
 
+  // Ki indította: bejelentkezett főadmin, vagy tokennel egy ütemező (null).
+  let actorId: string | null = null;
   if (!validBearer) {
     const session = await getServerSession(authOptions);
     if (session?.user?.role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    actorId = session.user.id;
   }
 
   const log: string[] = [];
@@ -288,5 +292,10 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  logAudit({
+    actorId, action: "ETL_RUN", targetType: "DataWarehouse", targetId: "etl",
+    targetName: `${factAdoptionData.length} örökbefogadás, ${inventoryCount} készletsor`,
+    reason: `${elapsedMs} ms`,
+  });
   return NextResponse.json({ success: true, log });
 }
