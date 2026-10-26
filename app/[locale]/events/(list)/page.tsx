@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { pageMetadata } from "@/lib/page-metadata";
+import { listingHasContent } from "@/lib/listing-index";
 
 /**
  * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
@@ -15,10 +16,12 @@ import { pageMetadata } from "@/lib/page-metadata";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const t = await getTranslations("seo");
+  const [t, has] = await Promise.all([getTranslations("seo"), listingHasContent()]);
   return pageMetadata({
     locale:      params.locale,
     path:        "/events",
+    // Üres lista: ne kerüljön indexbe „nincs találat” oldalként (lásd listing-index).
+    noIndex:     !has.events,
     title:       t("eventsTitle"),
     description: t("eventsDescription"),
   });

@@ -10,6 +10,7 @@ import { PawPrint } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/page-metadata";
+import { listingHasContent } from "@/lib/listing-index";
 
 /**
  * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
@@ -19,10 +20,12 @@ import { pageMetadata } from "@/lib/page-metadata";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const t = await getTranslations("seo");
+  const [t, has] = await Promise.all([getTranslations("seo"), listingHasContent()]);
   return pageMetadata({
     locale:      params.locale,
     path:        "/animals",
+    // Üres lista: ne kerüljön indexbe „nincs találat” oldalként (lásd listing-index).
+    noIndex:     !has.animals,
     title:       t("animalsTitle"),
     description: t("animalsDescription"),
   });
