@@ -487,7 +487,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
       {/* Mobilon a fő teendő (érdeklődés, örökbefogadás) a hosszú adatlap
           alján van: ez a sáv mindig kéznél tartja, az alsó menü fölött. */}
       {adoptable && (
-        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 border-t border-gray-200 bg-white/95 px-4 py-2.5 backdrop-blur md:hidden">
+        <div className="adopt-sticky-bar fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 border-t border-gray-200 bg-white/95 px-4 py-2.5 backdrop-blur md:hidden">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-gray-900">{animal.name}</p>

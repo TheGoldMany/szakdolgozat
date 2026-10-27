@@ -202,6 +202,12 @@ input[type="radio"]:checked {
   body[data-cookie-banner] .daily-fab { display: none; }
 }
 
+/* Az állat adatlapján mobilon tapadó örökbefogadási sáv van az alsó menü
+   fölött: a gomb a sáv fölé lép, különben az „Érdeklődöm” gombot takarná. */
+@media (max-width: 767px) {
+  body:has(.adopt-sticky-bar) .daily-fab { bottom: calc(8.5rem + env(safe-area-inset-bottom)); }
+}
+
 /* ─── Modális ablakok ──────────────────────────────────────
    A felugró panel eddig azonnal ott volt, háttérrel együtt. Ha egy doboz
    villanásszerűen megjelenik, a szem nem tudja, hogy ez egy réteg a tartalom
