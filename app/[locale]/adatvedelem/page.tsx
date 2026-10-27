@@ -366,7 +366,7 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6">
         <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
@@ -461,7 +461,7 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6">
         <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 sm:px-10">
 
           <P>

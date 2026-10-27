@@ -267,11 +267,11 @@ export function FeedClient({
   const hasContent = animals.length || campaigns.length || events.length || reports.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
 
       {/* ── Tartalom railek (mindig legfelül, legújabb) ──── */}
       {hasContent > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {animals.length > 0 && (
             <Rail icon={PawPrint} iconColor="bg-brand-50 text-brand-600" title={t("feedNewAnimals")} href="/animals" linkLabel={tCommon("all")}>
               {animals.map((a) => <AnimalCard key={a.id} a={a} />)}
@@ -299,7 +299,7 @@ export function FeedClient({
       {posts.length > 0 && (
         <>
           <SectionDivider label={tArt("title")} />
-          <div className="space-y-4">
+          <div className="space-y-6">
             {posts.map((post, i) =>
               compactAfter !== undefined && i >= compactAfter
                 ? <PostRow key={post.id} post={post} />

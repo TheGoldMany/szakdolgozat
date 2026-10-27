@@ -42,8 +42,8 @@ export default async function EventsListPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center gap-3">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center gap-3 sm:mb-12">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <CalendarHeart className="h-6 w-6 text-brand-500" />
           </div>
@@ -59,7 +59,7 @@ export default async function EventsListPage() {
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
             {events.map(ev => (
               <Link key={ev.id} href={`/events/${ev.slug}`}
                 className="press-card group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">

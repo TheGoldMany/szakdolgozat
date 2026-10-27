@@ -107,7 +107,7 @@ export default async function ReportsPage(props: PageProps) {
 
       {/* Fejléc */}
       <div className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
@@ -180,7 +180,7 @@ export default async function ReportsPage(props: PageProps) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 
         {/* Saját bejelentések: kompakt sor, hogy ne tolja le a listát */}
         {myReports.length > 0 && (

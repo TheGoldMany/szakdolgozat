@@ -92,12 +92,12 @@ export function PostCard({ post }: { post: FeedPost }) {
       {post.imageUrl && (
         href ? (
           <Link href={href} className="block">
-            <div className="relative aspect-[4/3] w-full bg-gray-50">
+            <div className="relative aspect-[4/3] w-full bg-gray-50 sm:aspect-[16/9]">
               <Image src={post.imageUrl} alt={post.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 640px" />
             </div>
           </Link>
         ) : (
-          <div className="relative aspect-[4/3] w-full bg-gray-50">
+          <div className="relative aspect-[4/3] w-full bg-gray-50 sm:aspect-[16/9]">
             <Image src={post.imageUrl} alt={post.title} fill className="object-cover" sizes="(max-width:640px) 100vw, 640px" />
           </div>
         )

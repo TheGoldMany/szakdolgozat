@@ -65,7 +65,7 @@ export default async function UserApplicationDetailPage(
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:py-10 sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6">
 
         <Link
           href="/applications"

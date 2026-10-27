@@ -55,7 +55,7 @@ export function HomeSidebar({
   const locale  = useLocale();
 
   return (
-    <aside className="space-y-4">
+    <aside className="space-y-6">
 
       {/* Gyorslinkek. Mobilon az alsó menü ugyanezt tudja, ott a lap aljára
           kerülne és csak hosszabbítaná a görgetést, ezért ott nem jelenik meg. */}

@@ -174,8 +174,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 pb-8 pt-8 sm:px-6 lg:px-8 lg:pb-10 lg:pt-10">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14 lg:px-8 lg:pb-20 lg:pt-20">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
 
             <div className="max-w-xl">
               {/* Nincs cédula a cím fölött és nincs kiemelt színű szó a címben:
@@ -271,13 +271,13 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       </section>
 
       {/* ── "Neked" feed ─────────────────────────────────── */}
-      <section className="bg-gray-50 py-8">
+      <section className="bg-gray-50 py-12 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
+          <div className="flex gap-8 xl:gap-12">
 
             {/* Folyam – kitölti a helyet az oldalsávig, így nem marad üres sáv */}
             <div className="min-w-0 flex-1">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
                 <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
                   {t("all")} <ArrowRight className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
               )}
 
               {/* Mobilon az oldalsáv tartalma a folyam alá kerül */}
-              <div className="mt-4 lg:hidden">
+              <div className="mt-10 lg:hidden">
                 <HomeSidebar
                   events={feedEvents}
                   campaigns={feedCampaigns}
@@ -336,7 +336,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           Kétoszlopos szakasz számozott listával. A korábbi három egyforma
           ikonos kártya a sarokban halvány óriás-sorszámmal a sablonos
           kezdőlapok legfelismerhetőbb eleme volt. */}
-      <section className="border-t border-gray-200 bg-white py-16">
+      <section className="border-t border-gray-200 bg-white py-16 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("howTitle")}</h2>
@@ -364,7 +364,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* ── Bejelentés ──────────────────────────────────── */}
       <section className="bg-brand-50">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-14 sm:px-6 md:flex-row lg:py-20 md:items-center md:justify-between lg:px-8">
           <div className="max-w-xl">
             <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{t("ctaTitle")}</h2>
             <p className="mt-2 text-sm leading-relaxed text-gray-600">{t("ctaDesc")}</p>
