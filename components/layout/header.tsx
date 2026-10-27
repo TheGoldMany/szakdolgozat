@@ -241,7 +241,7 @@ export function Header() {
       }}
     >
 
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8 2xl:px-12">
 
         {/* Logo – mobilon is kiírjuk a nevet: ott a fejlécben csak a logó és a
             menügomb van, tehát bőven elfér, és a látogató tudja, hol jár. */}

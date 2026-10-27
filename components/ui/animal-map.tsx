@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { badgeHtml, glyphForAnimal, glyphSvg, pinHtml, type MapGlyph } from "@/components/ui/map-icons";
@@ -104,6 +104,26 @@ function makeGroupIcon(group: MapReport[]) {
   });
 }
 
+/**
+ * Országos nézetben több száz állatorvos van a térképen, és a teljes méretű
+ * ikonok nagyjából 85%-a egymást takarta: amire a felhasználó rábökött, az
+ * gyakran egy alatta lévő másik jelölő volt, a bejelentések pedig elvesztek
+ * köztük. Ezért kis nagyításon az állatorvos csak egy kis pötty, és csak
+ * közelebbről kap teljes ikont.
+ */
+const VET_FULL_ICON_ZOOM = 10;
+
+function makeVetDot(isEmergency: boolean) {
+  const color = isEmergency ? VET_EMERGENCY_COLOR : VET_COLOR;
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:12px;height:12px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.35)"></div>`,
+    iconSize:   [12, 12],
+    iconAnchor: [6, 6],
+    popupAnchor:[0, -6],
+  });
+}
+
 function makeVetIcon(isEmergency: boolean) {
   return isEmergency
     ? makeBadgeIcon(VET_EMERGENCY_COLOR, "VET_EMERGENCY", "50%", 32)
@@ -128,6 +148,9 @@ export default function AnimalMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef       = useRef<L.Map | null>(null);
   const layerRef     = useRef<L.LayerGroup | null>(null);
+  // Csak a küszöb átlépésekor rajzolunk újra (különben minden nagyítás
+  // bezárná a nyitott buborékot).
+  const [vetFull, setVetFull] = useState(false);
 
   // Init map once
   useEffect(() => {
@@ -142,6 +165,7 @@ export default function AnimalMap({
       maxZoom: 19,
     }).addTo(mapRef.current);
     layerRef.current = L.layerGroup().addTo(mapRef.current);
+    mapRef.current.on("zoomend", () => setVetFull((mapRef.current?.getZoom() ?? 0) >= VET_FULL_ICON_ZOOM));
     return () => { mapRef.current?.remove(); mapRef.current = null; };
   }, []);
 
@@ -163,7 +187,7 @@ export default function AnimalMap({
         // Egy helyen több bejelentés: egy jelölő, darabszámmal, listás buborékkal.
         if (group.length > 1) {
           const { lat, lng } = group[0];
-          const marker = L.marker([lat, lng], { icon: makeGroupIcon(group), zIndexOffset: 500 });
+          const marker = L.marker([lat, lng], { icon: makeGroupIcon(group), zIndexOffset: 2000 });
           const rows = group.map(r => `
             <a href="${prefix}/reports/${encodeURIComponent(r.id)}"
               style="display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #F3F4F6;text-decoration:none;color:inherit">
@@ -189,7 +213,7 @@ export default function AnimalMap({
         }
 
         const r = group[0];
-        const marker = L.marker([r.lat, r.lng], { icon: makeReportIcon(r.type, r.animalType) });
+        const marker = L.marker([r.lat, r.lng], { icon: makeReportIcon(r.type, r.animalType), zIndexOffset: 1500 });
         const img = r.imageUrl
           ? `<img src="${esc(r.imageUrl)}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:6px" />`
           : "";
@@ -220,7 +244,7 @@ export default function AnimalMap({
 
     if (showShelters) {
       shelters.forEach(s => {
-        const marker = L.marker([s.lat, s.lng], { icon: SHELTER_ICON });
+        const marker = L.marker([s.lat, s.lng], { icon: SHELTER_ICON, zIndexOffset: 1000 });
         marker.bindPopup(`
           <div style="min-width:160px">
             <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px">
@@ -229,8 +253,8 @@ export default function AnimalMap({
             </div>
             <div style="font-size:12px;color:#6B7280">${esc(s.city)}${s.address ? `, ${esc(s.address)}` : ""}</div>
             <div style="font-size:12px;color:${SHELTER_COLOR};margin-top:2px">${esc(labels.shelterAnimals(s._count.animals))}</div>
-            ${s.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(s.phone)}</div>` : ""}
-            <a href="${prefix}/shelters/${encodeURIComponent(s.slug)}" target="_blank"
+            ${s.phone ? `<div style="font-size:12px;margin-top:2px"><a href="tel:${esc(s.phone.replace(/[^+\d]/g, ""))}" style="color:#2563EB">${esc(s.phone)}</a></div>` : ""}
+            <a href="${prefix}/shelters/${encodeURIComponent(s.slug)}"
               style="display:inline-block;margin-top:6px;font-size:12px;color:${SHELTER_COLOR};text-decoration:underline">
               ${esc(labels.shelterPage)} &rarr;
             </a>
@@ -242,7 +266,9 @@ export default function AnimalMap({
 
     if (showVets) {
       vets.forEach(v => {
-        const marker = L.marker([v.lat, v.lng], { icon: makeVetIcon(v.isEmergency) });
+        const marker = L.marker([v.lat, v.lng], {
+          icon: vetFull ? makeVetIcon(v.isEmergency) : makeVetDot(v.isEmergency),
+        });
         marker.bindPopup(`
           <div style="min-width:170px">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
@@ -253,7 +279,7 @@ export default function AnimalMap({
             </div>
             <div style="font-size:12px;color:#6B7280">${esc(v.city)}, ${esc(v.address)}</div>
             ${v.openingHours ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.openingHours)}</div>` : ""}
-            ${v.phone ? `<div style="font-size:12px;color:#374151;margin-top:2px">${esc(v.phone)}</div>` : ""}
+            ${v.phone ? `<div style="font-size:12px;margin-top:2px"><a href="tel:${esc(v.phone.replace(/[^+\d]/g, ""))}" style="color:#2563EB">${esc(v.phone)}</a></div>` : ""}
             ${safeHref(v.website)
               ? `<a href="${esc(safeHref(v.website))}" target="_blank" rel="noopener noreferrer"
                    style="display:inline-block;margin-top:6px;font-size:12px;color:${VET_COLOR};text-decoration:underline">${esc(labels.website)} &rarr;</a>`
@@ -263,7 +289,7 @@ export default function AnimalMap({
         marker.addTo(layerRef.current!);
       });
     }
-  }, [reports, shelters, vets, showReports, showShelters, showVets, typeFilter, labels, locale]);
+  }, [reports, shelters, vets, showReports, showShelters, showVets, typeFilter, labels, locale, vetFull]);
 
   return <div ref={containerRef} style={{ height: "100%", width: "100%", zIndex: 0 }} />;
 }
