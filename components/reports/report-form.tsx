@@ -92,8 +92,9 @@ function FieldError({ message }: { message?: string }) {
 /**
  * Bejelentő űrlap.
  *
- * Számozott szakaszokra bontva, a gondolkodás sorrendjében: mi történt,
- * milyen állat, fotó, hol, és hogyan érnek el. Bejelentkezett felhasználónál
+ * Számozott szakaszokra bontva: mi történt, fotó, milyen állat, hol, és
+ * hogyan érnek el. A fotó a második: mobilon a bejelentő épp az állat előtt
+ * áll, és az űrlap végén már késő elővenni a kamerát. Bejelentkezett felhasználónál
  * az elérhetőség előre ki van töltve – az oldal eddig ezt ígérte, de nem tette.
  */
 export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
@@ -139,6 +140,19 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
   });
 
   const selectedType = watch("type");
+
+  // Folyamatjelző: a kitöltés állapotából számolt, így mindig azt mutatja,
+  // ami tényleg kész, nem azt, hogy hányadik szakasznál tart a görgetés.
+  const [wImages, wDesc, wCity, wName, wPhone, wEmail] =
+    watch(["imageUrls", "description", "city", "contactName", "contactPhone", "contactEmail"]);
+  const steps = [
+    true,                                                     // 1. típus: mindig van alapérték
+    (wImages?.length ?? 0) > 0,                               // 2. fotó
+    (wDesc?.trim().length ?? 0) >= 10,                        // 3. az állat leírása
+    Boolean(wCity?.trim()),                                   // 4. hely
+    Boolean(wName?.trim() && (wPhone?.trim() || wEmail?.trim())), // 5. elérhetőség
+  ];
+  const doneCount = steps.filter(Boolean).length;
   const lat = watch("lat");
   const lng = watch("lng");
 
@@ -183,6 +197,18 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
         defaultValue=""
         style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
       />
+      <div className="sticky top-16 z-20 -mx-1 rounded-xl border border-gray-200 bg-white/95 px-3 py-2 backdrop-blur" aria-live="polite">
+        <div className="flex items-center justify-between text-xs font-medium text-gray-600">
+          <span>{t("formProgress", { done: doneCount, total: steps.length })}</span>
+          {doneCount === steps.length && <span className="font-semibold text-brand-700">{t("formProgressReady")}</span>}
+        </div>
+        <div className="mt-1.5 flex gap-1" aria-hidden>
+          {steps.map((ok, i) => (
+            <span key={i} className={cn("h-1.5 flex-1 rounded-full transition-colors", ok ? "bg-brand-600" : "bg-gray-200")} />
+          ))}
+        </div>
+      </div>
+
       {serverError && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
@@ -221,8 +247,19 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
         </fieldset>
       </Section>
 
-      {/* 2. Az állat */}
-      <Section n={2} title={t("formStepAnimal")}>
+      {/* 2. Fotók */}
+      <Section n={2} title={t("formStepPhotos")} hint={t("formPhotoHint")}>
+        <Controller
+          name="imageUrls"
+          control={control}
+          render={({ field }) => (
+            <MultiImageUpload value={field.value ?? []} onChange={field.onChange} max={6} label="" />
+          )}
+        />
+      </Section>
+
+      {/* 3. Az állat */}
+      <Section n={3} title={t("formStepAnimal")}>
         <fieldset>
           <legend className={labelCls}>{t("formSpeciesLabel")}<Req /></legend>
           <div className="flex flex-wrap gap-2">
@@ -278,17 +315,6 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
           />
           <FieldError message={errors.description?.message} />
         </div>
-      </Section>
-
-      {/* 3. Fotók */}
-      <Section n={3} title={t("formStepPhotos")} hint={t("formPhotoHint")}>
-        <Controller
-          name="imageUrls"
-          control={control}
-          render={({ field }) => (
-            <MultiImageUpload value={field.value ?? []} onChange={field.onChange} max={6} label="" />
-          )}
-        />
       </Section>
 
       {/* 4. Hol? */}

@@ -29,17 +29,29 @@ export const revalidate = 120;
 export default async function SheltersPage() {
   const t = await getTranslations("shelters");
 
-  const shelters = await prisma.shelter.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-    include: {
-      _count: {
-        select: {
-          animals: { where: { status: AnimalStatus.AVAILABLE } },
+  const [rawShelters, ratings] = await Promise.all([
+    prisma.shelter.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: {
+        id: true, slug: true, name: true, city: true, logoUrl: true, isVerified: true,
+        _count: { select: { animals: { where: { status: AnimalStatus.AVAILABLE } } } },
+        // A kártya kis fotói: az első néhány örökbefogadható állat főképe.
+        animals: {
+          where:   { status: AnimalStatus.AVAILABLE, images: { some: { isPrimary: true } } },
+          orderBy: { createdAt: "desc" },
+          take:    4,
+          select:  { images: { where: { isPrimary: true }, take: 1, select: { url: true } } },
         },
       },
-    },
-  });
+    }),
+    // Egyetlen összesítő lekérdezés: korábban minden kártya külön kérte le
+    // a saját értékeléseit (menhelyenként egy lekérdezés).
+    prisma.review.groupBy({ by: ["shelterId"], _avg: { rating: true }, _count: { _all: true } }),
+  ]);
+  const ratingBy = new Map(ratings.map((r) => [r.shelterId, { avg: r._avg.rating ?? 0, count: r._count._all }]));
+  // Akinél van örökbefogadható állat, előre kerül: a látogató azt keresi.
+  const shelters = [...rawShelters].sort((a, b) => b._count.animals - a._count.animals);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,9 +71,14 @@ export default async function SheltersPage() {
             <p className="mt-4 text-lg font-medium text-gray-700">{t("noShelters")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {shelters.map((shelter) => (
-              <ShelterCard key={shelter.id} shelter={shelter} />
+              <ShelterCard
+                key={shelter.id}
+                shelter={shelter}
+                thumbs={shelter.animals.map((a) => a.images[0]?.url).filter((u): u is string => Boolean(u))}
+                rating={ratingBy.get(shelter.id) ?? null}
+              />
             ))}
           </div>
         )}

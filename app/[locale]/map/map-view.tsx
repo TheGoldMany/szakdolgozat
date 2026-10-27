@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations, useLocale } from "next-intl";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import type { MapLabels, MapReport, MapShelter, MapVet } from "@/components/ui/animal-map";
 import {
   SHELTER_COLOR, TYPE_COLOR, VET_COLOR, VET_EMERGENCY_COLOR,
 } from "@/components/ui/map-colors";
 import { glyphSvg, type MapGlyph } from "@/components/ui/map-icons";
+import { cn } from "@/lib/utils";
 
 const AnimalMap = dynamic(() => import("@/components/ui/animal-map"), { ssr: false });
 
@@ -42,6 +43,12 @@ export default function MapView() {
   const [showReports,  setShowReports]  = useState(true);
   const [showShelters, setShowShelters] = useState(true);
   const [showVets,     setShowVets]     = useState(true);
+  // A jelmagyarázat mobilon a térkép negyedét takarná: ott alapból csak a
+  // fejléce látszik, koppintásra nyílik. Asztalon alapból nyitva.
+  const [legendOpen,   setLegendOpen]   = useState(false);
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 768px)").matches) setLegendOpen(true);
+  }, []);
   const [typeFilter,   setTypeFilter]   = useState("");
   const [status,       setStatus]       = useState("ACTIVE");
   const [panelOpen,    setPanelOpen]    = useState(false);
@@ -201,8 +208,13 @@ export default function MapView() {
 
       {/* Legend – bottom right */}
       <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
-        <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-gray-500">{t("legend")}</p>
-        <div className="space-y-1.5">
+        <button type="button" onClick={() => setLegendOpen((o) => !o)} aria-expanded={legendOpen}
+          className="flex w-full items-center justify-between gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+          {t("legend")}
+          <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", legendOpen && "rotate-180")} />
+        </button>
+        {legendOpen && (<>
+        <div className="mt-1.5 space-y-1.5">
           {([
             { color: TYPE_COLOR.LOST,        glyph: "DOG",           label: t("lost")      },
             { color: TYPE_COLOR.FOUND,       glyph: "CAT",           label: t("found")     },
@@ -220,6 +232,7 @@ export default function MapView() {
         <p className="mt-2 max-w-[9rem] border-t border-gray-100 pt-1.5 text-[10px] leading-snug text-gray-400">
           {t("legendHint")}
         </p>
+        </>)}
       </div>
 
       {/* New report button */}

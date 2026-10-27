@@ -80,12 +80,16 @@ export default async function EventsListPage() {
                     <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" />{ev.location}</span>
                     <span className="truncate">{ev.shelter.name} · {ev.shelter.city}</span>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 border-t border-gray-50 pt-2 text-xs text-gray-400">
-                    <Users className="h-3.5 w-3.5" />
-                    {ev.capacity != null
-                      ? `${ev._count.registrations} / ${ev.capacity}`
-                      : t("registrants", { count: ev._count.registrations })}
-                  </div>
+                  {/* „0 jelentkező” rossz benyomást kelt, információt nem ad: csak
+                      akkor írjuk ki, ha van jelentkező, vagy ha van létszámkorlát. */}
+                  {(ev.capacity != null || ev._count.registrations > 0) && (
+                    <div className="mt-3 flex items-center gap-1 border-t border-gray-50 pt-2 text-xs text-gray-400">
+                      <Users className="h-3.5 w-3.5" />
+                      {ev.capacity != null
+                        ? `${ev._count.registrations} / ${ev.capacity}`
+                        : t("registrants", { count: ev._count.registrations })}
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}

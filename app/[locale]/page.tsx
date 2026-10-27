@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { ArrowRight, PawPrint, Dog, Cat, Rabbit, Bird, FileWarning } from "lucide-react";
+import { ArrowRight, PawPrint, Dog, Cat, Rabbit, Bird, FileWarning, Building2, MapPin } from "lucide-react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -13,6 +13,7 @@ import { getTranslations } from "next-intl/server";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-metadata";
+import { paymentsEnabled } from "@/lib/payments-enabled";
 import { websiteJsonLd } from "@/lib/structured-data";
 import { JsonLd } from "@/components/seo/json-ld";
 
@@ -38,7 +39,12 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   };
 }
 
-const POSTS_PER_PAGE = 10;
+/**
+ * A főoldalon legfeljebb ennyi cikk: az első kiemelt, a többi kompakt sor. A
+ * többi a cikkoldalon van. Korábban 10 nagy kártya volt egymás alatt, és a
+ * főoldal mobilon 10 képernyőnyi lett, az állatok rovására.
+ */
+const HOME_POSTS = 3;
 
 export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
@@ -46,7 +52,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const tAnimals = await getTranslations("animals");
   const session  = await getServerSession(authOptions);
 
-  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters] =
+  const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters, postTotal, speciesCounts] =
     await Promise.all([
       prisma.animal.count({ where: { status: AnimalStatus.AVAILABLE } }),
       prisma.shelter.count({ where: { isActive: true } }),
@@ -54,7 +60,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       prisma.post.findMany({
         // Csak publikált cikkek – a piszkozat nem kerülhet ki a főoldalra
         where:   publishedWhere(),
-        take: POSTS_PER_PAGE,
+        take: HOME_POSTS,
         orderBy: { publishedAt: "desc" },
         include: {
           shelter:  { select: { id: true, name: true, slug: true, logoUrl: true, city: true } },
@@ -77,7 +83,8 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         take: 8,
         select: { id: true, title: true, slug: true, startsAt: true, location: true },
       }),
-      prisma.campaign.findMany({
+      // Fizetés kikapcsolva: gyűjtést sem mutatunk, a link úgyis 404-re vinne.
+      !paymentsEnabled() ? Promise.resolve([]) : prisma.campaign.findMany({
         where: { status: "ACTIVE", isGeneral: false },
         orderBy: { createdAt: "desc" },
         take: 8,
@@ -107,9 +114,12 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         take: 5,
         select: {
           id: true, name: true, slug: true, city: true, logoUrl: true,
-          _count: { select: { animals: true } },
+          _count: { select: { animals: { where: { status: AnimalStatus.AVAILABLE } } } },
         },
       }),
+      prisma.post.count({ where: publishedWhere() }),
+      // Fajonkénti darabszám: csak azokat a fajokat ajánljuk, amelyekből van állat.
+      prisma.animal.groupBy({ by: ["type"], where: { status: AnimalStatus.AVAILABLE }, _count: { _all: true } }),
     ]);
 
   // Kedvelt poszt-id-k a bejelentkezett felhasználóhoz.
@@ -145,7 +155,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
   const feedCampaigns = railCampaigns.map((c) => ({ id: c.id, title: c.title, slug: c.slug, targetAmount: c.targetAmount, raisedAmount: c.raisedAmount, imageUrl: c.imageUrl ?? null, shelter: c.shelter ? { name: c.shelter.name, slug: c.shelter.slug, logoUrl: c.shelter.logoUrl ?? null } : null, user: c.user ? { name: c.user.name ?? null, image: c.user.image ?? null } : null }));
   const feedReports   = railReports;
 
-  const nextCursor = posts.length === POSTS_PER_PAGE ? posts[posts.length - 1].id : null;
   const heroSlides = heroAnimals
     .map((a) => ({ url: a.images[0]?.url ?? "", name: a.name, slug: a.slug, shelterName: a.shelter.name }))
     .filter((s) => s.url);
@@ -198,23 +207,49 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                 </p>
               )}
 
-              {/* Quick-nav: type links + report */}
+              {/* Fajok szerinti gyorslinkek, darabszámmal. Csak az a faj
+                  jelenik meg, amelyikből van állat, így a gomb sosem visz üres
+                  listára; ahogy nő a kínálat, úgy jelennek meg az újabb fajok.
+                  Állat nélkül a „hamarosan” blokk áll a helyükön. */}
+              {availableCount === 0 ? (
+                <div className="mt-5 rounded-xl border border-brand-100 bg-brand-50/60 p-4">
+                  <p className="font-semibold text-gray-900">{t("soonTitle")}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-600">{t("soonDesc")}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link href="/reports/new"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800">
+                      <FileWarning className="h-3.5 w-3.5" /> {t("submitReport")}
+                    </Link>
+                    <Link href="/map"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:border-brand-300 hover:text-brand-700">
+                      <MapPin className="h-3.5 w-3.5" /> {t("soonMap")}
+                    </Link>
+                    <Link href="/auth/register/shelter"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:border-brand-300 hover:text-brand-700">
+                      <Building2 className="h-3.5 w-3.5" /> {t("soonShelter")}
+                    </Link>
+                  </div>
+                </div>
+              ) : (
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link href="/animals"
                   className="flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800">
                   <PawPrint className="h-3.5 w-3.5" /> {t("allAnimals")}
                 </Link>
                 {[
-                  { href: "/animals?type=DOG",    Icon: Dog,      label: tAnimals("dog")    },
-                  { href: "/animals?type=CAT",    Icon: Cat,      label: tAnimals("cat")    },
-                  { href: "/animals?type=RABBIT", Icon: Rabbit,   label: tAnimals("rabbit") },
-                  { href: "/animals?type=BIRD",   Icon: Bird,     label: tAnimals("bird")   },
-                  { href: "/animals?type=OTHER",  Icon: PawPrint, label: tAnimals("other")  },
-                ].map(({ href, Icon, label }) => (
-                  <Link key={href} href={href}
+                  { type: "DOG",    Icon: Dog,      label: tAnimals("dog")    },
+                  { type: "CAT",    Icon: Cat,      label: tAnimals("cat")    },
+                  { type: "RABBIT", Icon: Rabbit,   label: tAnimals("rabbit") },
+                  { type: "BIRD",   Icon: Bird,     label: tAnimals("bird")   },
+                  { type: "OTHER",  Icon: PawPrint, label: tAnimals("other")  },
+                ]
+                  .map((s) => ({ ...s, count: speciesCounts.find((c) => c.type === s.type)?._count._all ?? 0 }))
+                  .filter((s) => s.count > 0)
+                  .map(({ type, Icon, label, count }) => (
+                  <Link key={type} href={`/animals?type=${type}`}
                     className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-brand-300 hover:bg-white hover:text-brand-600">
                     <Icon className="h-3.5 w-3.5 shrink-0" />
-                    {label}
+                    {t("speciesCount", { label, count })}
                   </Link>
                 ))}
                 <span className="mx-1 h-4 w-px bg-gray-300" />
@@ -224,6 +259,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                   {t("submitReport")}
                 </Link>
               </div>
+              )}
             </div>
 
             {/* Hero diavetítés – az utolsó 5 feltöltött állat fotója */}
@@ -255,7 +291,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
                   events={[]}
                   reports={feedReports}
                   initialPosts={feedPosts}
-                  initialCursor={nextCursor}
+                  initialCursor={null}
+                  compactAfter={1}
+                  moreArticles={postTotal > feedPosts.length ? { href: "/articles", label: t("allArticles", { count: postTotal }) } : undefined}
                 />
               ) : (
                 <div className="rounded-xl border border-dashed border-gray-200 bg-white p-10 text-center">

@@ -6,9 +6,9 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
   PawPrint, Calendar, HandHeart, MapPin, Loader2,
-  AlertTriangle, Newspaper,
+  AlertTriangle, Newspaper, ArrowRight,
 } from "lucide-react";
-import { PostCard, type FeedPost } from "@/components/feed/post-card";
+import { PostCard, PostRow, type FeedPost } from "@/components/feed/post-card";
 import { ShareButton } from "@/components/ui/share-button";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +39,10 @@ export interface FeedClientProps {
   reports:       ReportRailItem[];
   initialPosts:  FeedPost[];
   initialCursor: string | null;
+  /** Ennyi cikk után kompakt sor jön a nagy kártya helyett (főoldal). */
+  compactAfter?: number;
+  /** „Összes cikk” hivatkozás a „Több betöltése” helyett (főoldal). */
+  moreArticles?: { href: string; label: string };
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -227,7 +231,7 @@ function SectionDivider({ label }: { label: string }) {
 
 export function FeedClient({
   animals, campaigns, events, reports,
-  initialPosts, initialCursor,
+  initialPosts, initialCursor, compactAfter, moreArticles,
 }: FeedClientProps) {
   const t        = useTranslations("home");
   const tCommon  = useTranslations("common");
@@ -296,8 +300,19 @@ export function FeedClient({
         <>
           <SectionDivider label={tArt("title")} />
           <div className="space-y-4">
-            {posts.map((post) => <PostCard key={post.id} post={post} />)}
+            {posts.map((post, i) =>
+              compactAfter !== undefined && i >= compactAfter
+                ? <PostRow key={post.id} post={post} />
+                : <PostCard key={post.id} post={post} />)}
           </div>
+          {moreArticles && (
+            <div className="flex justify-center pt-1">
+              <Link href={moreArticles.href}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gray-50">
+                {moreArticles.label} <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </>
       )}
 

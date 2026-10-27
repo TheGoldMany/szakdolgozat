@@ -44,8 +44,10 @@ export function CookieBanner() {
       aria-label={t("title")}
       className="animate-sheet-up fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-50 border-t border-gray-200 bg-white shadow-lg sm:left-4 sm:right-auto sm:max-w-sm sm:rounded-xl sm:border md:bottom-4"
     >
-      <div className="p-4 sm:p-5">
-        <div className="mb-3 flex items-center gap-2">
+      {/* Mobilon tömör: cím nélkül, a két gomb egymás mellett, így a képernyőnek
+          nagyjából a tizedét foglalja, nem a negyedét. */}
+      <div className="p-3 sm:p-5">
+        <div className="mb-3 hidden items-center gap-2 sm:flex">
           <Cookie className="h-5 w-5 shrink-0 text-brand-500" />
           <p className="text-sm font-semibold text-gray-900">{t("title")}</p>
         </div>
@@ -54,7 +56,7 @@ export function CookieBanner() {
             {t("learnMore")}
           </Link>
         </p>
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <div className="mt-2.5 flex gap-2 sm:mt-4">
           <button
             type="button"
             onClick={() => accept("all")}

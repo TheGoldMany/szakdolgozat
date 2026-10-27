@@ -223,8 +223,10 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
     );
   };
 
+  const adoptable = animal.status === AnimalStatus.AVAILABLE;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={cn("min-h-screen bg-gray-50", adoptable && "pb-20 md:pb-0")}>
       {/* A látható morzsasor mellé a gépi változat: ettől a keresőtalálatban
           a puszta URL helyett olvasható útvonal jelenik meg. */}
       <JsonLd
@@ -435,7 +437,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
 
         {(animal.shelter.adoptionRequirements || animal.shelter.documents.length > 0) ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
-            <div className="lg:col-span-3 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
+            <div id="adopt" className="scroll-mt-20 lg:col-span-3 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
               <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
               <AdoptionBlock />
             </div>
@@ -470,7 +472,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
             </div>
           </div>
         ) : (
-          <div className="mt-8 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
+          <div id="adopt" className="scroll-mt-20 mt-8 rounded-xl border border-gray-200 bg-white p-6" data-tour="adopt">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("adoptionSection")}</h2>
             <AdoptionBlock />
           </div>
@@ -481,6 +483,26 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
         </div>
 
       </div>
+
+      {/* Mobilon a fő teendő (érdeklődés, örökbefogadás) a hosszú adatlap
+          alján van: ez a sáv mindig kéznél tartja, az alsó menü fölött. */}
+      {adoptable && (
+        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 border-t border-gray-200 bg-white/95 px-4 py-2.5 backdrop-blur md:hidden">
+          <div className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-gray-900">{animal.name}</p>
+              <p className="truncate text-xs text-gray-500">{animal.shelter.name}</p>
+            </div>
+            <span className="relative h-9 w-9 shrink-0 [&>button]:right-0 [&>button]:top-0 [&>button]:border [&>button]:border-gray-200 [&>button]:shadow-none">
+              <FavoriteButton animalId={animal.id} initialFavorited={isFavorited} />
+            </span>
+            <a href="#adopt"
+              className="shrink-0 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-800">
+              {t("stickyCta")}
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

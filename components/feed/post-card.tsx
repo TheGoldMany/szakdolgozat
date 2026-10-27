@@ -173,3 +173,33 @@ export function PostCard({ post }: { post: FeedPost }) {
     </article>
   );
 }
+
+/**
+ * Kompakt cikk-sor: kis kép balra, cím és időpont jobbra. A főoldalon a
+ * kiemelt cikk utáni cikkek ilyenek, hogy a cikkek ne szorítsák ki az
+ * állatokat.
+ */
+export function PostRow({ post }: { post: FeedPost }) {
+  const t = useTranslations("articles");
+  const href = post.slug ? `/articles/${post.slug}` : "/articles";
+  return (
+    <Link href={href}
+      className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 transition-colors hover:bg-gray-50">
+      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-brand-50">
+        {post.imageUrl
+          ? <Image src={post.imageUrl} alt="" fill className="object-cover" sizes="80px" />
+          : <span className="flex h-full w-full items-center justify-center text-brand-300"><PawPrint className="h-6 w-6" /></span>}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">{post.title}</p>
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+          {timeAgo(post.createdAt)}
+          <span className="text-gray-300">·</span>
+          <Clock className="h-3 w-3 shrink-0" />
+          {t("minutes", { count: post.readingMinutes })}
+        </p>
+      </div>
+      <ArrowRight className="h-4 w-4 shrink-0 text-gray-300" />
+    </Link>
+  );
+}
