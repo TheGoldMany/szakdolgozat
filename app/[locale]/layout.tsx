@@ -15,6 +15,7 @@ import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import "../globals.css";
 import { siteUrl } from "@/lib/site-url";
+import { Analytics } from "@vercel/analytics/next";
 
 
 export const viewport: Viewport = {
@@ -92,6 +93,7 @@ export default async function LocaleLayout(
             <Suspense><PageTour /></Suspense>
           </Providers>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );
