@@ -207,7 +207,8 @@ export default function MapView() {
       </div>
 
       {/* Legend – bottom right */}
-      <div className="absolute bottom-8 right-3 z-[1000] rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
+      {/* Mobilon az „Új bejelentés” gomb fölé kerül, különben egymásra lógnak. */}
+      <div className="absolute bottom-20 right-3 z-[1000] md:bottom-8 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
         <button type="button" onClick={() => setLegendOpen((o) => !o)} aria-expanded={legendOpen}
           className="flex w-full items-center justify-between gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
           {t("legend")}

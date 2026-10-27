@@ -17,7 +17,9 @@
 
   body {
     @apply bg-white text-gray-900 antialiased;
-    overflow-x: hidden;
+    /* clip, nem hidden: a hidden görgetési konténerré tenné a body-t, és
+       akkor egyetlen `sticky` elem sem tapadna (pl. az űrlap folyamatjelzője). */
+    overflow-x: clip;
   }
 
   /* Címsorok a karakteres betűtípussal. Globálisan, mert több száz címsor
