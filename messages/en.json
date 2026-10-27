@@ -227,7 +227,10 @@
       "experienceOptional": "(optional)",
       "experiencePlaceholder": "Have you had a pet before? What experience do you have?",
       "submitting": "Submitting...",
-      "submitButton": "Submit application"
+      "submitButton": "Submit application",
+      "adultConfirmLabel": "I am over 18.",
+      "adultConfirmHint": "Only adults can sign an adoption contract. We don't ask for your date of birth, this statement is enough.",
+      "adultConfirmRequired": "Please confirm that you are over 18 to apply."
     },
     "showResults": "Show results",
     "alreadyApplied": "You have already applied for this animal.",
@@ -381,7 +384,7 @@
     "createAccountDesc": "Sign up for free and start browsing!",
     "fullName": "Full name",
     "emailLabel": "Email address",
-    "birthDate": "Date of birth (18+ required)",
+    "acceptTerms": "I am over 18 and I accept the <terms>Terms of Service</terms>. I have read the <privacy>Privacy Policy</privacy>.",
     "passwordMinHint": "Min. 8 characters, uppercase and number",
     "registering": "Registering…",
     "createAccountButton": "Create account",

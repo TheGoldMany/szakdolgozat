@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: huOnlyAlternates("/adatvedelem"),
 };
 
-const EFFECTIVE_DATE = "2024. január 1.";
+const EFFECTIVE_DATE = "2026. október 27.";
 const CONTROLLER_NAME = "ÁllatiMenhelyek.hu";
 const CONTROLLER_EMAIL = "info@allatimenhelyek.hu";
 const NAIH_URL = "https://www.naih.hu";
@@ -89,7 +89,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
       "This is a translated summary of the most important points. The full, legally binding Privacy Policy is written in Hungarian.",
     noticeLine2: "View the full Hungarian version",
     noticeLink: "/hu/adatvedelem",
-    lastUpdated: "Last updated: 1 January 2024",
+    lastUpdated: "Last updated: 27 October 2026",
     footerTos: "Terms of Service",
     footerContact: "Contact",
     sections: [
@@ -106,7 +106,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "2",
         heading: "Data we collect",
         items: [
-          "Account data: email address, display name, profile picture (optional), account creation date.",
+          "Account data: email address, display name, profile picture (optional), account creation date, and the time you confirmed being over 18 and accepted the Terms. We do not ask for your date of birth.",
           "Google OAuth tokens if you sign in with Google (no password stored in that case).",
           "Adoption application answers: collected on behalf of the shelter, which acts as data controller for this data.",
           "Payment transaction IDs, amounts, and statuses; we never store card details (Stripe handles that).",
@@ -175,7 +175,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
       "Dies ist eine übersetzte Zusammenfassung der wichtigsten Punkte. Die vollständige, rechtlich bindende Datenschutzerklärung ist auf Ungarisch verfasst.",
     noticeLine2: "Vollständige ungarische Version anzeigen",
     noticeLink: "/hu/adatvedelem",
-    lastUpdated: "Zuletzt aktualisiert: 1. Januar 2024",
+    lastUpdated: "Zuletzt aktualisiert: 27. Oktober 2026",
     footerTos: "AGB",
     footerContact: "Kontakt",
     sections: [
@@ -192,7 +192,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "2",
         heading: "Erhobene Daten",
         items: [
-          "Kontodaten: E-Mail-Adresse, Anzeigename, Profilbild (optional), Erstellungsdatum des Kontos.",
+          "Kontodaten: E-Mail-Adresse, Anzeigename, Profilbild (optional), Erstellungsdatum des Kontos sowie der Zeitpunkt Ihrer Erklärung, über 18 Jahre alt zu sein, und der Annahme der AGB. Ihr Geburtsdatum erfragen wir nicht.",
           "Google-OAuth-Token bei Anmeldung mit Google (kein Passwort wird in diesem Fall gespeichert).",
           "Antworten auf Adoptionsanträge: im Auftrag des Tierheims erhoben, das als Verantwortlicher für diese Daten gilt.",
           "Zahlungstransaktions-IDs, Beträge und Status; wir speichern niemals Kartendaten (das übernimmt Stripe).",
@@ -261,7 +261,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
       "To jest przetłumaczone podsumowanie najważniejszych punktów. Pełna, prawnie wiążąca Polityka prywatności sporządzona jest w języku węgierskim.",
     noticeLine2: "Zobacz pełną wersję węgierską",
     noticeLink: "/hu/adatvedelem",
-    lastUpdated: "Ostatnia aktualizacja: 1 stycznia 2024",
+    lastUpdated: "Ostatnia aktualizacja: 27 października 2026",
     footerTos: "Regulamin",
     footerContact: "Kontakt",
     sections: [
@@ -278,7 +278,7 @@ const SUMMARIES: Record<string, PrivacySummaryContent> = {
         number: "2",
         heading: "Zbierane dane",
         items: [
-          "Dane konta: adres e-mail, nazwa wyświetlana, zdjęcie profilowe (opcjonalne), data utworzenia konta.",
+          "Dane konta: adres e-mail, nazwa wyświetlana, zdjęcie profilowe (opcjonalne), data utworzenia konta oraz moment oświadczenia o ukończeniu 18 lat i akceptacji Regulaminu. Nie pytamy o datę urodzenia.",
           "Tokeny Google OAuth przy logowaniu przez Google (w tym przypadku hasło nie jest przechowywane).",
           "Odpowiedzi we wnioskach adopcyjnych: zbierane w imieniu schroniska, które jest administratorem tych danych.",
           "Identyfikatory transakcji płatniczych, kwoty i statusy; nigdy nie przechowujemy danych karty (zajmuje się tym Stripe).",
@@ -494,6 +494,7 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
             "Profilkép URL (opcionális, OAuth esetén automatikusan)",
             "Szerepkör (USER / SHELTER_ADMIN / SUPER_ADMIN)",
             "E-mail-megerősítés dátuma, fiók létrehozásának és módosításának ideje",
+            "A nyilatkozat időpontja arról, hogy betöltötte a 18. életévét, és az ÁSZF elfogadásának időpontja. Születési dátumot nem kérünk: a korhatárhoz elég a nyilatkozat.",
           ]} />
 
           <SubHeading title="2.2 Közösségi bejelentkezési adatok (OAuth)" />
@@ -560,7 +561,7 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {[
-                  ["Fiókregisztráció és hitelesítés", "E-mail, jelszó, név", "(b) szerződés teljesítése"],
+                  ["Fiókregisztráció és hitelesítés", "E-mail, jelszó, név, a nagykorúsági nyilatkozat és az ÁSZF elfogadásának időpontja", "(b) szerződés teljesítése"],
                   ["Örökbefogadási kérelem lebonyolítása", "Kérdőív válaszok", "(b) szerződés teljesítése"],
                   ["Fizetés feldolgozása", "Tranzakció-azonosítók", "(b) szerződés teljesítése"],
                   ["Üzenetváltás menhelyekkel", "Üzenetek tartalma", "(b) szerződés teljesítése"],

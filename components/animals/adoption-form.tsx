@@ -16,6 +16,7 @@ type FormData = {
   hasChildren: boolean;
   hasPets:     boolean;
   experience?: string;
+  adultConfirmed?: boolean;
 };
 
 interface AdoptionFormProps {
@@ -33,9 +34,15 @@ interface AdoptionFormProps {
     hasPets:            boolean | null;
     adoptionExperience: string | null;
   } | null;
+  /**
+   * Kell-e még nyilatkoznia a nagykorúságáról. Jelszavas regisztrációnál ezt
+   * már megtette; Google/Facebook belépésnél viszont nem volt hol, ezért az
+   * első kérelemnél kérjük, mert szerződést csak nagykorú köthet.
+   */
+  needsAdultConfirm?: boolean;
 }
 
-export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProps) {
+export function AdoptionForm({ animalId, animalName, profile, needsAdultConfirm = false }: AdoptionFormProps) {
   const t = useTranslations("animals.adoptionForm");
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
@@ -48,6 +55,9 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
     hasChildren: z.boolean(),
     hasPets:     z.boolean(),
     experience:  z.string().optional(),
+    adultConfirmed: needsAdultConfirm
+      ? z.literal(true, { errorMap: () => ({ message: t("adultConfirmRequired") }) })
+      : z.boolean().optional(),
   });
 
   const {
@@ -169,6 +179,25 @@ export function AdoptionForm({ animalId, animalName, profile }: AdoptionFormProp
           className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 resize-none"
         />
       </div>
+
+      {needsAdultConfirm && (
+        <div>
+          <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-gray-200 px-3 py-2.5 hover:bg-gray-50">
+            <input
+              type="checkbox"
+              {...register("adultConfirmed")}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-500 focus:ring-brand-200"
+            />
+            <span className="text-sm text-gray-700">
+              {t("adultConfirmLabel")} <span className="text-red-500">*</span>
+              <span className="mt-0.5 block text-xs text-gray-500">{t("adultConfirmHint")}</span>
+            </span>
+          </label>
+          {errors.adultConfirmed && (
+            <p className="mt-1 text-xs text-red-500">{errors.adultConfirmed.message}</p>
+          )}
+        </div>
+      )}
 
       <button
         type="submit"

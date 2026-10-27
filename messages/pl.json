@@ -227,7 +227,10 @@
       "experienceOptional": "(opcjonalnie)",
       "experiencePlaceholder": "Czy miałeś już wcześniej zwierzę? Jakie masz doświadczenia?",
       "submitting": "Wysyłanie...",
-      "submitButton": "Złóż wniosek"
+      "submitButton": "Złóż wniosek",
+      "adultConfirmLabel": "Mam ukończone 18 lat.",
+      "adultConfirmHint": "Umowę adopcyjną może zawrzeć tylko osoba pełnoletnia. Nie pytamy o datę urodzenia, wystarczy to oświadczenie.",
+      "adultConfirmRequired": "Aby złożyć wniosek, potwierdź, że masz ukończone 18 lat."
     },
     "showResults": "Pokaż wyniki",
     "alreadyApplied": "Złożyłeś już wniosek na to zwierzę.",
@@ -381,7 +384,7 @@
     "createAccountDesc": "Zarejestruj się za darmo i zacznij przeglądać!",
     "fullName": "Imię i nazwisko",
     "emailLabel": "Adres e-mail",
-    "birthDate": "Data urodzenia (wymagane 18+)",
+    "acceptTerms": "Mam ukończone 18 lat i akceptuję <terms>Regulamin</terms>. Zapoznałem(-am) się z <privacy>Polityką prywatności</privacy>.",
     "passwordMinHint": "Min. 8 znaków, wielka litera i cyfra",
     "registering": "Rejestracja…",
     "createAccountButton": "Utwórz konto",

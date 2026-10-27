@@ -124,6 +124,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
     homeType: string | null; hasGarden: boolean | null; hasChildren: boolean | null;
     hasPets: boolean | null; adoptionExperience: string | null;
   } | null = null;
+  let needsAdultConfirm = false;
 
   if (session?.user?.id) {
     const [conv, application, profile] = await Promise.all([
@@ -139,13 +140,14 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
         where:  { id: session.user.id },
         select: {
           homeType: true, hasGarden: true, hasChildren: true,
-          hasPets: true, adoptionExperience: true,
+          hasPets: true, adoptionExperience: true, adultConfirmedAt: true,
         },
       }),
     ]);
     existingConvId      = conv?.id ?? null;
     existingApplication = application;
     adopterProfile      = profile;
+    needsAdultConfirm   = !!profile && !profile.adultConfirmedAt;
   }
 
   // Virtuális gazdik (szponzorok)
@@ -200,6 +202,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
           animalId={animal.id}
           animalName={animal.name}
           profile={adopterProfile}
+          needsAdultConfirm={needsAdultConfirm}
         />
 
         <div className="border-t border-gray-200 pt-5">

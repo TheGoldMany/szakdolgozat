@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: huOnlyAlternates("/aszf"),
 };
 
-const EFFECTIVE_DATE = "2026. június 21.";
+const EFFECTIVE_DATE = "2026. október 27.";
 const PLATFORM_NAME = "ÁllatiMenhelyek.hu";
 const CONTACT_EMAIL = "info@allatimenhelyek.hu";
 
@@ -95,7 +95,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
       "This is a translated summary of the most important points. The full, legally binding Terms of Service is written in Hungarian.",
     noticeLine2: "View the full Hungarian version",
     noticeLink: "/hu/aszf",
-    lastUpdated: "Last updated: 21 June 2026",
+    lastUpdated: "Last updated: 27 October 2026",
     footerPrivacy: "Privacy Policy",
     footerContact: "Contact",
     sections: [
@@ -111,7 +111,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
         number: "2",
         heading: "Who can use the platform?",
         items: [
-          "You must be at least 18 years old (or have the consent of your legal guardian).",
+          "To register or apply for adoption you must be at least 18 years old (only adults can sign an adoption contract). Under 18 you may browse without an account.",
           "You confirm that the information you provide is accurate and up to date.",
         ],
       },
@@ -165,7 +165,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
       "Dies ist eine übersetzte Zusammenfassung der wichtigsten Punkte. Die vollständigen, rechtlich bindenden AGB sind auf Ungarisch verfasst.",
     noticeLine2: "Vollständige ungarische Version anzeigen",
     noticeLink: "/hu/aszf",
-    lastUpdated: "Zuletzt aktualisiert: 21. Juni 2026",
+    lastUpdated: "Zuletzt aktualisiert: 27. Oktober 2026",
     footerPrivacy: "Datenschutzerklärung",
     footerContact: "Kontakt",
     sections: [
@@ -181,7 +181,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
         number: "2",
         heading: "Wer darf die Plattform nutzen?",
         items: [
-          "Sie müssen mindestens 18 Jahre alt sein (oder die Einwilligung Ihres gesetzlichen Vertreters haben).",
+          "Für die Registrierung und einen Adoptionsantrag müssen Sie mindestens 18 Jahre alt sein (einen Adoptionsvertrag können nur Volljährige abschließen). Unter 18 können Sie die Plattform ohne Konto durchsuchen.",
           "Sie bestätigen, dass die von Ihnen angegebenen Daten korrekt und aktuell sind.",
         ],
       },
@@ -235,7 +235,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
       "To jest przetłumaczone podsumowanie najważniejszych punktów. Pełny, prawnie wiążący Regulamin sporządzony jest w języku węgierskim.",
     noticeLine2: "Zobacz pełną wersję węgierską",
     noticeLink: "/hu/aszf",
-    lastUpdated: "Ostatnia aktualizacja: 21 czerwca 2026",
+    lastUpdated: "Ostatnia aktualizacja: 27 października 2026",
     footerPrivacy: "Polityka prywatności",
     footerContact: "Kontakt",
     sections: [
@@ -251,7 +251,7 @@ const SUMMARIES: Record<string, SummaryContent> = {
         number: "2",
         heading: "Kto może korzystać z platformy?",
         items: [
-          "Musisz mieć co najmniej 18 lat (lub posiadać zgodę swojego opiekuna prawnego).",
+          "Aby się zarejestrować lub złożyć wniosek adopcyjny, musisz mieć ukończone 18 lat (umowę adopcyjną może zawrzeć tylko osoba pełnoletnia). Poniżej 18 lat możesz przeglądać serwis bez konta.",
           "Potwierdzasz, że podane przez Ciebie informacje są dokładne i aktualne.",
         ],
       },
@@ -446,7 +446,7 @@ export default async function ASZFPage(props: { params: Promise<{ locale: string
             böngészéssel történő igénybevételével Ön megerősíti, hogy:
           </P>
           <UL items={[
-            "legalább 18 éves, vagy törvényes képviselőjének beleegyezésével jár el;",
+            "regisztráció és örökbefogadási kérelem esetén betöltötte a 18. életévét (örökbefogadási szerződést csak nagykorú köthet); 18 év alatt a platformot bejelentkezés nélkül, böngészésre használhatja;",
             "elolvasta és elfogadja jelen ÁSZF-et és az Adatvédelmi tájékoztatót;",
             "az általa megadott adatok valósak és naprakészek.",
           ]} />

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, password, birthDate } = parsed.data;
+    const { name, email, password } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
 
     const hashed = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, birthDate: new Date(birthDate) },
+      // A két időpont a nyilatkozat bizonyítéka (GDPR 5. cikk (2), elszámoltathatóság).
+      data: { name, email, password: hashed, adultConfirmedAt: new Date(), termsAcceptedAt: new Date() },
       select: { id: true, name: true, email: true, role: true },
     });
 

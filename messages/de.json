@@ -227,7 +227,10 @@
       "experienceOptional": "(optional)",
       "experiencePlaceholder": "Hatten Sie schon einmal ein Haustier? Welche Erfahrungen haben Sie?",
       "submitting": "Wird gesendet...",
-      "submitButton": "Antrag einreichen"
+      "submitButton": "Antrag einreichen",
+      "adultConfirmLabel": "Ich bin über 18 Jahre alt.",
+      "adultConfirmHint": "Einen Adoptionsvertrag können nur Volljährige abschließen. Wir fragen nicht nach Ihrem Geburtsdatum, diese Erklärung genügt.",
+      "adultConfirmRequired": "Bitte bestätigen Sie, dass Sie über 18 Jahre alt sind."
     },
     "showResults": "Ergebnisse anzeigen",
     "alreadyApplied": "Du hast für dieses Tier bereits einen Antrag gestellt.",
@@ -381,7 +384,7 @@
     "createAccountDesc": "Registriere dich kostenlos und fange an zu stöbern!",
     "fullName": "Vollständiger Name",
     "emailLabel": "E-Mail-Adresse",
-    "birthDate": "Geburtsdatum (18+ erforderlich)",
+    "acceptTerms": "Ich bin über 18 Jahre alt und akzeptiere die <terms>AGB</terms>. Die <privacy>Datenschutzerklärung</privacy> habe ich gelesen.",
     "passwordMinHint": "Mind. 8 Zeichen, Großbuchstabe und Zahl",
     "registering": "Registrierung…",
     "createAccountButton": "Konto erstellen",

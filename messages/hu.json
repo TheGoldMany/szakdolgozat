@@ -227,7 +227,10 @@
       "experienceOptional": "(opcionális)",
       "experiencePlaceholder": "Volt-e már háziállatod? Milyen tapasztalataid vannak?",
       "submitting": "Küldés...",
-      "submitButton": "Kérelem beküldése"
+      "submitButton": "Kérelem beküldése",
+      "adultConfirmLabel": "Elmúltam 18 éves.",
+      "adultConfirmHint": "Örökbefogadási szerződést csak nagykorú köthet. A születési dátumodat nem kérjük, elég a nyilatkozat.",
+      "adultConfirmRequired": "A kérelemhez nyilatkoznod kell, hogy elmúltál 18 éves."
     },
     "showResults": "Mutasd az eredményeket",
     "alreadyApplied": "Már beadtál kérelmet erre az állatra.",
@@ -381,7 +384,7 @@
     "createAccountDesc": "Regisztrálj ingyenesen és kezdj böngészni!",
     "fullName": "Teljes név",
     "emailLabel": "Email cím",
-    "birthDate": "Születési dátum (18+ év szükséges)",
+    "acceptTerms": "Elmúltam 18 éves, és elfogadom az <terms>ÁSZF</terms>-et. Az <privacy>Adatvédelmi tájékoztatót</privacy> elolvastam.",
     "passwordMinHint": "Min. 8 karakter, nagybetű és szám",
     "registering": "Regisztráció…",
     "createAccountButton": "Fiók létrehozása",

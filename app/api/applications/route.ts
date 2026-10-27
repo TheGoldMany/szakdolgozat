@@ -14,6 +14,7 @@ const applicationSchema = z.object({
   hasChildren: z.boolean().optional(),
   hasPets:     z.boolean().optional(),
   experience:  z.string().optional(),
+  adultConfirmed: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Érvénytelen adatok" }, { status: 400 });
   }
 
-  const { animalId, ...rest } = parsed.data;
+  const { animalId, adultConfirmed, ...rest } = parsed.data;
 
   // Check animal exists and is available
   const animal = await prisma.animal.findUnique({
@@ -49,8 +50,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ez az állat jelenleg nem fogadható örökbe" }, { status: 409 });
   }
 
-  const applicant     = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+  const applicant     = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, adultConfirmedAt: true } });
   const applicantName = applicant?.name ?? "Ismeretlen";
+
+  // Szerződést csak nagykorú köthet. Jelszavas regisztrációnál erről már
+  // nyilatkozott; közösségi belépésnél az első kérelemkor teszi meg.
+  if (!applicant?.adultConfirmedAt) {
+    if (adultConfirmed !== true) {
+      return NextResponse.json({ error: "A kérelemhez nyilatkoznod kell, hogy elmúltál 18 éves." }, { status: 400 });
+    }
+    await prisma.user.update({ where: { id: userId }, data: { adultConfirmedAt: new Date() } });
+  }
 
   try {
     const application = await prisma.adoptionApplication.create({
