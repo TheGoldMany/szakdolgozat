@@ -17,7 +17,9 @@
 
   body {
     @apply bg-white text-gray-900 antialiased;
-    overflow-x: hidden;
+    /* clip, nem hidden: a hidden görgetési konténerré tenné a body-t, és
+       akkor egyetlen `sticky` elem sem tapadna (pl. az űrlap folyamatjelzője). */
+    overflow-x: clip;
   }
 
   /* Címsorok a karakteres betűtípussal. Globálisan, mert több száz címsor
@@ -198,6 +200,12 @@ input[type="radio"]:checked {
    nincs ütközés, ezért ott végig látszik. */
 @media (max-width: 639px) {
   body[data-cookie-banner] .daily-fab { display: none; }
+}
+
+/* Az állat adatlapján mobilon tapadó örökbefogadási sáv van az alsó menü
+   fölött: a gomb a sáv fölé lép, különben az „Érdeklődöm” gombot takarná. */
+@media (max-width: 767px) {
+  body:has(.adopt-sticky-bar) .daily-fab { bottom: calc(8.5rem + env(safe-area-inset-bottom)); }
 }
 
 /* ─── Modális ablakok ──────────────────────────────────────

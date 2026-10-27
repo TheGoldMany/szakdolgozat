@@ -188,21 +188,6 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  {t("birthDate")}
-                </label>
-                <input
-                  type="date"
-                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().slice(0, 10)}
-                  className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
-                  {...register("birthDate")}
-                />
-                {errors.birthDate && (
-                  <p className="mt-1 text-xs text-red-500">{errors.birthDate.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   {t("password")}
                 </label>
                 <input
@@ -230,6 +215,25 @@ export default function RegisterPage() {
                 />
                 {errors.confirmPassword && (
                   <p className="mt-1 text-xs text-red-500">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-relaxed text-gray-600">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-brand-500 focus:ring-brand-200"
+                    {...register("acceptTerms")}
+                  />
+                  <span>
+                    {t.rich("acceptTerms", {
+                      terms:   (c) => <Link href="/aszf" target="_blank" className="font-medium text-brand-700 underline underline-offset-2">{c}</Link>,
+                      privacy: (c) => <Link href="/adatvedelem" target="_blank" className="font-medium text-brand-700 underline underline-offset-2">{c}</Link>,
+                    })}
+                  </span>
+                </label>
+                {errors.acceptTerms && (
+                  <p className="mt-1 text-xs text-red-500">{errors.acceptTerms.message}</p>
                 )}
               </div>
 

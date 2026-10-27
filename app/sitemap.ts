@@ -6,6 +6,7 @@ import { tagSlug } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 import { localeUrl } from "@/lib/page-metadata";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { listingHasContent } from "@/lib/listing-index";
 
 // Always render at request time — requires a live DB connection
 export const dynamic = "force-dynamic";
@@ -40,8 +41,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Statikus, publikus oldalak. A `/donate` csak akkor, ha a fizetés él —
   // kikapcsolva 404-et ad, és egy 404-re mutató sitemap-bejegyzés minőségi
   // hibaként jelenik meg a Search Consoleban.
+  // Az üres listák (0 állat, 0 közelgő esemény) noindex-esek, ezért itt sem
+  // szerepelnek: egy noindex oldalra mutató sitemap-bejegyzés hibaként jelenik
+  // meg a Search Console-ban.
+  const has = await listingHasContent();
   const staticPaths = [
-    "/", "/animals", "/shelters", "/events", "/reports", "/map", "/articles",
+    "/", ...(has.animals ? ["/animals"] : []), "/shelters", ...(has.events ? ["/events"] : []),
+    "/reports", "/map", "/articles",
     ...(paymentsEnabled() ? ["/donate"] : []),
   ];
   const staticRoutes: MetadataRoute.Sitemap = staticPaths.flatMap((path) =>

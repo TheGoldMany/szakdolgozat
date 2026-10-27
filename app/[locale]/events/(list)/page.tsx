@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { pageMetadata } from "@/lib/page-metadata";
+import { listingHasContent } from "@/lib/listing-index";
 
 /**
  * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
@@ -15,10 +16,12 @@ import { pageMetadata } from "@/lib/page-metadata";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const t = await getTranslations("seo");
+  const [t, has] = await Promise.all([getTranslations("seo"), listingHasContent()]);
   return pageMetadata({
     locale:      params.locale,
     path:        "/events",
+    // Üres lista: ne kerüljön indexbe „nincs találat” oldalként (lásd listing-index).
+    noIndex:     !has.events,
     title:       t("eventsTitle"),
     description: t("eventsDescription"),
   });
@@ -39,8 +42,8 @@ export default async function EventsListPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center gap-3">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center gap-3 sm:mb-12">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <CalendarHeart className="h-6 w-6 text-brand-500" />
           </div>
@@ -56,7 +59,7 @@ export default async function EventsListPage() {
             <p className="mt-3 text-sm text-gray-500">{t("empty")}</p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
             {events.map(ev => (
               <Link key={ev.id} href={`/events/${ev.slug}`}
                 className="press-card group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-md">
@@ -77,12 +80,16 @@ export default async function EventsListPage() {
                     <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" />{ev.location}</span>
                     <span className="truncate">{ev.shelter.name} · {ev.shelter.city}</span>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 border-t border-gray-50 pt-2 text-xs text-gray-400">
-                    <Users className="h-3.5 w-3.5" />
-                    {ev.capacity != null
-                      ? `${ev._count.registrations} / ${ev.capacity}`
-                      : t("registrants", { count: ev._count.registrations })}
-                  </div>
+                  {/* „0 jelentkező” rossz benyomást kelt, információt nem ad: csak
+                      akkor írjuk ki, ha van jelentkező, vagy ha van létszámkorlát. */}
+                  {(ev.capacity != null || ev._count.registrations > 0) && (
+                    <div className="mt-3 flex items-center gap-1 border-t border-gray-50 pt-2 text-xs text-gray-400">
+                      <Users className="h-3.5 w-3.5" />
+                      {ev.capacity != null
+                        ? `${ev._count.registrations} / ${ev.capacity}`
+                        : t("registrants", { count: ev._count.registrations })}
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}

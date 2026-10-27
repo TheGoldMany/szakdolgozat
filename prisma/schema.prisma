@@ -121,7 +121,15 @@ model User {
   country                  String    @default("HU")
   stripeAccountId          String?
   stripeOnboardingComplete Boolean   @default(false)
+  /// ELAVULT: a születési dátumot már nem gyűjtjük (GDPR adattakarékosság: a
+  /// 18 éves korhatárhoz elég a nyilatkozat). Sem nem írjuk, sem nem olvassuk;
+  /// a következő kiadásban az oszlop a tárolt értékekkel együtt törlődik.
   birthDate                DateTime?
+  /// Mikor nyilatkozott, hogy betöltötte a 18. életévét: regisztrációkor, vagy
+  /// közösségi belépésnél az első örökbefogadási kérelemkor.
+  adultConfirmedAt         DateTime?
+  /// Mikor fogadta el az ÁSZF-et (regisztrációkor).
+  termsAcceptedAt          DateTime?
   deletionScheduledAt      DateTime?
   suspendedAt              DateTime?
   suspendedReason          String?

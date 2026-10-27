@@ -10,6 +10,7 @@ import { PawPrint } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { pageMetadata } from "@/lib/page-metadata";
+import { listingHasContent } from "@/lib/listing-index";
 
 /**
  * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
@@ -19,10 +20,12 @@ import { pageMetadata } from "@/lib/page-metadata";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const t = await getTranslations("seo");
+  const [t, has] = await Promise.all([getTranslations("seo"), listingHasContent()]);
   return pageMetadata({
     locale:      params.locale,
     path:        "/animals",
+    // Üres lista: ne kerüljön indexbe „nincs találat” oldalként (lásd listing-index).
+    noIndex:     !has.animals,
     title:       t("animalsTitle"),
     description: t("animalsDescription"),
   });
@@ -120,13 +123,13 @@ export default async function AnimalsPage(props: PageProps) {
 
       {/* Page header */}
       <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
           <p className="mt-1 text-sm text-gray-500 sm:text-base">{t("showing", { count: total })}</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="w-full shrink-0 lg:w-64" data-tour="animal-filters">
             <Suspense>
@@ -143,7 +146,7 @@ export default async function AnimalsPage(props: PageProps) {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
                   {animals.map((animal) => (
                     <AnimalCard key={animal.id} animal={animal} isFavorited={favoriteIds.has(animal.id)} />
                   ))}

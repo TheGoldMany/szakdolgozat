@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { Calendar, HandHeart, Building2, MapPin, FileWarning, PawPrint, Star } from "lucide-react";
+import { Calendar, HandHeart, Building2, MapPin, FileWarning, PawPrint } from "lucide-react";
 
 export interface SidebarEvent {
   id: string; title: string; slug: string; startsAt: string; location: string;
@@ -55,10 +55,11 @@ export function HomeSidebar({
   const locale  = useLocale();
 
   return (
-    <aside className="space-y-4">
+    <aside className="space-y-6">
 
-      {/* Gyorslinkek */}
-      <section className="rounded-xl border border-gray-200 bg-white p-3">
+      {/* Gyorslinkek. Mobilon az alsó menü ugyanezt tudja, ott a lap aljára
+          kerülne és csak hosszabbítaná a görgetést, ezért ott nem jelenik meg. */}
+      <section className="hidden rounded-xl border border-gray-200 bg-white p-3 md:block">
         <div className="grid grid-cols-4 gap-2 lg:grid-cols-2">
           {[
             { href: "/animals",     Icon: PawPrint,    label: tNav("animals")   },
@@ -147,10 +148,14 @@ export function HomeSidebar({
                     <p className="truncate text-xs font-semibold text-gray-800">{s.name}</p>
                     <p className="truncate text-[11px] text-gray-400">{s.city}</p>
                   </div>
-                  <span className="flex shrink-0 items-center gap-1 text-[11px] font-medium text-gray-400">
-                    <Star className="h-3 w-3" />
-                    {s.animalCount}
-                  </span>
+                  {/* Örökbefogadható állatok száma. Korábban csillaggal és az
+                      összes valaha felvett állattal: értékelésnek látszott. */}
+                  {s.animalCount > 0 && (
+                    <span className="flex shrink-0 items-center gap-1 text-[11px] font-medium text-brand-700" title={t("factAnimals", { count: s.animalCount })}>
+                      <PawPrint className="h-3 w-3" />
+                      {s.animalCount}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}

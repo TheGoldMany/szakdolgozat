@@ -95,9 +95,11 @@ export function Header() {
           l.highlight
             ? cn(
                 "rounded-full px-3 py-1.5",
+                // Nem aktív állapotban körvonalas gomb: a halvány zöld
+                // kitöltés a főoldalon is „itt vagy” jelzésnek látszott.
                 isActive(l.href)
                   ? "bg-forest text-white"
-                  : "bg-mint text-forest hover:bg-mint/70",
+                  : "border border-brand-200 bg-white text-forest hover:bg-mint/40",
               )
             : cn(
                 "hover:text-brand-500",
