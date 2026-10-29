@@ -241,7 +241,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
           params.locale
         )}
       />
-      <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-16">
 
         <nav className="mb-6 text-sm text-gray-500">
           <Link href="/animals" className="hover:text-brand-500">{t("breadcrumb")}</Link>

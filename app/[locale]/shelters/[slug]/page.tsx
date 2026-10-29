@@ -139,7 +139,7 @@ export default async function ShelterDetailPage(props: { params: Promise<{ slug:
       </div>
 
       <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 2xl:px-12">
+        <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8 2xl:px-16">
           <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:gap-5">
 
             <div className="relative -mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-xl border-4 border-white bg-white shadow-md sm:-mt-14 sm:h-28 sm:w-28">
@@ -185,7 +185,7 @@ export default async function ShelterDetailPage(props: { params: Promise<{ slug:
         </div>
       </div>
 
-      <div className="mx-auto max-w-screen-2xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 pb-16 pt-8 sm:px-6 lg:px-8 2xl:px-16">
         <div className="grid gap-8 lg:grid-cols-3">
 
           {/* Animals column */}

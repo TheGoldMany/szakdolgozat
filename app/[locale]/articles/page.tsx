@@ -44,7 +44,7 @@ export default async function ArticlesListPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 sm:py-14 lg:py-16 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-14 lg:py-16 lg:px-8 2xl:px-16">
         <div className="mb-6 flex items-center gap-3 sm:mb-8">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <Newspaper className="h-6 w-6 text-brand-500" />

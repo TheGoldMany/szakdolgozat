@@ -65,7 +65,7 @@ export default async function FavoritesPage(
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-16">
         <div className="mb-6 flex items-center gap-3">
           <Heart className="h-6 w-6 fill-rose-500 text-rose-500" />
           <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>

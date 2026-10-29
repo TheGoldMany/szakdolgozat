@@ -196,7 +196,7 @@ export default async function ArticleDetailPage(props: { params: Promise<{ slug:
       {/* A cikk címe és leírása adatbázisból jön: egy `</script>` a címben a
           nyers JSON.stringify mellett kitörne a blokkból. A JsonLd ezt szökteti. */}
       <JsonLd data={jsonLd} />
-      <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 sm:py-10 lg:px-8 2xl:px-16">
         <div className="flex justify-center gap-6">
 
           {/* Olvasósáv – olvasható szélességen tartva */}

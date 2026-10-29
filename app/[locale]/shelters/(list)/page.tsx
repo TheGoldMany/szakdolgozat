@@ -58,20 +58,20 @@ export default async function SheltersPage() {
 
       {/* Page header */}
       <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-12">
+        <div className="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-16">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
           <p className="mt-1 text-sm text-gray-500 sm:text-base">{t("count", { count: shelters.length })}</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-16">
         {shelters.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
             <Building2 className="h-12 w-12 text-gray-300" />
             <p className="mt-4 text-lg font-medium text-gray-700">{t("noShelters")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[1800px]:grid-cols-6">
             {shelters.map((shelter) => (
               <ShelterCard
                 key={shelter.id}

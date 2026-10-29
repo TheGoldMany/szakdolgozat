@@ -174,7 +174,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="bg-white">
-        <div className="mx-auto max-w-screen-2xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14 lg:px-8 2xl:px-12 lg:pb-20 lg:pt-20">
+        <div className="mx-auto max-w-[1800px] px-4 pb-12 pt-10 sm:px-6 sm:pt-14 lg:px-8 2xl:px-16 lg:pb-20 lg:pt-20">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
 
             <div className="max-w-xl">
@@ -272,7 +272,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* ── "Neked" feed ─────────────────────────────────── */}
       <section className="bg-gray-50 py-12 lg:py-20">
-        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 2xl:px-12">
+        <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8 2xl:px-16">
           <div className="flex gap-8 xl:gap-12">
 
             {/* Folyam – kitölti a helyet az oldalsávig, így nem marad üres sáv */}
@@ -337,7 +337,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
           ikonos kártya a sarokban halvány óriás-sorszámmal a sablonos
           kezdőlapok legfelismerhetőbb eleme volt. */}
       <section className="border-t border-gray-200 bg-white py-16 lg:py-24">
-        <div className="mx-auto grid max-w-screen-2xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8 2xl:px-12">
+        <div className="mx-auto grid max-w-[1800px] gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8 2xl:px-16">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("howTitle")}</h2>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-600">{t("howIntro")}</p>
@@ -364,7 +364,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
 
       {/* ── Bejelentés ──────────────────────────────────── */}
       <section className="bg-brand-50">
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-5 px-4 py-14 sm:px-6 md:flex-row lg:py-20 md:items-center md:justify-between lg:px-8 2xl:px-12">
+        <div className="mx-auto flex max-w-[1800px] flex-col gap-5 px-4 py-14 sm:px-6 md:flex-row lg:py-20 md:items-center md:justify-between lg:px-8 2xl:px-16">
           <div className="max-w-xl">
             <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">{t("ctaTitle")}</h2>
             <p className="mt-2 text-sm leading-relaxed text-gray-600">{t("ctaDesc")}</p>
