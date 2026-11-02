@@ -49,10 +49,6 @@ export const metadata: Metadata = {
   description: "Találd meg új legjobb barátod! Böngéssz örökbefogadható állatok között magyarországi menhelyekről.",
 };
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
-
 export default async function LocaleLayout(
   props: {
     children: React.ReactNode;

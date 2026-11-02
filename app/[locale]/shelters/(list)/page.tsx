@@ -7,6 +7,19 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/page-metadata";
 
 /**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+
+/**
  * A listaoldal a kulcsszavas belépési pont: a cím eddig csak a menüpont
  * szövege volt (pl. „Állatok"), leírás nélkül. A keresőtalálatban a leírás
  * adja a kattintás okát, és kanonikus cím + hreflang nélkül a négy nyelvi

@@ -9,6 +9,19 @@ import { publishedWhere, readingMinutes } from "@/lib/articles";
 import { tagSlug } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+
 const SITE_URL = siteUrl();
 
 // ISR: a gyűjtőoldal 5 percenként frissül

@@ -7,6 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
 import { alternates } from "@/lib/page-metadata";
 
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("articles");
   return {

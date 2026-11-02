@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(foster, { status: 201 });
   } catch (error) {
     console.error('[api/foster POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -100,6 +100,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(records);
   } catch (error) {
     console.error('[api/foster GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

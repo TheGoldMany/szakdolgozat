@@ -90,9 +90,14 @@ export async function GET(req: NextRequest) {
       r.status === ReportStatus.ACTIVE ? r : { ...r, contactPhone: null, contactName: null }
     );
 
-    return NextResponse.json({ reports: safeReports, shelters, vets });
+    // Nyilvános, mindenkinek ugyanaz: a CDN 1 percig kiszolgálja, utána még
+    // 5 percig a régit adja, amíg a háttérben frissít. Eddig minden
+    // térképnyitás három adatbázis-lekérést jelentett (akár 500 bejelentés).
+    return NextResponse.json({ reports: safeReports, shelters, vets }, {
+      headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" },
+    });
   } catch (error) {
     console.error('[api/map GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

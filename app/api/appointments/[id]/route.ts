@@ -108,7 +108,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json({ error: "Ismeretlen művelet" }, { status: 400 });
   } catch (error) {
     console.error('[api/appointments/[id] PATCH]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -143,6 +143,6 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
     return NextResponse.json(appt);
   } catch (error) {
     console.error('[api/appointments/[id] GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

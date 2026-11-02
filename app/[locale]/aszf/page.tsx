@@ -4,6 +4,19 @@ import { Link } from "@/i18n/navigation";
 import { FileText, AlertTriangle, CreditCard, Users, ShieldCheck, Scale } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+
 export const metadata: Metadata = {
   title: "Általános Szerződési Feltételek",
   description: "Az ÁllatiMenhelyek.hu általános szerződési feltételei",

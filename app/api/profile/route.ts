@@ -102,6 +102,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ user: toPublicProfile(user) });
   } catch (error) {
     console.error('[api/profile PATCH]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

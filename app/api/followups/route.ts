@@ -45,6 +45,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(followUps);
   } catch (error) {
     console.error('[api/followups GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

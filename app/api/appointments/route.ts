@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(appointment, { status: 201 });
   } catch (error) {
     console.error('[api/appointments POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -93,6 +93,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(appointments);
   } catch (error) {
     console.error('[api/appointments GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
