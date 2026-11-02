@@ -44,7 +44,7 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json(docs);
   } catch (error) {
     console.error('[api/animals/[id]/documents GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -73,6 +73,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json(doc, { status: 201 });
   } catch (error) {
     console.error('[api/animals/[id]/documents POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

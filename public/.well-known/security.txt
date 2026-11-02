@@ -1,0 +1,8 @@
+# Biztonsági hiba bejelentése / Reporting security issues
+# Ha biztonsági hibát találtál az oldalon, kérjük, a kapcsolati oldalon
+# keresztül jelezd. Köszönjük, hogy segítesz biztonságban tartani a látogatókat.
+
+Contact: https://www.allatimenhelyek.hu/kapcsolat
+Expires: 2027-11-01T00:00:00.000Z
+Preferred-Languages: hu, en
+Canonical: https://www.allatimenhelyek.hu/.well-known/security.txt

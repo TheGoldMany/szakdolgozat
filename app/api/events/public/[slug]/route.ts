@@ -42,6 +42,6 @@ export async function GET(req: NextRequest, props: { params: Promise<{ slug: str
     return NextResponse.json({ event: { ...event, takenSpots, registration } });
   } catch (error) {
     console.error("[api/events/public/[slug] GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

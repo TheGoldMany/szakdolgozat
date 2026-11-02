@@ -102,7 +102,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json(transfer, { status: 201 });
   } catch (error) {
     console.error('[api/animals/[id]/transfer POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -139,6 +139,6 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json(transfers);
   } catch (error) {
     console.error('[api/animals/[id]/transfer GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

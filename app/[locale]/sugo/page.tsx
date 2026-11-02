@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { listedTours } from "@/lib/tours";
+import { EmailLink } from "@/components/ui/email-link";
 
 /**
  * Végigvezető bemutatók listája.
@@ -1344,7 +1345,7 @@ export default function HelpPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
 
           {/* Sticky TOC */}
-          <aside className="lg:col-span-1">
+          <div className="lg:col-span-1">
             <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Tartalom</p>
               <nav className="space-y-0.5">
@@ -1358,10 +1359,10 @@ export default function HelpPage() {
                 ))}
               </nav>
             </div>
-          </aside>
+          </div>
 
           {/* Main content */}
-          <main className="lg:col-span-3">
+          <div className="lg:col-span-3">
             {activeTab === "user"       && <UserContent />}
             {activeTab === "admin"      && <AdminContent />}
             {activeTab === "superadmin" && <SuperAdminContent />}
@@ -1373,13 +1374,9 @@ export default function HelpPage() {
             <div className="mt-10 rounded-xl bg-brand-600 p-8 text-center text-white">
               <h3 className="text-xl font-bold">Nem találtad meg a választ?</h3>
               <p className="mt-2 text-sm text-brand-100">Írj nekünk és segítünk!</p>
-              <a href="mailto:info@allatimenhelyek.hu"
-                className="mt-4 inline-block rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
-              >
-                info@allatimenhelyek.hu
-              </a>
+              <EmailLink className="mt-4 inline-block rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors" />
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>

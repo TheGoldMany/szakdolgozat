@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { CalendarCheck, X, CheckCircle, Users } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   eventId:    string;
@@ -23,6 +24,8 @@ export function EventRegisterButton({ eventId, slug, loggedIn, isFull, registere
   const [note, setNote]       = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
+  // A frissítés után (jelentkezett / lemondta) a gomb újra használható.
+  useEffect(() => { setLoading(false); }, [registered]);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -31,9 +34,10 @@ export function EventRegisterButton({ eventId, slug, loggedIn, isFull, registere
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ guests, note: note || undefined }),
     });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setError(data.error ?? t("error")); return; }
+    const data = await res.json().catch(() => ({}));
+    // Siker után a gomb a frissítésig letiltva marad, különben a régi
+    // „Jelentkezem” még egyszer megnyomható lenne.
+    if (!res.ok) { setLoading(false); setError(userMessage(data.error, t("error"))); return; }
     setOpen(false);
     router.refresh();
   }
@@ -42,8 +46,7 @@ export function EventRegisterButton({ eventId, slug, loggedIn, isFull, registere
     if (!confirm(t("cancelConfirm"))) return;
     setLoading(true); setError(null);
     const res = await fetch(`/api/events/${eventId}/register`, { method: "DELETE" });
-    setLoading(false);
-    if (!res.ok) { const d = await res.json(); setError(d.error ?? t("error")); return; }
+    if (!res.ok) { setLoading(false); const d = await res.json().catch(() => ({})); setError(userMessage(d.error, t("error"))); return; }
     router.refresh();
   }
 

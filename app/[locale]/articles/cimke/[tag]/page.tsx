@@ -3,11 +3,24 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { Newspaper, Clock, ArrowLeft, Tag } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { publishedWhere, readingMinutes } from "@/lib/articles";
 import { tagSlug } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
+
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 
 const SITE_URL = siteUrl();
 
@@ -41,8 +54,10 @@ async function findByTagSlug(slug: string) {
   return { posts: matching, label };
 }
 
-export async function generateMetadata(props: { params: Promise<{ tag: string }> }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string; tag: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t = await getTranslations("articles");
   const { label, posts } = await findByTagSlug(params.tag);
   if (!label) return { title: t("notFound") };
@@ -54,8 +69,10 @@ export async function generateMetadata(props: { params: Promise<{ tag: string }>
   };
 }
 
-export default async function ArticlesByTagPage(props: { params: Promise<{ tag: string }> }) {
+export default async function ArticlesByTagPage(props: { params: Promise<{ locale: string; tag: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

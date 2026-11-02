@@ -8,6 +8,7 @@ import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 type FormData = {
   message:     string;
@@ -84,7 +85,7 @@ export function AdoptionForm({ animalId, animalName, profile, needsAdultConfirm 
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error ?? t("unknownError"));
+      setServerError(userMessage(json.error, t("unknownError")));
       return;
     }
     toast.success(t("successTitle"));

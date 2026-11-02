@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   const secret = req.headers.get("authorization")?.replace("Bearer ", "");
   if (!secret || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

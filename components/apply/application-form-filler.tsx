@@ -6,6 +6,7 @@ import { prepareImage } from "@/lib/prepare-image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { CheckCircle } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface FormField {
   id:       string;
@@ -88,11 +89,11 @@ export function ApplicationFormFiller({ token, fields, animalSlug }: Application
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error ?? t("fillerSubmitFailed"));
+        throw new Error(userMessage(data.error, t("fillerSubmitFailed")));
       }
       setSubmitted(true);
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, t("fillerSubmitFailed")));
     } finally {
       setSubmitting(false);
     }

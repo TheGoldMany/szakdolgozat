@@ -51,6 +51,6 @@ export async function POST(_req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json(updated);
   } catch (error) {
     console.error('[api/application-forms/[id]/approve POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

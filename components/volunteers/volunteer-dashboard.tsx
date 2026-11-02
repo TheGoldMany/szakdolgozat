@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
+import { userMessage } from "@/lib/client-error";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -163,7 +164,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
                       </p>
                     </div>
                     <span className={cn(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                      "shrink-0 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold",
                       a.task.status === "COMPLETED" ? "bg-green-100 text-green-700" :
                       a.task.status === "ASSIGNED"  ? "bg-blue-100  text-blue-700"  :
                                                       "bg-gray-100  text-gray-600"
@@ -222,7 +223,7 @@ function AvailableTaskCard({ task, userId, onSignup }: {
       await onSignup(task.id);
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : tCommon("error"));
+      setError(userMessage(err, tCommon("error")));
     } finally {
       setLoading(false);
     }
@@ -277,7 +278,7 @@ export function VolunteerDashboard({ data }: Props) {
     const res = await fetch(`/api/volunteer-tasks/${taskId}/assign`, { method: "POST" });
     if (!res.ok) {
       const d = await res.json();
-      throw new Error(d.error ?? tCommon("error"));
+      throw new Error(userMessage(d.error, tCommon("error")));
     }
     setTasks((prev) =>
       prev.map((t) =>

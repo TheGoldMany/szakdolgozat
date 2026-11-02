@@ -123,7 +123,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("Stripe checkout/sponsor error:", err);
-    const msg = err instanceof Error ? err.message : "Stripe hiba";
+    // A Stripe/Prisma hibaszövege a naplóba való, nem a látogató elé.
+    console.error("[checkout]", err);
+    const msg = "A fizetés indítása nem sikerült. Kérjük, próbáld újra később.";
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 

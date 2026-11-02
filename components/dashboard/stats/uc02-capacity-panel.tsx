@@ -134,12 +134,12 @@ export function Uc02CapacityPanel({ avgStayBySpecies, stayCategories, shelterUti
                   ? <UtilGauge rate={s.utilizationRate} />
                   : (
                     <div className="flex h-[90px] w-[90px] items-center justify-center rounded-full bg-gray-50">
-                      <span className="text-[10px] text-gray-400 text-center leading-tight px-2">Nincs kapacitás</span>
+                      <span className="text-xs text-gray-400 text-center leading-tight px-2">Nincs kapacitás</span>
                     </div>
                   )
                 }
-                <p className="text-[10px] text-gray-500 text-center max-w-[80px] leading-tight">{s.name}</p>
-                <p className="text-[10px] text-gray-400">{s.occupied}{s.capacity ? `/${s.capacity}` : ""} állat</p>
+                <p className="text-xs text-gray-500 text-center max-w-[80px] leading-tight">{s.name}</p>
+                <p className="text-xs text-gray-400">{s.occupied}{s.capacity ? `/${s.capacity}` : ""} állat</p>
               </div>
             ))}
           </div>

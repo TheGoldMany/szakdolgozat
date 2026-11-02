@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CreditCard, CheckCircle, AlertTriangle, Info, ExternalLink, Loader2 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 /** A `lib/stripe.ts` `ConnectedAccountState`-jével egyező értékek. */
 type StripeState = "missing" | "inaccessible" | "incomplete" | "ready" | "unknown";
@@ -30,10 +31,10 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
         body:    JSON.stringify({ type: "user" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("stripeConnectError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("stripeConnectError")));
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("stripeUnknownError"));
+      setError(userMessage(err, t("stripeUnknownError")));
       setConnecting(false);
     }
   }
@@ -48,10 +49,10 @@ export function StripeConnectSection({ stripeAccountId, stripeOnboardingComplete
         body:    JSON.stringify({}),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("stripeOpenError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("stripeOpenError")));
       window.open(data.url, "_blank");
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("stripeUnknownError"));
+      setError(userMessage(err, t("stripeUnknownError")));
     } finally {
       setOpening(false);
     }

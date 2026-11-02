@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   subscriptionId: string;
@@ -25,7 +26,7 @@ export function SubscriptionDeleteButton({ subscriptionId }: Props) {
       const res  = await fetch(`/api/subscriptions/${subscriptionId}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(data.error ?? "A törlés nem sikerült.");
+        toast.error(userMessage(data.error, "A törlés nem sikerült."));
         return;
       }
       toast.success("Az előfizetés törölve.");

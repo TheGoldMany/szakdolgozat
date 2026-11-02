@@ -20,7 +20,7 @@ async function checkAccess(shelterId: string, userId: string, role: string) {
 export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
 
   if (!(await checkAccess(params.id, session.user.id, session.user.role ?? "")))
     return NextResponse.json({ error: "Tiltott hozzáférés" }, { status: 403 });

@@ -146,6 +146,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ post: { ...post, likedByMe: false } }, { status: 201 });
   } catch (err) {
     console.error("[api/posts POST]", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

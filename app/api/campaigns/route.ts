@@ -48,7 +48,7 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json(campaigns);
   } catch (error) {
     console.error("[api/campaigns GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 
@@ -144,6 +144,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(campaign, { status: 201 });
   } catch (error) {
     console.error("[api/campaigns POST]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

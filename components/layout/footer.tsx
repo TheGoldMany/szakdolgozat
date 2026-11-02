@@ -6,6 +6,7 @@ import { Mail, Heart, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { paymentsEnabled } from "@/lib/payments-enabled";
 import { FeedbackDialog } from "@/components/layout/feedback-dialog";
+import { EmailLink, EMAIL_AT_TEXT } from "@/components/ui/email-link";
 
 export function Footer() {
   const t    = useTranslations("footer");
@@ -50,7 +51,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-gray-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-12 sm:px-6 lg:px-8 2xl:px-16">
 
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
 
@@ -75,13 +76,7 @@ export function Footer() {
             <p className="mt-3 text-sm text-gray-500 leading-relaxed">
               {t("description")}
             </p>
-            <a
-              href="mailto:info@allatimenhelyek.hu"
-              className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-brand-600 transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              info@allatimenhelyek.hu
-            </a>
+            <EmailLink className="mt-4 flex items-center gap-2 py-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors" icon={<Mail className="h-4 w-4" />} />
           </div>
 
           {/* Navigation */}
@@ -179,7 +174,7 @@ export function Footer() {
             <span aria-hidden className="mx-1.5 text-gray-300">·</span>
             {t("madeBy")}{" "}
             <a href="https://www.lundasoftware.hu" target="_blank" rel="noopener"
-              className="font-semibold text-gray-700 underline-offset-2 hover:text-brand-700 hover:underline">
+              className="hit-area font-semibold text-gray-700 underline-offset-2 hover:text-brand-700 hover:underline">
               Lunda Software
             </a>
           </p>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { HandHeart, X, CheckCircle } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   shelterId:       string;
@@ -58,7 +59,7 @@ export function VolunteerApplyButton({ shelterId, existingStatus }: Props) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? t("error")); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, t("error"))); return; }
       setSuccess(true);
       router.refresh();
     } catch {

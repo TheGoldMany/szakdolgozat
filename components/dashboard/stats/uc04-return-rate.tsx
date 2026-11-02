@@ -43,7 +43,7 @@ function RadialMeter({ value, label, color }: { value: number; label: string; co
           {value}%
         </text>
       </svg>
-      <p className="text-[11px] text-gray-500 text-center leading-tight">{label}</p>
+      <p className="text-xs text-gray-500 text-center leading-tight">{label}</p>
     </div>
   );
 }
@@ -80,11 +80,11 @@ export function Uc04ReturnRate({
           <div className="flex gap-6 text-center mt-2">
             <div>
               <p className="text-sm font-bold text-gray-700">{returnAnimals}</p>
-              <p className="text-[10px] text-gray-400">visszakerülő</p>
+              <p className="text-xs text-gray-400">visszakerülő</p>
             </div>
             <div>
               <p className="text-sm font-bold text-gray-700">{uniqueAnimals}</p>
-              <p className="text-[10px] text-gray-400">egyedi állat</p>
+              <p className="text-xs text-gray-400">egyedi állat</p>
             </div>
           </div>
           {yoyReturnRateChange !== null && (
@@ -92,7 +92,7 @@ export function Uc04ReturnRate({
               <span className={`text-sm font-semibold ${yoyReturnRateChange <= 0 ? "text-emerald-600" : "text-red-500"}`}>
                 {yoyReturnRateChange > 0 ? "+" : ""}{yoyReturnRateChange} pp
               </span>
-              <span className="ml-1 text-[10px] text-gray-400">éves változás</span>
+              <span className="ml-1 text-xs text-gray-400">éves változás</span>
             </div>
           )}
         </div>

@@ -126,7 +126,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json(updated);
   } catch (error) {
     console.error('[api/feeding-schedules/[id] PATCH]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -155,6 +155,6 @@ export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: s
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[api/feeding-schedules/[id] DELETE]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

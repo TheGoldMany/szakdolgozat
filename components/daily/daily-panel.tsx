@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Heart, Loader2, PawPrint, Plus, Sparkles, X, CalendarDays } from "lucide-react";
+import { Heart, PawPrint, Plus, Sparkles, X, CalendarDays } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ function PostCard({ post, onToggle }: { post: Post; onToggle: (id: string) => vo
           <span className="block truncate text-sm font-semibold text-gray-900">
             {post.author.name ?? "—"}
           </span>
-          <span className="block text-[11px] text-gray-400">{ago(post.createdAt)}</span>
+          <span className="block text-xs text-gray-400">{ago(post.createdAt)}</span>
         </Link>
       </header>
 
@@ -142,7 +142,13 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
     }
   }
 
+  // Folyamatban lévő kedvelések: a végpont vált (kedvel/visszavon), ezért egy
+  // gyors dupla koppintás kedvelne, majd vissza is vonná.
+  const likePending = useRef(new Set<string>());
+
   async function toggleLike(id: string) {
+    if (likePending.current.has(id)) return;
+    likePending.current.add(id);
     // Optimista: a szív azonnal váltson, a szám a szerver válaszából javul.
     setPosts((prev) => prev?.map((p) => p.id === id
       ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likeCount + (p.likedByMe ? -1 : 1) }
@@ -160,6 +166,8 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
         ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likeCount + (p.likedByMe ? -1 : 1) }
         : p) ?? prev);
       toast.error(t("networkError"));
+    } finally {
+      likePending.current.delete(id);
     }
   }
 
@@ -190,7 +198,7 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
         <ul className="mt-4 space-y-3">
           {[t("introPoint1"), t("introPoint2"), t("introPoint3")].map((point, i) => (
             <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-gray-600">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[0.6875rem] font-bold text-brand-700">
                 {i + 1}
               </span>
               {point}
@@ -251,11 +259,16 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
             </Button>
           )}
 
-        {posts === null && (
-          <p className="flex justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          </p>
-        )}
+        {/* Váz a pörgő karika helyett, a bejegyzések alakjában. */}
+        {posts === null && [0, 1].map((i) => (
+          <div key={i} className="animate-pulse overflow-hidden rounded-xl border border-gray-100 bg-white" aria-busy="true">
+            <div className="flex items-center gap-2 p-3">
+              <span className="h-8 w-8 rounded-full bg-gray-100" />
+              <span className="h-3 w-1/3 rounded bg-gray-100" />
+            </div>
+            <div className="aspect-square w-full bg-gray-100" />
+          </div>
+        ))}
 
         {posts?.length === 0 && (
           <p className="py-8 text-center text-sm text-gray-400">{emptyText}</p>

@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/api-auth";
 
+// GET /api/posts/[id]/like – kedvelte-e a bejelentkezett felhasználó. A
+// főoldal gyorsítótárból jön (mindenkinek ugyanaz), ezért a személyes
+// „kedveltem” jelzést a böngésző kéri le utólag.
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const { user, error } = await requireAuthUser(req);
+  if (error) return error;
+  const existing = await prisma.postLike.findUnique({
+    where:  { postId_userId: { postId: params.id, userId: user!.id } },
+    select: { id: true },
+  });
+  return NextResponse.json({ liked: !!existing }, { headers: { "Cache-Control": "private, no-store" } });
+}
+
 // POST /api/posts/[id]/like – kedvelés ki/be kapcsolása (toggle)
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

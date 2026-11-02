@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Heart, Users, X } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   animalId:       string;
@@ -45,7 +46,7 @@ export function VirtualAdoptionCard({
     const data = await res.json();
     if (!res.ok || !data.url) {
       setLoading(false);
-      setError(data.error ?? t("virtualError"));
+      setError(userMessage(data.error, t("virtualError")));
       return;
     }
     window.location.href = data.url;

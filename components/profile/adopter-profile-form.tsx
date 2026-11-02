@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { UserRound, Loader2, Check } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 export interface AdopterProfile {
   bio:                string;
@@ -53,7 +54,7 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("networkError"));
       setSaved(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("networkError"));
+      setError(userMessage(err, t("networkError")));
     } finally {
       setSaving(false);
     }
@@ -90,7 +91,7 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
             onChange={(e) => set("bio", e.target.value)}
             className={`${inputCls} resize-none`}
           />
-          <p className="mt-1 text-right text-[11px] text-gray-400">{form.bio.length}/2000</p>
+          <p className="mt-1 text-right text-xs text-gray-400">{form.bio.length}/2000</p>
         </div>
 
         <div>

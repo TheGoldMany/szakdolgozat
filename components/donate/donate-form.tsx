@@ -9,6 +9,7 @@ import {
   MIN_DONATION_HUF, PLATFORM_FEE_PERCENT, STRIPE_PERCENT_FEE, STRIPE_FIXED_FEE_HUF,
   platformFee, stripeProcessingFee, donorTotal,
 } from "@/lib/donation-limits";
+import { userMessage } from "@/lib/client-error";
 
 interface DonateFormProps {
   campaignId: string;
@@ -74,15 +75,18 @@ export function DonateForm({ campaignId, isShelterCampaign = false }: DonateForm
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("checkoutError"));
+        throw new Error(userMessage(data.error, t("checkoutError")));
       }
       const { url } = await res.json();
-      if (url) window.location.href = url;
+      // Átirányítás közben a gomb maradjon letiltva: a Stripe oldalának
+      // betöltése eltart egy ideig, és egy újabb koppintás második
+      // fizetési munkamenetet nyitna.
+      if (url) { window.location.href = url; return; }
+      setLoading(false);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : tCommon("unknownError");
+      const msg = userMessage(err, tCommon("unknownError"));
       setError(msg);
       toast.error(msg);
-    } finally {
       setLoading(false);
     }
   }

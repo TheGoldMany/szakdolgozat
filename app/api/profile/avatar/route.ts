@@ -27,6 +27,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ image: parsed.data.image });
   } catch (error) {
     console.error('[api/profile/avatar PATCH]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Send } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   reportId: string;
@@ -27,7 +28,7 @@ export function SendMessageForm({ reportId }: Props) {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? "Hiba történt.");
+        setError(userMessage(json.error, "Hiba történt."));
         return;
       }
       setSuccess(true);

@@ -113,16 +113,16 @@ export default async function DashboardArticlesPage(
                   <span
                     className={
                       published
-                        ? "rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700"
+                        ? "rounded-full bg-green-50 px-2 py-0.5 text-[0.6875rem] font-bold text-green-700"
                         : scheduled
-                          ? "rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700"
-                          : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                          ? "rounded-full bg-blue-50 px-2 py-0.5 text-[0.6875rem] font-bold text-blue-700"
+                          : "rounded-full bg-amber-50 px-2 py-0.5 text-[0.6875rem] font-bold text-amber-700"
                     }
                   >
                     {published ? "Publikálva" : scheduled ? "Időzítve" : "Piszkozat"}
                   </span>
                   {scheduled && a.publishedAt && (
-                    <span className="text-[11px] text-blue-600">
+                    <span className="text-xs text-blue-600">
                       {new Date(a.publishedAt).toLocaleString("hu-HU", {
                         year: "numeric", month: "short", day: "numeric",
                         hour: "2-digit", minute: "2-digit",

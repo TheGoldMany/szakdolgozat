@@ -4,7 +4,7 @@ import { LightboxProvider, LightboxTrigger } from "@/components/ui/image-lightbo
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList, PawPrint } from "lucide-react";
+import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList, PawPrint, Check, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
@@ -57,7 +57,7 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
       "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
       ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600",
     )}>
-      {ok ? "✓" : "✗"} {label}
+      {ok ? <Check className="h-3.5 w-3.5" aria-hidden /> : <X className="h-3.5 w-3.5" aria-hidden />} {label}
     </span>
   );
 }
@@ -241,7 +241,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
           params.locale
         )}
       />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-16">
 
         <nav className="mb-6 text-sm text-gray-500">
           <Link href="/animals" className="hover:text-brand-500">{t("breadcrumb")}</Link>
@@ -496,7 +496,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
               <p className="truncate text-sm font-semibold text-gray-900">{animal.name}</p>
               <p className="truncate text-xs text-gray-500">{animal.shelter.name}</p>
             </div>
-            <span className="relative h-9 w-9 shrink-0 [&>button]:right-0 [&>button]:top-0 [&>button]:border [&>button]:border-gray-200 [&>button]:shadow-none">
+            <span className="relative h-10 w-10 shrink-0 [&>button]:right-0 [&>button]:top-0 [&>button]:border [&>button]:border-gray-200 [&>button]:shadow-none">
               <FavoriteButton animalId={animal.id} initialFavorited={isFavorited} />
             </span>
             <a href="#adopt"

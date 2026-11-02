@@ -7,6 +7,7 @@ import { Plus, X, Trash2, DoorOpen, AlertTriangle } from "lucide-react";
 import { KENNEL_TYPE_LABELS, ALL_KENNEL_TYPES } from "@/lib/kennel";
 import { KENNEL_FACILITIES, emptyFacilities, type KennelFacilityKey } from "@/lib/kennel-facilities";
 import type { KennelType } from "@prisma/client";
+import { userMessage } from "@/lib/client-error";
 
 interface AnimalLite {
   id:       string;
@@ -60,7 +61,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
     });
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba")); return; }
     setKennels(prev => [...prev, data]);
     setShowForm(false); setName(""); setType("KENNEL"); setCapacity(1); setNote("");
     setFacilities(emptyFacilities());
@@ -80,7 +81,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "A mentés nem sikerült");
+      setError(userMessage(data.error, "A mentés nem sikerült"));
       setKennels(prev => prev.map(k => k.id === kennelId ? { ...k, [key]: !next } : k));
     }
   }
@@ -101,7 +102,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
       body:    JSON.stringify({ kennelId }),
     });
     const data = await res.json();
-    if (!res.ok) { setError(data.error ?? "Az áthelyezés nem sikerült"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Az áthelyezés nem sikerült")); return; }
     setAnimals(prev => prev.map(a => a.id === animalId ? { ...a, kennelId } : a));
     router.refresh();
   }
@@ -229,7 +230,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
 
                 {/* Felszereltség – kattintásra azonnal mentődik */}
                 <div className="mt-3 border-t border-gray-50 pt-3">
-                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                  <p className="mb-1.5 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-400">
                     Felszereltség
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -241,7 +242,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                           type="button"
                           onClick={() => toggleFacility(k.id, key, !on)}
                           title={on ? `${label} – kikapcsolás` : `${label} – bekapcsolás`}
-                          className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-medium transition-colors sm:px-2 sm:py-0.5 ${
+                          className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[0.6875rem] font-medium transition-colors sm:px-2 sm:py-0.5 ${
                             on
                               ? "bg-green-50 text-green-700 ring-1 ring-green-200"
                               : "bg-gray-50 text-gray-400 hover:bg-gray-100"

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Clock, X, CheckCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   shelterId: string;
@@ -44,7 +45,7 @@ export function AppointmentForm({ shelterId, animalId, animalName, onClose }: Pr
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) { setError(data.error ?? tc("error")); return; }
+    if (!res.ok) { setError(userMessage(data.error, tc("error"))); return; }
 
     setSuccess(true);
     router.refresh();

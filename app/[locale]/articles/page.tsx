@@ -2,10 +2,23 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Clock, Newspaper, User } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
 import { alternates } from "@/lib/page-metadata";
+
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("articles");
@@ -23,7 +36,9 @@ function formatDate(date: Date, locale: string) {
   return date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default async function ArticlesListPage() {
+export default async function ArticlesListPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 
@@ -44,7 +59,7 @@ export default async function ArticlesListPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-14 lg:py-16 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-14 lg:py-16 lg:px-8 2xl:px-16">
         <div className="mb-6 flex items-center gap-3 sm:mb-8">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <Newspaper className="h-6 w-6 text-brand-500" />

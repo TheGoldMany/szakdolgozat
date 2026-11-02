@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { userMessage } from "@/lib/client-error";
 
 interface PendingCampaign {
   id: string;
@@ -40,11 +41,11 @@ export function CampaignApprovals({ campaigns: initial }: CampaignApprovalsProps
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("analyticsError"));
+        throw new Error(userMessage(data.error, t("analyticsError")));
       }
       setCampaigns((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("campaignsError"));
+      setError(userMessage(err, t("campaignsError")));
     } finally {
       setLoadingId(null);
     }

@@ -53,7 +53,7 @@ const config = {
           100: "#eef0ee",
           200: "#e0e3e0",
           300: "#c8cdc9",
-          400: "#9ba29d",
+          400: "#6e7671", // korábban #9ba29d (2.6:1) — szövegként a WCAG 4.5:1 alatt volt
           500: "#6b736e",
           600: "#4f5752",
           700: "#3a413c",

@@ -19,5 +19,5 @@ import { paymentsEnabled } from "@/lib/payments-enabled";
  */
 export function paymentsDisabled(): NextResponse | null {
   if (paymentsEnabled()) return null;
-  return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json({ error: "Nem található." }, { status: 404 });
 }

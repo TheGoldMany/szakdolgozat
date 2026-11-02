@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error('[api/admin/shelters POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -174,6 +174,6 @@ export async function GET() {
     return NextResponse.json(shelters);
   } catch (error) {
     console.error('[api/admin/shelters GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

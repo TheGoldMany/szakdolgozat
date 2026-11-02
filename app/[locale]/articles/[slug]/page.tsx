@@ -13,7 +13,7 @@ import {
   PawPrint,
   User,
 } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { effectiveTitle, effectiveDescription, tagSlug } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 
@@ -23,8 +23,23 @@ import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
+
+export async function generateMetadata(props: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -103,8 +118,10 @@ function RelatedCard({
   );
 }
 
-export default async function ArticleDetailPage(props: { params: Promise<{ slug: string }> }) {
+export default async function ArticleDetailPage(props: { params: Promise<{ locale: string; slug: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 
@@ -196,7 +213,7 @@ export default async function ArticleDetailPage(props: { params: Promise<{ slug:
       {/* A cikk címe és leírása adatbázisból jön: egy `</script>` a címben a
           nyers JSON.stringify mellett kitörne a blokkból. A JsonLd ezt szökteti. */}
       <JsonLd data={jsonLd} />
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 sm:py-10 lg:px-8 2xl:px-16">
         <div className="flex justify-center gap-6">
 
           {/* Olvasósáv – olvasható szélességen tartva */}

@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { upload } from "@vercel/blob/client";
 import { FileText, Trash2, Upload, ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 type Doc = {
   id:        string;
@@ -67,13 +68,13 @@ export function AnimalDocuments({
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? t("animalsDocSaveError"));
+        throw new Error(userMessage(data.error, t("animalsDocSaveError")));
       }
 
       const doc = await res.json() as Doc;
       setDocs((prev) => [doc, ...prev]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("animalsDocUploadError"));
+      setError(userMessage(err, t("animalsDocUploadError")));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -89,7 +90,7 @@ export function AnimalDocuments({
       if (!res.ok) throw new Error(t("animalsDocDeleteError"));
       setDocs((prev) => prev.filter((d) => d.id !== docId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("animalsDocDeleteError"));
+      setError(userMessage(err, t("animalsDocDeleteError")));
     } finally {
       setDeleting(null);
     }

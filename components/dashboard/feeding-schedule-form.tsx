@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { FeedingSchedule, FeedingFrequency, InventoryItemOption } from "./feeding-schedule-manager";
+import { userMessage } from "@/lib/client-error";
 
 // ---------------------------------------------------------------------------
 // Zod schema
@@ -150,7 +151,7 @@ export function FeedingScheduleForm({ shelterId, inventoryItems, schedule, onClo
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setErrors({ root: data.error ?? "Mentés sikertelen" });
+        setErrors({ root: userMessage(data.error, "Mentés sikertelen") });
         return;
       }
 

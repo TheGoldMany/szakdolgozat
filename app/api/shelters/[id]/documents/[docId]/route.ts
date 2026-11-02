@@ -9,7 +9,7 @@ export async function DELETE(
 ) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
 
   const doc = await prisma.shelterDocument.findUnique({ where: { id: params.docId } });
   if (!doc || doc.shelterId !== params.id)
@@ -24,7 +24,7 @@ export async function DELETE(
     isShelterAdmin = !!record;
   }
   if (!isSuperAdmin && !isShelterAdmin)
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
 
   await prisma.shelterDocument.delete({ where: { id: params.docId } });
   return NextResponse.json({ ok: true });

@@ -35,7 +35,7 @@ export function WithdrawButton({ applicationId }: { applicationId: string }) {
       disabled={loading}
       className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
         confirmed
-          ? "bg-red-500 text-white hover:bg-red-600"
+          ? "bg-red-600 text-white hover:bg-red-700"
           : "border border-gray-200 text-gray-500 hover:bg-gray-50"
       }`}
     >

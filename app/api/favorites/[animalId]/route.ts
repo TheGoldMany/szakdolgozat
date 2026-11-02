@@ -16,6 +16,6 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ animal
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[api/favorites/[animalId] DELETE]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

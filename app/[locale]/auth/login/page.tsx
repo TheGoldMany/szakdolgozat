@@ -68,6 +68,8 @@ function LoginForm() {
   );
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  // Újraküldés közben a gomb nem fogad újabb koppintást (két e-mail menne ki).
+  const [resending, setResending] = useState(false);
 
   const {
     register,
@@ -109,6 +111,8 @@ function LoginForm() {
 
   async function resendVerification() {
     if (!unverifiedEmail) return;
+    if (resending) return;
+    setResending(true);
     try {
       await fetch("/api/auth/resend-verification", {
         method:  "POST",
@@ -135,6 +139,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={resendVerification}
+                    disabled={resending}
                   className="font-semibold text-brand-600 hover:underline"
                 >
                   {t("verifyResend")}
@@ -173,7 +178,7 @@ function LoginForm() {
           <label className="mb-1.5 block text-sm font-medium text-gray-700">{t("emailLabel")}</label>
           <input
             type="email"
-            placeholder="pelda@email.hu"
+            placeholder="pelda@example.com"
             autoComplete="email"
             className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
             {...register("email")}
@@ -185,7 +190,7 @@ function LoginForm() {
           <div className="mb-1.5 flex items-center justify-between">
             <label className="text-sm font-medium text-gray-700">{t("password")}</label>
             <Link href="/auth/forgot-password"
-              className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
+              className="hit-area text-xs text-gray-400 hover:text-brand-600 transition-colors">
               {t("forgotPassword")}
             </Link>
           </div>
@@ -308,7 +313,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
+            <Link href="/" className="hit-area text-xs text-gray-400 hover:text-brand-600 transition-colors">
               {t("backToHome")}
             </Link>
           </div>

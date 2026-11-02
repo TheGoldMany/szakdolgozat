@@ -23,6 +23,6 @@ export async function GET(_req: Request, props: { params: Promise<{ id: string }
     return NextResponse.json(animal);
   } catch (error) {
     console.error("[api/animals/[id] GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

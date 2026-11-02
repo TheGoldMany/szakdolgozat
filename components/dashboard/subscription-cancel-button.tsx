@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   subscriptionId: string;
@@ -28,7 +29,7 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? t("subscriptionsCancelError"));
+        toast.error(userMessage(data.error, t("subscriptionsCancelError")));
       }
     } catch {
       toast.error(t("subscriptionsCancelError"));
@@ -41,7 +42,7 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
     <button
       onClick={handleCancel}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-60"
+      className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
     >
       {loading && (
         <svg

@@ -13,6 +13,7 @@ import {
 } from "@/lib/event";
 import type { EventType, EventStatus } from "@prisma/client";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { userMessage } from "@/lib/client-error";
 
 export interface RegistrationEntry {
   id:        string;
@@ -104,7 +105,7 @@ export function EventsManager({ shelterId, events }: Props) {
 
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Hiba történt"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba történt")); return; }
     setShowForm(false); setEditId(null); setForm({ ...EMPTY });
     router.refresh();
   }
@@ -115,7 +116,7 @@ export function EventsManager({ shelterId, events }: Props) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    if (!res.ok) { const d = await res.json(); setError(d.error ?? "Hiba"); return; }
+    if (!res.ok) { const d = await res.json(); setError(userMessage(d.error, "Hiba")); return; }
     router.refresh();
   }
 
@@ -230,10 +231,10 @@ export function EventsManager({ shelterId, events }: Props) {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-bold text-gray-900">{ev.title}</h3>
-                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
+                      <span className={`rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
                         {EVENT_TYPE_LABELS[ev.type]}
                       </span>
-                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
+                      <span className={`rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
                         {EVENT_STATUS_LABELS[ev.status]}
                       </span>
                     </div>
@@ -256,7 +257,7 @@ export function EventsManager({ shelterId, events }: Props) {
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-50 pt-3">
                   {ev.status === "DRAFT" && (
                     <button onClick={() => changeStatus(ev.id, "PUBLISHED")}
-                      className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600 transition-colors">
+                      className="rounded-lg bg-green-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-800 transition-colors">
                       Közzététel
                     </button>
                   )}

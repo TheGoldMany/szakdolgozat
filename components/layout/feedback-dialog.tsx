@@ -145,7 +145,7 @@ export function FeedbackDialog() {
                     {state === "sending" ? t("sending") : t("send")}
                   </Button>
                 </div>
-                <p className="mt-3 text-center text-[11px] text-gray-400">{t("pageNote")}</p>
+                <p className="mt-3 text-center text-xs text-gray-400">{t("pageNote")}</p>
               </form>
             )}
           </div>

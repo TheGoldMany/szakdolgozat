@@ -20,8 +20,8 @@ interface TimelineNode {
 
 const NODE_BG: Record<TimelineNode["tone"], string> = {
   brand: "bg-brand-500 text-white",
-  green: "bg-green-500 text-white",
-  red:   "bg-red-500 text-white",
+  green: "bg-green-700 text-white",
+  red:   "bg-red-600 text-white",
   gray:  "bg-gray-200 text-gray-400",
 };
 

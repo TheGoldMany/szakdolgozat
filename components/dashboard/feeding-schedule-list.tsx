@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Pencil, Trash2, Pause, Play, CheckCircle2, AlertTriangle, UtensilsCrossed } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FeedingSchedule, FeedingLog, FeedingFrequency } from "./feeding-schedule-manager";
+import { userMessage } from "@/lib/client-error";
 
 const WEEKDAY_LABELS = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat", "Vasárnap"];
 
@@ -60,7 +61,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
       const updated: FeedingSchedule = await res.json();
       onToggled(updated);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Hiba történt");
+      setError(userMessage(err, "Hiba történt"));
     } finally {
       setTogglingId(null);
     }
@@ -75,7 +76,7 @@ export function FeedingScheduleList({ schedules, onEdit, onDeleted, onToggled }:
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "Törlés sikertelen");
       onDeleted(schedule.id);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Törlés sikertelen");
+      setError(userMessage(err, "Törlés sikertelen"));
     } finally {
       setDeletingId(null);
     }

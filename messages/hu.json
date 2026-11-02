@@ -162,8 +162,8 @@
     "goodWithKids": "Gyerekbarát",
     "goodWithDogs": "Kutyabarát",
     "goodWithCats": "Macskajáró",
-    "genderMale": "♂ Hím",
-    "genderFemale": "♀ Nőstény",
+    "genderMale": "Hím",
+    "genderFemale": "Nőstény",
     "shelterSection": "Menhely",
     "descSection": "Leírás",
     "adoptionSection": "Örökbefogadás",
@@ -599,7 +599,9 @@
     "tip1": "Tölts fel friss, éles fotót, lehetőleg az állat egész alakjáról.",
     "tip2": "Jelöld meg a pontos helyet a térképen: így a környéken élők is látják.",
     "tip3": "Írd le a jellegzetes jegyeket: nyakörv, sebhely, foltok, viselkedés.",
-    "tip4": "Ha az állat előkerült, jelöld megoldottnak, hogy ne keressék tovább."
+    "tip4": "Ha az állat előkerült, jelöld megoldottnak, hogy ne keressék tovább.",
+    "draftRestored": "Visszatöltöttük a félbehagyott bejelentésedet.",
+    "draftDiscard": "Újrakezdem"
   },
   "help": {
     "title": "Útmutató",
@@ -687,7 +689,10 @@
     "cameraHelpInApp": "Az oldalt egy alkalmazás (pl. Facebook, Messenger, Instagram) belső böngészőjében nyitottad meg, ami sokszor nem kap kamerát. A jobb felső menüből nyisd meg Safariban vagy Chrome-ban.",
     "cameraHelpOther": "A böngésző nem kapott kamera-engedélyt. Engedélyezd a kamerát ennek az oldalnak a böngésző beállításaiban, vagy válassz képet a galériából.",
     "cameraHelpGallery": "Választás a galériából",
-    "cameraHelpRetry": "Újrapróbálom"
+    "cameraHelpRetry": "Újrapróbálom",
+    "errorPageTitle": "Valami félrement",
+    "errorPageDesc": "Az oldal betöltése közben hiba történt. Próbáld újra, vagy térj vissza a főoldalra.",
+    "errorPageRetry": "Újrapróbálom"
   },
   "applications": {
     "title": "Kérelmeim",
@@ -1067,8 +1072,8 @@
     "animalsFormWeight": "Súly (kg)",
     "animalsFormWeightPlaceholder": "pl. 8.5",
     "animalsFormGender": "Nem",
-    "animalsFormGenderMale": "♂ Hím",
-    "animalsFormGenderFemale": "♀ Nőstény",
+    "animalsFormGenderMale": "Hím",
+    "animalsFormGenderFemale": "Nőstény",
     "animalsFormGenderUnknown": "Ismeretlen",
     "animalsFormDescription": "Leírás",
     "animalsFormDescriptionPlaceholder": "Mutasd be az állatot...",
@@ -2040,7 +2045,7 @@
     "messageLabel": "Üzenet",
     "messagePlaceholder": "Mi történt, és mit vártál volna? Ha hibáról van szó, írd le, mit csináltál előtte.",
     "emailLabel": "E-mail-címed (nem kötelező)",
-    "emailPlaceholder": "pelda@email.hu",
+    "emailPlaceholder": "pelda@example.com",
     "emailHint": "Ha megadod, tudunk válaszolni.",
     "send": "Küldés",
     "sending": "Küldés…",

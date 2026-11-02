@@ -100,7 +100,7 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
             <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-gray-100">
               {avatar
                 ? <Image src={avatar} alt={label} fill className="object-cover" sizes="24px" />
-                : <span className="flex h-full w-full items-center justify-center text-[9px] font-bold text-gray-400">{label[0]}</span>}
+                : <span className="flex h-full w-full items-center justify-center text-[0.625rem] font-bold text-gray-400">{label[0]}</span>}
             </div>
             <span className="truncate text-xs text-gray-500 font-medium">{label}</span>
           </div>

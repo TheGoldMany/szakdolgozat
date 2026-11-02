@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Home, X, CheckCircle } from "lucide-react";
 import { ANIMAL_TYPE_LABELS, ALL_ANIMAL_TYPES, FOSTER_STATUS_LABELS, FOSTER_STATUS_COLORS } from "@/lib/foster";
 import type { AnimalType, FosterStatus } from "@prisma/client";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   shelterId:       string;
@@ -53,7 +54,7 @@ export function FosterApplyButton({ shelterId, existingStatus }: Props) {
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error ?? t("error")); return; }
+    if (!res.ok) { setError(userMessage(data.error, t("error"))); return; }
     setSuccess(true);
     router.refresh();
   }

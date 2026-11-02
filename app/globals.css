@@ -9,6 +9,8 @@
   }
 
   html {
+    /* Lásd a viewport colorScheme-jét a layoutban: csak világos téma van. */
+    color-scheme: only light;
     overflow-x: hidden;
     /* Horgonyra ugrásnál gördüljön, és a célcím ne csússzon a fix fejléc alá */
     scroll-behavior: smooth;
@@ -41,13 +43,14 @@
   animation: sheetSlideUp 0.22s ease-out;
 }
 
-/* Mobil űrlap-élmény: 16px betűméret, hogy az iOS Safari ne közelítsen rá
-   fókuszáláskor; a jelölőnégyzeteket/rádiógombokat kihagyjuk. */
+/* Mobil űrlap-élmény: legalább 16px betűméret, hogy az iOS Safari ne
+   közelítsen rá fókuszáláskor; ha a felhasználó nagyobb betűt állított be,
+   azt követi (rem). A jelölőnégyzeteket/rádiógombokat kihagyjuk. */
 @media (max-width: 640px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
   select,
   textarea {
-    font-size: 16px !important;
+    font-size: max(16px, 1rem) !important;
   }
 }
 
@@ -202,6 +205,16 @@ input[type="radio"]:checked {
   body[data-cookie-banner] .daily-fab { display: none; }
 }
 
+/* Nyitott billentyűzetnél (lásd mobile-bottom-nav.tsx) a fix alsó elemek
+   eltűnnek, hogy ne takarják a kitöltött mezőt. A mezőhöz görgetéskor pedig
+   marad hely a fejléc alatt és a mező alatt is. */
+@media (max-width: 767px) {
+  body[data-keyboard] .mobile-bottom-nav,
+  body[data-keyboard] .adopt-sticky-bar,
+  body[data-keyboard] .daily-fab { display: none; }
+}
+input, textarea, select { scroll-margin-top: 5rem; scroll-margin-bottom: 6rem; }
+
 /* Az állat adatlapján mobilon tapadó örökbefogadási sáv van az alsó menü
    fölött: a gomb a sáv fölé lép, különben az „Érdeklődöm” gombot takarná. */
 @media (max-width: 767px) {
@@ -348,3 +361,9 @@ input[type="radio"]:checked {
 svg.lucide[stroke-width="2"] {
   stroke-width: 1.6px;
 }
+
+/* Kis szöveges link vagy gomb (pl. „Összes →”, „Vissza”), amelynek a
+   kinézete maradjon kicsi, de ujjal is eltalálható legyen: a koppintási
+   felület láthatatlanul nagyobb a feliratnál. */
+.hit-area { position: relative; }
+.hit-area::after { content: ""; position: absolute; inset: -10px -6px; }

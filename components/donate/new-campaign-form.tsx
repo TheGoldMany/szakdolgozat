@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 // Függőségmentes fájlból, hogy a Stripe SDK ne kerüljön a böngésző bundle-jébe.
 import { MIN_CAMPAIGN_TARGET_HUF } from "@/lib/donation-limits";
+import { userMessage } from "@/lib/client-error";
 
 interface Shelter { id: string; name: string }
 interface Animal  { id: string; name: string; breed: string | null }
@@ -70,10 +71,10 @@ export function NewCampaignForm({
         body:    JSON.stringify({ type: "user" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("stripeConnectError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("stripeConnectError")));
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : tCommon("unknownError"));
+      setError(userMessage(err, tCommon("unknownError")));
       setStripeLoading(false);
     }
   }
@@ -128,11 +129,11 @@ export function NewCampaignForm({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("newSubmitError"));
+        throw new Error(userMessage(data.error, t("newSubmitError")));
       }
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : tCommon("unknownError"));
+      setError(userMessage(err, tCommon("unknownError")));
     } finally {
       setLoading(false);
     }

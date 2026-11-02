@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 const cls = "w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 transition";
 
@@ -38,7 +39,7 @@ export function ChangePasswordForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? t("networkError"));
+        setError(userMessage(json.error, t("networkError")));
         return;
       }
       toast.success(t("passwordChanged"));

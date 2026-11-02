@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
   }
 
   const { searchParams } = new URL(req.url);
@@ -44,6 +44,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ users, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error('[api/admin/users GET]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

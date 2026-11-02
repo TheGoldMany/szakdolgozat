@@ -96,7 +96,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     return NextResponse.json(registration, { status: 201 });
   } catch (error) {
     console.error('[api/events/[id]/register POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }
 
@@ -120,6 +120,6 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('[api/events/[id]/register DELETE]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

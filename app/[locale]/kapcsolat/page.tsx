@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { alternates } from "@/lib/page-metadata";
+import { EmailLink } from "@/components/ui/email-link";
+
+/**
+ * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
+ * `setRequestLocale` adja. Az üres lista azt jelenti, hogy a build idején
+ * nem állítjuk elő (adatbázisból dolgozik, és a build nem függhet attól,
+ * hogy az épp elérhető): az első látogatáskor készül el, onnantól a
+ * gyorsítótárból jön. A bejelentkezéshez kötött oldalak ezt NEM kapják meg,
+ * azok dinamikusak maradnak.
+ */
+export function generateStaticParams() {
+  return [];
+}
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("contact");
@@ -13,7 +27,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function KapcsolatPage() {
+export default async function KapcsolatPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t = await getTranslations("contact");
 
   return (
@@ -41,12 +57,7 @@ export default async function KapcsolatPage() {
             <p className="mt-1 text-sm text-gray-500">
               {t("emailDesc")}
             </p>
-            <a
-              href="mailto:info@allatimenhelyek.hu"
-              className="mt-3 inline-block text-sm font-medium text-brand-600 hover:underline"
-            >
-              info@allatimenhelyek.hu
-            </a>
+            <EmailLink className="mt-3 inline-block text-sm font-medium text-brand-600 hover:underline" />
           </div>
 
           {/* Válaszidő */}
@@ -97,12 +108,9 @@ export default async function KapcsolatPage() {
           <p className="mt-2 text-sm text-brand-100 leading-relaxed">
             {t("shelterDesc")}
           </p>
-          <a
-            href="mailto:info@allatimenhelyek.hu?subject=Menhely regisztráció"
-            className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
-          >
+          <EmailLink subject="Menhely regisztráció" className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
             {t("shelterCta")}
-          </a>
+          </EmailLink>
         </div>
 
       </div>

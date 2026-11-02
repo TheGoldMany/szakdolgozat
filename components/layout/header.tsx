@@ -241,7 +241,7 @@ export function Header() {
       }}
     >
 
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-16 max-w-[1800px] items-center justify-between px-4 sm:px-6 lg:px-8 2xl:px-16">
 
         {/* Logo – mobilon is kiírjuk a nevet: ott a fejlécben csak a logó és a
             menügomb van, tehát bőven elfér, és a látogató tudja, hol jár. */}
@@ -362,7 +362,7 @@ export function Header() {
                 <span className="relative">
                   <MessageCircle className="h-4 w-4" />
                   {unread > 0 && (
-                    <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                    <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-600 text-[0.625rem] font-bold text-white">
                       {unread > 9 ? "9+" : unread}
                     </span>
                   )}
@@ -414,7 +414,7 @@ export function Header() {
                     )}
                     <hr className="my-1 border-gray-100" />
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut({ callbackUrl: locale === routing.defaultLocale ? "/" : `/${locale}` })}
                       className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50"
                     >
                       {t("logout")}
@@ -450,7 +450,7 @@ export function Header() {
             >
               <MessageCircle className="h-5 w-5" />
               {unread > 0 && (
-                <span className="animate-pop absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                <span className="animate-pop absolute right-1 top-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-600 text-[0.625rem] font-bold text-white">
                   {unread > 9 ? "9+" : unread}
                 </span>
               )}
@@ -582,7 +582,7 @@ export function Header() {
             {session && (
               <div className="border-t border-gray-100 px-4 py-4">
                 <button
-                  onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }); }}
+                  onClick={() => { setMobileOpen(false); signOut({ callbackUrl: locale === routing.defaultLocale ? "/" : `/${locale}` }); }}
                   className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-100 active:bg-red-200 transition-colors"
                 >
                   {t("logout")}

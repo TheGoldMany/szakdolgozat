@@ -69,6 +69,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("[api/events/public GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

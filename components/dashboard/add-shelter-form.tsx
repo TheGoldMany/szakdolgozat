@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Copy, Check, X, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 function buildSchema(t: (k: string) => string) {
   return z.object({
@@ -63,7 +64,7 @@ export function AddShelterForm({ onClose }: { onClose: () => void }) {
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error ?? t("addShelterUnknownError"));
+      setServerError(userMessage(json.error, t("addShelterUnknownError")));
       return;
     }
     setCreated({

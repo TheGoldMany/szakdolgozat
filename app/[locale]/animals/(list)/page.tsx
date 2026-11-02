@@ -123,21 +123,21 @@ export default async function AnimalsPage(props: PageProps) {
 
       {/* Page header */}
       <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-16">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("title")}</h1>
           <p className="mt-1 text-sm text-gray-500 sm:text-base">{t("showing", { count: total })}</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="mx-auto max-w-[1800px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8 2xl:px-16">
         <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="w-full shrink-0 lg:w-64" data-tour="animal-filters">
+          <div className="w-full shrink-0 lg:w-64" data-tour="animal-filters">
             <Suspense>
               <AnimalsFilters cities={cities} />
             </Suspense>
-          </aside>
+          </div>
 
-          <main className="flex-1" data-tour="animal-list">
+          <div className="flex-1" data-tour="animal-list">
             {animals.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white py-20 text-center">
                 <PawPrint className="h-12 w-12 text-gray-300" />
@@ -146,7 +146,7 @@ export default async function AnimalsPage(props: PageProps) {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8 2xl:grid-cols-4 min-[1800px]:grid-cols-5">
                   {animals.map((animal) => (
                     <AnimalCard key={animal.id} animal={animal} isFavorited={favoriteIds.has(animal.id)} />
                   ))}
@@ -157,7 +157,7 @@ export default async function AnimalsPage(props: PageProps) {
                 )}
               </>
             )}
-          </main>
+          </div>
         </div>
       </div>
     </div>

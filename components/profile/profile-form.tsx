@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 const schema = z.object({
   name:    z.string().min(2),
@@ -52,7 +53,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
     });
     const json = await res.json();
     if (!res.ok) {
-      setServerError(json.error ?? t("networkError"));
+      setServerError(userMessage(json.error, t("networkError")));
       return;
     }
     toast.success(t("profileSaved"));

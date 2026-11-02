@@ -11,17 +11,17 @@ import { geocodeReportLocation } from "@/lib/report-location";
 const schema = z.object({
   type:         z.nativeEnum(ReportType),
   animalType:   z.nativeEnum(AnimalType),
-  name:         z.string().max(100).optional(),
-  breed:        z.string().max(100).optional(),
-  color:        z.string().max(100).optional(),
+  name:         z.string().max(100, "A név legfeljebb 100 karakter lehet.").optional(),
+  breed:        z.string().max(100, "A fajta legfeljebb 100 karakter lehet.").optional(),
+  color:        z.string().max(100, "A szín legfeljebb 100 karakter lehet.").optional(),
   gender:       z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
-  description:  z.string().min(10, "Legalább 10 karakter szükséges").max(2000),
+  description:  z.string().min(10, "A leírás legalább 10 karakter legyen.").max(2000, "A leírás legfeljebb 2000 karakter lehet."),
   city:         z.string().min(1, "Kötelező mező").max(100),
-  address:      z.string().max(200).optional(),
+  address:      z.string().max(200, "A cím legfeljebb 200 karakter lehet.").optional(),
   imageUrl:     optionalOwnImageUrl,
-  imageUrls:    z.array(ownImageUrl).max(6).optional(),
-  contactName:  z.string().min(2).max(100),
-  contactPhone: z.string().min(1, "Kötelező mező").max(20),
+  imageUrls:    z.array(ownImageUrl).max(6, "Legfeljebb 6 képet tölthetsz fel.").optional(),
+  contactName:  z.string().min(2, "A neved legalább 2 karakter legyen.").max(100, "A név legfeljebb 100 karakter lehet."),
+  contactPhone: z.string().min(1, "Kötelező mező").max(20, "A telefonszám legfeljebb 20 karakter lehet."),
   contactEmail: z.string().email("Érvénytelen email"),
   lat:          z.number().optional(),
   lng:          z.number().optional(),
@@ -89,6 +89,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ report }, { status: 201 });
   } catch (error) {
     console.error('[api/reports POST]', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Szerverhiba történt. Kérjük, próbáld újra később.' }, { status: 500 });
   }
 }

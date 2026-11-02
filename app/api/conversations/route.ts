@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const authUser = await getAuthUser(req);
   if (!authUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   const isShelterAdmin =

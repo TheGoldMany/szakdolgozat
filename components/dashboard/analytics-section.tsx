@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { RefreshCw, ChevronDown, ChevronUp, DatabaseZap, Loader2 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 // A recharts-alapú panelek lazy-load-dal (a ~100KB chart bundle csak igény szerint töltődik)
 const chartFallback = (
@@ -126,7 +127,7 @@ export function AnalyticsSection({ role, shelters }: Props) {
         setEtlIsError(false);
         fetchData();
       } else {
-        setEtlMsg(t("analyticsEtlError", { error: data.error ?? t("tiersUnknownError") }));
+        setEtlMsg(t("analyticsEtlError", { error: userMessage(data.error, t("tiersUnknownError")) }));
         setEtlIsError(true);
       }
     } catch {

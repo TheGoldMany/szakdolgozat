@@ -309,7 +309,7 @@ export function ChatWindow({ conversationId, currentUserId, initialMessages }: C
                       )}
                     </div>
                   ) : null}
-                  <span className="text-[10px] text-gray-400 mx-1">{formatTime(msg.createdAt, locale)}</span>
+                  <span className="text-xs text-gray-400 mx-1">{formatTime(msg.createdAt, locale)}</span>
                 </div>
               </div>
             </div>

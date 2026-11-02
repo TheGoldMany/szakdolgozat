@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
   const secret = req.headers.get("authorization")?.replace("Bearer ", "");
   if (!secret || secret !== process.env.CRON_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   // Alapból egy hét: bőven átfogja a Stripe háromnapos újrapróbálási ablakát,

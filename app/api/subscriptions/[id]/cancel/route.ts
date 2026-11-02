@@ -110,7 +110,9 @@ export async function POST(_req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json({ ok: true, subscription: updated });
   } catch (err) {
     console.error("Cancel subscription error:", err);
-    const message = err instanceof Error ? err.message : "Ismeretlen hiba";
+    // A Stripe/Prisma hibaszövege a naplóba való, nem a látogató elé.
+    console.error("[cancel]", err);
+    const message = "A lemondás nem sikerült. Kérjük, próbáld újra később.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

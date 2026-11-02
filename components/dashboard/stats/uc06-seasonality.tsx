@@ -43,7 +43,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
           <h2 className="text-sm font-semibold text-gray-700">UC-06 &middot; Szezonalitás és adatfrissesség</h2>
           <p className="text-xs text-gray-400 mt-0.5">Adoptációk időbeli mintázata (DWH DimDate + ETL napló)</p>
         </div>
-        <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+        <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold ${
           dwhAvailable
             ? "bg-green-50 text-green-700 border border-green-200"
             : "bg-gray-100 text-gray-500 border border-gray-200"
@@ -65,7 +65,7 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-brand-500" />
             <div>
-              <p className="text-[10px] uppercase tracking-wide text-gray-400">Utolsó ETL futás</p>
+              <p className="text-[0.6875rem] uppercase tracking-wide text-gray-400">Utolsó ETL futás</p>
               <p className="text-xs font-semibold text-gray-700">
                 {lastEtl ? formatDate(lastEtl.finishedAt) : "Még nem futott"}
               </p>
@@ -75,12 +75,12 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
             <>
               <div className="h-8 w-px bg-gray-200" />
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400">Feldolgozott adoptációk</p>
+                <p className="text-[0.6875rem] uppercase tracking-wide text-gray-400">Feldolgozott adoptációk</p>
                 <p className="text-xs font-semibold text-gray-700">{lastEtl.adoptionCount} db</p>
               </div>
               <div className="h-8 w-px bg-gray-200" />
               <div>
-                <p className="text-[10px] uppercase tracking-wide text-gray-400">Futási idő</p>
+                <p className="text-[0.6875rem] uppercase tracking-wide text-gray-400">Futási idő</p>
                 <p className="text-xs font-semibold text-gray-700">{(lastEtl.elapsedMs / 1000).toFixed(1)} mp</p>
               </div>
             </>
@@ -144,14 +144,14 @@ export function Uc06Seasonality({ byQuarter, byWeekday, weekendPct, holidayCount
               <CalendarDays className="h-5 w-5 text-amber-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{weekendPct != null ? `${weekendPct}%` : "–"}</p>
-                <p className="text-[10px] text-gray-400">hétvégén történt adoptáció</p>
+                <p className="text-xs text-gray-400">hétvégén történt adoptáció</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
               <PartyPopper className="h-5 w-5 text-purple-500" />
               <div>
                 <p className="text-lg font-bold text-gray-800">{holidayCount}</p>
-                <p className="text-[10px] text-gray-400">ünnepnapon történt adoptáció</p>
+                <p className="text-xs text-gray-400">ünnepnapon történt adoptáció</p>
               </div>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import { parseCsv } from "@/lib/csv";
 import { safeHref } from "@/lib/safe-url";
+import { userMessage } from "@/lib/client-error";
 
 export interface VetClinic {
   id:           string;
@@ -91,7 +92,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "A mentés nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "A mentés nem sikerült.")); return; }
 
       setVets((prev) => [...prev, data]);
       setShowForm(false);
@@ -116,7 +117,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify({ regeocode: true }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "Nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "Nem sikerült.")); return; }
       setVets((prev) => prev.map((v) => (v.id === id ? data : v)));
       toast[data.lat != null ? "success" : "error"](
         data.lat != null ? "Koordináta frissítve." : "A cím nem volt beazonosítható.",
@@ -180,7 +181,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify({ rows: preview.rows }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "Az importálás nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "Az importálás nem sikerült.")); return; }
 
       setResult(data as ImportResult);
       setPreview(null);
@@ -323,7 +324,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
                 </table>
               </div>
               {preview.headers.length > previewColumns.length && (
-                <p className="mt-1 text-[11px] text-gray-400">
+                <p className="mt-1 text-xs text-gray-400">
                   Az előnézet az első {previewColumns.length} oszlopot és 5 sort mutatja.
                 </p>
               )}
@@ -456,7 +457,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
                   <div className="flex flex-wrap items-center gap-1.5">
                     <h3 className="font-bold text-gray-900">{v.name}</h3>
                     {v.isEmergency && (
-                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">Ügyelet</span>
+                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[0.6875rem] font-bold text-red-700">Ügyelet</span>
                     )}
                   </div>
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
@@ -485,13 +486,13 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
 
               <div className="mt-3 flex items-center justify-between border-t border-gray-50 pt-2.5">
                 {v.lat != null ? (
-                  <span className="text-[11px] font-medium text-green-600">Térképen megjelenik</span>
+                  <span className="text-xs font-medium text-green-600">Térképen megjelenik</span>
                 ) : (
-                  <span className="text-[11px] font-medium text-amber-600">Nincs koordináta</span>
+                  <span className="text-xs font-medium text-amber-600">Nincs koordináta</span>
                 )}
                 <button onClick={() => regeocode(v.id)} disabled={busy === v.id}
                   title="Koordináta újraszámolása a cím alapján"
-                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-[11px] font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
+                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
                   {busy === v.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Crosshair className="h-3 w-3" />}
                   Elhelyezés
                 </button>
