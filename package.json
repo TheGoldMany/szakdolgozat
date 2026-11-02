@@ -35,6 +35,7 @@
     "@react-leaflet/core": "^2.1.0",
     "@react-pdf/renderer": "^4.5.1",
     "@types/leaflet": "^1.9.21",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.3.3",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
