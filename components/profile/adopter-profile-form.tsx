@@ -90,7 +90,7 @@ export function AdopterProfileForm({ initial }: { initial: AdopterProfile }) {
             onChange={(e) => set("bio", e.target.value)}
             className={`${inputCls} resize-none`}
           />
-          <p className="mt-1 text-right text-[11px] text-gray-400">{form.bio.length}/2000</p>
+          <p className="mt-1 text-right text-xs text-gray-400">{form.bio.length}/2000</p>
         </div>
 
         <div>

@@ -163,7 +163,7 @@ function VolunteerCard({ vol, userId }: { vol: Volunteer; userId: string }) {
                       </p>
                     </div>
                     <span className={cn(
-                      "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                      "shrink-0 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold",
                       a.task.status === "COMPLETED" ? "bg-green-100 text-green-700" :
                       a.task.status === "ASSIGNED"  ? "bg-blue-100  text-blue-700"  :
                                                       "bg-gray-100  text-gray-600"

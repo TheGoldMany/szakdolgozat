@@ -87,7 +87,7 @@ export function MultiImageUpload({ value, onChange, max = 6, label }: Props) {
             <Image src={url} alt={`${t("imageAlt")} ${idx + 1}`} fill className="object-cover" sizes="150px" />
 
             {idx === 0 && (
-              <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full bg-brand-500 px-1.5 py-0.5 text-[0.6875rem] font-bold text-white">
                 <Star className="h-2.5 w-2.5" /> {t("primaryImage")}
               </span>
             )}

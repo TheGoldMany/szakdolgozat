@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ShelterCard } from "@/components/shelters/shelter-card";
 import { AnimalStatus } from "@prisma/client";
 import { Building2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/page-metadata";
 
 /**
@@ -14,6 +14,8 @@ import { pageMetadata } from "@/lib/page-metadata";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t = await getTranslations("seo");
   return pageMetadata({
     locale:      params.locale,
@@ -26,7 +28,9 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
 // ISR: a menhelylista ritkán változik, 2 percenként frissül (gyors betöltés cache-ből)
 export const revalidate = 120;
 
-export default async function SheltersPage() {
+export default async function SheltersPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t = await getTranslations("shelters");
 
   const [rawShelters, ratings] = await Promise.all([

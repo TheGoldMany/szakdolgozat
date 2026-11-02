@@ -50,7 +50,7 @@ function PostCard({ post, onToggle }: { post: Post; onToggle: (id: string) => vo
           <span className="block truncate text-sm font-semibold text-gray-900">
             {post.author.name ?? "—"}
           </span>
-          <span className="block text-[11px] text-gray-400">{ago(post.createdAt)}</span>
+          <span className="block text-xs text-gray-400">{ago(post.createdAt)}</span>
         </Link>
       </header>
 
@@ -190,7 +190,7 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
         <ul className="mt-4 space-y-3">
           {[t("introPoint1"), t("introPoint2"), t("introPoint3")].map((point, i) => (
             <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-gray-600">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[0.6875rem] font-bold text-brand-700">
                 {i + 1}
               </span>
               {point}

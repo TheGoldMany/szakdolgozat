@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { Newspaper, Clock, ArrowLeft, Tag } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { publishedWhere, readingMinutes } from "@/lib/articles";
 import { tagSlug } from "@/lib/seo";
@@ -41,8 +41,10 @@ async function findByTagSlug(slug: string) {
   return { posts: matching, label };
 }
 
-export async function generateMetadata(props: { params: Promise<{ tag: string }> }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string; tag: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t = await getTranslations("articles");
   const { label, posts } = await findByTagSlug(params.tag);
   if (!label) return { title: t("notFound") };
@@ -54,8 +56,10 @@ export async function generateMetadata(props: { params: Promise<{ tag: string }>
   };
 }
 
-export default async function ArticlesByTagPage(props: { params: Promise<{ tag: string }> }) {
+export default async function ArticlesByTagPage(props: { params: Promise<{ locale: string; tag: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

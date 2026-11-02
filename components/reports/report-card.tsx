@@ -82,11 +82,11 @@ export async function ReportCard({ report, priority }: ReportCardProps) {
           </div>
         )}
 
-        <span className={cn("absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-xs", style.solid)}>
+        <span className={cn("absolute left-2 top-2 rounded-md px-1.5 py-0.5 text-xs font-semibold sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-xs", style.solid)}>
           {typeLabel[report.type]}
         </span>
         {closed && (
-          <span className="absolute bottom-2 left-2 rounded-md bg-white/95 px-1.5 py-0.5 text-[11px] font-semibold text-gray-700 sm:bottom-auto sm:left-auto sm:right-3 sm:top-3 sm:px-2 sm:py-1 sm:text-xs">
+          <span className="absolute bottom-2 left-2 rounded-md bg-white/95 px-1.5 py-0.5 text-xs font-semibold text-gray-700 sm:bottom-auto sm:left-auto sm:right-3 sm:top-3 sm:px-2 sm:py-1 sm:text-xs">
             {statusLabel[report.status]}
           </span>
         )}

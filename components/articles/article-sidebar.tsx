@@ -79,7 +79,7 @@ export function ArticleSidebar({
                   </div>
                   <div className="min-w-0">
                     <p className="line-clamp-2 text-xs font-semibold leading-snug text-gray-800">{a.title}</p>
-                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-gray-400">
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
                       <Clock className="h-3 w-3 shrink-0" />
                       {t("minutes", { count: a.readingMinutes })}
                     </p>
@@ -108,7 +108,7 @@ export function ArticleSidebar({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-gray-800">{a.name}</p>
-                    <p className="truncate text-[11px] text-gray-400">{a.breed ?? a.city}</p>
+                    <p className="truncate text-xs text-gray-400">{a.breed ?? a.city}</p>
                   </div>
                 </Link>
               </li>
@@ -129,7 +129,7 @@ export function ArticleSidebar({
                     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                       <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="mt-1 text-[11px] text-gray-400">
+                    <p className="mt-1 text-xs text-gray-400">
                       {c.raisedAmount.toLocaleString(locale)} Ft · {pct}%
                     </p>
                   </Link>

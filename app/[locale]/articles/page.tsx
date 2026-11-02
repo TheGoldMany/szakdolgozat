@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { Clock, Newspaper, User } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
 import { alternates } from "@/lib/page-metadata";
@@ -23,7 +23,9 @@ function formatDate(date: Date, locale: string) {
   return date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 }
 
-export default async function ArticlesListPage() {
+export default async function ArticlesListPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

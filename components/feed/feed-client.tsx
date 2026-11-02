@@ -104,9 +104,9 @@ function AnimalCard({ a }: { a: AnimalRailItem }) {
         <div className="relative h-4 w-4 shrink-0 overflow-hidden rounded-full bg-gray-100">
           {a.shelterLogoUrl
             ? <Image src={a.shelterLogoUrl} alt={a.shelterName} fill className="object-cover" sizes="16px" />
-            : <span className="flex h-full w-full items-center justify-center text-[7px] font-bold text-gray-400">{a.shelterName[0]}</span>}
+            : <span className="flex h-full w-full items-center justify-center text-[0.5rem] font-bold text-gray-400">{a.shelterName[0]}</span>}
         </div>
-        <span className="truncate text-[10px] text-gray-400">{a.shelterName}</span>
+        <span className="truncate text-xs text-gray-400">{a.shelterName}</span>
       </div>
     </Link>
   );
@@ -126,7 +126,7 @@ function CampaignCard({ c, locale }: { c: CampaignRailItem; locale: string }) {
           {c.imageUrl
             ? <Image src={c.imageUrl} alt={c.title} fill className="object-cover" sizes="192px" />
             : <span className="flex h-full items-center justify-center"><HandHeart className="h-8 w-8 text-white/50" /></span>}
-          <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-bold text-pink-700 shadow-sm">
+          <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[0.6875rem] font-bold text-pink-700 shadow-sm">
             {pct}%
           </span>
         </div>
@@ -135,7 +135,7 @@ function CampaignCard({ c, locale }: { c: CampaignRailItem; locale: string }) {
           <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-gray-100">
             <div className="h-full rounded-full bg-pink-500 transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <p className="mt-1 text-[10px] text-gray-400">{c.raisedAmount.toLocaleString(locale)} Ft</p>
+          <p className="mt-1 text-xs text-gray-400">{c.raisedAmount.toLocaleString(locale)} Ft</p>
         </div>
       </Link>
       {label && (
@@ -143,9 +143,9 @@ function CampaignCard({ c, locale }: { c: CampaignRailItem; locale: string }) {
           <div className="relative h-4 w-4 shrink-0 overflow-hidden rounded-full bg-gray-100">
             {avatar
               ? <Image src={avatar} alt={label} fill className="object-cover" sizes="16px" />
-              : <span className="flex h-full w-full items-center justify-center text-[7px] font-bold text-gray-400">{label[0]}</span>}
+              : <span className="flex h-full w-full items-center justify-center text-[0.5rem] font-bold text-gray-400">{label[0]}</span>}
           </div>
-          <span className="min-w-0 flex-1 truncate text-[10px] text-gray-400">{label}</span>
+          <span className="min-w-0 flex-1 truncate text-xs text-gray-400">{label}</span>
           <ShareButton url={`/donate/${c.id}`} title={c.title} />
         </div>
       )}
@@ -165,12 +165,12 @@ function EventCard({ e, locale }: { e: EventRailItem; locale: string }) {
       <Link href={`/events/${e.slug}`} className="flex gap-3 p-3">
         {/* Calendar day block */}
         <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center overflow-hidden rounded-xl bg-purple-50 text-purple-700">
-          <span className="text-[10px] font-semibold uppercase leading-none">{month}</span>
+          <span className="text-[0.6875rem] font-semibold uppercase leading-none">{month}</span>
           <span className="text-xl font-black leading-tight">{day}</span>
         </div>
         <div className="min-w-0">
           <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900">{e.title}</p>
-          <p className="mt-1 flex items-center gap-1 truncate text-[10px] text-gray-400">
+          <p className="mt-1 flex items-center gap-1 truncate text-xs text-gray-400">
             <MapPin className="h-3 w-3 shrink-0" />{e.location}
           </p>
         </div>
@@ -200,7 +200,7 @@ function ReportCard({
         {r.imageUrl
           ? <Image src={r.imageUrl} alt="" fill className="object-cover" sizes="144px" />
           : <span className="flex h-full items-center justify-center"><AlertTriangle className="h-8 w-8 text-red-200" /></span>}
-        <span className={cn("absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white", REPORT_COLOR[r.type] ?? "bg-gray-500")}>
+        <span className={cn("absolute left-2 top-2 rounded-full px-2 py-0.5 text-[0.6875rem] font-bold text-white", REPORT_COLOR[r.type] ?? "bg-gray-500")}>
           {reportLabel(r.type)}
         </span>
       </div>
@@ -220,7 +220,7 @@ function SectionDivider({ label }: { label: string }) {
       <div className="h-px flex-1 bg-gray-200" />
       <div className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1">
         <Newspaper className="h-3 w-3 text-gray-400" />
-        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{label}</span>
+        <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-gray-400">{label}</span>
       </div>
       <div className="h-px flex-1 bg-gray-200" />
     </div>

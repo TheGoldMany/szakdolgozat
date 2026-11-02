@@ -230,10 +230,10 @@ export function EventsManager({ shelterId, events }: Props) {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-bold text-gray-900">{ev.title}</h3>
-                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
+                      <span className={`rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
                         {EVENT_TYPE_LABELS[ev.type]}
                       </span>
-                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
+                      <span className={`rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
                         {EVENT_STATUS_LABELS[ev.status]}
                       </span>
                     </div>

@@ -179,7 +179,7 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
                           {item.quantity.toLocaleString("hu-HU")} {item.unit}
                         </span>
                         {isLow && (
-                          <span className="flex items-center gap-1 text-[10px] text-red-500">
+                          <span className="flex items-center gap-1 text-xs text-red-500">
                             <AlertTriangle className="h-3 w-3" />
                             {ss === "empty" ? "Elfogyott" : `Min: ${item.minQuantity}`}
                           </span>

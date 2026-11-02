@@ -230,7 +230,7 @@ export default function MapView() {
             </div>
           ))}
         </div>
-        <p className="mt-2 max-w-[9rem] border-t border-gray-100 pt-1.5 text-[10px] leading-snug text-gray-400">
+        <p className="mt-2 max-w-[9rem] border-t border-gray-100 pt-1.5 text-xs leading-snug text-gray-400">
           {t("legendHint")}
         </p>
         </>)}

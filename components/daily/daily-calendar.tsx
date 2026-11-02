@@ -84,7 +84,7 @@ export function DailyCalendar() {
 
       <div className="mb-1 grid grid-cols-7 gap-1">
         {weekdays.map((w) => (
-          <span key={w} className="py-1 text-center text-[10px] font-semibold uppercase text-gray-400">
+          <span key={w} className="py-1 text-center text-[0.6875rem] font-semibold uppercase text-gray-400">
             {w}
           </span>
         ))}
@@ -117,11 +117,11 @@ export function DailyCalendar() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={entry.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
-              <span className="absolute inset-x-0 bottom-0 bg-black/45 py-0.5 text-center text-[10px] font-semibold text-white">
+              <span className="absolute inset-x-0 bottom-0 bg-black/45 py-0.5 text-center text-xs font-semibold text-white">
                 {dayNum}
               </span>
               {entry.count > 1 && (
-                <span className="absolute right-0.5 top-0.5 rounded-full bg-brand-600 px-1 text-[9px] font-bold text-white">
+                <span className="absolute right-0.5 top-0.5 rounded-full bg-brand-600 px-1 text-[0.625rem] font-bold text-white">
                   {entry.count}
                 </span>
               )}

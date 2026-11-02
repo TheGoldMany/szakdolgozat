@@ -89,7 +89,7 @@ export function HomeSidebar({
                 <li key={e.id}>
                   <Link href={`/events/${e.slug}`} className="flex gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50">
                     <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-purple-50 text-purple-700">
-                      <span className="text-[9px] font-semibold uppercase leading-none">
+                      <span className="text-[0.625rem] font-semibold uppercase leading-none">
                         {d.toLocaleDateString(locale, { month: "short" })}
                       </span>
                       <span className="text-base font-black leading-tight">
@@ -98,7 +98,7 @@ export function HomeSidebar({
                     </div>
                     <div className="min-w-0">
                       <p className="line-clamp-2 text-xs font-semibold leading-snug text-gray-800">{e.title}</p>
-                      <p className="mt-0.5 truncate text-[11px] text-gray-400">{e.location}</p>
+                      <p className="mt-0.5 truncate text-xs text-gray-400">{e.location}</p>
                     </div>
                   </Link>
                 </li>
@@ -121,7 +121,7 @@ export function HomeSidebar({
                     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                       <div className="h-full rounded-full bg-pink-500" style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="mt-1 text-[11px] text-gray-400">
+                    <p className="mt-1 text-xs text-gray-400">
                       {c.raisedAmount.toLocaleString(locale)} Ft · {pct}%
                     </p>
                   </Link>
@@ -142,16 +142,16 @@ export function HomeSidebar({
                   <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-brand-50">
                     {s.logoUrl
                       ? <Image src={s.logoUrl} alt={s.name} fill className="object-cover" sizes="32px" />
-                      : <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-brand-600">{s.name[0]}</span>}
+                      : <span className="flex h-full w-full items-center justify-center text-[0.6875rem] font-bold text-brand-600">{s.name[0]}</span>}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-gray-800">{s.name}</p>
-                    <p className="truncate text-[11px] text-gray-400">{s.city}</p>
+                    <p className="truncate text-xs text-gray-400">{s.city}</p>
                   </div>
                   {/* Örökbefogadható állatok száma. Korábban csillaggal és az
                       összes valaha felvett állattal: értékelésnek látszott. */}
                   {s.animalCount > 0 && (
-                    <span className="flex shrink-0 items-center gap-1 text-[11px] font-medium text-brand-700" title={t("factAnimals", { count: s.animalCount })}>
+                    <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-brand-700" title={t("factAnimals", { count: s.animalCount })}>
                       <PawPrint className="h-3 w-3" />
                       {s.animalCount}
                     </span>

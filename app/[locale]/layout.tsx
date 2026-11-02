@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@/lib/fonts";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -19,6 +19,11 @@ import { siteUrl } from "@/lib/site-url";
 
 export const viewport: Viewport = {
   themeColor: "#187f3b",
+  // Az oldalnak csak világos témája van. Az „only light” megtiltja, hogy a
+  // böngésző (pl. Chrome Androidon, Samsung Internet) automatikusan
+  // besötétítse: az kiszámíthatatlanul invertálja a színeket és a képeket,
+  // és az űrlapmezők is sötétek lennének a világos kártyákon.
+  colorScheme: "only light",
   width: "device-width",
   initialScale: 1,
   // A `cover` nélkül iOS-en az `env(safe-area-inset-*)` mindig 0. Ilyenkor az
@@ -44,6 +49,10 @@ export const metadata: Metadata = {
   description: "Találd meg új legjobb barátod! Böngéssz örökbefogadható állatok között magyarországi menhelyekről.",
 };
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function LocaleLayout(
   props: {
     children: React.ReactNode;
@@ -63,6 +72,13 @@ export default async function LocaleLayout(
   if (!routing.locales.includes(locale as "hu" | "en" | "de" | "pl")) {
     notFound();
   }
+
+  // E nélkül a next-intl a kérés fejlécéből olvassa a nyelvet, és ez minden
+  // oldalt dinamikussá tett: a `revalidate` beállítások hatástalanok voltak,
+  // minden látogatás új renderelést és adatbázis-lekérést jelentett. Az
+  // oldalaknak is hívniuk kell (párhuzamosan renderelnek); amelyik nem hívja,
+  // vagy munkamenetet olvas, az továbbra is dinamikus marad.
+  setRequestLocale(locale);
 
   const messages = await getMessages();
 

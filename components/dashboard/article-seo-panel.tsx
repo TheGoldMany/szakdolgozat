@@ -114,7 +114,7 @@ function TermInput({
           ))}
         </ul>
       )}
-      <p className="mt-1 text-[11px] leading-snug text-gray-400">{hint}</p>
+      <p className="mt-1 text-xs leading-snug text-gray-400">{hint}</p>
     </div>
   );
 }
@@ -162,7 +162,7 @@ export function ArticleSeoPanel({
 
       {/* Találat-előnézet */}
       <div className="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+        <p className="mb-2 text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-400">
           Így néz ki a keresőben
         </p>
         <p className="text-xs text-gray-500">
@@ -214,7 +214,7 @@ export function ArticleSeoPanel({
             onChange={(e) => set("focusKeyword", e.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-600"
           />
-          <p className="mt-1 text-[11px] leading-snug text-gray-400">
+          <p className="mt-1 text-xs leading-snug text-gray-400">
             Amire keresve meg kellene találni a cikket. Ez alapján készül az alábbi ellenőrzőlista.
           </p>
         </div>
@@ -252,7 +252,7 @@ export function ArticleSeoPanel({
                 <div className="min-w-0">
                   <span className="text-xs font-medium text-gray-700">{check.label}</span>
                   {check.hint && (
-                    <p className="text-[11px] leading-snug text-gray-400">{check.hint}</p>
+                    <p className="text-xs leading-snug text-gray-400">{check.hint}</p>
                   )}
                 </div>
               </li>

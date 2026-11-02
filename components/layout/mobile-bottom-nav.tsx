@@ -92,7 +92,7 @@ export function MobileBottomNav() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "press flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
+                  "press flex flex-col items-center gap-0.5 py-2 text-xs font-medium transition-colors",
                   active
                     ? "text-brand-600"
                     // A kiemelt fül inaktívan sem halványul el, mint a többi.

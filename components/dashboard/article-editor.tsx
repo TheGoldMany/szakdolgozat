@@ -213,8 +213,8 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
             <span
               className={
                 article!.published
-                  ? "rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700"
-                  : "rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700"
+                  ? "rounded-full bg-green-50 px-2 py-0.5 text-[0.6875rem] font-bold text-green-700"
+                  : "rounded-full bg-amber-50 px-2 py-0.5 text-[0.6875rem] font-bold text-amber-700"
               }
             >
               {article!.published ? "Publikálva" : "Piszkozat"}
@@ -261,7 +261,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
             placeholder="Néhány mondat, ami a listákban és a megosztásokban jelenik meg."
             className={`${cls} resize-y`}
           />
-          <p className="mt-1 text-right text-[11px] text-gray-400">
+          <p className="mt-1 text-right text-xs text-gray-400">
             {excerpt.length}/{EXCERPT_MAX}
           </p>
         </div>
@@ -279,7 +279,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
             placeholder="Írd meg a cikk teljes szövegét. Az üres sorral elválasztott részekből lesznek a bekezdések."
             className={`${cls} resize-y leading-relaxed`}
           />
-          <p className="mt-1 text-right text-[11px] text-gray-400">
+          <p className="mt-1 text-right text-xs text-gray-400">
             {content.trim() ? content.trim().split(/\s+/).length : 0} szó
           </p>
         </div>
@@ -298,7 +298,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
                   setImageUrl("");
                   if (fileRef.current) fileRef.current.value = "";
                 }}
-                className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-[11px] font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
+                className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <X className="h-3 w-3" /> Eltávolítás
               </button>
@@ -335,7 +335,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
-          <p className="mt-1 text-[11px] text-gray-400">
+          <p className="mt-1 text-xs text-gray-400">
             Csak akkor válassz menhelyet, ha a cikk kifejezetten róla szól.
           </p>
         </div>
@@ -362,7 +362,7 @@ export function ArticleEditor({ article }: { article?: EditableArticle | null })
             onChange={(e) => setScheduledAt(e.target.value)}
             className={cls}
           />
-          <p className="mt-1 text-[11px] text-gray-400">
+          <p className="mt-1 text-xs text-gray-400">
             Hagyd üresen az azonnali publikáláshoz. Jövőbeli időpontnál a cikk csak
             akkor jelenik meg a látogatóknak, addig itt marad, „Időzítve" jelöléssel.
           </p>

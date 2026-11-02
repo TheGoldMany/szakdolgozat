@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { FileText, AlertTriangle, CreditCard, Users, ShieldCheck, Scale } from "lucide-react";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Általános Szerződési Feltételek",
@@ -364,6 +365,8 @@ function ASZFSummaryPage({ locale }: { locale: string }) {
 
 export default async function ASZFPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
 
   const {
     locale

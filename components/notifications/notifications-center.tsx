@@ -137,7 +137,7 @@ export function NotificationsCenter() {
             {t("unread")}
             {unreadCount > 0 && (
               <span className={cn(
-                "rounded-full px-1.5 text-[10px] font-bold",
+                "rounded-full px-1.5 text-[0.6875rem] font-bold",
                 filter === "unread" ? "bg-white/25 text-white" : "bg-red-500 text-white"
               )}>
                 {unreadCount}

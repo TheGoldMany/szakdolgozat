@@ -39,7 +39,7 @@ export function Uc05AgeProfile({ ageCategoryDist, appCountDist, speciesAgeCross,
           <h2 className="text-sm font-semibold text-gray-700">UC-05 &middot; Adoptált állatok korfája és versenyhelyzet</h2>
           <p className="text-xs text-gray-400 mt-0.5">Korosztály-megoszlás és pályázatok száma (DWH-alapú)</p>
         </div>
-        <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+        <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold ${
           dwhAvailable
             ? "bg-green-50 text-green-700 border border-green-200"
             : "bg-gray-100 text-gray-500 border border-gray-200"

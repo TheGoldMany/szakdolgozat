@@ -176,7 +176,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
                         </span>
                       </div>
                       {tx.note && <p className="mt-0.5 text-xs text-gray-500">{tx.note}</p>}
-                      <p className="mt-0.5 text-[10px] text-gray-400">
+                      <p className="mt-0.5 text-xs text-gray-400">
                         {tx.createdBy?.name ?? "Rendszer"}
                         {" · "}
                         {new Date(tx.createdAt).toLocaleString("hu-HU", {

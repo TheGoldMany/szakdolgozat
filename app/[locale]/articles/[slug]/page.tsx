@@ -13,7 +13,7 @@ import {
   PawPrint,
   User,
 } from "lucide-react";
-import { getTranslations, getLocale } from "next-intl/server";
+import { getTranslations, getLocale, setRequestLocale } from "next-intl/server";
 import { effectiveTitle, effectiveDescription, tagSlug } from "@/lib/seo";
 import { siteUrl } from "@/lib/site-url";
 
@@ -23,8 +23,10 @@ import { readingMinutes, isPublished, publishedWhere } from "@/lib/articles";
 import { ArticleSidebar } from "@/components/articles/article-sidebar";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const article = await prisma.post.findUnique({
     where:  { slug: params.slug },
     select: {
@@ -103,8 +105,10 @@ function RelatedCard({
   );
 }
 
-export default async function ArticleDetailPage(props: { params: Promise<{ slug: string }> }) {
+export default async function ArticleDetailPage(props: { params: Promise<{ locale: string; slug: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const t      = await getTranslations("articles");
   const locale = await getLocale();
 

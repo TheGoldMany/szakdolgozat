@@ -96,11 +96,11 @@ export function ReportsManager({ initial }: { initial: AdminReport[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold", TYPE_CLS[r.type])}>{TYPE_LABEL[r.type]}</span>
-                  <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold",
+                  <span className={cn("rounded-full px-2 py-0.5 text-[0.6875rem] font-bold", TYPE_CLS[r.type])}>{TYPE_LABEL[r.type]}</span>
+                  <span className={cn("rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold",
                     r.status === "ACTIVE" ? "bg-brand-50 text-brand-800" : "bg-gray-100 text-gray-600")}>{STATUS_LABEL[r.status]}</span>
                   {(r.lat == null || r.lng == null) && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800" title="Nem jelenik meg a térképen">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[0.6875rem] font-semibold text-amber-800" title="Nem jelenik meg a térképen">
                       <MapPinOff className="h-3 w-3" /> Nincs a térképen
                     </span>
                   )}

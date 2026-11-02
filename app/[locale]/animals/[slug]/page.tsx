@@ -496,7 +496,7 @@ export default async function AnimalDetailPage(props: { params: Promise<{ slug: 
               <p className="truncate text-sm font-semibold text-gray-900">{animal.name}</p>
               <p className="truncate text-xs text-gray-500">{animal.shelter.name}</p>
             </div>
-            <span className="relative h-9 w-9 shrink-0 [&>button]:right-0 [&>button]:top-0 [&>button]:border [&>button]:border-gray-200 [&>button]:shadow-none">
+            <span className="relative h-10 w-10 shrink-0 [&>button]:right-0 [&>button]:top-0 [&>button]:border [&>button]:border-gray-200 [&>button]:shadow-none">
               <FavoriteButton animalId={animal.id} initialFavorited={isFavorited} />
             </span>
             <a href="#adopt"

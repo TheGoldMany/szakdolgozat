@@ -37,7 +37,7 @@ export function ShelterSwitcher({ options, shelterId }: Props) {
 
   return (
     <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3">
-      <label className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+      <label className="mb-1.5 flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-400">
         <Building2 className="h-3 w-3" />
         Kezelt menhely
       </label>
@@ -58,7 +58,7 @@ export function ShelterSwitcher({ options, shelterId }: Props) {
         </span>
       </div>
       {shelterId && (
-        <p className="mt-1.5 text-[11px] text-gray-400">
+        <p className="mt-1.5 text-xs text-gray-400">
           Az oldalak ennek a menhelynek az adatait mutatják.
         </p>
       )}

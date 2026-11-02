@@ -323,7 +323,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
                 </table>
               </div>
               {preview.headers.length > previewColumns.length && (
-                <p className="mt-1 text-[11px] text-gray-400">
+                <p className="mt-1 text-xs text-gray-400">
                   Az előnézet az első {previewColumns.length} oszlopot és 5 sort mutatja.
                 </p>
               )}
@@ -456,7 +456,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
                   <div className="flex flex-wrap items-center gap-1.5">
                     <h3 className="font-bold text-gray-900">{v.name}</h3>
                     {v.isEmergency && (
-                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">Ügyelet</span>
+                      <span className="rounded-full bg-red-50 px-2 py-0.5 text-[0.6875rem] font-bold text-red-700">Ügyelet</span>
                     )}
                   </div>
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
@@ -485,13 +485,13 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
 
               <div className="mt-3 flex items-center justify-between border-t border-gray-50 pt-2.5">
                 {v.lat != null ? (
-                  <span className="text-[11px] font-medium text-green-600">Térképen megjelenik</span>
+                  <span className="text-xs font-medium text-green-600">Térképen megjelenik</span>
                 ) : (
-                  <span className="text-[11px] font-medium text-amber-600">Nincs koordináta</span>
+                  <span className="text-xs font-medium text-amber-600">Nincs koordináta</span>
                 )}
                 <button onClick={() => regeocode(v.id)} disabled={busy === v.id}
                   title="Koordináta újraszámolása a cím alapján"
-                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-[11px] font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
+                  className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-50">
                   {busy === v.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Crosshair className="h-3 w-3" />}
                   Elhelyezés
                 </button>

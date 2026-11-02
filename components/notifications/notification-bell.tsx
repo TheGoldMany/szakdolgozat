@@ -95,7 +95,7 @@ export function NotificationBell() {
         <span className="relative">
           <Bell className="h-4 w-4" />
           {unreadCount > 0 && (
-            <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+            <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-500 text-[0.625rem] font-bold text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
@@ -140,7 +140,7 @@ export function NotificationBell() {
                       {n.body && (
                         <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{n.body}</p>
                       )}
-                      <p className="mt-1 text-[10px] text-gray-400">{formatTime(n.createdAt)}</p>
+                      <p className="mt-1 text-xs text-gray-400">{formatTime(n.createdAt)}</p>
                     </div>
                   </div>
                 </button>

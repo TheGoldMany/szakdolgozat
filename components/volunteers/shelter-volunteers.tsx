@@ -338,7 +338,7 @@ export function ShelterVolunteers({ shelterId, volunteers, tasks }: Props) {
               {tabKey === "volunteers" ? <HandHeart className="h-3.5 w-3.5" /> : <ClipboardList className="h-3.5 w-3.5" />}
               {tDash(tabKey)}
               {tabKey === "volunteers" && pending > 0 && (
-                <span className="ml-0.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-white">{pending}</span>
+                <span className="ml-0.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-[0.6875rem] font-bold text-white">{pending}</span>
               )}
             </button>
           ))}

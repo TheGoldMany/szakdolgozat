@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { alternates } from "@/lib/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,7 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function KapcsolatPage() {
+export default async function KapcsolatPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t = await getTranslations("contact");
 
   return (

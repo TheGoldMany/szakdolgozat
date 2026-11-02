@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { Shield, Cookie, Lock, Eye, Trash2, Download, Mail, ExternalLink, AlertTriangle } from "lucide-react";
+import { setRequestLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
   title: "Adatvédelmi tájékoztató",
@@ -406,6 +407,8 @@ function AdatvedelemSummaryPage({ locale }: { locale: string }) {
 
 export default async function AdatvedelemPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
 
   const {
     locale

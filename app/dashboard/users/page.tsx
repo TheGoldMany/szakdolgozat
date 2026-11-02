@@ -181,14 +181,14 @@ export default function DashboardUsersPage() {
                           <p className="font-medium text-gray-900 flex items-center gap-1.5">
                             {user.name ?? <span className="text-gray-400">–</span>}
                             {isSuspended && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[0.6875rem] font-semibold text-red-700">
                                 <Ban className="h-2.5 w-2.5" /> Felfüggesztve
                               </span>
                             )}
                           </p>
                           <p className="text-xs text-gray-400 md:hidden">{user.email}</p>
                           {!user.emailVerified && (
-                            <p className="text-[10px] font-medium text-amber-500">{t("usersEmailNotVerified")}</p>
+                            <p className="text-xs font-medium text-amber-500">{t("usersEmailNotVerified")}</p>
                           )}
                         </div>
                       </div>

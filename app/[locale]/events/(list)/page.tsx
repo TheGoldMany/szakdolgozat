@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { CalendarHeart, MapPin, Users } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_COLORS } from "@/lib/event";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -16,6 +16,8 @@ import { listingHasContent } from "@/lib/listing-index";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale(params.locale);
   const [t, has] = await Promise.all([getTranslations("seo"), listingHasContent()]);
   return pageMetadata({
     locale:      params.locale,
@@ -29,7 +31,9 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
 // ISR: az eseménylista 5 percenként frissül (gyors betöltés cache-ből)
 export const revalidate = 300;
 
-export default async function EventsListPage() {
+export default async function EventsListPage(props: { params: Promise<{ locale: string }> }) {
+  // Statikus/ISR renderelés: a nyelvet nem a kérés fejlécéből olvassa ki.
+  setRequestLocale((await props.params).locale);
   const t = await getTranslations("events");
   const events = await prisma.event.findMany({
     where:   { status: "PUBLISHED", startsAt: { gte: new Date() } },
@@ -67,7 +71,7 @@ export default async function EventsListPage() {
                   {ev.imageUrl
                     ? <Image src={ev.imageUrl} alt={ev.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width:768px) 100vw, 33vw" />
                     : <div className="flex h-full items-center justify-center"><CalendarHeart className="h-10 w-10 text-white/70" /></div>}
-                  <span className={`absolute left-3 top-3 rounded-full border px-2 py-0.5 text-[11px] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
+                  <span className={`absolute left-3 top-3 rounded-full border px-2 py-0.5 text-[0.6875rem] font-medium ${EVENT_TYPE_COLORS[ev.type]}`}>
                     {EVENT_TYPE_LABELS[ev.type]}
                   </span>
                 </div>

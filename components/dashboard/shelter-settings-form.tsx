@@ -435,7 +435,7 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
             {/* A gépi hibakód. Kijelölhető szövegként, hogy továbbítani lehessen —
                 enélkül a hiba diagnosztizálhatatlan, ezt élesben megtanultuk. */}
             {stripeCode && (
-              <p className="mt-1 select-all font-mono text-[11px] text-gray-400">
+              <p className="mt-1 select-all font-mono text-xs text-gray-400">
                 Stripe: {stripeCode}
               </p>
             )}

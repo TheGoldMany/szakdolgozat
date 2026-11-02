@@ -130,7 +130,7 @@ export default async function ApprovalsPage() {
                     <p className="mt-0.5 text-xs text-gray-500">
                       {form.shelter.name} · {form._count.fields} kérdés
                     </p>
-                    <p className="mt-1 text-[11px] text-gray-400">
+                    <p className="mt-1 text-xs text-gray-400">
                       Beküldve: {new Date(form.createdAt).toLocaleDateString("hu-HU")}
                     </p>
                   </div>

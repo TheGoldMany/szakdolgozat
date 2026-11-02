@@ -135,7 +135,7 @@ export function SidebarNav({ role }: { role: string }) {
       {groups.map((group, gi) => (
         <div key={gi} className={cn(gi > 0 && "mt-4")} data-tour={group.tourKey}>
           {group.titleKey && (
-            <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-1.5 px-3 text-[0.6875rem] font-semibold uppercase tracking-wider text-gray-400">
               {t(group.titleKey)}
             </p>
           )}

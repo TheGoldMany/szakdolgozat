@@ -114,7 +114,7 @@ export default async function FinancesPage() {
             <p className="text-xs text-gray-400 mb-1">{t("totalDonated")}</p>
             <p className="text-lg font-bold text-gray-900">{totalAll.toLocaleString("hu-HU")} Ft</p>
             {totalRecurring > 0 && (
-              <p className="mt-0.5 text-[11px] leading-snug text-gray-400">
+              <p className="mt-0.5 text-xs leading-snug text-gray-400">
                 {t("recurringBreakdown", {
                   oneOff:    totalDonated.toLocaleString("hu-HU"),
                   recurring: totalRecurring.toLocaleString("hu-HU"),

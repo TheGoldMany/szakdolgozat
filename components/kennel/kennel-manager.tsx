@@ -229,7 +229,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
 
                 {/* Felszereltség – kattintásra azonnal mentődik */}
                 <div className="mt-3 border-t border-gray-50 pt-3">
-                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                  <p className="mb-1.5 text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-400">
                     Felszereltség
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -241,7 +241,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
                           type="button"
                           onClick={() => toggleFacility(k.id, key, !on)}
                           title={on ? `${label} – kikapcsolás` : `${label} – bekapcsolás`}
-                          className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-medium transition-colors sm:px-2 sm:py-0.5 ${
+                          className={`flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[0.6875rem] font-medium transition-colors sm:px-2 sm:py-0.5 ${
                             on
                               ? "bg-green-50 text-green-700 ring-1 ring-green-200"
                               : "bg-gray-50 text-gray-400 hover:bg-gray-100"
