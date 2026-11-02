@@ -68,18 +68,22 @@ export function HeroSlideshow({ slides }: { slides: HeroSlide[] }) {
 
       {/* Progress dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-3 right-3 z-10 flex gap-1.5">
+        <div className="absolute bottom-1 right-2 z-10 flex">
+          {/* A pötty kicsi marad, de a gomb körülötte 32 px magas: ujjal is
+              eltalálható. */}
           {slides.map((_, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setActive(idx)}
               aria-label={`${idx + 1}. állat`}
-              className={cn(
-                "h-1.5 rounded-full transition-all",
+              className="flex h-8 items-center px-[3px]"
+            >
+              <span className={cn(
+                "block h-1.5 rounded-full transition-all",
                 idx === active ? "w-5 bg-white" : "w-1.5 bg-white/60 hover:bg-white/90",
-              )}
-            />
+              )} />
+            </button>
           ))}
         </div>
       )}

@@ -361,3 +361,9 @@ input, textarea, select { scroll-margin-top: 5rem; scroll-margin-bottom: 6rem; }
 svg.lucide[stroke-width="2"] {
   stroke-width: 1.6px;
 }
+
+/* Kis szöveges link vagy gomb (pl. „Összes →”, „Vissza”), amelynek a
+   kinézete maradjon kicsi, de ujjal is eltalálható legyen: a koppintási
+   felület láthatatlanul nagyobb a feliratnál. */
+.hit-area { position: relative; }
+.hit-area::after { content: ""; position: absolute; inset: -10px -6px; }

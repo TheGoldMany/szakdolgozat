@@ -32,7 +32,7 @@ function Card({
           <Icon className="h-4 w-4 text-brand-500" />
           {title}
         </h2>
-        <Link href={href} className="text-xs font-semibold text-brand-600 hover:underline">
+        <Link href={href} className="hit-area text-xs font-semibold text-brand-600 hover:underline">
           {linkLabel}
         </Link>
       </div>

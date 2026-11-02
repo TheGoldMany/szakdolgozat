@@ -285,7 +285,7 @@ export default function ShelterRegisterPage() {
           )}
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-gray-400 hover:text-brand-500 transition-colors">
+            <Link href="/" className="hit-area text-xs text-gray-400 hover:text-brand-500 transition-colors">
               {tCommon("backHome")}
             </Link>
           </div>

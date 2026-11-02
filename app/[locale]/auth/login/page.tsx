@@ -190,7 +190,7 @@ function LoginForm() {
           <div className="mb-1.5 flex items-center justify-between">
             <label className="text-sm font-medium text-gray-700">{t("password")}</label>
             <Link href="/auth/forgot-password"
-              className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
+              className="hit-area text-xs text-gray-400 hover:text-brand-600 transition-colors">
               {t("forgotPassword")}
             </Link>
           </div>
@@ -313,7 +313,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-gray-400 hover:text-brand-600 transition-colors">
+            <Link href="/" className="hit-area text-xs text-gray-400 hover:text-brand-600 transition-colors">
               {t("backToHome")}
             </Link>
           </div>

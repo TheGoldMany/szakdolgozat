@@ -57,7 +57,7 @@ export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonPro
       aria-label={liked ? "Kedvelés visszavonása" : "Kedvelés"}
       aria-pressed={liked}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors",
+        "inline-flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors",
         liked ? "text-rose-600 hover:bg-rose-50" : "text-gray-500 hover:bg-gray-100 hover:text-rose-600"
       )}
     >

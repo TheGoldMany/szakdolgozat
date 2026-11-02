@@ -279,7 +279,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             <div className="min-w-0 flex-1">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">{t("feedTitle")}</h2>
-                <Link href="/animals" className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
+                <Link href="/animals" className="hit-area flex items-center gap-1 text-sm font-semibold text-brand-700 hover:underline">
                   {t("all")} <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

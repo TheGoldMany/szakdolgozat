@@ -167,7 +167,7 @@ export default async function ReportsPage(props: PageProps) {
                     href={href({ status: tab.value, page: 1 })}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors",
+                      "rounded-md px-3 py-2.5 text-xs font-semibold transition-colors",
                       active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-800",
                     )}
                   >

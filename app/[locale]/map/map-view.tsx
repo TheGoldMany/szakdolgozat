@@ -238,7 +238,7 @@ export default function MapView() {
       {/* Bal alul áll: középen az „Új bejelentés”, jobb alul a Napi állatok gombja van; mobilon a gomb fölé kerül. */}
       <div className="absolute bottom-20 left-3 z-[1000] md:bottom-8 rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-lg">
         <button type="button" onClick={() => setLegendOpen((o) => !o)} aria-expanded={legendOpen}
-          className="flex w-full items-center justify-between gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+          className="hit-area flex w-full items-center justify-between gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
           {t("legend")}
           <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", legendOpen && "rotate-180")} />
         </button>

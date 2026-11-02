@@ -74,7 +74,7 @@ function Rail({
           </span>
           <h2 className="text-sm font-bold text-gray-900">{title}</h2>
         </div>
-        <Link href={href} className="text-xs font-semibold text-brand-600 hover:underline">{linkLabel} →</Link>
+        <Link href={href} className="hit-area text-xs font-semibold text-brand-600 hover:underline">{linkLabel} →</Link>
       </div>
       <div className="-mx-1 flex gap-3 overflow-x-auto px-4 py-3 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {children}

@@ -145,7 +145,7 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 
-        <Link href="/reports" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-brand-700">
+        <Link href="/reports" className="hit-area inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-brand-700">
           <ArrowLeft className="h-4 w-4" />
           {t("backToList")}
         </Link>

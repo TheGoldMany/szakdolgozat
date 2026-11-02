@@ -77,7 +77,7 @@ export function Footer() {
             </p>
             <a
               href="mailto:info@allatimenhelyek.hu"
-              className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-brand-600 transition-colors"
+              className="mt-4 flex items-center gap-2 py-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors"
             >
               <Mail className="h-4 w-4" />
               info@allatimenhelyek.hu
@@ -179,7 +179,7 @@ export function Footer() {
             <span aria-hidden className="mx-1.5 text-gray-300">·</span>
             {t("madeBy")}{" "}
             <a href="https://www.lundasoftware.hu" target="_blank" rel="noopener"
-              className="font-semibold text-gray-700 underline-offset-2 hover:text-brand-700 hover:underline">
+              className="hit-area font-semibold text-gray-700 underline-offset-2 hover:text-brand-700 hover:underline">
               Lunda Software
             </a>
           </p>
