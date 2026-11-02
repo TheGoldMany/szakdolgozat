@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 </label>
                 <input
                   type="email"
-                  placeholder="pelda@email.hu"
+                  placeholder="pelda@example.com"
                   autoComplete="email"
                   className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-brand-200"
                   {...register("email")}

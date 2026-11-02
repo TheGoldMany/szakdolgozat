@@ -51,9 +51,10 @@ const REPORT_LABEL_KEY: Record<string, string> = { LOST: "lost", FOUND: "found",
 const ANIMAL_LABEL_KEY: Record<string, string> = { DOG: "dog", CAT: "cat", RABBIT: "rabbit", BIRD: "bird", OTHER: "other" };
 
 const REPORT_COLOR: Record<string, string> = {
-  LOST:  "bg-red-500",
-  FOUND: "bg-green-500",
-  STRAY: "bg-orange-500",
+  // Fehér felirat alatt: a 600/700-as tónus adja a 4.5:1-es kontrasztot.
+  LOST:  "bg-red-600",
+  FOUND: "bg-green-700",
+  STRAY: "bg-orange-700",
 };
 
 // ── Rail wrapper ─────────────────────────────────────────────────────────────

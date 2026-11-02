@@ -362,7 +362,7 @@ export function Header() {
                 <span className="relative">
                   <MessageCircle className="h-4 w-4" />
                   {unread > 0 && (
-                    <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-500 text-[0.625rem] font-bold text-white">
+                    <span className="animate-pop absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-600 text-[0.625rem] font-bold text-white">
                       {unread > 9 ? "9+" : unread}
                     </span>
                   )}
@@ -450,7 +450,7 @@ export function Header() {
             >
               <MessageCircle className="h-5 w-5" />
               {unread > 0 && (
-                <span className="animate-pop absolute right-1 top-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-500 text-[0.625rem] font-bold text-white">
+                <span className="animate-pop absolute right-1 top-1 flex h-[18px] min-w-[18px] px-1 items-center justify-center rounded-full bg-red-600 text-[0.625rem] font-bold text-white">
                   {unread > 9 ? "9+" : unread}
                 </span>
               )}

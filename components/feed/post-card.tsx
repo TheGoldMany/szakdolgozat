@@ -22,7 +22,8 @@ export interface FeedPost {
   event:     { id: string; slug: string; title: string; startsAt: string; location: string } | null;
   campaign:  { id: string; slug: string; title: string; targetAmount: number; raisedAmount: number } | null;
   _count:    { likes: number };
-  likedByMe: boolean;
+  /** Hiányzik, ha az oldal gyorsítótárból jön: ilyenkor a gomb maga kérdezi le. */
+  likedByMe?: boolean;
 }
 
 /** Cikk-előnézet a hírfolyamban: cím, bevezető és átvezetés a teljes cikkre. */

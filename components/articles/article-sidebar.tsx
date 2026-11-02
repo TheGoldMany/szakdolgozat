@@ -57,7 +57,7 @@ export function ArticleSidebar({
   const locale  = useLocale();
 
   return (
-    <aside className="space-y-4">
+    <div className="space-y-4">
 
       {articles.length > 0 && (
         <Card icon={Newspaper} title={t("moreArticles")} href="/articles" linkLabel={tCommon("all")}>
@@ -139,6 +139,6 @@ export function ArticleSidebar({
           </ul>
         </Card>
       )}
-    </aside>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { Shield, Cookie, Lock, Eye, Trash2, Download, Mail, ExternalLink, AlertTriangle } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
+import { EmailLink, EMAIL_AT_TEXT } from "@/components/ui/email-link";
 
 /**
  * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
@@ -25,7 +26,9 @@ export const metadata: Metadata = {
 
 const EFFECTIVE_DATE = "2026. október 27.";
 const CONTROLLER_NAME = "ÁllatiMenhelyek.hu";
-const CONTROLLER_EMAIL = "info@allatimenhelyek.hu";
+// A cím nem szerepel egyben a HTML-ben (robotok gyűjtik): szövegben
+// „[kukac]” alakban, linkként a böngésző rakja össze (EmailLink).
+const CONTROLLER_EMAIL = EMAIL_AT_TEXT;
 const NAIH_URL = "https://www.naih.hu";
 
 function SectionHeading({ number, title }: { number: string; title: string }) {
@@ -66,7 +69,7 @@ function InfoBox({ children }: { children: React.ReactNode }) {
   );
 }
 
-function TableRow({ label, value }: { label: string; value: string }) {
+function TableRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <tr className="border-b border-gray-50">
       <td className="py-2.5 pr-4 text-sm font-medium text-gray-700 align-top w-[40%]">{label}</td>
@@ -493,9 +496,9 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
             <tbody>
               <TableRow label="Megnevezés" value={CONTROLLER_NAME} />
               <TableRow label="Székhely" value="Magyarország" />
-              <TableRow label="Kapcsolattartó e-mail" value={CONTROLLER_EMAIL} />
+              <TableRow label="Kapcsolattartó e-mail" value={<EmailLink className="font-medium text-brand-600 hover:underline" />} />
               <TableRow label="Weboldal" value="allatimenhelyek.hu" />
-              <TableRow label="GDPR kapcsolattartó" value={CONTROLLER_EMAIL} />
+              <TableRow label="GDPR kapcsolattartó" value={<EmailLink className="font-medium text-brand-600 hover:underline" />} />
             </tbody>
           </table>
 
@@ -667,7 +670,7 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
           <div id="section-6"><SectionHeading number="6" title="Az érintett jogai" /></div>
           <P>
             A GDPR III. fejezete alapján az alábbi jogok illetik meg az érintetteket.
-            Kérelmet a <strong>{CONTROLLER_EMAIL}</strong> e-mail-címre küldhet;
+            Kérelmet a <strong><EmailLink /></strong> e-mail-címre küldhet;
             azonosítás után 30 napon belül válaszolunk.
           </P>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -800,9 +803,7 @@ export default async function AdatvedelemPage(props: { params: Promise<{ locale:
           </P>
           <P>
             Adatvédelmi kérdésekkel forduljon hozzánk:{" "}
-            <a href={`mailto:${CONTROLLER_EMAIL}`} className="font-medium text-brand-600 hover:underline">
-              {CONTROLLER_EMAIL}
-            </a>
+            <EmailLink className="font-medium text-brand-600 hover:underline" />
           </P>
 
           <div className="mt-10 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">

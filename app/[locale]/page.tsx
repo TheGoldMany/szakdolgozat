@@ -1,7 +1,5 @@
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, PawPrint, Dog, Cat, Rabbit, Bird, FileWarning, Building2, MapPin } from "lucide-react";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AnimalStatus, ReportStatus } from "@prisma/client";
 import { HomeSearch } from "@/components/home/home-search";
@@ -9,7 +7,7 @@ import { HeroSlideshow } from "@/components/home/hero-slideshow";
 import { HomeSidebar } from "@/components/home/home-sidebar";
 import { FeedClient } from "@/components/feed/feed-client";
 import type { FeedPost } from "@/components/feed/post-card";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { readingMinutes, publishedWhere } from "@/lib/articles";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -17,7 +15,14 @@ import { paymentsEnabled } from "@/lib/payments-enabled";
 import { websiteJsonLd } from "@/lib/structured-data";
 import { JsonLd } from "@/components/seo/json-ld";
 
-export const dynamic = "force-dynamic";
+// A főoldal mindenkinek ugyanaz, ezért gyorsítótárból jön, és percenként
+// frissül. Eddig minden látogatás újrarenderelte (1-4 mp-es szerverválasz),
+// csak azért, hogy a kedvelt cikkeket jelölje: azt most a böngésző kéri le
+// (LikeButton). A build nem állítja elő (üres lista), az első kérés igen.
+export const revalidate = 60;
+export function generateStaticParams() {
+  return [];
+}
 
 /**
  * A kezdőlapnak eddig egyáltalán nem volt saját metaadata: a találati listában
@@ -27,6 +32,7 @@ export const dynamic = "force-dynamic";
  */
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const params = await props.params;
+  setRequestLocale(params.locale);
   const t = await getTranslations("seo");
   return {
     ...pageMetadata({
@@ -48,9 +54,9 @@ const HOME_POSTS = 3;
 
 export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
+  setRequestLocale(params.locale);
   const t        = await getTranslations("home");
   const tAnimals = await getTranslations("animals");
-  const session  = await getServerSession(authOptions);
 
   const [availableCount, shelterCount, adoptedCount, posts, railAnimals, railEvents, railCampaigns, railReports, heroAnimals, sidebarShelters, postTotal, speciesCounts] =
     await Promise.all([
@@ -122,15 +128,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       prisma.animal.groupBy({ by: ["type"], where: { status: AnimalStatus.AVAILABLE }, _count: { _all: true } }),
     ]);
 
-  // Kedvelt poszt-id-k a bejelentkezett felhasználóhoz.
-  let likedIds = new Set<string>();
-  if (session?.user?.id && posts.length) {
-    const likes = await prisma.postLike.findMany({
-      where:  { userId: session.user.id, postId: { in: posts.map((p) => p.id) } },
-      select: { postId: true },
-    });
-    likedIds = new Set(likes.map((l) => l.postId));
-  }
 
   const feedPosts: FeedPost[] = posts.map((p) => ({
     id:        p.id,
@@ -147,7 +144,6 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     event:     p.event ? { ...p.event, startsAt: p.event.startsAt.toISOString() } : null,
     campaign:  p.campaign,
     _count:    p._count,
-    likedByMe: likedIds.has(p.id),
   }));
 
   const feedAnimals   = railAnimals.map((a) => ({ id: a.id, name: a.name, slug: a.slug, breed: a.breed, city: a.shelter.city, shelterName: a.shelter.name, shelterLogoUrl: a.shelter.logoUrl ?? null, imageUrl: a.images[0]?.url ?? null }));
@@ -170,7 +166,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       {/* A kereső innen tudja meg, mi ez az oldal, és innen kínálhat
           saját keresődobozt a találat alatt. */}
       <JsonLd data={websiteJsonLd(params.locale)} />
-    <main className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="bg-white">
@@ -379,7 +375,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
         </div>
       </section>
 
-    </main>
+    </div>
     </>
   );
 }

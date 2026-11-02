@@ -3,6 +3,7 @@ import { huOnlyAlternates } from "@/lib/page-metadata";
 import { Link } from "@/i18n/navigation";
 import { FileText, AlertTriangle, CreditCard, Users, ShieldCheck, Scale } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
+import { EmailLink, EMAIL_AT_TEXT } from "@/components/ui/email-link";
 
 /**
  * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
@@ -25,7 +26,9 @@ export const metadata: Metadata = {
 
 const EFFECTIVE_DATE = "2026. október 27.";
 const PLATFORM_NAME = "ÁllatiMenhelyek.hu";
-const CONTACT_EMAIL = "info@allatimenhelyek.hu";
+// A cím nem szerepel egyben a HTML-ben (robotok gyűjtik): szövegben
+// „[kukac]” alakban, linkként a böngésző rakja össze (EmailLink).
+const CONTACT_EMAIL = EMAIL_AT_TEXT;
 
 function SectionHeading({ number, title }: { number: string; title: string }) {
   return (
@@ -571,7 +574,7 @@ export default async function ASZFPage(props: { params: Promise<{ locale: string
           <SubHeading title="5.2 Egyszeri adományok" />
           <P>
             Az egyszeri adományok visszatérítésmentes önkéntes juttatások. Technikai hiba
-            esetén visszatérítés kérhető a {CONTACT_EMAIL} e-mail-címen, a fizetéstől
+            esetén visszatérítés kérhető a <EmailLink className="font-medium text-brand-600 hover:underline" /> e-mail-címen, a fizetéstől
             számított <strong>5 munkanapon belül</strong>. Minden sikeres egyszeri fizetésről
             Stripe-on keresztül automatikus elektronikus bizonylat kerül kiküldésre a megadott
             e-mail-címre.
@@ -607,7 +610,7 @@ export default async function ASZFPage(props: { params: Promise<{ locale: string
 
           <SubHeading title="5.5 Visszatérítési folyamat" />
           <P>
-            Visszatérítési igényt a <strong>{CONTACT_EMAIL}</strong> e-mail-címen lehet benyújtani,
+            Visszatérítési igényt a <strong><EmailLink /></strong> e-mail-címen lehet benyújtani,
             feltüntetve a fizetés dátumát és összegét. A visszatérítés az eredeti bankkártyára
             vagy fizetési módra történik, általában <strong>5–10 munkanap</strong> alatt.
             A Stripe tranzakciós díja (kb. 1,4% + 50 Ft) visszatérítésre nem kerül, ha a

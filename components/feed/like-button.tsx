@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -11,15 +11,27 @@ import { loginHrefFromHere } from "@/lib/login-redirect";
 interface LikeButtonProps {
   postId:       string;
   initialCount: number;
-  initialLiked: boolean;
+  /** Ha nincs megadva (gyorsítótárazott oldal), bejelentkezve a böngésző kérdezi le. */
+  initialLiked?: boolean;
 }
 
 export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const [liked, setLiked] = useState(initialLiked);
+  const [liked, setLiked] = useState(initialLiked ?? false);
   const [count, setCount] = useState(initialCount);
   const [pending, setPending] = useState(false);
+
+  const userId = session?.user?.id;
+  useEffect(() => {
+    if (initialLiked !== undefined || !userId) return;
+    let cancelled = false;
+    fetch(`/api/posts/${postId}/like`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d && typeof d.liked === "boolean") setLiked(d.liked); })
+      .catch(() => { /* a jelzés hiánya nem hiba */ });
+    return () => { cancelled = true; };
+  }, [initialLiked, userId, postId]);
 
   async function toggle() {
     if (!session?.user?.id) {

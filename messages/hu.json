@@ -2045,7 +2045,7 @@
     "messageLabel": "Üzenet",
     "messagePlaceholder": "Mi történt, és mit vártál volna? Ha hibáról van szó, írd le, mit csináltál előtte.",
     "emailLabel": "E-mail-címed (nem kötelező)",
-    "emailPlaceholder": "pelda@email.hu",
+    "emailPlaceholder": "pelda@example.com",
     "emailHint": "Ha megadod, tudunk válaszolni.",
     "send": "Küldés",
     "sending": "Küldés…",

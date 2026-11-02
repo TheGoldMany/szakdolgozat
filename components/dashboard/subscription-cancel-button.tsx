@@ -42,7 +42,7 @@ export function SubscriptionCancelButton({ subscriptionId }: Props) {
     <button
       onClick={handleCancel}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-60"
+      className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
     >
       {loading && (
         <svg

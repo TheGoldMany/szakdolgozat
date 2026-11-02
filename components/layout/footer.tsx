@@ -6,6 +6,7 @@ import { Mail, Heart, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { paymentsEnabled } from "@/lib/payments-enabled";
 import { FeedbackDialog } from "@/components/layout/feedback-dialog";
+import { EmailLink, EMAIL_AT_TEXT } from "@/components/ui/email-link";
 
 export function Footer() {
   const t    = useTranslations("footer");
@@ -75,13 +76,7 @@ export function Footer() {
             <p className="mt-3 text-sm text-gray-500 leading-relaxed">
               {t("description")}
             </p>
-            <a
-              href="mailto:info@allatimenhelyek.hu"
-              className="mt-4 flex items-center gap-2 py-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              info@allatimenhelyek.hu
-            </a>
+            <EmailLink className="mt-4 flex items-center gap-2 py-1.5 text-sm text-gray-500 hover:text-brand-600 transition-colors" icon={<Mail className="h-4 w-4" />} />
           </div>
 
           {/* Navigation */}

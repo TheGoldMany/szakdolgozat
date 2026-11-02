@@ -220,7 +220,7 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
             )}
           </div>
 
-          <aside className="space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
+          <div className="space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start">
             <section className={cn("rounded-xl border p-5", active ? "border-gray-200 bg-white" : "border-gray-200 bg-gray-100")}>
               {showContact(report.status) ? (
                 <>
@@ -281,7 +281,7 @@ export default async function ReportDetailPage(props: { params: Promise<{ id: st
             {isOwnerOrAdmin && (
               <ReportLocationEditor reportId={report.id} lat={report.lat} lng={report.lng} />
             )}
-          </aside>
+          </div>
 
           <section className="min-w-0 rounded-xl border border-gray-200 bg-white p-5 sm:p-6 lg:col-start-1">
               <h2 className="text-base font-semibold text-gray-900">{t("descSection")}</h2>

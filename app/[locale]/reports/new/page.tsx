@@ -57,7 +57,7 @@ export default async function NewReportPage() {
             />
           </div>
 
-          <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
             {!userId && (
               <div className="rounded-xl border border-gray-200 bg-white p-5 text-sm">
                 <p className="font-semibold text-gray-900">{t("guestNotice")}</p>
@@ -84,7 +84,7 @@ export default async function NewReportPage() {
                 ))}
               </ul>
             </div>
-          </aside>
+          </div>
         </div>
       </div>
     </div>

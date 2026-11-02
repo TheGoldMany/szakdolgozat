@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Mail, MapPin, Clock, PawPrint, ExternalLink } from "lucide-react";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { alternates } from "@/lib/page-metadata";
+import { EmailLink } from "@/components/ui/email-link";
 
 /**
  * Gyorsítótárazható oldal (ISR): nem olvas munkamenetet, és a nyelvet a
@@ -56,12 +57,7 @@ export default async function KapcsolatPage(props: { params: Promise<{ locale: s
             <p className="mt-1 text-sm text-gray-500">
               {t("emailDesc")}
             </p>
-            <a
-              href="mailto:info@allatimenhelyek.hu"
-              className="mt-3 inline-block text-sm font-medium text-brand-600 hover:underline"
-            >
-              info@allatimenhelyek.hu
-            </a>
+            <EmailLink className="mt-3 inline-block text-sm font-medium text-brand-600 hover:underline" />
           </div>
 
           {/* Válaszidő */}
@@ -112,12 +108,9 @@ export default async function KapcsolatPage(props: { params: Promise<{ locale: s
           <p className="mt-2 text-sm text-brand-100 leading-relaxed">
             {t("shelterDesc")}
           </p>
-          <a
-            href="mailto:info@allatimenhelyek.hu?subject=Menhely regisztráció"
-            className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
-          >
+          <EmailLink subject="Menhely regisztráció" className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
             {t("shelterCta")}
-          </a>
+          </EmailLink>
         </div>
 
       </div>

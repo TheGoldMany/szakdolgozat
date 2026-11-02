@@ -257,7 +257,7 @@ export function EventsManager({ shelterId, events }: Props) {
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-50 pt-3">
                   {ev.status === "DRAFT" && (
                     <button onClick={() => changeStatus(ev.id, "PUBLISHED")}
-                      className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600 transition-colors">
+                      className="rounded-lg bg-green-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-800 transition-colors">
                       Közzététel
                     </button>
                   )}
