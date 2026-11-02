@@ -4,7 +4,7 @@ import { LightboxProvider, LightboxTrigger } from "@/components/ui/image-lightbo
 import { Link } from "@/i18n/navigation";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
-import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList, PawPrint } from "lucide-react";
+import { MapPin, Phone, Mail, Ruler, Calendar, Weight, Syringe, Scissors, Wifi, FileText, ClipboardList, PawPrint, Check, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { AdoptionContact } from "@/components/animals/adoption-contact";
@@ -57,7 +57,7 @@ function Trait({ ok, label }: { ok: boolean | null; label: string }) {
       "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
       ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600",
     )}>
-      {ok ? "✓" : "✗"} {label}
+      {ok ? <Check className="h-3.5 w-3.5" aria-hidden /> : <X className="h-3.5 w-3.5" aria-hidden />} {label}
     </span>
   );
 }

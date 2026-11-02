@@ -239,14 +239,14 @@ function TransferCard({
                       disabled={!!isLoading("APPROVED")}
                       className="flex-1 rounded-lg bg-green-600 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
                     >
-                      {isLoading("APPROVED") ? "…" : "✓ Jóváhagyás"}
+                      {isLoading("APPROVED") ? "…" : <span className="inline-flex items-center justify-center gap-1.5"><CheckCircle className="h-4 w-4" aria-hidden /> Jóváhagyás</span>}
                     </button>
                     <button
                       onClick={() => resolve(t, "REJECTED")}
                       disabled={!!isLoading("REJECTED")}
                       className="flex-1 rounded-lg bg-red-600 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
                     >
-                      {isLoading("REJECTED") ? "…" : "✗ Elutasítás"}
+                      {isLoading("REJECTED") ? "…" : <span className="inline-flex items-center justify-center gap-1.5"><XCircle className="h-4 w-4" aria-hidden /> Elutasítás</span>}
                     </button>
                   </>
                 )}

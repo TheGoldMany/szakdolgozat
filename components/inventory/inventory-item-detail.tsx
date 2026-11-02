@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, ArrowDownCircle, ArrowUpCircle, RotateCcw, AlertTriangle, Clock } from "lucide-react";
+import { Pencil, ArrowDownCircle, ArrowUpCircle, RotateCcw, AlertTriangle, Clock, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TransactionModal } from "./transaction-modal";
 import { InventoryItemForm } from "./inventory-item-form";
@@ -207,7 +207,7 @@ export function InventoryItemDetail({ item: initialItem }: { item: Item }) {
           <div className="animate-modal w-full max-w-lg rounded-xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-900">Tétel szerkesztése</h2>
-              <button onClick={() => setShowEdit(false)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 transition-colors">✕</button>
+              <button onClick={() => setShowEdit(false)} aria-label="Bezárás" className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-5">
               <InventoryItemForm shelterId={item.shelterId} item={item} onClose={() => { setShowEdit(false); router.refresh(); }} />

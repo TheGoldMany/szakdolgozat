@@ -205,6 +205,16 @@ input[type="radio"]:checked {
   body[data-cookie-banner] .daily-fab { display: none; }
 }
 
+/* Nyitott billentyűzetnél (lásd mobile-bottom-nav.tsx) a fix alsó elemek
+   eltűnnek, hogy ne takarják a kitöltött mezőt. A mezőhöz görgetéskor pedig
+   marad hely a fejléc alatt és a mező alatt is. */
+@media (max-width: 767px) {
+  body[data-keyboard] .mobile-bottom-nav,
+  body[data-keyboard] .adopt-sticky-bar,
+  body[data-keyboard] .daily-fab { display: none; }
+}
+input, textarea, select { scroll-margin-top: 5rem; scroll-margin-bottom: 6rem; }
+
 /* Az állat adatlapján mobilon tapadó örökbefogadási sáv van az alsó menü
    fölött: a gomb a sáv fölé lép, különben az „Érdeklődöm” gombot takarná. */
 @media (max-width: 767px) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { PawPrint, HandHeart, MapPin, FileWarning, User, LogIn, type LucideIcon } from "lucide-react";
@@ -52,13 +52,36 @@ export function MobileBottomNav() {
   // A jelölő csík ehhez a fülhöz csúszik. -1, ha egyik fülön sem vagyunk
   // (pl. kezdőlap): ilyenkor eltűnik, de a helyét megjegyzi, így a
   // visszatéréskor onnan indul, nem a bal szélről.
+  // Nyitott billentyűzetnél (szövegmező fókuszban) az alsó sáv, a tapadó
+  // örökbefogadási sáv és a lebegő gomb eltűnik: iOS-en a billentyűzet fölé
+  // ugranak, és épp a kitöltött mezőt takarnák. A body jelzőjére a
+  // globals.css rejti el őket.
+  useEffect(() => {
+    const isTextField = (el: EventTarget | null) =>
+      el instanceof HTMLTextAreaElement ||
+      (el instanceof HTMLInputElement && !["checkbox", "radio", "range", "button", "submit", "file", "color"].includes(el.type)) ||
+      (el instanceof HTMLElement && el.isContentEditable);
+    const onIn  = (e: FocusEvent) => { if (isTextField(e.target)) document.body.dataset.keyboard = "open"; };
+    const onOut = () => {
+      // A következő fókusz még nem ismert: egy pillanat múlva nézzük meg.
+      setTimeout(() => { if (!isTextField(document.activeElement)) delete document.body.dataset.keyboard; }, 50);
+    };
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    return () => {
+      document.removeEventListener("focusin", onIn);
+      document.removeEventListener("focusout", onOut);
+      delete document.body.dataset.keyboard;
+    };
+  }, []);
+
   const activeIndex = tabs.findIndex((tab) => isActive(tab.href));
   const lastIndex   = useRef(0);
   if (activeIndex >= 0) lastIndex.current = activeIndex;
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 overflow-hidden border-t border-gray-200 bg-white md:hidden"
+      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-40 overflow-hidden border-t border-gray-200 bg-white md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label={t("openMenu")}
     >

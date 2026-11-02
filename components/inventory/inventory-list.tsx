@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, AlertTriangle, Clock, ChevronRight, Pencil, Trash2, Package } from "lucide-react";
+import { Search, AlertTriangle, Clock, ChevronRight, Pencil, Trash2, Package, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TransactionModal } from "./transaction-modal";
 import { InventoryItemForm } from "./inventory-item-form";
@@ -248,8 +248,8 @@ export function InventoryList({ items, shelterId, isSuperAdmin }: Props) {
           <div className="animate-modal w-full max-w-lg rounded-xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
               <h2 className="text-sm font-semibold text-gray-900">Tétel szerkesztése</h2>
-              <button onClick={() => setEditItem(null)} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 transition-colors">
-                ✕
+              <button onClick={() => setEditItem(null)} aria-label="Bezárás" className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 transition-colors">
+                <X className="h-5 w-5" />
               </button>
             </div>
             <div className="p-5">
