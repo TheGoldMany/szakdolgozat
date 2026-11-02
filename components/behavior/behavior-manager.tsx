@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, Plus, X, Trash2, Save, TrendingUp } from "lucide-react";
 import { FLAG_LABELS, ALL_FLAGS } from "@/lib/behavior";
 import type { AnimalFlag } from "@prisma/client";
+import { userMessage } from "@/lib/client-error";
 
 interface BehaviorEntry {
   id:            string;
@@ -70,7 +71,7 @@ export function BehaviorManager({
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba")); return; }
     setLogs(prev => [data as BehaviorEntry, ...prev]);
     if (withProgress) setProgress(logProgress);
     setShowForm(false); setNote(""); setWithProgress(false);

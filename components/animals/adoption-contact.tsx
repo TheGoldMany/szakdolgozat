@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { MessageCircle, Phone, Mail, Loader2 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface AdoptionContactProps {
   animalId: string;
@@ -27,7 +28,7 @@ export function AdoptionContact({ animalId, animalName, shelter }: AdoptionConta
         body: JSON.stringify({ animalId }),
       });
       const json = await res.json();
-      if (!res.ok) { setError(json.error ?? t("networkError")); return; }
+      if (!res.ok) { setError(userMessage(json.error, t("networkError"))); return; }
       router.push(`/messages/${json.conversationId}`);
     } catch {
       setError(t("networkError"));

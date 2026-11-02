@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 type Sponsorship = {
   id:          string;
@@ -30,10 +31,10 @@ export function SponsorshipsList({ sponsorships }: { sponsorships: Sponsorship[]
     try {
       const res  = await fetch(`/api/sponsorships/${id}/cancel`, { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("networkError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("networkError")));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("networkError"));
+      setError(userMessage(err, t("networkError")));
     } finally {
       setLoading(null);
     }

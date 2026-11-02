@@ -687,7 +687,10 @@
     "cameraHelpInApp": "You opened this page inside an app's built-in browser (e.g. Facebook, Messenger, Instagram), which often can't use the camera. Use the menu in the top corner to open it in Safari or Chrome.",
     "cameraHelpOther": "The browser doesn't have camera permission. Allow the camera for this site in your browser settings, or pick a photo from your gallery.",
     "cameraHelpGallery": "Choose from gallery",
-    "cameraHelpRetry": "Try again"
+    "cameraHelpRetry": "Try again",
+    "errorPageTitle": "Something went wrong",
+    "errorPageDesc": "An error occurred while loading this page. Please try again or go back to the home page.",
+    "errorPageRetry": "Try again"
   },
   "applications": {
     "title": "My applications",

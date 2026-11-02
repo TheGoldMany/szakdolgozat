@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   shelterId: string;
@@ -74,7 +75,7 @@ export function InventoryItemForm({ shelterId, item, onClose }: Props) {
     setSaving(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Mentés sikertelen");
+      setError(userMessage(data.error, "Mentés sikertelen"));
       return;
     }
 

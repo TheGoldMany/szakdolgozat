@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Heart, Loader2, PawPrint, Plus, Sparkles, X, CalendarDays } from "lucide-react";
@@ -142,7 +142,13 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
     }
   }
 
+  // Folyamatban lévő kedvelések: a végpont vált (kedvel/visszavon), ezért egy
+  // gyors dupla koppintás kedvelne, majd vissza is vonná.
+  const likePending = useRef(new Set<string>());
+
   async function toggleLike(id: string) {
+    if (likePending.current.has(id)) return;
+    likePending.current.add(id);
     // Optimista: a szív azonnal váltson, a szám a szerver válaszából javul.
     setPosts((prev) => prev?.map((p) => p.id === id
       ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likeCount + (p.likedByMe ? -1 : 1) }
@@ -160,6 +166,8 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
         ? { ...p, likedByMe: !p.likedByMe, likeCount: p.likeCount + (p.likedByMe ? -1 : 1) }
         : p) ?? prev);
       toast.error(t("networkError"));
+    } finally {
+      likePending.current.delete(id);
     }
   }
 

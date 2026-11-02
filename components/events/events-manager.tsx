@@ -13,6 +13,7 @@ import {
 } from "@/lib/event";
 import type { EventType, EventStatus } from "@prisma/client";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { userMessage } from "@/lib/client-error";
 
 export interface RegistrationEntry {
   id:        string;
@@ -104,7 +105,7 @@ export function EventsManager({ shelterId, events }: Props) {
 
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Hiba történt"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba történt")); return; }
     setShowForm(false); setEditId(null); setForm({ ...EMPTY });
     router.refresh();
   }
@@ -115,7 +116,7 @@ export function EventsManager({ shelterId, events }: Props) {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
-    if (!res.ok) { const d = await res.json(); setError(d.error ?? "Hiba"); return; }
+    if (!res.ok) { const d = await res.json(); setError(userMessage(d.error, "Hiba")); return; }
     router.refresh();
   }
 

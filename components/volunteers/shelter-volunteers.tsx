@@ -7,6 +7,7 @@ import {
   Check, X, UserMinus, Plus, ChevronDown, ChevronUp,
   CalendarDays, Clock, ClipboardList, Users, HandHeart,
 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -268,7 +269,7 @@ function NewTaskForm({ shelterId, onCreated }: { shelterId: string; onCreated: (
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba")); return; }
     setTitle(""); setDescription(""); setScheduledAt(""); setMaxVolunteers("1");
     onCreated(); router.refresh();
   }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 type FieldType = "TEXT" | "TEXTAREA" | "IMAGE" | "FILE";
 
@@ -106,7 +107,7 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("formBuilderSaveFailed"));
+        throw new Error(userMessage(data.error, t("formBuilderSaveFailed")));
       }
       return formId;
     } else {
@@ -117,7 +118,7 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("formBuilderCreateFailed"));
+        throw new Error(userMessage(data.error, t("formBuilderCreateFailed")));
       }
       const data = await res.json();
       return data.id as string;
@@ -138,7 +139,7 @@ export function FormBuilder({
         router.refresh();
       }
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, t("formBuilderSaveFailed")));
     } finally {
       setSaving(false);
     }
@@ -157,12 +158,12 @@ export function FormBuilder({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("formBuilderSubmitFailed"));
+        throw new Error(userMessage(data.error, t("formBuilderSubmitFailed")));
       }
       setSuccess(t("formBuilderSubmitted"));
       router.push("/dashboard/forms");
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, t("formBuilderSaveFailed")));
     } finally {
       setSubmitting(false);
     }

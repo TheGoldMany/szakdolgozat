@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
   const params = await props.params;
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
   }
   if (params.id === session.user.id) {
     return NextResponse.json({ error: "Saját fiókod nem módosíthatod itt" }, { status: 400 });
@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json(user);
   } catch (error) {
     console.error("[api/admin/users/[id] PATCH]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 
@@ -78,7 +78,7 @@ export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: s
   const params = await props.params;
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
   }
   if (params.id === session.user.id) {
     return NextResponse.json({ error: "Saját fiókod nem törölheted itt" }, { status: 400 });

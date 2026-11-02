@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Send } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface ApprovedForm {
   id:    string;
@@ -34,12 +35,12 @@ export function InviteSender({ conversationId, approvedForms }: InviteSenderProp
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error ?? "Meghívó küldése sikertelen");
+        throw new Error(userMessage(data.error, "Meghívó küldése sikertelen"));
       }
       setSuccess(true);
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, "Meghívó küldése sikertelen"));
     } finally {
       setSending(false);
     }

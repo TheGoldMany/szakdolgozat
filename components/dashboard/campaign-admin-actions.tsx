@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Pencil, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 export type CampaignAdminStatus = "PENDING" | "ACTIVE" | "COMPLETED" | "REJECTED";
 
@@ -98,7 +99,7 @@ export function CampaignAdminActions({ campaign, hasDonations }: Props) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(data.error ?? "A mentés nem sikerült.");
+        toast.error(userMessage(data.error, "A mentés nem sikerült."));
         return;
       }
       toast.success("A gyűjtés frissítve.");
@@ -120,7 +121,7 @@ export function CampaignAdminActions({ campaign, hasDonations }: Props) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         // 409: a szerver megindokolja, miért nem törölhető — ezt mutatjuk meg.
-        toast.error(data.error ?? "A törlés nem sikerült.");
+        toast.error(userMessage(data.error, "A törlés nem sikerült."));
         return;
       }
       toast.success("A gyűjtés törölve.");

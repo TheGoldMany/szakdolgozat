@@ -6,6 +6,7 @@ import { ExternalLink, MapPinOff, Pencil, Search, Trash2, X } from "lucide-react
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { userMessage } from "@/lib/client-error";
 
 type ReportType   = "LOST" | "FOUND" | "STRAY";
 type ReportStatus = "ACTIVE" | "RESOLVED" | "CLOSED";
@@ -193,7 +194,7 @@ function EditDialog({ report, onClose, onSaved }: {
       toast.success(body.regeocoded ? "Mentve, a térképes hely is frissült." : "Mentve.");
       onSaved({ ...body.report, createdAt: report.createdAt, thumb: report.thumb, imageCount: report.imageCount });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Nem sikerült menteni.");
+      toast.error(userMessage(err, "Nem sikerült menteni."));
     } finally {
       setSaving(false);
     }

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!tokenOk) {
     const session = await getServerSession(authOptions);
     if (session?.user?.role !== "SUPER_ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS });
+      return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401, headers: CORS });
     }
   }
 

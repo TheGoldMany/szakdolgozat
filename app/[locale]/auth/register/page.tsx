@@ -9,6 +9,7 @@ import { PawPrint, Heart, Shield, Bell, MailCheck, Building2 } from "lucide-reac
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 export default function RegisterPage() {
   const t           = useTranslations("auth");
@@ -17,6 +18,8 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  // Újraküldés közben a gomb nem fogad újabb koppintást (két e-mail menne ki).
+  const [resending, setResending] = useState(false);
 
   const {
     register,
@@ -35,7 +38,7 @@ export default function RegisterPage() {
 
     if (!res.ok) {
       const json = await res.json();
-      setServerError(json.error ?? t("registerErrorGeneric"));
+      setServerError(userMessage(json.error, t("registerErrorGeneric")));
       return;
     }
 
@@ -45,6 +48,8 @@ export default function RegisterPage() {
 
   async function resend() {
     if (!registeredEmail) return;
+    if (resending) return;
+    setResending(true);
     try {
       await fetch("/api/auth/resend-verification", {
         method:  "POST",
@@ -137,6 +142,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={resend}
+                    disabled={resending}
                     className="text-sm font-semibold text-brand-600 hover:underline"
                   >
                     {t("verifyResend")}

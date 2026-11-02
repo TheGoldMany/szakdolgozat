@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Home, AlertTriangle } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface FosterOption { id: string; label: string }
 
@@ -29,7 +30,7 @@ export function FosterAssign({ animalId, currentFosterId, fosters }: Props) {
     });
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? t("error")); return; }
+    if (!res.ok) { setError(userMessage(data.error, t("error"))); return; }
     setValue(fosterId);
     router.refresh();
   }

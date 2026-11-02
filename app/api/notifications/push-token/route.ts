@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/notifications/push-token POST]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 
@@ -71,6 +71,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[api/notifications/push-token DELETE]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 type Tier = {
   name:    string;
@@ -33,11 +34,11 @@ export function SubscriptionsList({ subscriptions }: { subscriptions: Subscripti
     try {
       const res  = await fetch(`/api/subscriptions/${id}/cancel`, { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("networkError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("networkError")));
       toast.success(t("cancelled"));
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("networkError"));
+      toast.error(userMessage(err, t("networkError")));
     } finally {
       setLoading(null);
     }

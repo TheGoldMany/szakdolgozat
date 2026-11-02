@@ -53,6 +53,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, total: missing.length, updated, failed });
   } catch (error) {
     console.error("[api/admin/shelters/geocode]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

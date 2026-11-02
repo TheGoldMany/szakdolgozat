@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightLeft, CheckCircle, XCircle, Undo2, Clock, ChevronDown, ChevronUp, PawPrint } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { userMessage } from "@/lib/client-error";
 
 type TransferStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 
@@ -49,7 +50,7 @@ export function TransfersManager({ initialTransfers, currentShelterId }: Props) 
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error ?? "Hiba történt");
+        alert(userMessage(data.error, "Hiba történt"));
         return;
       }
       // Refresh from server

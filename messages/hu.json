@@ -687,7 +687,10 @@
     "cameraHelpInApp": "Az oldalt egy alkalmazás (pl. Facebook, Messenger, Instagram) belső böngészőjében nyitottad meg, ami sokszor nem kap kamerát. A jobb felső menüből nyisd meg Safariban vagy Chrome-ban.",
     "cameraHelpOther": "A böngésző nem kapott kamera-engedélyt. Engedélyezd a kamerát ennek az oldalnak a böngésző beállításaiban, vagy válassz képet a galériából.",
     "cameraHelpGallery": "Választás a galériából",
-    "cameraHelpRetry": "Újrapróbálom"
+    "cameraHelpRetry": "Újrapróbálom",
+    "errorPageTitle": "Valami félrement",
+    "errorPageDesc": "Az oldal betöltése közben hiba történt. Próbáld újra, vagy térj vissza a főoldalra.",
+    "errorPageRetry": "Újrapróbálom"
   },
   "applications": {
     "title": "Kérelmeim",

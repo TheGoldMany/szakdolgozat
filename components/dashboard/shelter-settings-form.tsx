@@ -10,6 +10,7 @@ import { LocationPicker } from "@/components/ui/location-picker";
 // bekerülne a böngésző bundle-jébe.
 import { PLATFORM_FEE_PERCENT } from "@/lib/donation-limits";
 import { paymentsEnabled } from "@/lib/payments-enabled";
+import { userMessage } from "@/lib/client-error";
 
 interface ShelterDoc {
   id:        string;
@@ -141,11 +142,11 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
       const data = await res.json();
       if (!res.ok) {
         setStripeCode(codeLine(data.stripe));
-        throw new Error(data.error ?? t("analyticsError"));
+        throw new Error(userMessage(data.error, t("analyticsError")));
       }
       window.location.href = data.url;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("tiersUnknownError");
+      const message = userMessage(err, t("tiersUnknownError"));
       setStripeError(message);
       setStripeLoading(false);
     }
@@ -162,10 +163,10 @@ export function ShelterSettingsForm({ shelter, stripeState }: Props) {
         body:    JSON.stringify({ shelterId: shelter.id }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t("analyticsError"));
+      if (!res.ok) throw new Error(userMessage(data.error, t("analyticsError")));
       window.open(data.url, "_blank");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("tiersUnknownError");
+      const message = userMessage(err, t("tiersUnknownError"));
       setStripeError(message);
     } finally {
       setStripeDashLoading(false);

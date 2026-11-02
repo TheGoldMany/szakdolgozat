@@ -89,6 +89,6 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
     });
   } catch (error) {
     console.error("[api/applications/[id]/contract GET]", error);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return Response.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

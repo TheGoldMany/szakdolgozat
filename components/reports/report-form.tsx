@@ -11,6 +11,7 @@ import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 import { LocationPicker } from "@/components/ui/location-picker";
 import { cn } from "@/lib/utils";
 import { REPORT_TYPE_STYLE, SPECIES_ICON } from "@/lib/report-style";
+import { userMessage } from "@/lib/client-error";
 
 function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
   return z.object({
@@ -167,7 +168,7 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
       body: JSON.stringify({ ...data, _hp: honeypotRef.current?.value ?? "" }),
     });
     const json = await res.json();
-    if (!res.ok) { setServerError(json.error ?? tc("error")); return; }
+    if (!res.ok) { setServerError(userMessage(json.error, tc("error"))); return; }
 
     toast.success(t("formSuccess"));
 

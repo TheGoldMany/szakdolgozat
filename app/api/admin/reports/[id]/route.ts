@@ -74,7 +74,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json({ report, regeocoded: Boolean(coords) });
   } catch (error) {
     console.error("[api/admin/reports/[id] PATCH]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 
@@ -102,6 +102,6 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/admin/reports/[id] DELETE]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

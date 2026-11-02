@@ -19,6 +19,6 @@ export async function GET() {
     return NextResponse.json(await publicShelters());
   } catch (error) {
     console.error("[api/shelters GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

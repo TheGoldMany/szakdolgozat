@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, Loader2, MapPin, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 export interface PendingShelter {
   id:        string;
@@ -39,7 +40,7 @@ export function ShelterApprovals({ shelters: initial }: { shelters: PendingShelt
         router.refresh();
       } else {
         const json = await res.json().catch(() => ({}));
-        toast.error(json.error ?? "A hitelesítés sikertelen.");
+        toast.error(userMessage(json.error, "A hitelesítés sikertelen."));
       }
     } finally {
       setBusy(null);

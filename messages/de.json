@@ -687,7 +687,10 @@
     "cameraHelpInApp": "Du hast die Seite im integrierten Browser einer App (z. B. Facebook, Messenger, Instagram) geöffnet, der oft keine Kamera nutzen darf. Öffne sie über das Menü oben in Safari oder Chrome.",
     "cameraHelpOther": "Der Browser hat keine Kameraberechtigung. Erlaube die Kamera für diese Seite in den Browsereinstellungen oder wähle ein Foto aus der Galerie.",
     "cameraHelpGallery": "Aus der Galerie wählen",
-    "cameraHelpRetry": "Erneut versuchen"
+    "cameraHelpRetry": "Erneut versuchen",
+    "errorPageTitle": "Etwas ist schiefgelaufen",
+    "errorPageDesc": "Beim Laden der Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder kehren Sie zur Startseite zurück.",
+    "errorPageRetry": "Erneut versuchen"
   },
   "applications": {
     "title": "Meine Anträge",

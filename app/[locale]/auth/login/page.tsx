@@ -68,6 +68,8 @@ function LoginForm() {
   );
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  // Újraküldés közben a gomb nem fogad újabb koppintást (két e-mail menne ki).
+  const [resending, setResending] = useState(false);
 
   const {
     register,
@@ -109,6 +111,8 @@ function LoginForm() {
 
   async function resendVerification() {
     if (!unverifiedEmail) return;
+    if (resending) return;
+    setResending(true);
     try {
       await fetch("/api/auth/resend-verification", {
         method:  "POST",
@@ -135,6 +139,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={resendVerification}
+                    disabled={resending}
                   className="font-semibold text-brand-600 hover:underline"
                 >
                   {t("verifyResend")}

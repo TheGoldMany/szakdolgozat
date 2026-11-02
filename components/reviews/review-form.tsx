@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { StarRating } from "./star-rating";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   shelterId?:    string;
@@ -34,7 +35,7 @@ export function ReviewForm({ shelterId, targetUserId }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error ?? "Hiba történt");
+        toast.error(userMessage(data.error, "Hiba történt"));
         return;
       }
 

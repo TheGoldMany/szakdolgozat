@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Pencil, X, Check, Info } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Tier {
   id: string;
@@ -67,7 +68,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? t("tiersUnknownError"));
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("tiersUnknownError"));
+      setError(userMessage(err, t("tiersUnknownError")));
     } finally {
       setCreating(false);
     }
@@ -101,7 +102,7 @@ export function TiersManager({ tiers: initialTiers, shelterId, allowedAmounts }:
       setTiers((prev) => prev.map((x) => (x.id === tierId ? { ...x, ...updated } : x)));
       setEditingId(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("tiersUnknownError"));
+      setError(userMessage(err, t("tiersUnknownError")));
     } finally {
       setSaving(false);
     }

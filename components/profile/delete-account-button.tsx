@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signOut }  from "next-auth/react";
 import { Trash2, AlertTriangle, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 const CONFIRM_WORD = "TÖRLÉS";
 
@@ -22,7 +23,7 @@ export function DeleteAccountButton() {
       const res = await fetch("/api/auth/delete-account", { method: "DELETE" });
       if (!res.ok) {
         const json = await res.json();
-        setError(json.error ?? t("deleteError"));
+        setError(userMessage(json.error, t("deleteError")));
         setLoading(false);
         return;
       }

@@ -95,7 +95,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     return NextResponse.json(post);
   } catch (err) {
     console.error("[api/posts/[id] PATCH]", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   item: { id: string; name: string; unit: string; quantity: number };
@@ -53,7 +54,7 @@ export function TransactionModal({ item, onClose }: Props) {
     setSaving(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Sikertelen");
+      setError(userMessage(data.error, "Sikertelen"));
       return;
     }
 

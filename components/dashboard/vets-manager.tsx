@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import { parseCsv } from "@/lib/csv";
 import { safeHref } from "@/lib/safe-url";
+import { userMessage } from "@/lib/client-error";
 
 export interface VetClinic {
   id:           string;
@@ -91,7 +92,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "A mentés nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "A mentés nem sikerült.")); return; }
 
       setVets((prev) => [...prev, data]);
       setShowForm(false);
@@ -116,7 +117,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify({ regeocode: true }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "Nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "Nem sikerült.")); return; }
       setVets((prev) => prev.map((v) => (v.id === id ? data : v)));
       toast[data.lat != null ? "success" : "error"](
         data.lat != null ? "Koordináta frissítve." : "A cím nem volt beazonosítható.",
@@ -180,7 +181,7 @@ export function VetsManager({ initial }: { initial: VetClinic[] }) {
         body:    JSON.stringify({ rows: preview.rows }),
       });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error ?? "Az importálás nem sikerült."); return; }
+      if (!res.ok) { toast.error(userMessage(data.error, "Az importálás nem sikerült.")); return; }
 
       setResult(data as ImportResult);
       setPreview(null);

@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("[api/animals GET]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }
 
@@ -115,7 +115,7 @@ function slugify(text: string) {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   const isSuperAdmin = session.user.role === "SUPER_ADMIN";

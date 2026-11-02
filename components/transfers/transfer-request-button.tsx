@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRightLeft } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Shelter { id: string; name: string }
 
@@ -31,13 +32,13 @@ export function TransferRequestButton({ animalId, animalName, shelters, onSucces
         body:    JSON.stringify({ toShelterId, note: note || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Hiba történt");
+      if (!res.ok) throw new Error(userMessage(data.error, "Hiba történt"));
       setOpen(false);
       setToShelterId("");
       setNote("");
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba");
+      setError(userMessage(err, "Ismeretlen hiba"));
     } finally {
       setLoading(false);
     }

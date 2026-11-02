@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
   }
 
   const { searchParams } = new URL(req.url);

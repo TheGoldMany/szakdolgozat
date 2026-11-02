@@ -7,6 +7,7 @@ import { Plus, X, Trash2, DoorOpen, AlertTriangle } from "lucide-react";
 import { KENNEL_TYPE_LABELS, ALL_KENNEL_TYPES } from "@/lib/kennel";
 import { KENNEL_FACILITIES, emptyFacilities, type KennelFacilityKey } from "@/lib/kennel-facilities";
 import type { KennelType } from "@prisma/client";
+import { userMessage } from "@/lib/client-error";
 
 interface AnimalLite {
   id:       string;
@@ -60,7 +61,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
     });
     const data = await res.json();
     setSaving(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba")); return; }
     setKennels(prev => [...prev, data]);
     setShowForm(false); setName(""); setType("KENNEL"); setCapacity(1); setNote("");
     setFacilities(emptyFacilities());
@@ -80,7 +81,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "A mentés nem sikerült");
+      setError(userMessage(data.error, "A mentés nem sikerült"));
       setKennels(prev => prev.map(k => k.id === kennelId ? { ...k, [key]: !next } : k));
     }
   }
@@ -101,7 +102,7 @@ export function KennelManager({ initialKennels, animals: initialAnimals }: Props
       body:    JSON.stringify({ kennelId }),
     });
     const data = await res.json();
-    if (!res.ok) { setError(data.error ?? "Az áthelyezés nem sikerült"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Az áthelyezés nem sikerült")); return; }
     setAnimals(prev => prev.map(a => a.id === animalId ? { ...a, kennelId } : a));
     router.refresh();
   }

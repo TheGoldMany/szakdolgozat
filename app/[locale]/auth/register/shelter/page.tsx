@@ -8,6 +8,7 @@ import { PawPrint, Building2, BadgeCheck, Users, Heart, MailCheck } from "lucide
 import { shelterRegisterSchema, type ShelterRegisterInput } from "@/lib/validations/auth";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 export default function ShelterRegisterPage() {
   const t       = useTranslations("auth");
@@ -15,6 +16,8 @@ export default function ShelterRegisterPage() {
   const [serverError, setServerError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   const [resent, setResent] = useState(false);
+  // Újraküldés közben a gomb nem fogad újabb koppintást (két e-mail menne ki).
+  const [resending, setResending] = useState(false);
 
   const {
     register,
@@ -31,7 +34,7 @@ export default function ShelterRegisterPage() {
     });
     if (!res.ok) {
       const json = await res.json();
-      setServerError(json.error ?? t("registerError"));
+      setServerError(userMessage(json.error, t("registerError")));
       return;
     }
     setRegisteredEmail(data.email);
@@ -39,6 +42,8 @@ export default function ShelterRegisterPage() {
 
   async function resend() {
     if (!registeredEmail) return;
+    if (resending) return;
+    setResending(true);
     try {
       await fetch("/api/auth/resend-verification", {
         method:  "POST",
@@ -127,7 +132,8 @@ export default function ShelterRegisterPage() {
                 {resent ? (
                   <p className="text-sm font-medium text-green-600">{t("resent")}</p>
                 ) : (
-                  <button type="button" onClick={resend} className="text-sm font-semibold text-brand-600 hover:underline">
+                  <button type="button" onClick={resend}
+                    disabled={resending} className="text-sm font-semibold text-brand-600 hover:underline">
                     {t("resend")}
                   </button>
                 )}

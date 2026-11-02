@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (token !== cronSecret) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   // --------------------------------------------------------------------------

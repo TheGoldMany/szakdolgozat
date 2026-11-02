@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Syringe, Stethoscope, Scissors, HeartPulse, Bug, ClipboardCheck, Trash2, Plus, X } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
   VACCINATION: Syringe,
@@ -78,7 +79,7 @@ export function HealthManager({ animalId, initial }: Props) {
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error ?? "Hiba"); return; }
+    if (!res.ok) { setError(userMessage(data.error, "Hiba")); return; }
     setRecords(prev => [data as HealthEntry, ...prev]);
     setShowForm(false);
     setTitle(""); setDescription(""); setNextDueDate(""); setVetName("");

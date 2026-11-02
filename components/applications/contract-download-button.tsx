@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileDown, Loader2 } from "lucide-react";
+import { userMessage } from "@/lib/client-error";
 
 interface Props {
   applicationId: string;
@@ -18,7 +19,7 @@ export function ContractDownloadButton({ applicationId, animalName }: Props) {
       const res = await fetch(`/api/applications/${applicationId}/contract`);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error ?? "Hiba történt");
+        setError(userMessage(data.error, "Hiba történt"));
         return;
       }
       const blob = await res.blob();

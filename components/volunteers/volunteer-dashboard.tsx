@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
+import { userMessage } from "@/lib/client-error";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -222,7 +223,7 @@ function AvailableTaskCard({ task, userId, onSignup }: {
       await onSignup(task.id);
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : tCommon("error"));
+      setError(userMessage(err, tCommon("error")));
     } finally {
       setLoading(false);
     }
@@ -277,7 +278,7 @@ export function VolunteerDashboard({ data }: Props) {
     const res = await fetch(`/api/volunteer-tasks/${taskId}/assign`, { method: "POST" });
     if (!res.ok) {
       const d = await res.json();
-      throw new Error(d.error ?? tCommon("error"));
+      throw new Error(userMessage(d.error, tCommon("error")));
     }
     setTasks((prev) =>
       prev.map((t) =>

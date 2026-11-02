@@ -9,6 +9,7 @@ import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { MultiImageUpload } from "@/components/ui/multi-image-upload";
 import { MultiDocumentUpload, type DocItem } from "@/components/ui/multi-document-upload";
+import { userMessage } from "@/lib/client-error";
 
 function makeSchema(t: (key: string) => string) {
   return z.object({
@@ -102,7 +103,7 @@ export function AddAnimalForm({ onClose }: { onClose: () => void }) {
       body: JSON.stringify(data),
     });
     const json = await res.json();
-    if (!res.ok) { setServerError(json.error ?? t("animalsFormErrorUnknown")); return; }
+    if (!res.ok) { setServerError(userMessage(json.error, t("animalsFormErrorUnknown"))); return; }
     router.refresh();
     onClose();
   }

@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { PawPrint, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { userMessage } from "@/lib/client-error";
 
 function ResetForm() {
   const t           = useTranslations("auth");
@@ -54,7 +55,7 @@ function ResetForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? t("resetGenericError"));
+        setError(userMessage(json.error, t("resetGenericError")));
         return;
       }
       toast.success(t("resetSuccessTitle"));

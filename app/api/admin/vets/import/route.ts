@@ -168,6 +168,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ created, skipped, duplicates, errors });
   } catch (error) {
     console.error("[api/admin/vets/import]", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Szerverhiba történt. Kérjük, próbáld újra később." }, { status: 500 });
   }
 }

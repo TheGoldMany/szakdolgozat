@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { userMessage } from "@/lib/client-error";
 
 interface FormApprovalActionsProps {
   formId: string;
@@ -24,11 +25,11 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
       const res = await fetch(`/api/application-forms/${formId}/approve`, { method: "POST" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("formApprovalApproveFailed"));
+        throw new Error(userMessage(data.error, t("formApprovalApproveFailed")));
       }
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, t("formApprovalApproveFailed")));
     } finally {
       setLoading(null);
     }
@@ -45,11 +46,11 @@ export function FormApprovalActions({ formId }: FormApprovalActionsProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? t("formApprovalRejectFailed"));
+        throw new Error(userMessage(data.error, t("formApprovalRejectFailed")));
       }
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(userMessage(e, t("formApprovalApproveFailed")));
     } finally {
       setLoading(null);
     }

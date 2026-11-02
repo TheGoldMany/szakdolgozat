@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Users, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 interface TierCardProps {
   tier: {
@@ -38,13 +39,14 @@ export function TierCard({ tier, isSubscribed = false }: TierCardProps) {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Hiba történt");
+        throw new Error(userMessage(data.error, "Hiba történt"));
       }
       const { url } = await res.json();
-      if (url) router.push(url);
+      // Átirányítás közben a gomb maradjon letiltva (lásd donate-form).
+      if (url) { router.push(url); return; }
+      setLoading(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba");
-    } finally {
+      setError(userMessage(err, "Ismeretlen hiba"));
       setLoading(false);
     }
   }

@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
   const params = await props.params;
   const authUser = await getAuthUser(req);
   if (!authUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   }
 
   const conversation = await prisma.conversation.findUnique({

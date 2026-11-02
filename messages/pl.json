@@ -687,7 +687,10 @@
     "cameraHelpInApp": "Strona jest otwarta we wbudowanej przeglądarce aplikacji (np. Facebook, Messenger, Instagram), która często nie ma dostępu do aparatu. Otwórz ją z menu u góry w Safari lub Chrome.",
     "cameraHelpOther": "Przeglądarka nie ma uprawnienia do aparatu. Zezwól na aparat dla tej strony w ustawieniach przeglądarki albo wybierz zdjęcie z galerii.",
     "cameraHelpGallery": "Wybierz z galerii",
-    "cameraHelpRetry": "Spróbuj ponownie"
+    "cameraHelpRetry": "Spróbuj ponownie",
+    "errorPageTitle": "Coś poszło nie tak",
+    "errorPageDesc": "Podczas ładowania strony wystąpił błąd. Spróbuj ponownie lub wróć na stronę główną.",
+    "errorPageRetry": "Spróbuj ponownie"
   },
   "applications": {
     "title": "Moje wnioski",

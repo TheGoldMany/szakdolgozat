@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { PawPrint, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { userMessage } from "@/lib/client-error";
 
 type Status = "loading" | "success" | "error";
 
@@ -15,6 +16,10 @@ function VerifyEmailInner() {
 
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState("");
+  // A token egyszer használható: ha a hatás kétszer futna (Strict Mode, vagy
+  // a fordító objektum változása), a második, „már felhasznált” válasz
+  // felülírná a sikeres képernyőt.
+  const sentFor = useRef<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -22,6 +27,8 @@ function VerifyEmailInner() {
       setMessage(t("verifyFailDesc"));
       return;
     }
+    if (sentFor.current === token) return;
+    sentFor.current = token;
     (async () => {
       try {
         const res = await fetch("/api/auth/verify-email", {
@@ -34,7 +41,7 @@ function VerifyEmailInner() {
           setStatus("success");
         } else {
           setStatus("error");
-          setMessage(data.error ?? t("verifyFailDesc"));
+          setMessage(userMessage(data.error, t("verifyFailDesc")));
         }
       } catch {
         setStatus("error");

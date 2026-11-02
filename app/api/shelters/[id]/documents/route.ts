@@ -23,9 +23,9 @@ async function checkAccess(shelterId: string, userId: string, role: string) {
 export async function GET(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   if (!(await checkAccess(params.id, session.user.id, session.user.role ?? "")))
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
 
   try {
     const docs = await prisma.shelterDocument.findMany({
@@ -42,9 +42,9 @@ export async function GET(_req: NextRequest, props: { params: Promise<{ id: stri
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) return NextResponse.json({ error: "Ehhez be kell jelentkezned." }, { status: 401 });
   if (!(await checkAccess(params.id, session.user.id, session.user.role ?? "")))
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Ehhez nincs jogosultságod." }, { status: 403 });
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success)
