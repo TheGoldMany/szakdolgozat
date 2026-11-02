@@ -6,6 +6,7 @@ import { Heart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { loginHrefFromHere } from "@/lib/login-redirect";
 
 interface LikeButtonProps {
   postId:       string;
@@ -22,7 +23,7 @@ export function LikeButton({ postId, initialCount, initialLiked }: LikeButtonPro
 
   async function toggle() {
     if (!session?.user?.id) {
-      router.push("/auth/login");
+      router.push(loginHrefFromHere());
       return;
     }
     if (pending) return;

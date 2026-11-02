@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,9 @@ import { LocationPicker } from "@/components/ui/location-picker";
 import { cn } from "@/lib/utils";
 import { REPORT_TYPE_STYLE, SPECIES_ICON } from "@/lib/report-style";
 import { userMessage } from "@/lib/client-error";
+
+const REPORT_DRAFT_KEY = "allatimenhelyek:report-draft";
+const REPORT_DRAFT_TTL = 7 * 24 * 60 * 60 * 1000;
 
 function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
   return z.object({
@@ -127,6 +130,8 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
     watch,
     control,
     setValue,
+    reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -159,6 +164,41 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
 
   const honeypotRef = useRef<HTMLInputElement>(null);
 
+  // Piszkozat: egy véletlen visszalépés vagy újratöltés eddig mindent
+  // törölt, pedig a bejelentés kitöltése pár perc, gyakran stresszes
+  // helyzetben. A böngészőben 7 napig megmarad, sikeres beküldéskor törlődik.
+  const [draftRestored, setDraftRestored] = useState(false);
+  const draftLoaded = useRef(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(REPORT_DRAFT_KEY);
+      const draft = raw ? JSON.parse(raw) : null;
+      if (draft?.values && Date.now() - (draft.savedAt ?? 0) < REPORT_DRAFT_TTL) {
+        reset({ ...getValues(), ...draft.values });
+        setDraftRestored(true);
+      }
+    } catch { /* tiltott vagy sérült tároló */ }
+    draftLoaded.current = true;
+  }, [reset, getValues]);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const sub = watch((values) => {
+      if (!draftLoaded.current) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        try { localStorage.setItem(REPORT_DRAFT_KEY, JSON.stringify({ savedAt: Date.now(), values })); } catch { /* tele/tiltott */ }
+      }, 500);
+    });
+    return () => { clearTimeout(timer); sub.unsubscribe(); };
+  }, [watch]);
+  function discardDraft() {
+    try { localStorage.removeItem(REPORT_DRAFT_KEY); } catch { /* nincs mit tenni */ }
+    draftLoaded.current = false;
+    reset();
+    draftLoaded.current = true;
+    setDraftRestored(false);
+  }
+
   async function onSubmit(data: FormData) {
     setServerError(null);
     const res = await fetch("/api/reports", {
@@ -167,9 +207,10 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
       // A csali mező értéke — embernél mindig üres (lásd az API-t).
       body: JSON.stringify({ ...data, _hp: honeypotRef.current?.value ?? "" }),
     });
-    const json = await res.json();
+    const json = await res.json().catch(() => ({}));
     if (!res.ok) { setServerError(userMessage(json.error, tc("error"))); return; }
 
+    try { localStorage.removeItem(REPORT_DRAFT_KEY); } catch { /* nincs mit tenni */ }
     toast.success(t("formSuccess"));
 
     // Kép-alapú párosítás futtatása (legjobb tudás szerint, hibatűrően).
@@ -198,6 +239,14 @@ export function ReportForm({ defaults }: { defaults?: ReportFormDefaults }) {
         defaultValue=""
         style={{ position: "absolute", left: "-10000px", width: 1, height: 1, opacity: 0 }}
       />
+      {draftRestored && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-100 bg-brand-50 px-3 py-2.5 text-sm text-brand-800">
+          <span>{t("draftRestored")}</span>
+          <button type="button" onClick={discardDraft} className="shrink-0 font-semibold underline underline-offset-2">
+            {t("draftDiscard")}
+          </button>
+        </div>
+      )}
       <div className="sticky top-16 z-20 -mx-1 rounded-xl border border-gray-200 bg-white/95 px-3 py-2 backdrop-blur" aria-live="polite">
         <div className="flex items-center justify-between text-xs font-medium text-gray-600">
           <span>{t("formProgress", { done: doneCount, total: steps.length })}</span>

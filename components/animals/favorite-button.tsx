@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { loginHrefFromHere } from "@/lib/login-redirect";
 
 interface Props {
   animalId:         string;
@@ -29,7 +30,7 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
     e.stopPropagation();
 
     if (status === "unauthenticated") {
-      router.push("/auth/login");
+      router.push(loginHrefFromHere());
       return;
     }
     if (loading) return;
@@ -48,7 +49,7 @@ export function FavoriteButton({ animalId, initialFavorited, variant = "overlay"
 
       if (!res.ok) {
         if (res.status === 401) {
-          router.push("/auth/login");
+          router.push(loginHrefFromHere());
           return;
         }
         setFavorited(!next);     // revert

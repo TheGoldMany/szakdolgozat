@@ -24,6 +24,8 @@ function LegendDot({ color, glyph }: { color: string; glyph: MapGlyph }) {
   );
 }
 
+const MAP_PREFS_KEY = "allatimenhelyek:map-filters";
+
 export default function MapView() {
   const t       = useTranslations("map");
   const locale  = useLocale();
@@ -53,14 +55,40 @@ export default function MapView() {
   const [status,       setStatus]       = useState("ACTIVE");
   const [panelOpen,    setPanelOpen]    = useState(false);
 
+  // A szűrők a böngészőben megmaradnak: eddig minden újratöltésnél és
+  // visszatérésnél visszaálltak alaphelyzetbe. Amíg be nem olvastuk őket, nem
+  // töltünk adatot, hogy ne kérjük le kétszer (egyszer az alap-, egyszer a
+  // mentett állapottal).
+  const [prefsReady, setPrefsReady] = useState(false);
   useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(MAP_PREFS_KEY) ?? "null");
+      if (saved && typeof saved === "object") {
+        if (typeof saved.showReports  === "boolean") setShowReports(saved.showReports);
+        if (typeof saved.showShelters === "boolean") setShowShelters(saved.showShelters);
+        if (typeof saved.showVets     === "boolean") setShowVets(saved.showVets);
+        if (typeof saved.typeFilter   === "string")  setTypeFilter(saved.typeFilter);
+        if (["ACTIVE", "RESOLVED", "ALL"].includes(saved.status)) setStatus(saved.status);
+      }
+    } catch { /* tiltott vagy sérült tároló: alapértékek */ }
+    setPrefsReady(true);
+  }, []);
+  useEffect(() => {
+    if (!prefsReady) return;
+    try {
+      localStorage.setItem(MAP_PREFS_KEY, JSON.stringify({ showReports, showShelters, showVets, typeFilter, status }));
+    } catch { /* nincs mit tenni */ }
+  }, [prefsReady, showReports, showShelters, showVets, typeFilter, status]);
+
+  useEffect(() => {
+    if (!prefsReady) return;
     setLoading(true);
     const qs = new URLSearchParams({ status });
     fetch(`/api/map?${qs}`)
       .then(r => r.json())
       .then(d => { setReports(d.reports ?? []); setShelters(d.shelters ?? []); setVets(d.vets ?? []); })
       .finally(() => setLoading(false));
-  }, [status]);
+  }, [status, prefsReady]);
 
   // A jelölő-buborékok szövegei; memoizálva, hogy ne rajzoljuk újra minden rendernél.
   const labels: MapLabels = useMemo(() => ({

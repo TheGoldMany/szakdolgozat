@@ -599,7 +599,9 @@
     "tip1": "Dodaj aktualne, wyraźne zdjęcie, najlepiej całego zwierzęcia.",
     "tip2": "Zaznacz dokładne miejsce na mapie, aby widzieli je też okoliczni mieszkańcy.",
     "tip3": "Opisz znaki szczególne: obrożę, blizny, łaty, zachowanie.",
-    "tip4": "Gdy zwierzę się odnajdzie, oznacz zgłoszenie jako rozwiązane, aby nikt dalej nie szukał."
+    "tip4": "Gdy zwierzę się odnajdzie, oznacz zgłoszenie jako rozwiązane, aby nikt dalej nie szukał.",
+    "draftRestored": "Przywróciliśmy rozpoczęte wcześniej zgłoszenie.",
+    "draftDiscard": "Zacznij od nowa"
   },
   "help": {
     "title": "Podręcznik użytkownika",

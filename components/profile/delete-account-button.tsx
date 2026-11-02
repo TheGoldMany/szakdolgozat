@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { signOut }  from "next-auth/react";
 import { Trash2, AlertTriangle, X } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { userMessage } from "@/lib/client-error";
 
 const CONFIRM_WORD = "TÖRLÉS";
 
 export function DeleteAccountButton() {
   const t = useTranslations("profile");
+  const locale = useLocale();
   const [open,    setOpen]    = useState(false);
   const [input,   setInput]   = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,7 @@ export function DeleteAccountButton() {
         setLoading(false);
         return;
       }
-      await signOut({ callbackUrl: "/" });
+      await signOut({ callbackUrl: locale === "hu" ? "/" : `/${locale}` });
     } catch {
       setError(t("deleteError"));
       setLoading(false);

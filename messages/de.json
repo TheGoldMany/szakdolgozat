@@ -599,7 +599,9 @@
     "tip1": "Lade ein aktuelles, scharfes Foto hoch, am besten vom ganzen Tier.",
     "tip2": "Markiere den genauen Ort auf der Karte, damit ihn auch Menschen in der Nähe sehen.",
     "tip3": "Beschreibe besondere Merkmale: Halsband, Narben, Flecken, Verhalten.",
-    "tip4": "Sobald das Tier wieder da ist, markiere die Meldung als gelöst, damit niemand weitersucht."
+    "tip4": "Sobald das Tier wieder da ist, markiere die Meldung als gelöst, damit niemand weitersucht.",
+    "draftRestored": "Wir haben Ihre angefangene Meldung wiederhergestellt.",
+    "draftDiscard": "Neu beginnen"
   },
   "help": {
     "title": "Benutzerhandbuch",

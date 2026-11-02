@@ -414,7 +414,7 @@ export function Header() {
                     )}
                     <hr className="my-1 border-gray-100" />
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => signOut({ callbackUrl: locale === routing.defaultLocale ? "/" : `/${locale}` })}
                       className="block w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50"
                     >
                       {t("logout")}
@@ -582,7 +582,7 @@ export function Header() {
             {session && (
               <div className="border-t border-gray-100 px-4 py-4">
                 <button
-                  onClick={() => { setMobileOpen(false); signOut({ callbackUrl: "/" }); }}
+                  onClick={() => { setMobileOpen(false); signOut({ callbackUrl: locale === routing.defaultLocale ? "/" : `/${locale}` }); }}
                   className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-100 active:bg-red-200 transition-colors"
                 >
                   {t("logout")}

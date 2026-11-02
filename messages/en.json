@@ -599,7 +599,9 @@
     "tip1": "Upload a recent, sharp photo, ideally showing the whole animal.",
     "tip2": "Mark the exact place on the map so people nearby can see it too.",
     "tip3": "Describe distinctive features: collar, scars, markings, behaviour.",
-    "tip4": "Once the animal is back, mark the report as resolved so people stop searching."
+    "tip4": "Once the animal is back, mark the report as resolved so people stop searching.",
+    "draftRestored": "We restored the report you started earlier.",
+    "draftDiscard": "Start over"
   },
   "help": {
     "title": "User guide",

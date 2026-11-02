@@ -271,7 +271,7 @@ export default async function HomePage(props: { params: Promise<{ locale: string
       </section>
 
       {/* ── "Neked" feed ─────────────────────────────────── */}
-      <section className="bg-gray-50 py-12 lg:py-20">
+      <section className="bg-gray-50 py-8 sm:py-12 lg:py-20">
         <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8 2xl:px-16">
           <div className="flex gap-8 xl:gap-12">
 
