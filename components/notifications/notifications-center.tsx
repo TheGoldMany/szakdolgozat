@@ -159,9 +159,19 @@ export function NotificationsCenter() {
 
       {/* List */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-300" />
-        </div>
+        // Váz a pörgő karika helyett: látszik, milyen tartalom jön, és a lista
+        // betöltéskor nem ugrik.
+        <ul className="space-y-2" aria-busy="true">
+          {[0, 1, 2, 3].map((i) => (
+            <li key={i} className="flex animate-pulse gap-3 rounded-xl border border-gray-100 bg-white p-4">
+              <span className="h-9 w-9 shrink-0 rounded-full bg-gray-100" />
+              <span className="flex-1 space-y-2">
+                <span className="block h-3.5 w-2/3 rounded bg-gray-100" />
+                <span className="block h-3 w-1/3 rounded bg-gray-100" />
+              </span>
+            </li>
+          ))}
+        </ul>
       ) : shown.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 bg-white py-16 text-center">
           <Bell className="mx-auto mb-3 h-10 w-10 text-gray-300" />

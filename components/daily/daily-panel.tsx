@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Heart, Loader2, PawPrint, Plus, Sparkles, X, CalendarDays } from "lucide-react";
+import { Heart, PawPrint, Plus, Sparkles, X, CalendarDays } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -259,11 +259,16 @@ export function DailyPanel({ loggedIn }: { loggedIn: boolean }) {
             </Button>
           )}
 
-        {posts === null && (
-          <p className="flex justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          </p>
-        )}
+        {/* Váz a pörgő karika helyett, a bejegyzések alakjában. */}
+        {posts === null && [0, 1].map((i) => (
+          <div key={i} className="animate-pulse overflow-hidden rounded-xl border border-gray-100 bg-white" aria-busy="true">
+            <div className="flex items-center gap-2 p-3">
+              <span className="h-8 w-8 rounded-full bg-gray-100" />
+              <span className="h-3 w-1/3 rounded bg-gray-100" />
+            </div>
+            <div className="aspect-square w-full bg-gray-100" />
+          </div>
+        ))}
 
         {posts?.length === 0 && (
           <p className="py-8 text-center text-sm text-gray-400">{emptyText}</p>
