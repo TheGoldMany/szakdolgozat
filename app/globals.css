@@ -149,6 +149,17 @@ summary:active {
   animation: pressDown 0.09s ease-out forwards;
 }
 
+/* A térkép elemei (jelölők, csoportjelölők, vezérlők) KIMARADNAK: a Leaflet
+   `role="button"`-t ad nekik, és a helyüket a `transform: translate3d(...)`
+   adja. A nyomás-animáció `transform: scale()`-je ezt felülírta, a jelölő
+   lenyomáskor a térkép bal felső sarkába ugrott, a felengedés már nem rajta
+   történt, így a buborék nem nyílt meg. */
+.leaflet-container [role="button"]:active,
+.leaflet-container button:active,
+.leaflet-marker-icon:active {
+  animation: none !important;
+}
+
 /* Kártya-felület: nagyobb doboz, ezért kisebb elmozdulás adja ugyanazt az
    érzetet. A :active a lenyomott linkről az ősre is átterjed, így elég a
    kártya külső elemére tenni – a képet lefedő "stretched link" is ezt hozza. */
