@@ -59,7 +59,7 @@ export default async function EventsListPage(props: { params: Promise<{ locale: 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-16">
+      <div className="mx-auto max-w-[1600px] px-4 py-8 sm:py-14 lg:py-16 sm:px-6 lg:px-8 2xl:px-16">
         <div className="mb-8 flex items-center gap-3 sm:mb-12">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50">
             <CalendarHeart className="h-6 w-6 text-brand-500" />
