@@ -14,7 +14,7 @@ const schema = z.object({
   name:         z.string().max(100, "A név legfeljebb 100 karakter lehet.").optional(),
   breed:        z.string().max(100, "A fajta legfeljebb 100 karakter lehet.").optional(),
   color:        z.string().max(100, "A szín legfeljebb 100 karakter lehet.").optional(),
-  gender:       z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
+  gender:       z.preprocess((v) => (v === "" ? undefined : v), z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional()),
   description:  z.string().min(10, "A leírás legalább 10 karakter legyen.").max(2000, "A leírás legfeljebb 2000 karakter lehet."),
   city:         z.string().min(1, "Kötelező mező").max(100),
   address:      z.string().max(200, "A cím legfeljebb 200 karakter lehet.").optional(),
