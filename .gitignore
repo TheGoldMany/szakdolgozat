@@ -52,3 +52,6 @@ lib/generated/
 e2e/.auth/
 playwright-report/
 test-results/
+
+# Marketinganyagok (videók), nem a kódtárba valók
+marketing-video/

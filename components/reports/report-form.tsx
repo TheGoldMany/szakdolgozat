@@ -23,7 +23,10 @@ function buildSchema(t: ReturnType<typeof useTranslations<"reports">>) {
     name:         z.string().optional(),
     breed:        z.string().optional(),
     color:        z.string().optional(),
-    gender:       z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
+    // Az „Ismeretlen” opció értéke üres szöveg: azt „nincs megadva”-ként
+    // kezeljük. Enélkül a z.enum elutasította, és aki nem választott nemet,
+    // annak a beküldés csendben elakadt (a mezőnél nincs hibaüzenet).
+    gender:       z.preprocess((v) => (v === "" ? undefined : v), z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional()),
     description:  z.string().min(10, t("validationDescMin")),
     city:         z.string().min(1, t("validationRequired")),
     address:      z.string().optional(),
