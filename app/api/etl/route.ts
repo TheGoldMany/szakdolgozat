@@ -13,6 +13,11 @@ import {
 // Vercel Pro: 60s; Hobby: 10s (optimalizált batch-ekkel elegendő)
 export const maxDuration = 60;
 
+/** Egy connection string hostja és adatbázisa, jelszó és felhasználónév nélkül (naplózáshoz). */
+function hostOf(url: string | undefined): string {
+  try { const u = new URL(url ?? ""); return `${u.hostname}${u.pathname}`; } catch { return "(ismeretlen)"; }
+}
+
 // POST /api/etl  – védett: Bearer <ETL_SECRET> VAGY bejelentkezett SUPER_ADMIN
 export async function POST(req: NextRequest) {
   const auth  = req.headers.get("authorization") ?? "";
@@ -29,7 +34,25 @@ export async function POST(req: NextRequest) {
     actorId = session.user.id;
   }
 
-  const log: string[] = [];
+  // Preview-védelem: az ETL teljes újratöltés, minden DWH-táblát töröl. Amíg a
+  // preview ugyanazt az adattárházat használja, mint az éles oldal, egy
+  // preview-n indított futás az éles DWH-t írná felül. Ezért preview-ban csak
+  // akkor fut, ha a Preview környezetben külön DWH van beállítva, és ezt a
+  // PREVIEW_DWH_SEPARATE=1 jelzi. A PREVIEW_DWH_FORBIDDEN_HOSTS (vesszővel
+  // elválasztott hostnevek, pl. az éles DWH hostja) második védővonal.
+  const dwhHost = hostOf(process.env.dwh_POSTGRES_PRISMA_URL);
+  if (process.env.VERCEL_ENV === "preview") {
+    const forbidden = (process.env.PREVIEW_DWH_FORBIDDEN_HOSTS ?? "")
+      .split(",").map((h) => h.trim().toLowerCase()).filter(Boolean);
+    if (process.env.PREVIEW_DWH_SEPARATE !== "1" || forbidden.some((h) => dwhHost.toLowerCase().startsWith(h))) {
+      return NextResponse.json(
+        { error: "Preview-ban az ETL csak külön adattárházon futhat (PREVIEW_DWH_SEPARATE).", dwhHost },
+        { status: 409 },
+      );
+    }
+  }
+
+  const log: string[] = [`DWH: ${dwhHost}`];
   const startedAt = new Date();
   const t0 = Date.now();
 
